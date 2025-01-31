@@ -5,12 +5,6 @@ import SearchFilter from './utils/SearchFilter.jsx';
 
 const Home = () => {
   const [showFilters, setShowFilters] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const handleCardClick = async (id) => {
-    await fetchTireById(id); // Obtén los datos específicos de la rueda
-    setIsModalOpen(true); // Abre el modal
-  };
 
   return (
     <>
