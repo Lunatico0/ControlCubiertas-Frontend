@@ -1,8 +1,8 @@
 import React, { useContext, useState } from 'react';
-import apiContext from '../context/apiContext.jsx';
-import TireDetails from './utils/TireDetails.jsx';
 import Card from './Card.jsx';
 import UpdateTire from './utils/UpdateTire.jsx';
+import TireDetails from './utils/TireDetails.jsx';
+import apiContext from '../context/apiContext.jsx';
 import Swal from 'sweetalert2';
 
 const CardList = () => {
