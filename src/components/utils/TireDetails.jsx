@@ -91,41 +91,52 @@ const TireDetails = ({ selectedLoading, selectedTire, setIsTireModalOpen, setTir
                   </div>
                 </div>
               </div>
+
               <div className="mt-4">
                 <h3 className="font-semibold mb-2">Histórico:</h3>
-                <table className="w-full border-collapse text-left">
-                  <thead>
-                    <tr className="border-b border-gray-500">
-                      <th>Fecha</th>
-                      <th>Hora</th>
-                      <th>Mobil</th>
-                      <th>Patente</th>
-                      <th>Km</th>
-                      <th>Estado</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {selectedTire.history.map((record, index) => (
-                      <tr key={index} className="border-b border-gray-500">
-                        <td>{new Date(record.date).toLocaleDateString('es-AR')}</td>
-                        <td>{new Date(record.date).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', hour12: false })}</td>
-                        <td>{record.vehicle && `${record.vehicle.mobile}`}</td>
-                        <td>{record.vehicle && `${record.vehicle.licensePlate}`}</td>
-                        <td>{record.km}</td>
-                        <td>{record.status}</td>
+                <div className="max-h-64 border border-gray-500 rounded overflow-hidden">
+                  <table className="w-full border-collapse text-center">
+                    <thead className="bg-gray-300 dark:bg-gray-700">
+                      <tr className="border-b border-gray-500">
+                        <th className="p-1 w-1/6 text-left">Fecha</th>
+                        <th className="p-1 w-1/6 text-left">Hora</th>
+                        <th className="p-1 w-1/6">Móvil</th>
+                        <th className="p-1 w-1/6">Patente</th>
+                        <th className="p-1 w-1/6 text-left pl-4">Km</th>
+                        <th className="p-1 pr-12 w-1/6">Estado</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                  </table>
+
+                  <div className="max-h-52 overflow-y-auto">
+                    <table className="w-full border-collapse text-left">
+                      <tbody>
+                        {selectedTire.history
+                          .slice()
+                          .reverse()
+                          .map((record, index) => (
+                            <tr key={index} className="border-b border-gray-500">
+                              <td className="p-1 w-1/6">{new Date(record.date).toLocaleDateString('es-AR')}</td>
+                              <td className="p-1 w-1/6">{new Date(record.date).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', hour12: false })}</td>
+                              <td className={`p-1 w-1/6 text-nowrap ${!record.vehicle && 'text-center'}`}>{record.vehicle ? record.vehicle.mobile : '-'}</td>
+                              <td className={`p-1 w-1/6 text-nowrap ${!record.vehicle && 'text-center'}`}>{record.vehicle ? record.vehicle.licensePlate : '-'}</td>
+                              <td className="p-1 w-1/6">{record.km}</td>
+                              <td className="p-1 w-1/6 text-nowrap">{record.status}</td>
+                            </tr>
+                          ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
               </div>
+
               {
                 selectedTire.status !== "Descartada" && (
                   <div className="flex justify-around mt-6 items-center">
                     <h2>Marcar como:</h2>
                     <button className={`
                       px-4 py-2 rounded
-                      text-black
-                      dark:text-white
+                      text-white
                       ${selectedTire.status == "Nueva" && `bg-primer-recap`}
                       ${selectedTire.status == "1er Recapado" && `bg-segundo-recap`}
                       ${selectedTire.status == "2do Recapado" && `bg-tercer-recap`}
@@ -148,7 +159,7 @@ const TireDetails = ({ selectedLoading, selectedTire, setIsTireModalOpen, setTir
                       selectedTire.status !== "3er Recapado" && (
                         selectedTire.status !== "Descartada" && (
                           <button
-                            className="bg-red-500 px-4 py-2 rounded text-black dark:text-white"
+                            className="bg-red-500 px-4 py-2 rounded text-white"
                             onClick={() => handleQuickUpdate("Descartada")}
                           >
                             Descartada
