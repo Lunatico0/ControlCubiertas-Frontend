@@ -12,7 +12,8 @@ const CardList = () => {
     error,
     fetchTireById,
     selectedTire,
-    selectedLoading
+    selectedLoading,
+    tireCount
   } = useContext(apiContext);
 
   const [tireToUpdate, setTireToUpdate] = useState(null)
@@ -56,7 +57,8 @@ const CardList = () => {
   };
 
   if (loading) return <p>Cargando...</p>;
-  if (error) return <p>{error}</p>;
+  if (tireCount == 0) return <p>No hay datos para mostrar</p>
+  if (error) return <p>{error}</p>
 
   return (
     <div>

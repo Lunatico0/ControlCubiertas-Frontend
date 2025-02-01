@@ -80,6 +80,23 @@ const SearchFilter = ({ showFilters, setShowFilters }) => {
 
             <div className="flex flex-col gap-2 pt-2">
               <div className="flex flex-row flex-nowrap justify-between gap-2 items-center">
+                <h2>Ordenar por:</h2>
+                <select
+                  className="rounded bg-gray-300 text-black flex-grow"
+                  value={filters.sortBy}
+                  onChange={(e) => setFilters({ ...filters, sortBy: e.target.value })}
+                >
+                  <option value="">Ninguno</option>
+                  <option value="status">Estado</option>
+                  <option value="codeAsc">Código (ascendente)</option>
+                  <option value="codeDesc">Código (descendente)</option>
+                  <option value="kmAsc">Kilómetros (ascendente)</option>
+                  <option value="kmDesc">Kilómetros (descendente)</option>
+                </select>
+                <button onClick={() => setFilters({ ...filters, sortBy: "" })}>✖</button>
+              </div>
+
+              <div className="flex flex-row flex-nowrap justify-between gap-2 items-center">
                 <h2>Estado:</h2>
                 <select
                   className="rounded bg-gray-300 text-black flex-grow"

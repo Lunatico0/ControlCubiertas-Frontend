@@ -9,7 +9,10 @@ const Home = () => {
   return (
     <>
       <HelpNew />
-      <SearchFilter showFilters={showFilters} setShowFilters={setShowFilters} />
+      <SearchFilter
+        showFilters={showFilters}
+        setShowFilters={setShowFilters}
+      />
       <TireList />
     </>
   )

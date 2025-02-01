@@ -17,12 +17,14 @@ export const ApiProvider = ({ children }) => {
   const [availableVehicles, setAvailableVehicles] = useState([]);
   const [vehiclesWTires, setVehiclesWTires] = useState([]);
   const tireCount = data?.length || 0;
+  const stateOrder = ["Nueva", "1er Recapado", "2do Recapado", "3er Recapado", "Descartada"];
   const [filters, setFilters] = useState({
     status: "",
     brand: "",
     vehicle: "",
     kmFrom: "",
     kmTo: "",
+    sortBy: "",
   });
 
   const suggestCode = (data) => {
@@ -160,7 +162,6 @@ export const ApiProvider = ({ children }) => {
 
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
-
       filtered = filtered.filter((tire) =>
         tire.code.toString().includes(query) ||
         Object.values(tire).some(value =>
@@ -195,17 +196,38 @@ export const ApiProvider = ({ children }) => {
       filtered = filtered.filter((tire) => tire.kilometers <= parseInt(filters.kmTo));
     }
 
+    if (filters.sortBy) {
+      filtered = [...filtered].sort((a, b) => {
+        switch (filters.sortBy) {
+          case "status":
+            return stateOrder.indexOf(a.status) - stateOrder.indexOf(b.status);
+          case "codeAsc":
+            return a.code - b.code;
+          case "codeDesc":
+            return b.code - a.code;
+          case "kmAsc":
+            return a.kilometers - b.kilometers;
+          case "kmDesc":
+            return b.kilometers - a.kilometers;
+          default:
+            return 0;
+        }
+      });
+    }
+
     setFilteredTireData(filtered);
   }, [searchQuery, filters, data]);
 
+
   useEffect(() => {
     if (data) {
-      setAvailableStatuses([...new Set(data.map(tire => tire.status))]);
+      setAvailableStatuses(
+        stateOrder.filter(status => data.some(tire => tire.status === status))
+      );
       setAvailableBrands([...new Set(data.map(tire => tire.brand))]);
       setVehiclesWTires([...new Set(data.map(tire => tire.vehicle?.mobile || 'Sin asignar'))]);
     }
   }, [data]);
-
 
   useEffect(() => {
     fetchData();
