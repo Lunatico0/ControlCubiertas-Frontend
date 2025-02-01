@@ -1,6 +1,12 @@
 import React from 'react';
 
-const Card = ({ data, handleCardClick }) => {
+const Card = ({ data, handleCardClick, setTireToUpdate, setIsUpdateTireModalOpen, handlePasswordCheck }) => {
+
+  const handleEdit = (id) => {
+    setIsUpdateTireModalOpen(true);
+    handlePasswordCheck()
+    setTireToUpdate(id);
+  }
 
   return (
     <>
@@ -18,6 +24,7 @@ const Card = ({ data, handleCardClick }) => {
             </div>
             <div className='p-4 pb-12 flex flex-col items-start w-60 bg-gray-200 text-black dark:bg-gray-900 dark:text-white'>
               <h2 className='font-semibold'>Marca: <span className='font-normal'>{item.brand}</span></h2>
+              <h2 className='font-semibold'>Codigo: <span className='font-normal'>{item.code}</span></h2>
               <h2 className='font-semibold'>Medidas: <span className='font-normal'>{item.size}</span></h2>
               <h2 className='font-semibold'>Dibujo: <span className='font-normal'>{item.pattern}</span></h2>
               <h2 className='font-semibold'>Estado: <span className='capitalize font-normal'>{item.status}</span></h2>
@@ -25,6 +32,7 @@ const Card = ({ data, handleCardClick }) => {
             </div>
             <button
               className='absolute px-2 py-1 bottom-2 right-2 rounded bg-slate-600 text-white'
+              onClick={() => handleEdit(item._id)}
             >
               Editar ✏️
             </button>

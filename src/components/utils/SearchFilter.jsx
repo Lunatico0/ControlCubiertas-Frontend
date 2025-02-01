@@ -5,7 +5,7 @@ import ApiContext from '../../context/apiContext.jsx';
 const SearchFilter = ({ showFilters, setShowFilters }) => {
   const modalRef = useRef(null);
   const {
-    searchQuery, setSearchQuery, filters, setFilters, availableBrands, availableStatuses, availableVehicles, tireCount
+    searchQuery, setSearchQuery, filters, setFilters, availableBrands, availableStatuses, vehiclesWTires, tireCount
   } = useContext(ApiContext);
 
   useEffect(() => {
@@ -127,7 +127,7 @@ const SearchFilter = ({ showFilters, setShowFilters }) => {
                   onChange={(e) => setFilters({ ...filters, vehicle: e.target.value })}
                 >
                   <option value="" hidden></option>
-                  {availableVehicles.map((vehicle, index) => (
+                  {vehiclesWTires.map((vehicle, index) => (
                     <option
                       key={index}
                       value={vehicle}

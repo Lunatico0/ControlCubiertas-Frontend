@@ -1,6 +1,42 @@
-import React from 'react'
+import React, { useContext, useState } from 'react'
+import ApiContext from '../../context/apiContext.jsx';
 
-const TireDetails = ({ selectedLoading, selectedTire, setIsTireModalOpen }) => {
+const TireDetails = ({ selectedLoading, selectedTire, setIsTireModalOpen, setTireToUpdate, setIsUpdateTireModalOpen, handlePasswordCheck }) => {
+  const { updateTire } = useContext(ApiContext);
+  const [formData, setFormData] = useState({
+    brand: selectedTire.brand,
+    size: selectedTire.size,
+    pattern: selectedTire.pattern,
+    status: selectedTire.status,
+    kilometers: selectedTire.kilometers,
+    vehicle: selectedTire.vehicle,
+  });
+
+  const handleEdit = (id) => {
+    setIsUpdateTireModalOpen(true);
+    handlePasswordCheck();
+    setTireToUpdate(id);
+  }
+
+  const handleQuickUpdate = async (newStatus) => {
+    const updatedData = {
+      ...formData,
+      status: newStatus,
+      vehicle: formData?.vehicle === ("Sin asignar" || null) ? null : (formData?.vehicle?._id),
+    };
+
+    try {
+      console.log("Datos enviados:", updatedData);
+      await updateTire(selectedTire._id, updatedData);
+      setFormData((prevData) => ({
+        ...prevData,
+        status: newStatus,
+      }));
+    } catch (error) {
+      console.error("Error al actualizar la cubierta:", error);
+    }
+  };
+
   return (
     <div
       className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 w-full h-full"
@@ -38,7 +74,12 @@ const TireDetails = ({ selectedLoading, selectedTire, setIsTireModalOpen }) => {
                 </div>
                 <div className='border-l-2 border-gray-500 h-64'></div>
                 <div className='flex flex-col h-64 justify-evenly relative'>
-                  <button className='px-4 py-2 border border-gray-900 dark:border-gray-300 rounded w-fit absolute right-1 top-0'>Editar ✏️</button>
+                  <button
+                    className='px-4 py-2 border border-gray-900 dark:border-gray-300 rounded w-fit absolute right-1 top-0'
+                    onClick={() => handleEdit(selectedTire._id)}
+                  >
+                    Editar ✏️
+                  </button>
                   <div className='flex flex-col items-start mt-8 ml-6 text-lg'>
                     <h3 className="font-semibold">Marca: <span className='font-normal'>{selectedTire.brand}</span></h3>
                     <h3 className="font-semibold">Medidas: <span className='font-normal'>{selectedTire.size}</span></h3>
@@ -67,11 +108,11 @@ const TireDetails = ({ selectedLoading, selectedTire, setIsTireModalOpen }) => {
                     {selectedTire.history.map((record, index) => (
                       <tr key={index} className="border-b border-gray-500">
                         <td>{new Date(record.date).toLocaleDateString('es-AR')}</td>
-                        <td>{new Date(record.date).toLocaleTimeString('es-AR', {hour: '2-digit', minute:'2-digit', hour12: false})}</td>
+                        <td>{new Date(record.date).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', hour12: false })}</td>
                         <td>{record.vehicle && `${record.vehicle.mobile}`}</td>
                         <td>{record.vehicle && `${record.vehicle.licensePlate}`}</td>
                         <td>{record.km}</td>
-                        <td>{record.state}</td>
+                        <td>{record.status}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -90,18 +131,27 @@ const TireDetails = ({ selectedLoading, selectedTire, setIsTireModalOpen }) => {
                       ${selectedTire.status == "2do Recapado" && `bg-tercer-recap`}
                       ${selectedTire.status == "3er Recapado" && `bg-descartada`}
                       ${selectedTire.status == "Descartada" && `bg-descartada`}
-                    `}>
+                    `}
+                      onClick={() => handleQuickUpdate(
+                        selectedTire.status == "Nueva" ? "1er Recapado" :
+                          selectedTire.status == "1er Recapado" ? "2do Recapado" :
+                            selectedTire.status == "2do Recapado" ? "3er Recapado" : "Descartada"
+                      )}
+                    >
                       {
                         selectedTire.status == "Nueva" ? "1er Recapado" :
-                        selectedTire.status == "1er Recapado" ? "2do Recapado" :
-                        selectedTire.status == "2do Recapado" ? "3er Recapado" : "Descartar"
+                          selectedTire.status == "1er Recapado" ? "2do Recapado" :
+                            selectedTire.status == "2do Recapado" ? "3er Recapado" : "Descartada"
                       }
                     </button>
                     {
                       selectedTire.status !== "3er Recapado" && (
                         selectedTire.status !== "Descartada" && (
-                          <button className="bg-red-500 px-4 py-2 rounded text-black dark:text-white">
-                            Descartar
+                          <button
+                            className="bg-red-500 px-4 py-2 rounded text-black dark:text-white"
+                            onClick={() => handleQuickUpdate("Descartada")}
+                          >
+                            Descartada
                           </button>
                         )
                       )
