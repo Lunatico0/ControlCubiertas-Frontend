@@ -5,7 +5,7 @@ const TireDetails = ({ selectedLoading, selectedTire, setIsTireModalOpen, setTir
   const { updateTire } = useContext(ApiContext);
   const [formData, setFormData] = useState({
     brand: selectedTire.brand,
-    size: selectedTire.size,
+    date: selectedTire.history?.[0]?.date || new Date().toISOString().split("T")[0], // Toma la fecha del historial o la fecha actual
     pattern: selectedTire.pattern,
     status: selectedTire.status,
     kilometers: selectedTire.kilometers,
@@ -26,7 +26,6 @@ const TireDetails = ({ selectedLoading, selectedTire, setIsTireModalOpen, setTir
     };
 
     try {
-      console.log("Datos enviados:", updatedData);
       await updateTire(selectedTire._id, updatedData);
       setFormData((prevData) => ({
         ...prevData,
@@ -64,12 +63,12 @@ const TireDetails = ({ selectedLoading, selectedTire, setIsTireModalOpen, setTir
             <div className="text-sm">
               <div className='flex items-center justify-evenly'>
                 <div className={`flex items-center justify-center h-64 relative rounded-xl
-            ${selectedTire.status == "Nueva" && 'bg-nueva'}
-            ${selectedTire.status == "1er Recapado" && 'bg-primer-recap'}
-            ${selectedTire.status == "2do Recapado" && 'bg-segundo-recap'}
-            ${selectedTire.status == "3er Recapado" && 'bg-tercer-recap'}
-            ${selectedTire.status == "Descartada" && 'bg-descartada'}
-          `}>
+                  ${selectedTire.status == "Nueva" && 'bg-nueva'}
+                  ${selectedTire.status == "1er Recapado" && 'bg-primer-recap'}
+                  ${selectedTire.status == "2do Recapado" && 'bg-segundo-recap'}
+                  ${selectedTire.status == "3er Recapado" && 'bg-tercer-recap'}
+                  ${selectedTire.status == "Descartada" && 'bg-descartada'}
+                `}>
                   <img src="/Cubierta.png" alt="Cubierta" className='w-56 justify-center items-center' />
                 </div>
                 <div className='border-l-2 border-gray-500 h-64'></div>
@@ -82,7 +81,7 @@ const TireDetails = ({ selectedLoading, selectedTire, setIsTireModalOpen, setTir
                   </button>
                   <div className='flex flex-col items-start mt-8 ml-6 text-lg'>
                     <h3 className="font-semibold">Marca: <span className='font-normal'>{selectedTire.brand}</span></h3>
-                    <h3 className="font-semibold">Medidas: <span className='font-normal'>{selectedTire.size}</span></h3>
+                    <h3 className="font-semibold">Fecha: <span className='font-normal'>{new Date(selectedTire.history?.[0]?.date).toLocaleDateString('es-AR')}</span></h3>
                     <h3 className="font-semibold">Dibujo: <span className='font-normal'>{selectedTire.pattern}</span></h3>
                     <h3 className="font-semibold">Estado: <span className='font-normal'>{selectedTire.status}</span></h3>
                     <h3 className="font-semibold">Codigo: <span className='font-normal'>{selectedTire.code}</span></h3>

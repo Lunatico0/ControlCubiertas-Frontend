@@ -16,6 +16,7 @@ export const ApiProvider = ({ children }) => {
   const [availableStatuses, setAvailableStatuses] = useState([]);
   const [availableVehicles, setAvailableVehicles] = useState([]);
   const [vehiclesWTires, setVehiclesWTires] = useState([]);
+  const [updateTrigger, setUpdateTrigger] = useState(false);
   const tireCount = data?.length || 0;
   const stateOrder = ["Nueva", "1er Recapado", "2do Recapado", "3er Recapado", "Descartada"];
   const [filters, setFilters] = useState({
@@ -91,6 +92,7 @@ export const ApiProvider = ({ children }) => {
         throw new Error(result.message || "Error desconocido al guardar la cubierta.");
       }
 
+      setUpdateTrigger(prev => !prev);
       return result;
     } catch (error) {
       console.error("Error en fetchNewTire:", error);
@@ -150,6 +152,7 @@ export const ApiProvider = ({ children }) => {
         throw new Error(result.message || "Error desconocido al actualizar la cubierta.");
       }
 
+      setUpdateTrigger(prev => !prev);
       return result;
     } catch (error) {
       console.error("Error en updateTire:", error);
@@ -230,9 +233,13 @@ export const ApiProvider = ({ children }) => {
   }, [data]);
 
   useEffect(() => {
-    fetchData();
     fetchVehicles();
+    fetchData();
   }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, [updateTrigger]);
 
   return (
     <ApiContext.Provider

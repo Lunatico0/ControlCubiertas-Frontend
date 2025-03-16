@@ -6,7 +6,7 @@ const UpdateTire = ({ id, setIsUpdateTireModalOpen }) => {
 
   const [formData, setFormData] = useState({
     brand: '',
-    size: '',
+    date: '',
     pattern: '',
     status: '',
     kilometers: '',
@@ -19,7 +19,7 @@ const UpdateTire = ({ id, setIsUpdateTireModalOpen }) => {
         await fetchTireById(id);
         setFormData({
           brand: selectedTire?.brand || '',
-          size: selectedTire?.size || '',
+          date: new Date().toISOString().split("T")[0],
           pattern: selectedTire?.pattern || '',
           status: selectedTire?.status || '',
           kilometers: selectedTire?.kilometers || '',
@@ -32,6 +32,7 @@ const UpdateTire = ({ id, setIsUpdateTireModalOpen }) => {
 
     if (id) loadTireData();
   }, [id]);
+
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -86,12 +87,11 @@ const UpdateTire = ({ id, setIsUpdateTireModalOpen }) => {
 
           <input
             className="p-2 border rounded w-full"
-            type="text"
-            name="size"
-            value={formData.size}
+            type="date"
+            name="date"
+            value={formData.date}
             onChange={handleChange}
-            placeholder="Medidas"
-            required
+            placeholder="Fecha"
           />
 
           <input

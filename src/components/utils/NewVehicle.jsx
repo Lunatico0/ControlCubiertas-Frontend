@@ -120,7 +120,7 @@ const NewVehicle = ({ setIsVehicleModalOpen }) => {
                 className="flex items-center justify-between border p-2 rounded text-black bg-gray-100 dark:bg-gray-800 dark:text-white dark:border-gray-900"
               >
                 <p>
-                  <strong>{tire.brand}</strong> - {tire.size} - {tire.pattern} - Código: {tire.code}
+                  <strong>{tire.brand}</strong> - {tire.pattern} - Código: {tire.code}
                 </p>
                 <button
                   type="button"
@@ -160,7 +160,7 @@ const NewVehicle = ({ setIsVehicleModalOpen }) => {
                         className="p-2 hover:bg-gray-200 dark:hover:bg-gray-600 cursor-pointer flex justify-between"
                         onClick={() => handleAddTire(tire)}
                       >
-                        <span>{tire.code} - {tire.brand} - {tire.size}</span>
+                        <span>{tire.code} - {tire.brand}</span>
                         <button className="p-1 bg-green-500 text-white rounded">Seleccionar</button>
                       </div>
                     ))

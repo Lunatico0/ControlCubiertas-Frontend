@@ -11,33 +11,35 @@ const NewTire = ({ setIsTireModalOpen }) => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   useEffect(() => {
-      const handleKeyDown = (e) => {
-        if (e.key === "Escape") setIsSearchOpen(false);
-      };
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") setIsSearchOpen(false);
+    };
 
-      const handleClickOutside = (e) => {
-        if (!e.target.closest(".toolbox")) setIsSearchOpen(false);
-      };
+    const handleClickOutside = (e) => {
+      if (!e.target.closest(".toolbox")) setIsSearchOpen(false);
+    };
 
-      document.addEventListener("keydown", handleKeyDown);
-      document.addEventListener("click", handleClickOutside);
+    document.addEventListener("keydown", handleKeyDown);
+    document.addEventListener("click", handleClickOutside);
 
-      return () => {
-        document.removeEventListener("keydown", handleKeyDown);
-        document.removeEventListener("click", handleClickOutside);
-      };
-    }, []);
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      document.removeEventListener("click", handleClickOutside);
+    };
+  }, []);
 
   const handleFormSubmit = async (data) => {
     const newTire = {
       status: data.status,
       code: data.code || suggestedCode,
       brand: data.brand,
-      size: data.size,
+      createdAt: data.createdAt,
       pattern: data.pattern,
       kilometers: data.kilometers || 0,
       vehicle: data.vehicle || null,
     };
+
+    console.log(data)
 
     try {
       await fetchNewTire(newTire);
@@ -95,9 +97,16 @@ const NewTire = ({ setIsTireModalOpen }) => {
           />
 
           <input {...register("brand")} type="text" placeholder="Marca" className="p-2 rounded" required />
-          <input {...register("size")} type="text" placeholder="Medidas" className="p-2 rounded"  />
           <input {...register("pattern")} type="text" placeholder="Dibujo" className="p-2 rounded" />
           <input {...register("kilometers")} type="number" placeholder="Km iniciales" className="p-2 rounded" />
+
+          {/* NUEVO: Campo de fecha con valor sugerido */}
+          <input
+            {...register("createdAt")}
+            type="date"
+            defaultValue={new Date().toISOString().split("T")[0]} // Sugerir la fecha actual
+            className="p-2 rounded"
+          />
 
           <div className="flex flex-col space-y-2">
             <label className="text-sm font-medium">Asignación inicial (opcional)</label>
@@ -150,6 +159,7 @@ const NewTire = ({ setIsTireModalOpen }) => {
             </button>
           </div>
         </form>
+
       </div>
     </div>
   );
