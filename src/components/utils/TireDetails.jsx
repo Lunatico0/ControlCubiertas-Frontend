@@ -1,5 +1,6 @@
 import React, { useContext, useState } from 'react'
 import ApiContext from '../../context/apiContext.jsx';
+import cubiertaIMG from '/Cubierta.png';
 
 const TireDetails = ({ selectedLoading, selectedTire, setIsTireModalOpen, setTireToUpdate, setIsUpdateTireModalOpen, handlePasswordCheck }) => {
   const { updateTire } = useContext(ApiContext);
@@ -69,7 +70,7 @@ const TireDetails = ({ selectedLoading, selectedTire, setIsTireModalOpen, setTir
                   ${selectedTire.status == "3er Recapado" && 'bg-tercer-recap'}
                   ${selectedTire.status == "Descartada" && 'bg-descartada'}
                 `}>
-                  <img src="/Cubierta.png" alt="Cubierta" className='w-56 justify-center items-center' />
+                  <img src={cubiertaIMG} alt="Cubierta" className='w-56 justify-center items-center' />
                 </div>
                 <div className='border-l-2 border-gray-500 h-64'></div>
                 <div className='flex flex-col h-64 justify-evenly relative'>

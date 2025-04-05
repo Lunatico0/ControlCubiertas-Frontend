@@ -1,6 +1,8 @@
-import React, { useState } from 'react'
-import NewVehicle from './NewVehicle.jsx'
-import NewTire from './NewTire.jsx'
+import React, { useState } from 'react';
+import NewVehicle from './NewVehicle.jsx';
+import NewTire from './NewTire.jsx';
+import camionIMG from '/Camion.png';
+import cubiertaIMG from '/Cubierta.png';
 
 const New = ({ setIsNewModalOpen }) => {
 
@@ -40,7 +42,7 @@ const New = ({ setIsNewModalOpen }) => {
             className="grid grid-flow-col-dense place-items-center w-full h-40 rounded-xl bg-vehiculo p-4"
             onClick={handleNewVehicle}
           >
-            <img src="/Camion.png" alt="Camion" className="h-auto max-h-32" />
+            <img src={camionIMG} alt="Camion" className="h-auto max-h-32" />
             <h2 className="text-3xl text-black">Nuevo vehículo</h2>
           </button>
 
@@ -48,7 +50,7 @@ const New = ({ setIsNewModalOpen }) => {
             className="grid grid-flow-col-dense place-items-center w-full h-40 rounded-xl bg-cubierta p-4"
             onClick={handleNewTire}
           >
-            <img src="/Cubierta.png" alt="Cubierta" className="h-auto max-h-28" />
+            <img src={cubiertaIMG} alt="Cubierta" className="h-auto max-h-28" />
             <h2 className="text-3xl text-black">Nueva cubierta</h2>
           </button>
         </div>

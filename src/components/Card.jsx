@@ -1,4 +1,5 @@
 import React from 'react';
+import cubiertaIMG from '/Cubierta.png';
 
 const Card = ({ data, handleCardClick, setTireToUpdate, setIsUpdateTireModalOpen, handlePasswordCheck }) => {
 
@@ -20,7 +21,7 @@ const Card = ({ data, handleCardClick, setTireToUpdate, setIsUpdateTireModalOpen
               ${item.status == "3er Recapado" && 'bg-tercer-recap'}
               ${item.status == "Descartada" && 'bg-descartada'}
             `}>
-              <img src="/Cubierta.png" alt="Cubierta" className='w-56 justify-center items-center cursor-pointer' onClick={() => handleCardClick(item._id)} />
+              <img src={cubiertaIMG} alt="Cubierta" className='w-56 justify-center items-center cursor-pointer' onClick={() => handleCardClick(item._id)} />
             </div>
             <div className='p-4 pb-12 flex flex-col items-start w-60 bg-gray-200 text-black dark:bg-gray-900 dark:text-white'>
               <h2 className='font-semibold'>Marca: <span className='font-normal'>{item.brand}</span></h2>
