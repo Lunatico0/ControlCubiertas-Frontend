@@ -89,7 +89,7 @@ const UpdateTire = ({ id, setIsUpdateTireModalOpen }) => {
             className="p-2 border rounded w-full"
             type="date"
             name="date"
-            value={formData.date}
+            value={formData.date || new Date().toISOString().split("T")[0]}
             onChange={handleChange}
             placeholder="Fecha"
           />

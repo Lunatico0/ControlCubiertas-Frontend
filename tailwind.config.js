@@ -7,11 +7,11 @@ export default {
   theme: {
     extend: {
       colors: {
-        "nueva": '#22c55e',
-        "primer-recap": '#0080ff',
-        "segundo-recap": '#ff00bf',
-        "tercer-recap": '#bf00ff',
-        "descartada": '#ef4444',
+        "nueva": '#0000ff',
+        "primer-recap": '#1db51d',
+        "segundo-recap": '#ffff00',
+        "tercer-recap": '#ff8000',
+        "descartada": '#ef2222',
         "vehiculo": '#b2f2bb',
         "cubierta": '#a5d8ff',
       },

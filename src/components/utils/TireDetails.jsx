@@ -6,7 +6,7 @@ const TireDetails = ({ selectedLoading, selectedTire, setIsTireModalOpen, setTir
   const { updateTire } = useContext(ApiContext);
   const [formData, setFormData] = useState({
     brand: selectedTire.brand,
-    date: selectedTire.history?.[0]?.date || new Date().toISOString().split("T")[0], // Toma la fecha del historial o la fecha actual
+    date: new Date().toISOString().split("T")[0], // Toma la fecha del historial o la fecha actual
     pattern: selectedTire.pattern,
     status: selectedTire.status,
     kilometers: selectedTire.kilometers,
@@ -22,6 +22,7 @@ const TireDetails = ({ selectedLoading, selectedTire, setIsTireModalOpen, setTir
   const handleQuickUpdate = async (newStatus) => {
     const updatedData = {
       ...formData,
+      date: new Date().toISOString(),
       status: newStatus,
       vehicle: formData?.vehicle === ("Sin asignar" || null) ? null : (formData?.vehicle?._id),
     };
@@ -36,6 +37,7 @@ const TireDetails = ({ selectedLoading, selectedTire, setIsTireModalOpen, setTir
       console.error("Error al actualizar la cubierta:", error);
     }
   };
+
 
   return (
     <div
@@ -99,7 +101,6 @@ const TireDetails = ({ selectedLoading, selectedTire, setIsTireModalOpen, setTir
                     <thead className="bg-gray-300 dark:bg-gray-700">
                       <tr className="border-b border-gray-500">
                         <th className="p-1 w-1/6 text-left">Fecha</th>
-                        <th className="p-1 w-1/6 text-left">Hora</th>
                         <th className="p-1 w-1/6">Móvil</th>
                         <th className="p-1 w-1/6">Patente</th>
                         <th className="p-1 w-1/6 text-left pl-4">Km</th>
@@ -117,7 +118,6 @@ const TireDetails = ({ selectedLoading, selectedTire, setIsTireModalOpen, setTir
                           .map((record, index) => (
                             <tr key={index} className="border-b border-gray-500">
                               <td className="p-1 w-1/6">{new Date(record.date).toLocaleDateString('es-AR')}</td>
-                              <td className="p-1 w-1/6">{new Date(record.date).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', hour12: false })}</td>
                               <td className={`p-1 w-1/6 text-nowrap ${!record.vehicle && 'text-center'}`}>{record.vehicle ? record.vehicle.mobile : '-'}</td>
                               <td className={`p-1 w-1/6 text-nowrap ${!record.vehicle && 'text-center'}`}>{record.vehicle ? record.vehicle.licensePlate : '-'}</td>
                               <td className="p-1 w-1/6">{record.km}</td>
