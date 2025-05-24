@@ -1,7 +1,7 @@
 import React, { useState, useContext } from 'react';
-import TireList from './TireList.jsx';
-import HelpNew from './utils/HelpNew.jsx';
-import SearchFilter from './utils/SearchFilter.jsx';
+import TireList from './TireList/TireList.jsx';
+import HelpNew from './HelpNew.jsx';
+import SearchFilter from './SearchFilter.jsx';
 
 const Home = () => {
   const [showFilters, setShowFilters] = useState(false);

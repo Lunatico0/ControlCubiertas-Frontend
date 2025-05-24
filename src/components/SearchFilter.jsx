@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
-import ApiContext from '../../context/apiContext.jsx';
+import ApiContext from '../context/apiContext.jsx';
 
 const SearchFilter = ({ showFilters, setShowFilters }) => {
   const modalRef = useRef(null);

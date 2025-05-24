@@ -1,24 +1,38 @@
 import React, { createContext, useState, useEffect } from 'react';
+import { getSuggestedCode } from "../utils/suggestedCode";
+
+import {
+  fetchAllTires,
+  fetchTireById,
+  createTire,
+  updateTireStatus,
+  assignTireToVehicle,
+  unassignTireFromVehicle,
+  updateTireDataCorrection,
+  getReceiptNumber
+} from "../api/tires";
+
+import {
+  fetchAllVehicles,
+  fetchVehicleById,
+  createVehicle,
+  updateVehicle
+} from "../api/vehicles";
 
 const ApiContext = createContext();
 
 export const ApiProvider = ({ children }) => {
-  const URL = import.meta.env.VITE_API_URL;
-  const [data, setData] = useState(null);
-  const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [tires, setTires] = useState([]);
+  const [vehicles, setVehicles] = useState([]);
   const [filteredTireData, setFilteredTireData] = useState([]);
   const [selectedTire, setSelectedTire] = useState(null);
-  const [suggestedCode, setSuggestedCode] = useState("");
-  const [availableBrands, setAvailableBrands] = useState([]);
+  const [refreshFlag, setRefreshFlag] = useState(false);
+
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [selectedLoading, setSelectedLoading] = useState(true);
-  const [availableStatuses, setAvailableStatuses] = useState([]);
-  const [availableVehicles, setAvailableVehicles] = useState([]);
-  const [vehiclesWTires, setVehiclesWTires] = useState([]);
-  const [updateTrigger, setUpdateTrigger] = useState(false);
-  const tireCount = data?.length || 0;
-  const stateOrder = ["Nueva", "1er Recapado", "2do Recapado", "3er Recapado", "Descartada"];
+
+  const [searchQuery, setSearchQuery] = useState("");
   const [filters, setFilters] = useState({
     status: "",
     brand: "",
@@ -28,245 +42,188 @@ export const ApiProvider = ({ children }) => {
     sortBy: "",
   });
 
-  const suggestCode = (data) => {
-    let currentCode = 0;
-    data.forEach(tire => {
-      currentCode <= tire.code && (currentCode = tire.code)
-    });
-    setSuggestedCode(prev => currentCode++);
-  }
+  const [availableBrands, setAvailableBrands] = useState([]);
+  const [availableStatuses, setAvailableStatuses] = useState([]);
+  const [vehiclesWTires, setVehiclesWTires] = useState([]);
+  const [suggestedCode, setSuggestedCode] = useState("");
+  const [updateTrigger, setUpdateTrigger] = useState(false);
 
-  const fetchData = async () => {
+  const tireCount = tires?.length || 0;
+  const stateOrder = ['Nueva', '1er Recapado', '2do Recapado', '3er Recapado', 'A recapar', 'Descartada'];
+
+  const triggerGlobalRefresh = () => {
+    setRefreshFlag(prev => !prev); // cambia de true <-> false para que los useEffect reaccionen
+  };
+
+  const replaceTireInList = (updatedTire) => {
+    setTires(prev =>
+      prev.map(t => t._id === updatedTire._id ? updatedTire : t)
+    );
+  };
+
+  const loadTires = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${URL}/api/tires`);
-      const result = await response.json();
-      suggestCode(result)
-      setData(result);
+      const result = await fetchAllTires();
+      setTires(result);
       setFilteredTireData(result);
+      setSuggestedCode(getSuggestedCode(result));
     } catch (err) {
-      setError('Error al obtener los datos');
+      setError('Error al obtener las cubiertas');
     } finally {
       setLoading(false);
     }
   };
 
-  const fetchNewVehicle = async (data) => {
+  const loadVehicles = async () => {
     try {
-      const response = await fetch(`${URL}/api/vehicles`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw result;
-      }
-
-      return result;
-    } catch (error) {
-      console.error("Error en fetchNewVehicle:", error);
-      throw error;
+      const result = await fetchAllVehicles();
+      setVehicles(result);
+    } catch (err) {
+      console.error("Error al obtener vehículos:", err);
     }
   };
 
-  const fetchNewTire = async (data) => {
-    try {
-      const response = await fetch(`${URL}/api/tires`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        if (result.message && result.message.includes("E11000 duplicate key error")) {
-          const match = result.message.match(/dup key: { code: (\d+) }/);
-          const duplicatedCode = match ? match[1] : "desconocido";
-          throw new Error(`Error de código duplicado: el código ${duplicatedCode} ya existe.`);
-        }
-
-        throw new Error(result.message || "Error desconocido al guardar la cubierta.");
-      }
-
-      setUpdateTrigger(prev => !prev);
-      return result;
-    } catch (error) {
-      console.error("Error en fetchNewTire:", error);
-      throw error;
-    }
-  };
-
-  const fetchVehicles = async () => {
-    try {
-      const response = await fetch(`${URL}/api/vehicles`);
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error("Error al obtener los vehículos");
-      }
-
-      setAvailableVehicles(result);
-    } catch (error) {
-      console.error("Error en fetchVehicles:", error);
-    }
-  };
-
-  const fetchTireById = async (id) => {
+  const loadTireById = async (id) => {
     try {
       setSelectedLoading(true);
-      const response = await fetch(`${URL}/api/tires/${id}`);
-      const result = await response.json();
+      const result = await fetchTireById(id);
       setSelectedTire(result);
-    } catch (err) {
-      setError('Error al obtener los datos de la rueda');
+    } catch {
+      setError("Error al obtener la cubierta");
     } finally {
       setSelectedLoading(false);
     }
   };
 
-  const updateTire = async (id, data) => {
-    const formattedData = {
-      ...data,
-      vehicle: data.vehicle ? { _id: data.vehicle } : null,
-    };
-    try {
-      const response = await fetch(`${URL}/api/tires/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formattedData),
-      });
+  const handleCreateTire = async (data) => {
+    const result = await createTire(data);
+    setUpdateTrigger(prev => !prev);
+    return result;
+  };
 
-      const result = await response.json();
-
-      if (!response.ok) {
-        if (result.message && result.message.includes("E11000 duplicate key error")) {
-          const match = result.message.match(/dup key: { code: (\d+) }/);
-          const duplicatedCode = match ? match[1] : "desconocido";
-          throw new Error(`Error de código duplicado: el código ${duplicatedCode} ya existe.`);
-        }
-
-        throw new Error(result.message || "Error desconocido al actualizar la cubierta.");
-      }
-
-      setUpdateTrigger(prev => !prev);
-      return result;
-    } catch (error) {
-      console.error("Error en updateTire:", error);
-      throw error;
-    }
+  const handleCreateVehicle = async (data) => {
+    const result = await createVehicle(data);
+    await loadVehicles();
+    return result;
   };
 
   useEffect(() => {
-    let filtered = data;
+    let filtered = [...tires];
 
     if (searchQuery) {
-      const query = searchQuery.toLowerCase();
+      const q = searchQuery.toLowerCase();
       filtered = filtered.filter((tire) =>
-        tire.code.toString().includes(query) ||
+        tire.code.toString().includes(q) ||
         Object.values(tire).some(value =>
-          typeof value === "string" ? value.toLowerCase().includes(query) : false
-        ) || (tire.vehicle && tire.vehicle?.mobile.toLowerCase().includes(query))
+          typeof value === "string" && value.toLowerCase().includes(q)
+        ) || (tire.vehicle?.mobile?.toLowerCase().includes(q))
       );
     }
 
     if (filters.status) {
-      filtered = filtered.filter((tire) => tire.status.toLowerCase() === filters.status.toLowerCase());
+      filtered = filtered.filter(t => t.status.toLowerCase() === filters.status.toLowerCase());
     }
 
     if (filters.brand) {
-      filtered = filtered.filter((tire) => tire.brand === filters.brand);
+      filtered = filtered.filter(t => t.brand === filters.brand);
     }
 
     if (filters.vehicle) {
       if (filters.vehicle.toLowerCase() === "sin asignar") {
-        filtered = filtered.filter(
-          (tire) => tire.vehicle === null || tire.vehicle === "sin asignar"
-        );
+        filtered = filtered.filter(t => !t.vehicle || t.vehicle === "sin asignar");
       } else {
-        filtered = filtered.filter((tire) => tire.vehicle?.mobile === filters.vehicle);
+        filtered = filtered.filter(t => t.vehicle?.mobile === filters.vehicle);
       }
     }
 
     if (filters.kmFrom) {
-      filtered = filtered.filter((tire) => tire.kilometers >= parseInt(filters.kmFrom));
+      filtered = filtered.filter(t => t.kilometers >= parseInt(filters.kmFrom));
     }
 
     if (filters.kmTo) {
-      filtered = filtered.filter((tire) => tire.kilometers <= parseInt(filters.kmTo));
+      filtered = filtered.filter(t => t.kilometers <= parseInt(filters.kmTo));
     }
 
     if (filters.sortBy) {
-      filtered = [...filtered].sort((a, b) => {
+      filtered.sort((a, b) => {
         switch (filters.sortBy) {
-          case "status":
-            return stateOrder.indexOf(a.status) - stateOrder.indexOf(b.status);
-          case "codeAsc":
-            return a.code - b.code;
-          case "codeDesc":
-            return b.code - a.code;
-          case "kmAsc":
-            return a.kilometers - b.kilometers;
-          case "kmDesc":
-            return b.kilometers - a.kilometers;
-          default:
-            return 0;
+          case "status": return stateOrder.indexOf(a.status) - stateOrder.indexOf(b.status);
+          case "codeAsc": return a.code - b.code;
+          case "codeDesc": return b.code - a.code;
+          case "kmAsc": return a.kilometers - b.kilometers;
+          case "kmDesc": return b.kilometers - a.kilometers;
+          default: return 0;
         }
       });
     }
 
     setFilteredTireData(filtered);
-  }, [searchQuery, filters, data]);
-
+  }, [searchQuery, filters, tires]);
 
   useEffect(() => {
-    if (data) {
+    if (tires.length) {
       setAvailableStatuses(
-        stateOrder.filter(status => data.some(tire => tire.status === status))
+        stateOrder.filter(status => tires.some(t => t.status === status))
       );
-      setAvailableBrands([...new Set(data.map(tire => tire.brand))]);
-      setVehiclesWTires([...new Set(data.map(tire => tire.vehicle?.mobile || 'Sin asignar'))]);
+      setAvailableBrands([...new Set(tires.map(t => t.brand))]);
+      setVehiclesWTires([...new Set(tires.map(t => t.vehicle?.mobile || 'Sin asignar'))]);
     }
-  }, [data]);
+  }, [tires]);
 
   useEffect(() => {
-    fetchVehicles();
-    fetchData();
+    loadVehicles();
+    loadTires();
   }, []);
 
   useEffect(() => {
-    fetchData();
+    loadTires();
   }, [updateTrigger]);
 
   return (
     <ApiContext.Provider
       value={{
-        data,
-        loading,
-        error,
+        // Datos
+        tires,
+        vehicles,
         selectedTire,
-        selectedLoading,
-        filteredTireData,
-        searchQuery,
-        filters,
-        availableBrands,
-        availableStatuses,
-        availableVehicles,
-        tireCount,
-        suggestedCode,
         vehiclesWTires,
-        setVehiclesWTires,
-        fetchTireById,
-        updateTire,
-        setSearchQuery,
+        availableBrands,
+        filteredTireData,
+        availableStatuses,
+
+        // Estados
+        error,
+        loading,
+        tireCount,
+        refreshFlag,
+        suggestedCode,
+        selectedLoading,
+
+        // Acciones
+        loadTires,
+        loadVehicles,
+        loadTireById,
+        updateVehicle,
+        handleCreateTire,
+        updateTireStatus,
+        getReceiptNumber,
+        fetchVehicleById,
+        replaceTireInList,
+        handleCreateVehicle,
+        assignTireToVehicle,
+        triggerGlobalRefresh,
+        unassignTireFromVehicle,
+        updateTireDataCorrection,
+
+        // UI
+        setTires,
         setFilters,
-        fetchNewVehicle,
-        fetchNewTire,
-        fetchVehicles
-      }}>
+        setSearchQuery,
+        filters,
+        searchQuery,
+      }}
+    >
       {children}
     </ApiContext.Provider>
   );

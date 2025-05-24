@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Help from './Help.jsx';
-import New from './New.jsx';
+import New from './New/New.jsx';
 
 const HelpNew = () => {
   const [isNewModalOpen, setIsNewModalOpen] = useState(false);

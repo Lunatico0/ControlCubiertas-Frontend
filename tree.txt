@@ -1,0 +1,47 @@
+
+¦   .env
+¦   .gitignore
+¦   eslint.config.js
+¦   index.html
+¦   package-lock.json
+¦   package.json
+¦   postcss.config.js
+¦   README.md
+¦   tailwind.config.js
+¦   vercel.json
+¦   vite.config.js
+¦   
++---.vscode
+¦
++---node_modules
+¦
++---public
+¦       Camion.png
+¦       Cubierta.png
+¦       TMBC.ico
+¦       TMBC.png
+¦       
++---src
+    ¦   App.css
+    ¦   App.jsx
+    ¦   index.css
+    ¦   main.jsx
+    ¦   
+    +---components
+    ¦   ¦   Card.jsx
+    ¦   ¦   Home.jsx
+    ¦   ¦   TireList.jsx
+    ¦   ¦   
+    ¦   +---utils
+    ¦           Help.jsx
+    ¦           HelpNew.jsx
+    ¦           New.jsx
+    ¦           NewTire.jsx
+    ¦           NewVehicle.jsx
+    ¦           SearchFilter.jsx
+    ¦           TireDetails.jsx
+    ¦           UpdateTire.jsx
+    ¦           
+    +---context
+            apiContext.jsx
+            
