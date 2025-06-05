@@ -12,7 +12,7 @@ import { showToast } from "@utils/toast"
  * @param {Function} props.onClose - Función para cerrar el modal
  * @param {Function} props.onSuccess - Función a ejecutar después de crear el vehículo
  */
-const NewVehicleModal = ({ onClose, onSuccess }) => {
+const NewVehicle = ({ onClose, onSuccess }) => {
   const { tires, handleCreateVehicle } = useContext(ApiContext)
 
   // Filtrar solo cubiertas disponibles (sin asignar)
@@ -97,4 +97,4 @@ const NewVehicleModal = ({ onClose, onSuccess }) => {
   )
 }
 
-export default NewVehicleModal
+export default NewVehicle

@@ -1,3 +1,3 @@
-export { default as New } from "./New"
-export { default as NewTireModal } from "./NewTire"
-export { default as NewVehicleModal } from "./NewVehicle"
+export { default as New } from "./New.jsx"
+export { default as NewTire } from "./NewTire.jsx"
+export { default as NewVehicle } from "./NewVehicle.jsx"

@@ -1,6 +1,6 @@
 import { useState } from "react"
-import NewVehicleModal from "./NewVehicle"
-import NewTireModal from "./NewTire"
+import NewVehicle from "./NewVehicle"
+import NewTire from "./NewTire"
 import Modal from "../ui/Modal"
 
 /**
@@ -75,8 +75,8 @@ const New = ({ onClose }) => {
       </Modal>
 
       {/* Modales secundarios */}
-      {activeModal === "vehicle" && <NewVehicleModal onClose={handleCloseModal} onSuccess={handleCloseAll} />}
-      {activeModal === "tire" && <NewTireModal onClose={handleCloseModal} onSuccess={handleCloseAll} />}
+      {activeModal === "vehicle" && <NewVehicle onClose={handleCloseModal} onSuccess={handleCloseAll} />}
+      {activeModal === "tire" && <NewTire onClose={handleCloseModal} onSuccess={handleCloseAll} />}
     </>
   )
 }

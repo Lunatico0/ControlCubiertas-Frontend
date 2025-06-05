@@ -1,6 +1,6 @@
 import { useState } from "react"
-import Help from "./Help"
-import { New } from "./new"
+import Help from './Help'
+import { New } from './New'
 
 /**
  * Componente que combina la ayuda y el botón para agregar nuevos elementos

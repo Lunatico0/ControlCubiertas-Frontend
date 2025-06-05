@@ -1,4 +1,3 @@
-// Componentes principales
 export { default as Home } from "./Home"
 export { default as Help } from "./Help"
 export { default as HelpNew } from "./HelpNew"
@@ -20,7 +19,7 @@ export * from "./TireList"
 export * from "./UpdateTire"
 
 // Componentes de creación
-export * from "./new"
+export * from "./New"
 
 // Componentes de UI
 export * from "./ui"

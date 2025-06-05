@@ -11,7 +11,7 @@ import { useCreateEntity } from "@hooks/useCreateEntity"
  * @param {Function} props.onClose - Función para cerrar el modal
  * @param {Function} props.onSuccess - Función a ejecutar después de crear la cubierta
  */
-const NewTireModal = ({ onClose, onSuccess }) => {
+const NewTire = ({ onClose, onSuccess }) => {
   const { handleCreateTire, vehicles, suggestedCode } = useContext(ApiContext)
   const { validateOrderNumber } = useOrderValidation()
 
@@ -22,7 +22,7 @@ const NewTireModal = ({ onClose, onSuccess }) => {
   )
 
   const handleSubmit = async (data) => {
-    console.log("🚀 NewTireModal: Datos recibidos del formulario:", data)
+    console.log("🚀 NewTire: Datos recibidos del formulario:", data)
 
     const newTire = {
       status: data.status || "Nueva",
@@ -36,7 +36,7 @@ const NewTireModal = ({ onClose, onSuccess }) => {
       vehicle: data.vehicle || null,
     }
 
-    console.log("📦 NewTireModal: Datos preparados para enviar:", newTire)
+    console.log("📦 NewTire: Datos preparados para enviar:", newTire)
     await create(newTire, onSuccess || onClose)
   }
 
@@ -107,4 +107,4 @@ const NewTireModal = ({ onClose, onSuccess }) => {
   )
 }
 
-export default NewTireModal
+export default NewTire
