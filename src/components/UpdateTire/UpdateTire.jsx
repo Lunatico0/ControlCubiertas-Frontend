@@ -1,7 +1,7 @@
 import { useEffect, useContext, useState } from "react"
 import ApiContext from "@context/apiContext"
 import TireForm from "@components/Forms/TireForm"
-import Modal from "@components/ui/Modal"
+import Modal from "@components/UI/Modal"
 import { useOrderValidation } from "@hooks/useOrderValidation"
 import { showToast } from "@utils/toast"
 

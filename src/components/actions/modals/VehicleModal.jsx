@@ -1,7 +1,7 @@
 import { useContext } from "react"
 import ApiContext from "@context/apiContext"
 import VehicleForm from "@components/Forms/VehicleForm"
-import Modal from "@components/ui/Modal"
+import Modal from "@components/UI/Modal"
 import { useTireSelection } from "@hooks/useTireSelection"
 
 /**
