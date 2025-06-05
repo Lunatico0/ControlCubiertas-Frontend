@@ -79,11 +79,11 @@ const TireDetails = ({ selectedLoading, selectedTire, onClose, onEdit, handlePas
       {/* Modal con backdrop */}
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" onClick={onClose}>
         <div
-          className="bg-white dark:bg-gray-900 text-black dark:text-white rounded-xl w-full max-w-6xl shadow-2xl max-h-[95dvh] flex flex-col"
+          className="bg-white dark:bg-gray-900 text-black dark:text-white rounded-xl w-full max-w-6xl shadow-2xl h-[90vh] flex flex-col"
           onClick={(e) => e.stopPropagation()}
         >
-          {/* Header del modal */}
-          <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+          {/* Header del modal - FIJO */}
+          <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
             <h2 className="text-xl font-bold">Detalles de la cubierta #{selectedTire.code}</h2>
             <div className="flex items-center gap-3">
               <button
@@ -102,15 +102,15 @@ const TireDetails = ({ selectedLoading, selectedTire, onClose, onEdit, handlePas
             </div>
           </div>
 
-          {/* Contenido principal con scroll */}
-          <div className="flex-1 overflow-hidden flex flex-col">
-            {/* Información compacta de la cubierta */}
-            <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+          {/* Contenido principal - FLEXIBLE */}
+          <div className="flex-1 flex flex-col min-h-0">
+            {/* Información de la cubierta - FIJO */}
+            <div className="p-6 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
               <TireInfo tire={selectedTire} compact={true} />
             </div>
 
-            {/* Historial con scroll independiente */}
-            <div className="flex-1 overflow-hidden">
+            {/* Historial - SCROLLABLE */}
+            <div className="flex-1 min-h-0">
               <TireHistory
                 history={selectedTire.history || []}
                 code={selectedTire.code}
@@ -120,8 +120,8 @@ const TireDetails = ({ selectedLoading, selectedTire, onClose, onEdit, handlePas
               />
             </div>
 
-            {/* Acciones rápidas fijas en la parte inferior */}
-            <div className="border-t border-gray-200 dark:border-gray-700 p-6 bg-gray-50 dark:bg-gray-800/50">
+            {/* Acciones rápidas - FIJO */}
+            <div className="border-t border-gray-200 dark:border-gray-700 p-6 bg-gray-50 dark:bg-gray-800/50 flex-shrink-0">
               <h3 className="font-semibold mb-4 text-center">Acciones rápidas</h3>
               <QuickActions tire={selectedTire} refreshTire={handleRefreshTire} />
             </div>

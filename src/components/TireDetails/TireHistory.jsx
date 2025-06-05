@@ -40,19 +40,29 @@ const TireHistory = ({ history = [], code, serialNumber, tire, onEditEntry }) =>
 
   if (!history || history.length === 0) {
     return (
-      <div className="p-6">
-        <h3 className="font-semibold mb-4">Historial</h3>
-        <div className="text-center py-8 bg-gray-50 dark:bg-gray-800 rounded-lg">
-          <p className="text-gray-500">No hay registros en el historial</p>
+      <div className="h-full flex flex-col">
+        {/* Header fijo */}
+        <div className="flex items-center justify-between p-6 pb-4 flex-shrink-0">
+          <h3 className="font-semibold">Historial</h3>
+          <span className="text-sm text-gray-500 bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-full">
+            0 registro(s)
+          </span>
+        </div>
+
+        {/* Contenido vacío */}
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center py-8 bg-gray-50 dark:bg-gray-800 rounded-lg mx-6">
+            <p className="text-gray-500">No hay registros en el historial</p>
+          </div>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="flex flex-col h-full">
-      {/* Header del historial */}
-      <div className="flex items-center justify-between p-6 pb-4">
+    <div className="h-full flex flex-col">
+      {/* Header fijo */}
+      <div className="flex items-center justify-between p-6 pb-4 flex-shrink-0">
         <h3 className="font-semibold">Historial</h3>
         <span className="text-sm text-gray-500 bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-full">
           {history.length} registro(s)
@@ -60,41 +70,40 @@ const TireHistory = ({ history = [], code, serialNumber, tire, onEditEntry }) =>
       </div>
 
       {/* Tabla con scroll independiente */}
-      <div className="flex-1 overflow-hidden px-6">
-        <div className="border rounded-lg shadow-sm h-full flex flex-col">
-          <div className="flex-1 overflow-auto">
-            <table className="min-w-full text-sm text-left">
-              <thead className="bg-gray-100 dark:bg-gray-800 sticky top-0 z-10">
-                <tr>
-                  <th className="p-3 font-medium text-xs">Fecha</th>
-                  <th className="p-3 font-medium text-xs">N° Orden</th>
-                  <th className="p-3 font-medium text-xs">Móvil</th>
-                  <th className="p-3 font-medium text-xs">Patente</th>
-                  <th className="p-3 font-medium text-xs">Km Alta</th>
-                  <th className="p-3 font-medium text-xs">Km Baja</th>
-                  <th className="p-3 font-medium text-xs">Km Total</th>
-                  <th className="p-3 font-medium text-xs">Estado</th>
-                  <th className="p-3 font-medium text-xs">N° Int</th>
-                  <th className="p-3 font-medium text-xs">N° Serie</th>
-                  <th className="p-3 font-medium text-xs text-center">Acciones</th>
-                </tr>
-              </thead>
-              <tbody>
-                {reversedHistory.map((record, i) => (
-                  <HistoryRow
-                    key={`${record._id || i}-${record.date}`}
-                    record={record}
-                    index={i}
-                    code={code}
-                    serialNumber={serialNumber}
-                    onShowTooltip={showTooltip}
-                    onHideTooltip={hideTooltip}
-                    onOpenMenu={openMenu}
-                    openMenuIndex={openMenuIndex}
-                  />
-                ))}
-              </tbody>
-            </table>
+      <div className="flex-1 min-h-0 px-6 pb-6">
+        <div className="border rounded-lg shadow-sm h-full flex flex-col overflow-hidden">
+          {/* Header de la tabla - fijo */}
+          <div className="bg-gray-100 dark:bg-gray-800 flex-shrink-0">
+            <div className="grid grid-cols-11 gap-2 p-3 text-xs font-medium">
+              <div className="text-center">Fecha</div>
+              <div className="text-center">N° Orden</div>
+              <div className="text-center">Móvil</div>
+              <div className="text-center">Patente</div>
+              <div className="text-center">Km Alta</div>
+              <div className="text-center">Km Baja</div>
+              <div className="text-center">Km Total</div>
+              <div className="text-center">Estado</div>
+              <div className="text-center">N° Int</div>
+              <div className="text-center">N° Serie</div>
+              <div className="text-center">Acciones</div>
+            </div>
+          </div>
+
+          {/* Cuerpo de la tabla - scrollable */}
+          <div className="flex-1 overflow-y-auto">
+            {reversedHistory.map((record, i) => (
+              <HistoryRow
+                key={`${record._id || i}-${record.date}`}
+                record={record}
+                index={i}
+                code={code}
+                serialNumber={serialNumber}
+                onShowTooltip={showTooltip}
+                onHideTooltip={hideTooltip}
+                onOpenMenu={openMenu}
+                openMenuIndex={openMenuIndex}
+              />
+            ))}
           </div>
         </div>
       </div>
@@ -175,20 +184,23 @@ const HistoryRow = ({ record, index, code, serialNumber, onShowTooltip, onHideTo
   }
 
   return (
-    <tr
-      className={`border-b border-gray-200 dark:border-gray-700 ${getRowStyle(record.type, record.flag)} hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors`}
+    <div
+      className={`grid grid-cols-11 gap-2 p-3 text-xs border-b border-gray-200 dark:border-gray-700 ${getRowStyle(
+        record.type,
+        record.flag,
+      )} hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors`}
     >
-      <td className="p-3 text-xs">{formatDate(record.date)}</td>
-      <td className="p-3 text-center text-xs">{record.orderNumber || "-"}</td>
-      <td className="p-3 text-center text-xs">{record.vehicle?.mobile || "-"}</td>
-      <td className="p-3 text-center text-xs">{record.vehicle?.licensePlate || "-"}</td>
-      <td className="p-3 text-center text-xs">{formatKm(record.kmAlta)}</td>
-      <td className="p-3 text-center text-xs">{formatKm(record.kmBaja)}</td>
-      <td className="p-3 text-center text-xs">{formatKm(record.km)}</td>
-      <td className="p-3 text-center text-xs">{record.status || "-"}</td>
-      <td className="p-3 text-center text-xs">{code}</td>
-      <td className="p-3 text-center text-xs">{serialNumber}</td>
-      <td className="p-3 text-center">
+      <div className="text-center">{formatDate(record.date)}</div>
+      <div className="text-center">{record.orderNumber || "-"}</div>
+      <div className="text-center">{record.vehicle?.mobile || "-"}</div>
+      <div className="text-center">{record.vehicle?.licensePlate || "-"}</div>
+      <div className="text-center">{formatKm(record.kmAlta)}</div>
+      <div className="text-center">{formatKm(record.kmBaja)}</div>
+      <div className="text-center">{formatKm(record.km)}</div>
+      <div className="text-center">{record.status || "-"}</div>
+      <div className="text-center">{code}</div>
+      <div className="text-center">{serialNumber}</div>
+      <div className="text-center">
         <div className="flex items-center justify-center gap-2">
           {record.flag && (
             <span
@@ -216,8 +228,8 @@ const HistoryRow = ({ record, index, code, serialNumber, onShowTooltip, onHideTo
             ⋮
           </button>
         </div>
-      </td>
-    </tr>
+      </div>
+    </div>
   )
 }
 
