@@ -1,128 +1,129 @@
-import React, { useState, useContext } from 'react';
-import ApiContext from '../../context/apiContext';
-import { showToast } from '../../utils/toast';
-import AssignTireModal from './modals/AssignTireModal';
-import UnassignTireModal from './modals/UnassignTireModal';
-import SendToRecapModal from './modals/SendToRecapModal';
-import MarkRecapDoneModal from './modals/FinishRecapModal.jsx';
-import DiscardTireModal from './modals/ConfirmDiscardModal.jsx';
+import { useState, useContext } from "react"
+import ApiContext from "@context/apiContext"
+import AssignTireModal from "./modals/AssignTireModal"
+import UnassignTireModal from "./modals/UnassignTireModal"
+import SendToRecapModal from "./modals/SendToRecapModal"
+import FinishRecapModal from "./modals/FinishRecapModal"
+import DiscardTireModal from "./modals/ConfirmDiscardModal"
+import UndoHistoryEntryModal from "./modals/UndoHistoryEntryModal"
+import EditHistoryModal from "./modals/EditHistoryModal"
 
-const QuickActions = ({ tire, refreshTire }) => {
-  const { triggerGlobalRefresh } = useContext(ApiContext);
-  const [modal, setModal] = useState(null);
+const QuickActions = ({ tire, refreshTire, historyEntry = null }) => {
+  const [activeModal, setActiveModal] = useState(null)
+  const { loadTireById } = useContext(ApiContext)
 
-  const canDo = {
-    assign: !tire.vehicle,
-    unassign: !!tire.vehicle,
-    sendToRecap: !['A recapar', 'Descartada'].includes(tire.status),
-    markRecapDone: tire.status === 'A recapar',
-    discard: tire.status !== 'Descartada',
-  };
+  const closeModal = () => {
+    setActiveModal(null)
+  }
+
+  const handleRefresh = async () => {
+    if (refreshTire) {
+      await refreshTire()
+    } else if (tire?._id) {
+      await loadTireById(tire._id)
+    }
+  }
+
+  const canAssign = !tire?.vehicle && tire?.status !== "Descartada" && tire?.status !== "A recapar"
+  const canUnassign = !!tire?.vehicle
+  const canSendToRecap =
+    tire?.status !== "A recapar" && tire?.status !== "Descartada" && (!tire?.vehicle || !!tire?.vehicle)
+  const canFinishRecap = tire?.status === "A recapar"
+  const canDiscard = tire?.status !== "Descartada"
+  const canEditHistory = !!historyEntry && !historyEntry.type.startsWith("correccion")
+  const canUndoHistory = !!historyEntry && !historyEntry.flag
 
   return (
-    <div className="mt-6 flex flex-col gap-4">
+    <>
+      <div className="flex flex-wrap gap-2 justify-center">
+        {canAssign && (
+          <button
+            onClick={() => setActiveModal("assign")}
+            className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+          >
+            Asignar
+          </button>
+        )}
 
-      <div className="mx-auto flex gap-2 flex-wrap">
+        {canUnassign && (
+          <button
+            onClick={() => setActiveModal("unassign")}
+            className="px-3 py-1 bg-yellow-600 text-white rounded hover:bg-yellow-700 transition"
+          >
+            Desasignar
+          </button>
+        )}
 
-        {/* ASIGNAR */}
-        <button
-          onClick={() => setModal('assign')}
-          disabled={!canDo.assign}
-          title="Asignar cubierta a un vehículo"
-          className={`p-2 rounded ${canDo.assign ? 'bg-blue-500 text-white' : 'bg-gray-300 cursor-not-allowed'}`}
-        >
-          Asignar
-        </button>
+        {canSendToRecap && (
+          <button
+            onClick={() => setActiveModal("sendToRecap")}
+            className="px-3 py-1 bg-purple-600 text-white rounded hover:bg-purple-700 transition"
+          >
+            Enviar a recapar
+          </button>
+        )}
 
-        {/* DESASIGNAR */}
-        <button
-          onClick={() => setModal('unassign')}
-          disabled={!canDo.unassign}
-          title={canDo.unassign ? 'Desasignar cubierta del vehículo actual' : 'La cubierta no está asignada'}
-          className={`p-2 rounded ${canDo.unassign ? 'bg-yellow-500 text-white' : 'bg-gray-300 cursor-not-allowed'}`}
-        >
-          Desasignar
-        </button>
+        {canFinishRecap && (
+          <button
+            onClick={() => setActiveModal("finishRecap")}
+            className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 transition"
+          >
+            Recapado listo
+          </button>
+        )}
 
-        {/* ENVIAR A RECAPAR */}
-        <button
-          onClick={() => setModal('recapar')}
-          disabled={!canDo.sendToRecap}
-          title="Enviar cubierta a recapado"
-          className={`p-2 rounded ${canDo.sendToRecap ? 'bg-purple-600 text-white' : 'bg-gray-300 cursor-not-allowed'}`}
-        >
-          Enviar a recapar
-        </button>
+        {canDiscard && (
+          <button
+            onClick={() => setActiveModal("discard")}
+            className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 transition"
+          >
+            Descartar
+          </button>
+        )}
 
-        {/* RECAPADO LISTO */}
-        <button
-          onClick={() => setModal('recapDone')}
-          disabled={!canDo.markRecapDone}
-          title="Marcar recapado como completado"
-          className={`p-2 rounded ${canDo.markRecapDone ? 'bg-green-600 text-white' : 'bg-gray-300 cursor-not-allowed'}`}
-        >
-          Recapado listo
-        </button>
+        {canEditHistory && (
+          <button
+            onClick={() => setActiveModal("editHistory")}
+            className="px-3 py-1 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition"
+          >
+            Editar
+          </button>
+        )}
 
-        {/* DESCARTAR */}
-        <button
-          onClick={() => setModal('discard')}
-          disabled={!canDo.discard}
-          title="Marcar como descartada"
-          className={`p-2 rounded ${canDo.discard ? 'bg-red-600 text-white' : 'bg-gray-300 cursor-not-allowed'}`}
-        >
-          Descartar
-        </button>
+        {canUndoHistory && (
+          <button
+            onClick={() => setActiveModal("undoHistory")}
+            className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 transition"
+          >
+            Deshacer
+          </button>
+        )}
       </div>
 
-      {/* Modales condicionales */}
-      {modal === 'assign' && (
-        <AssignTireModal
-          tire={tire}
-          onClose={() => setModal(null)}
-          refreshTire={refreshTire}
-          triggerGlobalRefresh={triggerGlobalRefresh}
-        />
+      {/* Modales */}
+      {activeModal === "assign" && <AssignTireModal tire={tire} onClose={closeModal} refreshTire={handleRefresh} />}
+
+      {activeModal === "unassign" && <UnassignTireModal tire={tire} onClose={closeModal} refreshTire={handleRefresh} />}
+
+      {activeModal === "sendToRecap" && (
+        <SendToRecapModal tire={tire} onClose={closeModal} refreshTire={handleRefresh} />
       )}
 
-      {modal === 'unassign' && (
-        <UnassignTireModal
-          tire={tire}
-          onClose={() => setModal(null)}
-          refreshTire={refreshTire}
-          triggerGlobalRefresh={triggerGlobalRefresh}
-        />
+      {activeModal === "finishRecap" && (
+        <FinishRecapModal tire={tire} onClose={closeModal} refreshTire={handleRefresh} />
       )}
 
-      {modal === 'recapar' && (
-        <SendToRecapModal
-          tire={tire}
-          onClose={() => setModal(null)}
-          refreshTire={refreshTire}
-          triggerGlobalRefresh={triggerGlobalRefresh}
-        />
+      {activeModal === "discard" && <DiscardTireModal tire={tire} onClose={closeModal} refreshTire={handleRefresh} />}
+
+      {activeModal === "editHistory" && historyEntry && (
+        <EditHistoryModal tire={tire} entry={historyEntry} onClose={closeModal} refreshTire={handleRefresh} />
       )}
 
-      {modal === 'recapDone' && (
-        <MarkRecapDoneModal
-          tire={tire}
-          onClose={() => setModal(null)}
-          refreshTire={refreshTire}
-          triggerGlobalRefresh={triggerGlobalRefresh}
-        />
+      {activeModal === "undoHistory" && historyEntry && (
+        <UndoHistoryEntryModal tire={tire} entry={historyEntry} onClose={closeModal} refreshTire={handleRefresh} />
       )}
+    </>
+  )
+}
 
-      {modal === 'discard' && (
-        <DiscardTireModal
-          tire={tire}
-          onClose={() => setModal(null)}
-          refreshTire={refreshTire}
-          triggerGlobalRefresh={triggerGlobalRefresh}
-        />
-      )}
-
-    </div>
-  );
-};
-
-export default QuickActions;
+export default QuickActions

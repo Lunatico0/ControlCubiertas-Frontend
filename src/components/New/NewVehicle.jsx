@@ -1,126 +1,100 @@
-import React, { useContext, useEffect, useState } from "react";
-import Swal from 'sweetalert2';
-import { useForm } from "react-hook-form";
-import ApiContext from "../../context/apiContext.jsx";
-import VehicleForm from "../Forms/VehicleForm.jsx";
+import { useContext } from "react"
+import ApiContext from "@context/apiContext"
+import VehicleForm from "../Forms/VehicleForm"
+import Modal from "../ui/Modal"
+import { useTireSelection } from "@hooks/useTireSelection"
+import { useCreateEntity } from "@hooks/useCreateEntity"
+import { showToast } from "@utils/toast"
 
-const NewVehicle = ({ setIsVehicleModalOpen }) => {
-  const { searchQuery, setSearchQuery, filteredTireData, fetchNewVehicle } = useContext(ApiContext);
-  const [selectedTires, setSelectedTires] = useState([]);
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
+/**
+ * Modal para crear un nuevo vehículo
+ * @param {Object} props - Propiedades del componente
+ * @param {Function} props.onClose - Función para cerrar el modal
+ * @param {Function} props.onSuccess - Función a ejecutar después de crear el vehículo
+ */
+const NewVehicleModal = ({ onClose, onSuccess }) => {
+  const { tires, handleCreateVehicle } = useContext(ApiContext)
 
-  const { register, handleSubmit, reset } = useForm();
+  // Filtrar solo cubiertas disponibles (sin asignar)
+  const availableTires = tires.filter((tire) => !tire.vehicle || tire.vehicle === "sin asignar")
 
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === "Escape") setIsSearchOpen(false);
-    };
+  const { selectedTires, searchQuery, setSearchQuery, isSearchOpen, setIsSearchOpen, handleAddTire, handleRemoveTire } =
+    useTireSelection([])
 
-    const handleClickOutside = (e) => {
-      if (!e.target.closest(".toolbox")) setIsSearchOpen(false);
-    };
+  const { create, isSubmitting } = useCreateEntity(
+    handleCreateVehicle,
+    "Vehículo creado con éxito",
+    "No se pudo crear el vehículo",
+  )
 
-    document.addEventListener("keydown", handleKeyDown);
-    document.addEventListener("click", handleClickOutside);
-
-    return () => {
-      document.removeEventListener("keydown", handleKeyDown);
-      document.removeEventListener("click", handleClickOutside);
-    };
-  }, []);
-
-  const handleAddTire = (tire) => {
-    setSelectedTires([...selectedTires, tire]);
-    setIsSearchOpen(false);
-    setSearchQuery("");
-  };
-
-  const handleRemoveTire = (index) => {
-    setSelectedTires(selectedTires.filter((_, i) => i !== index));
-  };
-
-  const handleFormSubmit = async (data) => {
+  const handleSubmit = async (data) => {
     const newVehicle = {
       mobile: data.mobile,
       licensePlate: data.licensePlate,
       brand: data.brand,
       type: data.type || null,
-      tires: selectedTires.length > 0 ? selectedTires.map((tire) => tire._id) : null,
-    };
+      tires: selectedTires.map((tire) => tire._id),
+    }
 
     try {
-      const result = await fetchNewVehicle(newVehicle);
-
-      Swal.fire({
-        title: "¡Éxito!",
-        text: "Vehículo guardado con éxito",
-        icon: "success",
-        confirmButtonText: "Aceptar",
-      });
-
-      reset();
-      setSelectedTires([]);
-      setIsVehicleModalOpen(false);
+      await create(newVehicle, onSuccess || onClose)
     } catch (error) {
-      console.error("Error en la respuesta del servidor:", error);
-
-      if (error.conflictingTires) {
-        const tireCodes = error.conflictingTires.map((t) => t.code).join(", ");
-
-        Swal.fire({
-          title: "Error",
-          text: `Las siguientes cubiertas ya están asignadas a otros vehículos: ${tireCodes}`,
-          icon: "warning",
-          confirmButtonText: "Entendido",
-        });
-      } else {
-        Swal.fire({
-          title: "Error",
-          text: error.message || "No se pudo guardar el vehículo",
-          icon: "error",
-          confirmButtonText: "Cerrar",
-        });
+      // Manejar errores específicos
+      if (error?.conflictingTires) {
+        const tireCodes = error.conflictingTires.map((t) => t.code).join(", ")
+        showToast("error", `Cubiertas ya asignadas: ${tireCodes}`)
+      } else if (error.message?.includes("mobile")) {
+        showToast("error", "Ya existe un vehículo con ese número de móvil")
+      } else if (error.message?.includes("licensePlate")) {
+        showToast("error", "Ya existe un vehículo con esa patente")
       }
     }
-  };
+  }
 
+  // Filtrar cubiertas según la búsqueda
+  const filteredTires = availableTires.filter(
+    (tire) =>
+      tire.code.toString().includes(searchQuery) ||
+      tire.brand.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      tire.pattern.toLowerCase().includes(searchQuery.toLowerCase()),
+  )
 
   return (
-    <div
-      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 w-full h-full"
-      onClick={() => setIsVehicleModalOpen(false)}
-    >
-      <div
-        className="bg-gray-200 text-black dark:bg-gray-900 dark:text-white w-1/2 max-w-screen-sm p-6 rounded-xl shadow-lg relative z-10"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="absolute top-1 right-2">
-          <button
-            onClick={() => setIsVehicleModalOpen(false)}
-            className="text-gray-500 hover:text-gray-700"
-          >
-            ✖
-          </button>
-        </div>
+    <Modal title="Nuevo vehículo" onClose={onClose} maxWidth="lg">
+      <VehicleForm
+        onSubmit={handleSubmit}
+        onCancel={onClose}
+        isSubmitting={isSubmitting}
+        defaultValues={{
+          mobile: "",
+          licensePlate: "",
+          brand: "",
+          type: "",
+        }}
+        showFields={{
+          brand: true,
+          mobile: true,
+          licensePlate: true,
+          type: true,
+          tires: true,
+        }}
+        fieldOptions={{
+          brand: { required: true },
+          mobile: { required: true },
+          licensePlate: { required: true },
+        }}
+        availableTires={filteredTires}
+        selectedTires={selectedTires}
+        onAddTire={handleAddTire}
+        onRemoveTire={handleRemoveTire}
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        isSearchOpen={isSearchOpen}
+        setIsSearchOpen={setIsSearchOpen}
+        submitLabel="Crear vehículo"
+      />
+    </Modal>
+  )
+}
 
-        <h2 className="text-4xl font-bold mb-4 text-center">Nuevo vehículo</h2>
-
-        <VehicleForm
-          onSubmit={handleFormSubmit}
-          selectedTires={selectedTires}
-          onAddTire={handleAddTire}
-          onRemoveTire={handleRemoveTire}
-          availableTires={filteredTireData}
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
-          isSearchOpen={isSearchOpen}
-          setIsSearchOpen={setIsSearchOpen}
-          onCancel={() => setIsVehicleModalOpen(false)}
-        />
-
-      </div>
-    </div>
-  );
-};
-
-export default NewVehicle;
+export default NewVehicleModal

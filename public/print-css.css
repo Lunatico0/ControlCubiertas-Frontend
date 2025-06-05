@@ -1,0 +1,161 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background: white;
+  color: black;
+}
+
+@media print {
+  body {
+    margin: 0;
+    padding: 0;
+  }
+
+  .page-break {
+    page-break-after: always;
+  }
+}
+
+.receipt-root {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 210mm;
+  background: white;
+  color: black;
+  font-size: 14px;
+  font-family: Arial, sans-serif;
+  padding: 0 16px;
+  gap: 16px;
+  overflow-y: hidden;
+}
+
+.receipt-section {
+  width: 100%;
+  min-height: 130mm;
+  border-bottom: 1px dashed black;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 16px;
+}
+
+.watermark {
+  position: absolute;
+  top: 60%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80%;
+  opacity: 0.1;
+  z-index: 0;
+  text-align: center;
+}
+
+.watermark img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.content {
+  position: relative;
+  z-index: 10;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+
+.company-info {
+  font-size: 12px;
+}
+
+.company-info p:first-child {
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.receipt-info {
+  text-align: right;
+  font-size: 12px;
+}
+
+.title {
+  text-align: center;
+  font-weight: bold;
+  text-decoration: underline;
+  margin: 16px 0;
+  font-size: 16px;
+}
+
+.details {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 6px 26px;
+  font-size: 12px;
+  margin-bottom: 16px;
+}
+
+.details p {
+  margin-bottom: 4px;
+}
+
+.km-recorridos {
+  margin-top: 10px;
+  font-weight: bold;
+  font-size: 12px;
+}
+
+.vehiculo-km {
+  margin-top: 10px;
+  font-weight: bold;
+  font-size: 12px;
+}
+
+.cubierta-km {
+  margin-top: 10px;
+  font-weight: bold;
+  font-size: 12px;
+}
+
+.watermark-image {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.footer {
+  position: relative;
+  z-index: 10;
+  margin-top: auto;
+}
+
+.signatures {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 40px;
+  font-size: 12px;
+}
+
+.note {
+  margin-top: 32px;
+  border-top: 1px solid #ccc;
+  padding-top: 8px;
+  font-size: 11px;
+}
+
+.km-info {
+  margin-top: 16px;
+  font-size: 12px;
+  text-align: center;
+  font-weight: bold;
+}

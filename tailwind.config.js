@@ -16,6 +16,9 @@ export default {
         "vehiculo": '#b2f2bb',
         "cubierta": '#a5d8ff',
       },
+      fontFamily: {
+        inter: ['Inter', 'sans-serif'],
+      },
     },
   },
   plugins: [],

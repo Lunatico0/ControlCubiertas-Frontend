@@ -1,119 +1,152 @@
-import React from "react";
-import { useForm } from "react-hook-form";
+import { useForm } from "react-hook-form"
+import VehicleField from "./fields/VehicleField"
+import TireSearchBox from "./fields/TireSearchBox"
+import SelectedTiresList from "./fields/SelectedTiresList"
 
+/**
+ * Formulario para vehículos
+ * @param {Object} props - Propiedades del componente
+ * @param {Function} props.onSubmit - Función para manejar el envío del formulario
+ * @param {Object} props.defaultValues - Valores por defecto para los campos
+ * @param {Object} props.showFields - Campos a mostrar
+ * @param {Array} props.availableTires - Lista de cubiertas disponibles
+ * @param {Array} props.selectedTires - Lista de cubiertas seleccionadas
+ * @param {React.RefObject} props.modalRef - Referencia al modal
+ * @param {Function} props.onAddTire - Función para añadir una cubierta
+ * @param {Function} props.onRemoveTire - Función para eliminar una cubierta
+ * @param {string} props.searchQuery - Consulta de búsqueda
+ * @param {Function} props.setSearchQuery - Función para establecer la consulta de búsqueda
+ * @param {boolean} props.isSearchOpen - Indica si la búsqueda está abierta
+ * @param {Function} props.setIsSearchOpen - Función para establecer si la búsqueda está abierta
+ * @param {string} props.submitLabel - Etiqueta del botón de envío
+ * @param {string} props.cancelLabel - Etiqueta del botón de cancelar
+ * @param {Function} props.onCancel - Función para manejar el cancelar
+ * @param {boolean} props.isSubmitting - Indica si el formulario está enviándose
+ * @param {Object} props.fieldOptions - Opciones adicionales para los campos
+ */
 const VehicleForm = ({
   onSubmit,
   defaultValues = {},
-  showFields = {
-    brand: true,
-    mobile: true,
-    licensePlate: true,
-    type: true,
-    tires: true,
-  },
+  showFields = {},
   availableTires = [],
   selectedTires = [],
+  modalRef,
   onAddTire,
   onRemoveTire,
-  searchQuery = '',
+  searchQuery = "",
   setSearchQuery = () => {},
   isSearchOpen = false,
   setIsSearchOpen = () => {},
   submitLabel = "Guardar",
   cancelLabel = "Cancelar",
-  onCancel
+  onCancel,
+  isSubmitting = false,
+  fieldOptions = {},
 }) => {
-  const { register, handleSubmit } = useForm({ defaultValues });
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({ defaultValues, mode: "onBlur" })
+
+  const baseInputStyles =
+    "w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-900 text-black dark:text-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
+
+  const renderIf = (name, element) => (showFields[name] ? element : null)
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
-      {showFields.brand && (
-        <input {...register("brand")} type="text" placeholder="Marca" className="p-2 rounded" required />
+    <form ref={modalRef} onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+      {renderIf(
+        "brand",
+        <VehicleField label="Marca">
+          <input
+            {...register("brand", { required: fieldOptions.brand?.required !== false })}
+            type="text"
+            className={baseInputStyles}
+            disabled={fieldOptions.brand?.disabled}
+          />
+          {errors.brand && <p className="text-sm text-red-500 mt-1">{errors.brand.message}</p>}
+        </VehicleField>,
       )}
 
-      {showFields.mobile && (
-        <input {...register("mobile")} type="text" placeholder="Movil" className="p-2 rounded" required />
+      {renderIf(
+        "mobile",
+        <VehicleField label="Móvil">
+          <input
+            {...register("mobile", { required: fieldOptions.mobile?.required !== false })}
+            type="text"
+            className={baseInputStyles}
+            disabled={fieldOptions.mobile?.disabled}
+          />
+          {errors.mobile && <p className="text-sm text-red-500 mt-1">{errors.mobile.message}</p>}
+        </VehicleField>,
       )}
 
-      {showFields.licensePlate && (
-        <input {...register("licensePlate")} type="text" placeholder="Patente" className="p-2 rounded" required />
+      {renderIf(
+        "licensePlate",
+        <VehicleField label="Patente">
+          <input
+            {...register("licensePlate", { required: fieldOptions.licensePlate?.required !== false })}
+            type="text"
+            className={baseInputStyles}
+            disabled={fieldOptions.licensePlate?.disabled}
+          />
+          {errors.licensePlate && <p className="text-sm text-red-500 mt-1">{errors.licensePlate.message}</p>}
+        </VehicleField>,
       )}
 
-      {showFields.type && (
-        <input {...register("type")} type="text" placeholder="Tipo (Opcional)" className="p-2 rounded" />
+      {renderIf(
+        "type",
+        <VehicleField label="Tipo (opcional)">
+          <input {...register("type")} type="text" className={baseInputStyles} disabled={fieldOptions.type?.disabled} />
+          {errors.type && <p className="text-sm text-red-500 mt-1">{errors.type.message}</p>}
+        </VehicleField>,
       )}
 
-      {showFields.tires && (
-        <div className="flex flex-col space-y-2">
-          <label className="text-sm font-medium">Asignación de cubiertas (opcional)</label>
-
-          {selectedTires.map((tire, index) => (
-            <div
-              key={index}
-              className="flex items-center justify-between border p-2 rounded text-black bg-gray-100 dark:bg-gray-800 dark:text-white dark:border-gray-900"
-            >
-              <p><strong>{tire.brand}</strong> - {tire.pattern} - Código: {tire.code}</p>
-              <button
-                type="button"
-                onClick={() => onRemoveTire(index)}
-                className="px-2 py-1 bg-red-500 text-white rounded"
-              >
-                ✖
-              </button>
-            </div>
-          ))}
-
+      {renderIf(
+        "tires",
+        <VehicleField label="Asignación de cubiertas (opcional)">
+          <SelectedTiresList tires={selectedTires} onRemoveTire={onRemoveTire} />
           {!isSearchOpen && (
             <button
               type="button"
               onClick={() => setIsSearchOpen(true)}
-              className="p-2 bg-blue-500 text-white rounded flex justify-center items-center"
+              className="p-2 bg-blue-600 hover:bg-blue-700 text-white rounded flex justify-center items-center mt-2"
             >
               ➕ Agregar cubierta
             </button>
           )}
-
           {isSearchOpen && (
-            <div className="relative toolbox">
-              <input
-                type="text"
-                placeholder="Buscar cubierta..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="p-2 border rounded w-full"
-              />
-
-              <div className="absolute text-black bg-gray-100 dark:bg-gray-800 dark:text-white dark:border-gray-900 border rounded shadow-md max-h-52 overflow-auto mt-1 w-full z-20">
-                {availableTires.length > 0 ? (
-                  availableTires.map((tire) => (
-                    <div
-                      key={tire._id}
-                      className="p-2 hover:bg-gray-200 dark:hover:bg-gray-600 cursor-pointer flex justify-between"
-                      onClick={() => onAddTire(tire)}
-                    >
-                      <span>{tire.code} - {tire.brand}</span>
-                      <button className="p-1 bg-green-500 text-white rounded">Seleccionar</button>
-                    </div>
-                  ))
-                ) : (
-                  <p className="p-2 text-gray-400">No hay resultados</p>
-                )}
-              </div>
-            </div>
+            <TireSearchBox
+              availableTires={availableTires}
+              onAddTire={onAddTire}
+              query={searchQuery}
+              setQuery={setSearchQuery}
+            />
           )}
-        </div>
+        </VehicleField>,
       )}
 
-      <div className="flex gap-4 mt-4 justify-evenly items-center">
-        <button type="submit" className="bg-green-500 text-white p-2 rounded">
+      <div className="flex gap-4 mt-4 justify-center">
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold px-6 py-2 rounded-md transition flex items-center gap-2"
+        >
+          {isSubmitting && <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>}
           {submitLabel}
         </button>
-        <button type="button" onClick={onCancel} className="bg-red-500 text-white p-2 rounded">
+        <button
+          type="button"
+          onClick={onCancel}
+          disabled={isSubmitting}
+          className="bg-gray-300 hover:bg-gray-400 disabled:bg-gray-200 text-gray-800 font-semibold px-6 py-2 rounded-md transition"
+        >
           {cancelLabel}
         </button>
       </div>
     </form>
-  );
-};
+  )
+}
 
-export default VehicleForm;
+export default VehicleForm

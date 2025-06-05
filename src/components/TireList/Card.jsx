@@ -1,69 +1,188 @@
-import React from 'react';
-import cubiertaIMG from '/Cubierta.png';
-import { statusStyles } from '../../utils/statusStyle.js';
+import { statusStyles } from "@utils/statusStyle"
 
-const Card = ({ data, handleCardClick, setTireToUpdate, setIsUpdateTireModalOpen, handlePasswordCheck }) => {
+/**
+ * Componente de tarjeta para mostrar información de una cubierta
+ * @param {Object} props - Propiedades del componente
+ * @param {Object} props.tire - Datos de la cubierta
+ * @param {Function} props.onCardClick - Función para manejar click en la tarjeta
+ * @param {Function} props.onEdit - Función para editar la cubierta
+ * @param {boolean} props.isLoading - Indica si está cargando
+ */
+const TireCard = ({ tire, onCardClick, onEdit, isLoading = false }) => {
+  const isRecap = tire.status === "A recapar"
+  const isDiscarded = tire.status === "Descartada"
 
-  const handleEdit = (id) => {
-    handlePasswordCheck().then((confirmed) => {
-      if (confirmed) {
-        setTireToUpdate(id);
-        setIsUpdateTireModalOpen(true);
-      }
-    });
-  };
+  const handleCardClick = () => {
+    if (!isLoading && onCardClick) {
+      onCardClick(tire._id)
+    }
+  }
+
+  const handleEdit = (e) => {
+    e.stopPropagation()
+    if (!isLoading && onEdit) {
+      onEdit(tire._id)
+    }
+  }
+
+  const formatDate = (date) => {
+    try {
+      return new Date(date).toLocaleDateString("es-AR")
+    } catch {
+      return "Fecha inválida"
+    }
+  }
 
   return (
-    <>
-      {data && data.map((item) =>
-        <div key={item._id} className={`
-        flex flex-col items-center relative group transition-shadow shadow-md hover:shadow-xl overflow-hidden rounded-lg p-4
-        bg-gray-200 dark:bg-slate-900 border dark:border-gray-700`}>
+    <div
+      className={`
+        relative group transition-all duration-300 transform hover:scale-105 hover:shadow-xl
+        bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700
+        rounded-xl overflow-hidden shadow-md cursor-pointer h-full flex flex-col
+        ${isLoading ? "opacity-50 pointer-events-none" : ""}
+        ${isRecap || isDiscarded ? "opacity-80" : ""}
+      `}
+      onClick={handleCardClick}
+    >
+      {/* Indicador de estado en la esquina superior */}
+      <div className="absolute top-3 left-3 z-10">
+        <StatusBadge status={tire.status} />
+      </div>
 
-          <div
-            className={`flex items-center justify-center w-60 h-72 relative
-            ${statusStyles[item.status] || ''}`}
-          >
-            <img
-              src={cubiertaIMG}
-              alt="Cubierta"
-              className={`w-56 cursor-pointer transition-opacity duration-300 ${item.status === "A recapar" && "opacity-60"}`}
-              onClick={() => handleCardClick(item._id)}
+      {/* Botón de editar - Posicionado mejor para no tapar información */}
+      <button
+        onClick={handleEdit}
+        disabled={isLoading}
+        className="
+          absolute top-3 right-3 p-2 z-20
+          bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400
+          text-white rounded-lg shadow-sm
+          transition-all duration-200 transform hover:scale-105
+          opacity-0 group-hover:opacity-100
+        "
+        title="Editar cubierta"
+      >
+        ✏️
+      </button>
+
+      {/* Imagen de la cubierta */}
+      <div
+        className={`
+          flex items-center justify-center h-48 relative overflow-hidden
+          ${statusStyles[tire.status] || "bg-gray-100 dark:bg-gray-700"}
+        `}
+      >
+        <img
+          src="/Cubierta.png"
+          alt="Cubierta"
+          className={`
+            w-32 h-32 object-contain transition-all duration-300
+            ${isRecap ? "opacity-60 grayscale" : ""}
+            ${isDiscarded ? "opacity-40 grayscale" : ""}
+            group-hover:scale-110
+          `}
+        />
+
+        {/* Overlay con información rápida */}
+        <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300 flex items-center justify-center">
+          <span className="text-white font-semibold opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            Ver detalles
+          </span>
+        </div>
+      </div>
+
+      {/* Información de la cubierta - Altura fija para consistencia */}
+      <div className="p-4 flex-1 flex flex-col justify-between min-h-[200px]">
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <h3 className="font-bold text-lg text-gray-900 dark:text-white">#{tire.code}</h3>
+            <span className="text-sm text-gray-500 dark:text-gray-400 truncate max-w-[100px]">{tire.serialNumber}</span>
+          </div>
+
+          <div className="space-y-2 text-sm">
+            <InfoRow label="Marca" value={tire.brand} />
+            <InfoRow label="Dibujo" value={tire.pattern} />
+            <InfoRow
+              label="Vehículo"
+              value={tire.vehicle?.mobile || "Sin asignar"}
+              valueClass={tire.vehicle ? "text-green-600 dark:text-green-400" : "text-gray-500"}
             />
+            <InfoRow label="Kilómetros" value={`${(tire.kilometers || 0).toLocaleString()} km`} />
+            <InfoRow label="Fecha alta" value={formatDate(tire.createdAt)} />
           </div>
+        </div>
 
-          <div className={`p-4 flex flex-col items-start w-60 ${item.status == "A recapar" && "opacity-70"} dark:text-white`}>
+        {/* Información del vehículo si está asignado - Siempre en la parte inferior */}
+        <div className="mt-4">
+          {tire.vehicle ? (
+            <div className="p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
+              <p className="text-xs text-green-700 dark:text-green-300 font-medium">
+                Asignado a: {tire.vehicle.mobile} ({tire.vehicle.licensePlate})
+              </p>
+            </div>
+          ) : (
+            <div className="p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700">
+              <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">Sin asignar a vehículo</p>
+            </div>
+          )}
+        </div>
+      </div>
 
-            <p className='font-bold'>Numero de Serie #
-              <span className='font-normal'>{item.serialNumber}</span>
-            </p>
-
-            <h3 className='font-bold'>Cubierta #
-              <span className='font-semibold'>{item.code}</span>
-            </h3>
-
-            <p className='font-semibold'>Marca: <span className='font-normal pr-2'>{item.brand}</span></p>
-
-            <p className='font-semibold'>Estado: <span className='font-normal capitalize pr-1'>{item.status}</span> </p>
-
-            <p className='font-semibold'>Dibujo: <span className='font-normal'>{item.pattern}</span></p>
-
-            <p className='font-semibold'>Vehiculo: <span className='font-normal'>{item.vehicle?.mobile || 'Sin asignar'}</span></p>
-
-            <p className='font-semibold'>Fecha: <span className='font-normal'>{new Date(item.history?.[0]?.date).toLocaleDateString('es-AR')}</span></p>
-
-          </div>
-
-          <button
-            className='absolute bottom-2 right-2 px-3 py-1 text-sm bg-slate-600 hover:bg-slate-700 text-white rounded shadow-sm'
-            onClick={() => handleEdit(item._id)}
-          >
-            Editar ✏️
-          </button>
+      {/* Indicador de carga */}
+      {isLoading && (
+        <div className="absolute inset-0 bg-white bg-opacity-75 dark:bg-gray-800 dark:bg-opacity-75 flex items-center justify-center z-30">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
         </div>
       )}
-    </>
+    </div>
   )
 }
 
-export default Card;
+/**
+ * Componente para mostrar una fila de información
+ */
+const InfoRow = ({ label, value, valueClass = "" }) => (
+  <div className="flex justify-between items-center">
+    <span className="text-gray-600 dark:text-gray-400 font-medium">{label}:</span>
+    <span className={`font-semibold truncate max-w-[120px] ${valueClass}`} title={value}>
+      {value}
+    </span>
+  </div>
+)
+
+/**
+ * Componente para mostrar el badge de estado
+ */
+const StatusBadge = ({ status }) => {
+  const getStatusColor = (status) => {
+    switch (status) {
+      case "Nueva":
+        return "bg-blue-600 dark:bg-blue-900"
+      case "1er Recapado":
+        return "bg-green-600 dark:bg-green-900"
+      case "2do Recapado":
+        return "bg-yellow-600 dark:bg-yellow-900"
+      case "3er Recapado":
+        return "bg-orange-600 dark:bg-orange-900"
+      case "A recapar":
+        return "bg-neutral-600 dark:bg-neutral-900"
+      case "Descartada":
+        return "bg-red-600 dark:bg-red-900"
+      default:
+        return "bg-gray-600 dark:bg-gray-700"
+    }
+  }
+
+  return (
+    <span
+      className={`
+        px-3 py-1 text-xs font-semibold text-white rounded-full shadow-sm
+        ${getStatusColor(status)}
+      `}
+    >
+      {status}
+    </span>
+  )
+}
+
+export default TireCard

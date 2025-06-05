@@ -1,14 +1,18 @@
-import React, { useContext, useEffect, useState } from 'react';
-import { createRoot } from 'react-dom/client';
-import Card from './Card.jsx';
-import UpdateTire from '../UpdateTire/UpdateTire.jsx';
-import TireDetails from '../TireDetails/TireDetails.jsx';
-import ApiContext from '../../context/apiContext.jsx';
-import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
-import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
-import Swal from 'sweetalert2';
+import { useContext, useEffect, useState } from "react"
+import ApiContext from "@context/apiContext"
+import TireCard from "./Card"
+import TireDetails from "../TireDetails/TireDetails"
+import UpdateTire from "../UpdateTire/UpdateTire"
+import { usePasswordCheck } from "@hooks/usePasswordCheck"
+import LoadingGrid from "./LoadingGrid"
+import EmptyState from "./EmptyState"
 
-const CardList = () => {
+/**
+ * Componente principal para mostrar la lista de cubiertas
+ * @param {Object} props - Propiedades del componente
+ * @param {Function} props.onTireSelect - Función para seleccionar una cubierta
+ */
+const TireList = ({ onTireSelect }) => {
   const {
     error,
     loading,
@@ -19,109 +23,128 @@ const CardList = () => {
     selectedTire,
     selectedLoading,
     filteredTireData,
-  } = useContext(ApiContext);
+  } = useContext(ApiContext)
 
   const [tireToUpdate, setTireToUpdate] = useState(null)
-  const [isTireModalOpen, setIsTireModalOpen] = useState(false);
-  const [isUpdateTireModalOpen, setIsUpdateTireModalOpen] = useState(false);
+  const [isTireModalOpen, setIsTireModalOpen] = useState(false)
+  const [isUpdateTireModalOpen, setIsUpdateTireModalOpen] = useState(false)
+  const [loadingTireId, setLoadingTireId] = useState(null)
+
+  const { checkPassword } = usePasswordCheck()
 
   const handleCardClick = async (id) => {
-    setIsTireModalOpen(true);
-    await loadTireById(id);
-  };
+    try {
+      setLoadingTireId(id)
+      setIsTireModalOpen(true)
+      await loadTireById(id)
 
-  const handlePasswordCheck = async () => {
-    return Swal.fire({
-      title: 'Para editar un elemento',
-      input: 'password',
-      inputPlaceholder: "Ingresa la contraseña",
-      inputAttributes: {
-        autocapitalize: 'off',
-        autocorrect: 'off',
-        id: 'swal-password-input'
-      },
-      showCancelButton: true,
-      confirmButtonText: 'Confirmar',
-      cancelButtonText: 'Cancelar',
-      showLoaderOnConfirm: true,
-      didOpen: () => {
-        const input = Swal.getInput();
-
-        // Crear contenedor React para el botón
-        const btnContainer = document.createElement('div');
-        btnContainer.id = 'toggle-password-icon';
-        btnContainer.style.position = 'absolute';
-        btnContainer.style.right = '3rem';
-        btnContainer.style.top = '48%';
-        btnContainer.style.transform = 'translateY(-50%)';
-        btnContainer.style.cursor = 'pointer';
-
-        input.parentNode.style.position = 'relative';
-        input.parentNode.appendChild(btnContainer);
-
-        let show = false;
-
-        const renderIcon = () => {
-          const root = createRoot(btnContainer);
-          root.render(show ? <VisibilityOffOutlinedIcon /> : <VisibilityOutlinedIcon />);
-        };
-
-        btnContainer.onclick = () => {
-          show = !show;
-          input.type = show ? 'text' : 'password';
-          renderIcon();
-        };
-
-        renderIcon();
-      },
-      inputValidator: (value) => {
-        return new Promise((resolve) => {
-          if (value === '1234') resolve();
-          else resolve('Contraseña incorrecta');
-        });
+      if (onTireSelect) {
+        onTireSelect(id)
       }
-    }).then((result) => result.isConfirmed);
-  };
+    } catch (error) {
+      console.error("Error al cargar cubierta:", error)
+    } finally {
+      setLoadingTireId(null)
+    }
+  }
+
+  const handleEdit = async (id) => {
+    const confirmed = await checkPassword()
+    if (confirmed) {
+      setTireToUpdate(id)
+      setIsUpdateTireModalOpen(true)
+    }
+  }
+
+  const handleCloseTireModal = () => {
+    setIsTireModalOpen(false)
+    setLoadingTireId(null)
+  }
+
+  const handleCloseUpdateModal = () => {
+    setIsUpdateTireModalOpen(false)
+    setTireToUpdate(null)
+  }
+
+  const handleEditFromDetails = async (id) => {
+    const confirmed = await checkPassword()
+    if (confirmed) {
+      setTireToUpdate(id)
+      setIsUpdateTireModalOpen(true)
+      setIsTireModalOpen(false) // Cerrar el modal de detalles
+    }
+  }
 
   useEffect(() => {
-    loadTires();
-  }, [refreshFlag]);
+    loadTires()
+  }, [refreshFlag])
 
-  if (loading) return <p>Cargando...</p>;
-  if (tireCount == 0) return <p>No hay datos para mostrar</p>
-  if (error) return <p>{error}</p>
+  // Estados de carga y error
+  if (loading) {
+    return <LoadingGrid />
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-64">
+        <div className="text-center">
+          <div className="text-red-500 text-6xl mb-4">⚠️</div>
+          <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Error al cargar las cubiertas</h3>
+          <p className="text-gray-600 dark:text-gray-400 mb-4">{error}</p>
+          <button
+            onClick={loadTires}
+            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+          >
+            Reintentar
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  if (tireCount === 0) {
+    return <EmptyState />
+  }
 
   return (
-    <div>
-      <div className='grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 w-fit mx-auto mt-4 gap-3'>
-        <Card
-          data={filteredTireData}
-          handlePasswordCheck={handlePasswordCheck}
-          handleCardClick={handleCardClick}
-          setTireToUpdate={setTireToUpdate}
-          setIsUpdateTireModalOpen={setIsUpdateTireModalOpen}
-        />
+    <div className="space-y-6">
+      {/* Información del listado */}
+      <div className="flex items-center justify-center">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Inventario de Cubiertas</h2>
+          <p className="text-gray-600 dark:text-gray-400">
+            {filteredTireData.length} de {tireCount} cubierta(s)
+          </p>
+        </div>
       </div>
+
+      {/* Grid de tarjetas */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
+        {filteredTireData.map((tire) => (
+          <TireCard
+            key={tire._id}
+            tire={tire}
+            onCardClick={handleCardClick}
+            onEdit={handleEdit}
+            isLoading={loadingTireId === tire._id}
+          />
+        ))}
+      </div>
+
+      {/* Modales */}
       {isTireModalOpen && selectedTire && (
         <TireDetails
-          handlePasswordCheck={handlePasswordCheck}
           selectedLoading={selectedLoading}
           selectedTire={selectedTire}
-          setIsTireModalOpen={setIsTireModalOpen}
-          setTireToUpdate={setTireToUpdate}
-          setIsUpdateTireModalOpen={setIsUpdateTireModalOpen}
+          onClose={handleCloseTireModal}
+          onEdit={handleEditFromDetails}
+          handlePasswordCheck={checkPassword}
         />
       )}
 
-      {isUpdateTireModalOpen && (
-        < UpdateTire
-          id={tireToUpdate}
-          setIsUpdateTireModalOpen={setIsUpdateTireModalOpen}
-        />
-      )}
-
+      {isUpdateTireModalOpen && tireToUpdate && <UpdateTire id={tireToUpdate} onClose={handleCloseUpdateModal} />}
     </div>
   )
 }
 
-export default CardList
+export default TireList

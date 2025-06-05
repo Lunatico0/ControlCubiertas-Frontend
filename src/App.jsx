@@ -1,6 +1,6 @@
 import './App.css'
-import Home from './components/Home.jsx'
-import { ApiProvider } from './context/apiContext.jsx'
+import Home from '@components/Home.jsx'
+import { ApiProvider } from '@context/apiContext'
 
 function App() {
 

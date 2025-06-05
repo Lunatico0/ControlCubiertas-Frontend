@@ -1,63 +1,83 @@
-import React, { useState } from 'react';
-import NewVehicle from './NewVehicle.jsx';
-import NewTire from './NewTire.jsx';
-import camionIMG from '/Camion.png';
-import cubiertaIMG from '/Cubierta.png';
+import { useState } from "react"
+import NewVehicleModal from "./NewVehicle"
+import NewTireModal from "./NewTire"
+import Modal from "../ui/Modal"
 
-const New = ({ setIsNewModalOpen }) => {
+/**
+ * Componente principal para crear nuevos elementos
+ * @param {Object} props - Propiedades del componente
+ * @param {Function} props.onClose - Función para cerrar el modal
+ */
+const New = ({ onClose }) => {
+  const [activeModal, setActiveModal] = useState(null)
 
-  const [isVehicleModalOpen, setIsVehicleModalOpen] = useState(false)
-  const [isTireModalOpen, setIsTireModalOpen] = useState(false)
-
-  const handleNewVehicle = () => {
-    setIsVehicleModalOpen(prev => !prev)
+  const handleOpenVehicleModal = () => {
+    setActiveModal("vehicle")
   }
 
-  const handleNewTire = () => {
-    setIsTireModalOpen(prev => !prev)
+  const handleOpenTireModal = () => {
+    setActiveModal("tire")
+  }
+
+  const handleCloseModal = () => {
+    setActiveModal(null)
+  }
+
+  const handleCloseAll = () => {
+    setActiveModal(null)
+    onClose()
   }
 
   return (
-    <div
-      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 w-full h-full"
-      onClick={() => setIsNewModalOpen(false)}>
-      <div
-        className="bg-gray-200 text-black dark:bg-gray-900 dark:text-white w-1/2 max-w-screen-sm p-6 rounded-xl shadow-lg relative z-10"
-        onClick={(e) => e.stopPropagation()}>
-        <div className="absolute top-1 right-2">
+    <>
+      <Modal title="Agregar nuevo" onClose={onClose} maxWidth="lg">
+        <div className="flex flex-col items-center gap-6">
           <button
-            onClick={() => setIsNewModalOpen(false)}
-            className="text-gray-500 hover:text-gray-700"
+            className="group relative w-full h-40 rounded-xl bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 p-6 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
+            onClick={handleOpenVehicleModal}
           >
-            ✖
+            <div className="flex items-center justify-center gap-6 h-full">
+              <div className="flex-shrink-0">
+                <img
+                  src="/Camion.png"
+                  alt="Vehículo"
+                  className="h-24 w-auto object-contain filter brightness-0 invert"
+                />
+              </div>
+              <div className="text-left">
+                <h3 className="text-2xl font-bold text-white mb-2">Nuevo vehículo</h3>
+                <p className="text-blue-100 text-sm">Registrar un nuevo vehículo en el sistema</p>
+              </div>
+            </div>
+            <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 rounded-xl transition-opacity duration-300"></div>
+          </button>
+
+          <button
+            className="group relative w-full h-40 rounded-xl bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 p-6 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
+            onClick={handleOpenTireModal}
+          >
+            <div className="flex items-center justify-center gap-6 h-full">
+              <div className="flex-shrink-0">
+                <img
+                  src="/Cubierta.png"
+                  alt="Cubierta"
+                  className="h-20 w-auto object-contain filter brightness-0 invert"
+                />
+              </div>
+              <div className="text-left">
+                <h3 className="text-2xl font-bold text-white mb-2">Nueva cubierta</h3>
+                <p className="text-green-100 text-sm">Registrar una nueva cubierta en el inventario</p>
+              </div>
+            </div>
+            <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 rounded-xl transition-opacity duration-300"></div>
           </button>
         </div>
+      </Modal>
 
-        <h2 className="text-4xl font-bold mb-4 text-center">
-          Agregar nuevo
-        </h2>
-
-        <div className="flex flex-col items-center gap-4">
-          <button
-            className="grid grid-flow-col-dense place-items-center w-full h-40 rounded-xl bg-vehiculo p-4"
-            onClick={handleNewVehicle}
-          >
-            <img src={camionIMG} alt="Camion" className="h-auto max-h-32" />
-            <h2 className="text-3xl text-black">Nuevo vehículo</h2>
-          </button>
-
-          <button
-            className="grid grid-flow-col-dense place-items-center w-full h-40 rounded-xl bg-cubierta p-4"
-            onClick={handleNewTire}
-          >
-            <img src={cubiertaIMG} alt="Cubierta" className="h-auto max-h-28" />
-            <h2 className="text-3xl text-black">Nueva cubierta</h2>
-          </button>
-        </div>
-      </div>
-      {isVehicleModalOpen && <NewVehicle setIsVehicleModalOpen={setIsVehicleModalOpen} />}
-      {isTireModalOpen && <NewTire setIsTireModalOpen={setIsTireModalOpen} />}
-    </div>
+      {/* Modales secundarios */}
+      {activeModal === "vehicle" && <NewVehicleModal onClose={handleCloseModal} onSuccess={handleCloseAll} />}
+      {activeModal === "tire" && <NewTireModal onClose={handleCloseModal} onSuccess={handleCloseAll} />}
+    </>
   )
 }
 

@@ -1,47 +1,108 @@
-
-¦   .env
-¦   .gitignore
-¦   eslint.config.js
-¦   index.html
-¦   package-lock.json
-¦   package.json
-¦   postcss.config.js
-¦   README.md
-¦   tailwind.config.js
-¦   vercel.json
-¦   vite.config.js
-¦   
-+---.vscode
-¦
-+---node_modules
-¦
+|   .env
+|   .gitignore
+|   eslint.config.js
+|   index.html
+|   package-lock.json
+|   package.json
+|   postcss.config.js
+|   README.md
+|   tailwind.config.js
+|   tree.txt
+|   vercel.json
+|   vite.config.js
+|
++---.vercel
 +---public
-¦       Camion.png
-¦       Cubierta.png
-¦       TMBC.ico
-¦       TMBC.png
-¦       
+|       Camion.png
+|       Cubierta.png
+|       print-css.css
+|       print-template.html
+|       TMBC.ico
+|       TMBC.png
+|
 +---src
-    ¦   App.css
-    ¦   App.jsx
-    ¦   index.css
-    ¦   main.jsx
-    ¦   
+    |   App.css
+    |   App.jsx
+    |   index.css
+    |   main.jsx
+    |
+    +---api
+    |       tires.js
+    |       vehicles.js
+    |
     +---components
-    ¦   ¦   Card.jsx
-    ¦   ¦   Home.jsx
-    ¦   ¦   TireList.jsx
-    ¦   ¦   
-    ¦   +---utils
-    ¦           Help.jsx
-    ¦           HelpNew.jsx
-    ¦           New.jsx
-    ¦           NewTire.jsx
-    ¦           NewVehicle.jsx
-    ¦           SearchFilter.jsx
-    ¦           TireDetails.jsx
-    ¦           UpdateTire.jsx
-    ¦           
+    |   |   Help.jsx
+    |   |   HelpNew.jsx
+    |   |   Home.jsx
+    |   |   SearchFilter.jsx
+    |   |
+    |   +---actions
+    |   |   |   QuickActions.jsx
+    |   |   |
+    |   |   +---modals
+    |   |           AssignTireModal.jsx
+    |   |           ConfirmDiscardModal.jsx
+    |   |           EditHistoryModal.jsx
+    |   |           FinishRecapModal.jsx
+    |   |           SendToRecapModal.jsx
+    |   |           UnassignTireModal.jsx
+    |   |           UndoHistoryEntryModal.jsx
+    |   |
+    |   +---Forms
+    |   |   |   TireForm.jsx
+    |   |   |   VehicleForm.jsx
+    |   |   |
+    |   |   +---fields
+    |   |           SelectedTiresList.jsx
+    |   |           TireField.jsx
+    |   |           TireSearchBox.jsx
+    |   |           VehicleField.jsx
+    |   |
+    |   +---New
+    |   |       New.jsx
+    |   |       NewTire.jsx
+    |   |       NewVehicle.jsx
+    |   |
+    |   +---TireDetails
+    |   |       TireDetails.jsx
+    |   |       TireHistory.jsx
+    |   |       TireInfo.jsx
+    |   |
+    |   +---TireList
+    |   |       Card.jsx
+    |   |       TireList.jsx
+    |   |
+    |   +---UpdateTire
+    |           UpdateTire.jsx
+    |
     +---context
-            apiContext.jsx
-            
+    |       apiContext.jsx
+    |
+    +---hooks
+    |       use-print-refactor.js
+    |       use-print.js
+    |       use-tire-action.js
+    |       useClose.js
+    |       useContextMenu.js
+    |       useCreateEntity.js
+    |       useOrderValidation.js
+    |       UsePasswordCheck.js
+    |       UseTireDetails.js
+    |       UseTireSelection.js
+    |       useTooltip.js
+    |
+    +---utils
+            getRowStyle.js
+            orderNumber.js
+            print-data.js
+            PrintableReceipt.jsx
+            printReceipt.js
+            receipt-html.js
+            statusStyle.js
+            suggestedCode.js
+            tireStatusInfo.js
+            toast.js
+
+Implementar paginacion condicional
+
+Hacer funcionar electronUpdater                                                X

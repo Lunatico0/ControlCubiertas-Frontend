@@ -1,0 +1,141 @@
+import { useContext } from "react"
+import ApiContext from "@context/apiContext"
+import { useTireAction } from "@hooks/useTireAction"
+import { buildCorrectionPrintData } from "@utils/print-data"
+import TireForm from "../../Forms/TireForm"
+import Modal from "../../ui/Modal"
+import { useOrderValidation } from "@hooks/useOrderValidation"
+
+const EditHistoryModal = ({ tire, entry, onClose, refreshTire }) => {
+  const { handleUpdateHistoryEntry, vehicles, getReceiptNumber, loadTireById } = useContext(ApiContext)
+  const { validateOrderNumber } = useOrderValidation()
+
+  const currentVehicleId = entry.vehicle?._id || ""
+  const type = entry.type || "estado"
+  const isCorrection = type.startsWith("correccion")
+  const baseType = type.replace("correccion-", "")
+
+  const { execute, isSubmitting } = useTireAction({
+    apiCall: handleUpdateHistoryEntry,
+    printBuilder: buildCorrectionPrintData,
+    successMessage: "Entrada del historial actualizada correctamente",
+  })
+
+  const handleSubmit = async (data) => {
+    await execute({
+      tire,
+      entry,
+      formData: {
+        form: {
+          orderNumber: data.orderNumber,
+          kmAlta: data.kmAlta,
+          kmBaja: data.kmBaja,
+          status: data.status,
+          vehicle: data.vehicle,
+          reason: data.reason,
+        },
+        getReceiptNumber,
+      },
+      refresh: loadTireById,
+      close: onClose,
+    })
+  }
+
+  if (isCorrection) {
+    return (
+      <Modal title="Editar entrada de historial" onClose={onClose}>
+        <p className="text-red-500 font-semibold text-center">
+          Esta entrada ya es una corrección y no puede ser editada nuevamente.
+        </p>
+        <div className="flex justify-center mt-4">
+          <button
+            onClick={onClose}
+            className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold px-6 py-2 rounded-md transition"
+          >
+            Cerrar
+          </button>
+        </div>
+      </Modal>
+    )
+  }
+
+  // Determinar qué campos mostrar y cuáles son requeridos según el tipo
+  const showFields = {
+    orderNumber: true,
+    status: true,
+    reason: true,
+    kmAlta: ["asignacion"].includes(baseType),
+    kmBaja: ["desasignacion"].includes(baseType),
+    vehicle: ["asignacion"].includes(baseType),
+  }
+
+  const fieldOptions = {
+    orderNumber: {
+      required: true,
+      requiredMessage: "El número de orden es obligatorio",
+    },
+    status: {
+      required: true,
+      requiredMessage: "El estado es obligatorio",
+    },
+    reason: {
+      required: true,
+      requiredMessage: "El motivo de corrección es obligatorio",
+    },
+    kmAlta: {
+      required: ["asignacion"].includes(baseType),
+      requiredMessage: "El kilometraje inicial es obligatorio",
+      disabled: !["asignacion"].includes(baseType),
+    },
+    kmBaja: {
+      required: ["desasignacion"].includes(baseType),
+      requiredMessage: "El kilometraje final es obligatorio",
+      disabled: !["desasignacion"].includes(baseType),
+    },
+    vehicle: {
+      required: ["asignacion"].includes(baseType),
+      requiredMessage: "Debe seleccionar un vehículo",
+      disabled: !["asignacion"].includes(baseType),
+    },
+  }
+
+  return (
+    <Modal title="Editar entrada de historial" onClose={onClose} maxWidth="lg">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        <div className="p-2 bg-gray-100 dark:bg-gray-800 rounded">
+          <p className="font-semibold">Código: {tire.code}</p>
+        </div>
+        <div className="p-2 bg-gray-100 dark:bg-gray-800 rounded">
+          <p className="font-semibold">Serie: {tire.serialNumber}</p>
+        </div>
+        <div className="p-2 bg-gray-100 dark:bg-gray-800 rounded">
+          <p className="font-semibold">Marca: {tire.brand}</p>
+        </div>
+        <div className="p-2 bg-gray-100 dark:bg-gray-800 rounded">
+          <p className="font-semibold">Dibujo: {tire.pattern}</p>
+        </div>
+      </div>
+
+      <TireForm
+        onSubmit={handleSubmit}
+        onCancel={onClose}
+        isSubmitting={isSubmitting}
+        vehicles={vehicles}
+        defaultValues={{
+          orderNumber: "",
+          kmAlta: entry.kmAlta || "",
+          kmBaja: entry.kmBaja || "",
+          status: entry.status || tire.status,
+          vehicle: currentVehicleId,
+          reason: `Corrección de Orden N°${entry.orderNumber}`,
+        }}
+        showFields={showFields}
+        fieldOptions={fieldOptions}
+        validateOrderNumber={validateOrderNumber}
+        submitLabel="Guardar"
+      />
+    </Modal>
+  )
+}
+
+export default EditHistoryModal
