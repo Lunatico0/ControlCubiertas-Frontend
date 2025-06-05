@@ -2,7 +2,7 @@ import { useContext, useState } from "react"
 import { getRowStyle, dictionary } from "@utils/historyStyles"
 import useContextMenu from "@hooks/useContextMenu"
 import useTooltip from "@hooks/useTooltip"
-import UndoHistoryEntryModal from "../actions/modals/UndoHistoryEntryModal"
+import UndoHistoryEntryModal from "@components/actions/modals/UndoHistoryEntryModal"
 import ApiContext from "@context/apiContext"
 
 /**

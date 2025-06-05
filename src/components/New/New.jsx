@@ -1,7 +1,7 @@
 import { useState } from "react"
 import NewVehicle from "./NewVehicle"
 import NewTire from "./NewTire"
-import Modal from "../ui/Modal"
+import Modal from "@components/ui/Modal"
 
 /**
  * Componente principal para crear nuevos elementos

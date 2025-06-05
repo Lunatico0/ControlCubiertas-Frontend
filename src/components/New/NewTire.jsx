@@ -1,7 +1,7 @@
 import { useContext } from "react"
 import ApiContext from "@context/apiContext"
-import TireForm from "../Forms/TireForm"
-import Modal from "../ui/Modal"
+import TireForm from "@components/Forms/TireForm"
+import Modal from "@components/ui/Modal"
 import { useOrderValidation } from "@hooks/useOrderValidation"
 import { useCreateEntity } from "@hooks/useCreateEntity"
 

@@ -2,8 +2,8 @@ import { useContext, useState, useEffect } from "react"
 import ApiContext from "@context/apiContext"
 import TireInfo from "./TireInfo"
 import TireHistory from "./TireHistory"
-import QuickActions from "../actions/QuickActions"
-import EditHistoryModal from "../actions/modals/EditHistoryModal"
+import QuickActions from "@components/actions/QuickActions"
+import EditHistoryModal from "@components/actions/modals/EditHistoryModal"
 
 /**
  * Componente principal para mostrar los detalles de una cubierta

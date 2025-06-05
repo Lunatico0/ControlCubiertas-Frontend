@@ -2,8 +2,8 @@ import { useContext, useState } from "react"
 import ApiContext from "@context/apiContext"
 import { useTireAction } from "@hooks/useTireAction"
 import { buildFinishRecapPrintData } from "@utils/print-data"
-import TireForm from "../../Forms/TireForm"
-import Modal from "../../ui/Modal"
+import TireForm from "@components/Forms/TireForm"
+import Modal from "@components/ui/Modal"
 import { useOrderValidation } from "@hooks/useOrderValidation"
 
 const FinishRecapModal = ({ tire, onClose, refreshTire }) => {
