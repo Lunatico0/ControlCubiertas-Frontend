@@ -5,7 +5,7 @@ import {
   showDownloadProgress,
   updateProgressBar,
   closeDownloadProgress
-} from "@utils/update-progress"
+} from "@utils/updateProgress"
 
 export const useUpdater = () => {
   useEffect(() => {
