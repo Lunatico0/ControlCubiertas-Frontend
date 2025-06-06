@@ -1,11 +1,11 @@
 import { useEffect } from "react"
 import Swal from "sweetalert2"
-import { showToast } from "../utils/toast"
+import { showToast } from "@utils/toast"
 import {
   showDownloadProgress,
   updateProgressBar,
   closeDownloadProgress
-} from "../utils/update-progress"
+} from "@utils/update-progress"
 
 export const useUpdater = () => {
   useEffect(() => {
