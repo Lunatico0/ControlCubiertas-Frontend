@@ -3,7 +3,7 @@
  */
 export const statusStyles = {
   "Nueva": "bg-blue-300 dark:bg-blue-900/60",
-  "1er Recapado": "bg-green-300 dark:bg-green-900/60",
+  "1er Recapado": "bg-green-400 dark:bg-green-900/60",
   "2do Recapado": "bg-yellow-300 dark:bg-yellow-900/60",
   "3er Recapado": "bg-orange-400 dark:bg-orange-900/60",
   "A recapar": "bg-neutral-700 dark:bg-neutral-900/60",
@@ -44,7 +44,7 @@ export const getStatusBorderColor = (status) => {
     case "Nueva":
       return "border-blue-300 dark:border-blue-700"
     case "1er Recapado":
-      return "border-green-300 dark:border-green-700"
+      return "border-green-400 dark:border-green-700"
     case "2do Recapado":
       return "border-yellow-300 dark:border-yellow-700"
     case "3er Recapado":

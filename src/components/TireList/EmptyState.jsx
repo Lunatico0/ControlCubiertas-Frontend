@@ -6,7 +6,7 @@ const EmptyState = () => {
     <div className="flex items-center justify-center min-h-96">
       <div className="text-center max-w-md">
         <div className="w-24 h-24 mx-auto mb-6 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center">
-          <img src="/Cubierta.png" alt="Sin cubiertas" className="w-16 h-16 opacity-50 filter grayscale" />
+          <img src="Cubierta.png" alt="Sin cubiertas" className="w-16 h-16 opacity-50 filter grayscale" />
         </div>
 
         <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">No hay cubiertas registradas</h3>

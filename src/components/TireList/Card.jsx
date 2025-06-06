@@ -73,7 +73,7 @@ const TireCard = ({ tire, onCardClick, onEdit, isLoading = false }) => {
         `}
       >
         <img
-          src="/Cubierta.png"
+          src="Cubierta.png"
           alt="Cubierta"
           className={`
             w-32 h-32 object-contain transition-all duration-300

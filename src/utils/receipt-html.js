@@ -82,74 +82,71 @@ export const generateReceiptHTML = (data) => {
   const sections = ["ORIGINAL", "DUPLICADO"]
     .map(
       (type) => `
-    <div class="receipt-section">
-      <div class="watermark">
-        <img
-          src="/TMBC.png"
-          alt="Marca de agua TMBC"
-          class="watermark-image"
-        />
-      </div>
-
-      <div class="content">
-        <div class="header">
-          <div class="company-info">
-            <p>TMBC</p>
-            <p>Ruta Nac. Nº 12 Km 1, Nogoyá</p>
-            <p>Tel: 03435 - 423694</p>
-          </div>
-          <div class="receipt-info">
-            <p><strong>${type}</strong></p>
-            <p>Recibo Nº: ${data?.receiptNumber || "0000-00000000"}</p>
-            <p>Fecha: ${new Date().toLocaleDateString("es-AR")}</p>
-          </div>
+      <div class="receipt-section">
+        <div class="watermark">
+          <img
+            src="TMBC.png"
+            alt="Marca de agua TMBC"
+            class="watermark-image"
+          />
         </div>
 
-        <p class="title">COMPROBANTE</p>
-
-        <div class="details">
-          <div>
-            <p><strong>Cubierta:</strong> #${data?.tire?.code || ""}</p>
-            <p><strong>N° Serie:</strong> ${data?.tire?.serialNumber || ""}</p>
-            <p><strong>Marca:</strong> ${data?.tire?.brand || ""}</p>
-            <p><strong>Dibujo:</strong> ${data?.tire?.pattern || ""}</p>
-
-            ${data?.tire?.status ? `<p><strong>Estado:</strong> ${data?.tire?.status}</p>` : ""}
-
-            ${
-              data?.tire?.kilometers !== undefined
-                ? `<p><strong>Km recorridos totales:</strong> ${data?.tire?.kilometers.toLocaleString() || "0"}</p>`
-                : ""
-            }
+        <div class="content">
+          <div class="header">
+            <div class="company-info">
+              <p>TMBC</p>
+              <p>Ruta Nac. Nº 12 Km 1, Nogoyá</p>
+              <p>Tel: 03435 - 423694</p>
+            </div>
+            <div class="receipt-info">
+              <p><strong>${type}</strong></p>
+              <p>Recibo Nº: ${data?.receiptNumber || "0000-00000000"}</p>
+              <p>Fecha: ${new Date().toLocaleDateString("es-AR")}</p>
+            </div>
           </div>
-          <div>
-            <p><strong>Orden:</strong> ${data?.orderNumber || data?.correction?.orderNumber || ""}</p>
-            <p><strong>Acción:</strong> ${data?.actionType || ""}</p>
 
-            ${renderStatusChanges(data)}
-            ${renderKmInfo(data)}
+          <p class="title">COMPROBANTE</p>
+
+          <div class="details">
+            <div>
+              <p><strong>Cubierta:</strong> #${data?.tire?.code || ""}</p>
+              <p><strong>N° Serie:</strong> ${data?.tire?.serialNumber || ""}</p>
+              <p><strong>Marca:</strong> ${data?.tire?.brand || ""}</p>
+              <p><strong>Dibujo:</strong> ${data?.tire?.pattern || ""}</p>
+
+              ${data?.tire?.status ? `<p><strong>Estado:</strong> ${data?.tire?.status}</p>` : ""}
+
+              ${data?.tire?.kilometers !== undefined
+          ? `<p><strong>Km recorridos totales:</strong> ${data?.tire?.kilometers.toLocaleString() || "0"}</p>`
+          : ""
+        }
+            </div>
+            <div>
+              <p><strong>Orden:</strong> ${data?.orderNumber || data?.correction?.orderNumber || ""}</p>
+              <p><strong>Acción:</strong> ${data?.actionType || ""}</p>
+
+              ${renderStatusChanges(data)}
+              ${renderKmInfo(data)}
+            </div>
+            <div>
+              <p><strong>Vehículo:</strong> ${data?.vehicle?.mobile || "Sin asignar"}</p>
+              <p><strong>Patente:</strong> ${data?.vehicle?.licensePlate || "Sin asignar"}</p>
+            </div>
           </div>
-          <div>
-            <p><strong>Vehículo:</strong> ${data?.vehicle?.mobile || "Sin asignar"}</p>
-            <p><strong>Patente:</strong> ${data?.vehicle?.licensePlate || "Sin asignar"}</p>
-          </div>
+
+          ${renderCorrectionInfo(data)}
         </div>
 
-        ${renderCorrectionInfo(data)}
-      </div>
-
-      <div class="footer">
-        <div class="signatures">
-          <p>Firma Responsable: ___________________________</p>
-          <p>Firma Chofer: ___________________________</p>
+        <div class="footer">
+          <div class="signatures">
+            <p>Firma Responsable: ___________________________</p>
+            <p>Firma Chofer: ___________________________</p>
+          </div>
+          <p class="note">
+            <strong>Nota:</strong> Este comprobante se emite automáticamente por el sistema.
+          </p>
         </div>
-        <p class="note">
-          <strong>Nota:</strong> Este comprobante se emite automáticamente por el sistema.
-        </p>
-      </div>
-    </div>
-  `,
-    )
+      </div>`,)
     .join("")
 
   return `${styles}${sections}`
@@ -192,10 +189,9 @@ const renderKmInfo = (data) => {
   if (data?.kmBaja) {
     return `
       <p class="km-recorridos"><strong>Km Baja:</strong> ${data.kmBaja.toLocaleString()} km</p>
-      ${
-        data.kmRecorridos !== undefined
-          ? `<p class="km-recorridos"><strong>Km en este viaje:</strong> ${data.kmRecorridos.toLocaleString()} km</p>`
-          : ""
+      ${data.kmRecorridos !== undefined
+        ? `<p class="km-recorridos"><strong>Km en este viaje:</strong> ${data.kmRecorridos.toLocaleString()} km</p>`
+        : ""
       }
     `
   }

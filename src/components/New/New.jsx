@@ -39,7 +39,7 @@ const New = ({ onClose }) => {
             <div className="flex items-center justify-center gap-6 h-full">
               <div className="flex-shrink-0">
                 <img
-                  src="/Camion.png"
+                  src="Camion.png"
                   alt="Vehículo"
                   className="h-24 w-auto object-contain filter brightness-0 invert"
                 />
@@ -59,7 +59,7 @@ const New = ({ onClose }) => {
             <div className="flex items-center justify-center gap-6 h-full">
               <div className="flex-shrink-0">
                 <img
-                  src="/Cubierta.png"
+                  src="Cubierta.png"
                   alt="Cubierta"
                   className="h-20 w-auto object-contain filter brightness-0 invert"
                 />

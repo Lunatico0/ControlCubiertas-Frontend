@@ -103,6 +103,14 @@
             tireStatusInfo.js
             toast.js
 
-Implementar paginacion condicional
+
 
 Hacer funcionar electronUpdater                                                X
+
+Acomodar plantilla de impresion
+
+Poder reimprimir desde las opciones de una entrada de historial
+
+Vistas para notebook (1350 x 640)
+
+Implementar paginacion condicional

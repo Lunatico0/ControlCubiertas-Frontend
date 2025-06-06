@@ -28,7 +28,7 @@ const TireInfo = ({ tire, onEdit, compact = false }) => {
           <div className="text-center">
             <div className="w-16 h-16 mb-2 flex items-center justify-center mx-auto">
               <img
-                src="/Cubierta.png"
+                src="Cubierta.png"
                 alt="Cubierta"
                 className="w-12 h-12 object-contain"
               />
@@ -96,7 +96,7 @@ const TireInfo = ({ tire, onEdit, compact = false }) => {
       >
         <div className="w-32 h-32 mb-4 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center">
           <img
-            src="/Cubierta.png"
+            src="Cubierta.png"
             alt="Cubierta"
             className="w-24 h-24 object-contain filter brightness-0 dark:invert"
           />
