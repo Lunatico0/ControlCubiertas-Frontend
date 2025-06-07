@@ -362,7 +362,6 @@ export const ApiProvider = ({ children }) => {
   // Efecto para recargar cuando cambia refreshTrigger
   useEffect(() => {
     if (refreshTrigger > 0) {
-      console.log("🔄 Refrescando datos...")
       loadTires()
     }
   }, [refreshTrigger, loadTires])

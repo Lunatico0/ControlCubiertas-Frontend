@@ -89,18 +89,11 @@ const TireForm = ({
 
   // Función para manejar el envío del formulario
   const handleFormSubmit = async (data) => {
-    console.log("📝 Datos del formulario antes de procesar:", data)
-    {errors && console.log("❗ Errores del formulario:", errors)}
-    console.log("🔍 Campos mostrados:", showFields)
-    console.log("⚙️ Opciones de campos:", fieldOptions)
-
     try {
       // Si hay orderNumber, formatearlo antes de enviar
       if (data.orderNumber) {
         data.orderNumber = formatOrderNumber(data.orderNumber)
       }
-
-      console.log("📤 Datos finales a enviar:", data)
       await onSubmit(data)
     } catch (error) {
       console.error("Error en envío del formulario:", error)

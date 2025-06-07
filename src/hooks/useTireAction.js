@@ -23,7 +23,6 @@ export const useTireAction = ({ printBuilder, apiCall, successMessage }) => {
 
       try {
         setIsSubmitting(true)
-        console.log("🔄 Iniciando acción para tire:", tire._id)
 
         // Validar que apiCall existe
         if (!apiCall || typeof apiCall !== "function") {
@@ -38,8 +37,6 @@ export const useTireAction = ({ printBuilder, apiCall, successMessage }) => {
           updated = await apiCall(tire._id, formData)
         }
 
-        console.log("✅ Respuesta de API recibida:", updated)
-
         if (!updated?.tire) {
           throw new Error("Respuesta inválida del servidor")
         }
@@ -49,7 +46,6 @@ export const useTireAction = ({ printBuilder, apiCall, successMessage }) => {
         if (formData.getReceiptNumber && typeof formData.getReceiptNumber === "function") {
           try {
             receipt = await formData.getReceiptNumber()
-            console.log("🧾 Número de recibo obtenido:", receipt)
           } catch (receiptError) {
             console.warn("⚠️ No se pudo obtener número de recibo:", receiptError)
           }
@@ -59,12 +55,9 @@ export const useTireAction = ({ printBuilder, apiCall, successMessage }) => {
         if (printBuilder) {
           try {
             const printData = printBuilder(tire, updated, formData, receipt)
-            console.log("🖨️ Datos de impresión preparados")
 
             if (printData) {
-              console.log("🖨️ Iniciando proceso de impresión...")
               const printResult = await print(printData)
-              console.log("🖨️ Resultado de impresión:", printResult)
             }
           } catch (printError) {
             console.error("❌ Error al imprimir:", printError)
@@ -73,15 +66,12 @@ export const useTireAction = ({ printBuilder, apiCall, successMessage }) => {
         }
 
         // Mostrar mensaje de éxito DESPUÉS de la impresión
-        console.log("✅ Mostrando mensaje de éxito")
         showToast("success", successMessage)
 
         // Refrescar datos
         if (refresh && typeof refresh === "function") {
           try {
-            console.log("🔄 Refrescando datos...")
             await refresh(updated.tire._id)
-            console.log("✅ Datos refrescados")
           } catch (refreshError) {
             console.error("❌ Error al refrescar:", refreshError)
           }
@@ -89,11 +79,9 @@ export const useTireAction = ({ printBuilder, apiCall, successMessage }) => {
 
         // Cerrar modal
         if (close && typeof close === "function") {
-          console.log("🚪 Cerrando modal...")
           close()
         }
 
-        console.log("🎉 Acción completada exitosamente")
         return updated
       } catch (error) {
         console.error("❌ Error en la acción:", error)
@@ -101,7 +89,6 @@ export const useTireAction = ({ printBuilder, apiCall, successMessage }) => {
         throw error
       } finally {
         setIsSubmitting(false)
-        console.log("🔄 Estado isSubmitting reseteado")
       }
     },
     [apiCall, printBuilder, print, isSubmitting, successMessage],

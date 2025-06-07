@@ -13,16 +13,12 @@ export const usePrint = () => {
       return new Promise((resolve, reject) => {
         try {
           setIsPrinting(true)
-          console.log("🖨️ Iniciando proceso de impresión...")
-
           // Crear ventana de impresión
           const printWindow = window.open("", "", "width=800,height=600")
 
           if (!printWindow) {
             throw new Error("No se pudo abrir la ventana de impresión")
           }
-
-          console.log("✅ Ventana de impresión abierta")
 
           // Escribir contenido HTML
           printWindow.document.write(`
@@ -100,14 +96,10 @@ export const usePrint = () => {
         `)
 
           printWindow.document.close()
-          console.log("📄 Documento HTML escrito y cerrado")
 
           // Escuchar mensaje de confirmación
           const handleMessage = (event) => {
-            console.log("📨 Mensaje recibido:", event.data)
-
             if (event.data?.printed !== undefined) {
-              console.log("✅ Confirmación de impresión recibida:", event.data.printed)
               window.removeEventListener("message", handleMessage)
               setIsPrinting(false)
               resolve(event.data.printed)
@@ -115,11 +107,9 @@ export const usePrint = () => {
           }
 
           window.addEventListener("message", handleMessage)
-          console.log("👂 Listener de mensajes configurado")
 
           // Timeout de seguridad más largo
           setTimeout(() => {
-            console.log("⏰ Timeout alcanzado")
             if (isPrinting) {
               window.removeEventListener("message", handleMessage)
               setIsPrinting(false)
@@ -131,7 +121,6 @@ export const usePrint = () => {
           // Detectar si la ventana se cierra sin mensaje
           const checkClosed = setInterval(() => {
             if (printWindow.closed) {
-              console.log("🚪 Ventana cerrada detectada")
               clearInterval(checkClosed)
               if (isPrinting) {
                 window.removeEventListener("message", handleMessage)
