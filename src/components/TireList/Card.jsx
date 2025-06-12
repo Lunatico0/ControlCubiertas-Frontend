@@ -46,13 +46,9 @@ const TireCard = ({ tire, onCardClick, onEdit, isLoading = false }) => {
       <button
         onClick={handleEdit}
         disabled={isLoading}
-        className={`
-          absolute top-3 right-3 z-20
-          ${button.primary}
-          text-white rounded-lg
-          transition-transform transform hover:scale-105
-          opacity-0 group-hover:opacity-100
-        `}
+        className={
+          `absolute top-3 right-3 z-20 shadow-sm hover:shadow-md px-3 py-1 rounded-lg hover:scale-105 opacity-0 group-hover:opacity-100 bg-blue-600 hover:bg-blue-700 text-white transition-all transform duration-300`
+        }
         title="Editar cubierta"
       >
         <EditNoteRoundedIcon />
@@ -61,24 +57,23 @@ const TireCard = ({ tire, onCardClick, onEdit, isLoading = false }) => {
       {/* Imagen de la cubierta */}
       <div
         className={`
-          flex items-center justify-center h-48 relative overflow-hidden
-          ${statusStyles[tire.status] || "bg-gray-100 dark:bg-gray-700"}
-        `}
+    relative h-48 w-full overflow-hidden
+    ${statusStyles[tire.status] || "bg-gray-100 dark:bg-gray-700"}
+  `}
       >
-        <img
-          src="Cubierta.png"
-          alt="Cubierta"
-          className={`
-            w-32 h-32 object-contain transition-all duration-300
-            ${isRecap ? "opacity-60 grayscale" : ""}
-            ${isDiscarded ? "opacity-40 grayscale" : ""}
-            group-hover:scale-110
-          `}
-        />
+        {/* Capa que se blurea */}
+        <div className="absolute inset-0 z-0 group-hover:bg-black/10 group-hover:blur-sm transition-all duration-300">
+          <img
+            src="Cubierta.png"
+            alt="Cubierta"
+            className={`w-full h-full object-contain ${isRecap ? "opacity-60 grayscale" : ""} ${isDiscarded ? "opacity-40 grayscale" : ""} transition-transform duration-300 group-hover:scale-110`
+            }
+          />
+        </div>
 
-        {/* Overlay con información rápida */}
-        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 group-hover:backdrop-blur-sm transition-all duration-300 flex items-center justify-center">
-          <span className="text-white font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+        {/* Elementos que NO deben verse afectados por el blur */}
+        <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
+          <span className="text-white font-medium text-md opacity-0 group-hover:opacity-100 transition-opacity duration-300">
             Ver detalles
           </span>
         </div>

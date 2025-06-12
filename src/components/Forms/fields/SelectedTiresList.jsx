@@ -17,7 +17,7 @@ const SelectedTiresList = ({ tires = [], onRemoveTire }) => (
           </p>
           <button
             type="button"
-            onClick={() => onRemoveTire(tire)}
+            onClick={() => onRemoveTire(tire._id)}
             className="px-2 py-1 bg-red-500 hover:bg-red-600 text-white rounded text-xs"
             aria-label={`Eliminar cubierta ${tire.code}`}
           >

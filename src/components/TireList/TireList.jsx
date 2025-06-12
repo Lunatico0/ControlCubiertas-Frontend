@@ -7,6 +7,8 @@ import { usePasswordCheck } from "@hooks/usePasswordCheck"
 import LoadingGrid from "./LoadingGrid"
 import EmptyState from "./EmptyState"
 import { colors } from "@utils/tokens"
+import { usePagination } from "@hooks/usePagination.js"
+import PaginationControls from "@components/TireList/PaginationControls.jsx"
 
 const TireList = ({ onTireSelect }) => {
   const {
@@ -15,6 +17,17 @@ const TireList = ({ onTireSelect }) => {
     tires,
     state
   } = useContext(ApiContext)
+
+  const {
+    currentPage,
+    totalPages,
+    currentItems,
+    goToPage,
+    nextPage,
+    prevPage,
+    itemsPerPage,
+    setItemsPerPage,
+  } = usePagination(data.filteredTireData, 12)
 
   const [tireToUpdate, setTireToUpdate] = useState(null)
   const [isTireModalOpen, setIsTireModalOpen] = useState(false)
@@ -104,14 +117,30 @@ const TireList = ({ onTireSelect }) => {
         <div>
           <h2 className="text-2xl font-semibold tracking-tight text-gray-900 dark:text-white mb-1">Inventario de Cubiertas</h2>
           <p className={`${colors.muted} text-sm`}>
-            {data.filteredTireData.length} de {data.tireCount} cubierta(s)
+            {currentItems.length} de {data.tireCount} cubierta(s)
           </p>
         </div>
       </div>
 
+      <div className="flex items-center gap-2 justify-end">
+        <label htmlFor="itemsPerPage" className={`${colors.muted} text-sm`}>
+          Por página:
+        </label>
+        <select
+          id="itemsPerPage"
+          value={itemsPerPage}
+          onChange={(e) => setItemsPerPage(Number(e.target.value))}
+          className="flex py-1 px-2 w-20 text-center border rounded bg-white dark:bg-gray-900 dark:text-white"
+        >
+          {[12, 24, 48].map((opt) => (
+            <option key={opt} value={opt}>{opt}</option>
+          ))}
+        </select>
+      </div>
+
       {/* Grid de tarjetas */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pt-8">
-        {data.filteredTireData.map((tire) => (
+        {currentItems.map((tire) => (
           <TireCard
             key={tire._id}
             tire={tire}
@@ -120,6 +149,8 @@ const TireList = ({ onTireSelect }) => {
             isLoading={loadingTireId === tire._id}
           />
         ))}
+
+
       </div>
 
       {/* Modales */}
@@ -134,6 +165,14 @@ const TireList = ({ onTireSelect }) => {
       )}
 
       {isUpdateTireModalOpen && tireToUpdate && <UpdateTire id={tireToUpdate} onClose={handleCloseUpdateModal} />}
+
+      <PaginationControls
+        currentPage={currentPage}
+        totalPages={totalPages}
+        goToPage={goToPage}
+        nextPage={nextPage}
+        prevPage={prevPage}
+      />
     </div>
   )
 }

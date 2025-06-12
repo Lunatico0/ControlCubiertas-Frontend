@@ -3,7 +3,7 @@ import VehicleField from "./fields/VehicleField"
 import TireSearchBox from "./fields/TireSearchBox"
 import SelectedTiresList from "./fields/SelectedTiresList"
 import AddCircleRoundedIcon from '@mui/icons-material/AddCircleRounded';
-import Button from '@components/UI/button'
+import Button from '@components/UI/Button'
 import { button } from '@utils/tokens'
 
 const VehicleForm = ({
