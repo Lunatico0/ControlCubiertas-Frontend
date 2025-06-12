@@ -7,7 +7,8 @@
   "scripts": {
     "dev": "vite",
     "start": "vite",
-    "build": "vite build",
+    "build:web": "vite build",
+    "build:electron": "BUILD_TARGET=electron vite build",
     "preview": "vite preview",
     "electron:start": "electron ."
   },

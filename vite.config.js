@@ -1,13 +1,16 @@
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
-import path from 'path';
+// vite.config.js
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import path from 'path'
 
-// https://vite.dev/config/
+// Detectar si el build es para Electron (via variable de entorno)
+const isElectron = process.env.BUILD_TARGET === 'electron'
+
 export default defineConfig({
   plugins: [react()],
   base: './',
   build: {
-    outDir: '../desktop/build',
+    outDir: isElectron ? '../desktop/build' : 'dist', // Electron usa otro output
     emptyOutDir: true,
   },
   resolve: {
