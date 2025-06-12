@@ -1,20 +1,19 @@
-import { useContext } from "react"
-import ApiContext from "@context/apiContext"
-import tireStatusInfo from "@utils/tireStatusInfo"
+import { useContext } from "react";
+import ApiContext from "@context/apiContext";
+import tireStatusInfo from "@utils/tireStatusInfo";
+import HelpOutlineRoundedIcon from '@mui/icons-material/HelpOutlineRounded';
+import { colors } from "@utils/tokens"
 
-/**
- * Componente de ayuda que muestra información sobre los estados de las cubiertas
- */
 const Help = () => {
-  const { availableStatuses } = useContext(ApiContext)
+  const { data } = useContext(ApiContext)
 
   return (
     <div className="relative group">
       <button
-        className="flex items-center gap-3 px-4 py-3 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-all duration-200 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
-        title="Ver información de estados"
+        className={`flex items-center gap-3 px-4 py-3 ${colors.muted} hover:text-gray-800 dark:hover:text-gray-200 transition-all duration-200 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
+        title="Ver información de estados`}
       >
-        <span className="text-xl">❓</span>
+        <span className="text-xl"><HelpOutlineRoundedIcon /></span>
         <span className="font-medium">Ayuda</span>
       </button>
 
@@ -27,13 +26,13 @@ const Help = () => {
           <div className="space-y-4">
             <div className="border-b border-gray-200 dark:border-gray-700 pb-3">
               <h3 className="font-bold text-gray-900 dark:text-white text-lg">Estados de las cubiertas</h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+              <p className={`text-sm ${colors.muted} mt-1`}>
                 Información sobre los diferentes estados del sistema
               </p>
             </div>
 
             <div className="space-y-3 max-h-80 overflow-y-auto">
-              {availableStatuses.map((status) => {
+              {data.availableStatuses.map((status) => {
                 const info = tireStatusInfo[status]
                 if (!info) return null
 
@@ -44,13 +43,13 @@ const Help = () => {
                   >
                     <div className="flex-shrink-0 mt-1">
                       <div className="flex items-center gap-2">
-                        <span className="text-lg">{info.icon}</span>
-                        <div className={`w-3 h-3 rounded-full ${info.colorClass.replace("text-", "bg-")}`}></div>
+                        <span className="text-lg"> <info.icon/> </span>
+                        <div className={`w-3 h-3 rounded-full ${info.colorClass}`}></div>
                       </div>
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="font-semibold text-sm text-gray-900 dark:text-white">{status}</p>
-                      <p className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed mt-1">
+                      <p className={`text-xs ${colors.muted} leading-relaxed mt-1`}>
                         {info.description}
                       </p>
                     </div>
@@ -60,8 +59,7 @@ const Help = () => {
             </div>
 
             <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
-              <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-400">
-                <span className="text-lg">🛞</span>
+              <div className={`flex items-center gap-3 text-sm ${colors.muted}`}>
                 <span>Haz clic en una cubierta para ver más detalles y realizar acciones</span>
               </div>
             </div>

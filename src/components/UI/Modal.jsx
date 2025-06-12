@@ -1,12 +1,6 @@
-/**
- * Componente base para modales
- * @param {Object} props - Propiedades del componente
- * @param {React.ReactNode} props.children - Contenido del modal
- * @param {string} props.title - Título del modal
- * @param {Function} props.onClose - Función para cerrar el modal
- * @param {string} props.maxWidth - Ancho máximo del modal (md, lg, xl, 2xl, etc.)
- * @param {string} props.maxHeight - Altura máxima del modal
- */
+import { colors, text } from "@utils/tokens"
+import CloseRoundedIcon from "@mui/icons-material/CloseRounded"
+
 const Modal = ({ children, title, onClose, maxWidth = "md", maxHeight = "90dvh" }) => {
   const maxWidthClasses = {
     sm: "max-w-sm",
@@ -18,26 +12,34 @@ const Modal = ({ children, title, onClose, maxWidth = "md", maxHeight = "90dvh" 
     "4xl": "max-w-4xl",
     "5xl": "max-w-5xl",
     "6xl": "max-w-6xl",
-    full: "max-w-full",
+    full: "max-w-full sm:max-w-lg",
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" onClick={onClose}>
+    <div
+      className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 p-4 flex items-center justify-center"
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+    >
       <div
-        className={`bg-white dark:bg-gray-900 text-black dark:text-white rounded-xl p-6 w-full ${
-          maxWidthClasses[maxWidth] || "max-w-md"
-        } shadow-xl overflow-auto`}
+        className={`
+          ${colors.surface} ${colors.shadow} text-gray-900 dark:text-gray-100
+          rounded-xl p-6 w-full ${maxWidthClasses[maxWidth] || "max-w-md"}
+          overflow-auto relative
+        `}
         style={{ maxHeight }}
         onClick={(e) => e.stopPropagation()}
       >
         {title && (
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold">{title}</h2>
+            <h2 className={`${text.heading} text-lg`}>{title}</h2>
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-1 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              aria-label="Cerrar modal"
+              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
             >
-              ✖
+              <CloseRoundedIcon fontSize="small" />
             </button>
           </div>
         )}

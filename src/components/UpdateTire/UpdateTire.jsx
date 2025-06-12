@@ -4,22 +4,22 @@ import TireForm from "@components/Forms/TireForm"
 import Modal from "@components/UI/Modal"
 import { useOrderValidation } from "@hooks/useOrderValidation"
 import { showToast } from "@utils/toast"
+import { colors } from "@utils/tokens"
 
-/**
- * Modal para actualizar/corregir datos de una cubierta
- * @param {Object} props - Propiedades del componente
- * @param {string} props.id - ID de la cubierta a actualizar
- * @param {Function} props.onClose - Función para cerrar el modal
- * @param {Function} props.onSuccess - Función a ejecutar después de actualizar
- */
 const UpdateTire = ({ id, onClose, onSuccess }) => {
-  const { loadTireById, selectedTire, selectedLoading, handleCorrectTire, getReceiptNumber } = useContext(ApiContext)
+  const {
+    tires,
+    data,
+    ui,
+    orders
+  } = useContext(ApiContext)
+
   const { validateOrderNumber } = useOrderValidation()
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   useEffect(() => {
     if (id) {
-      loadTireById(id)
+      tires.loadById(id)
     }
   }, [id])
 
@@ -36,10 +36,10 @@ const UpdateTire = ({ id, onClose, onSuccess }) => {
           reason: data.reason || "Corrección manual de datos",
           orderNumber: data.orderNumber,
         },
-        getReceiptNumber,
+        getReceiptNumber: orders.getNextReceipt
       }
 
-      await handleCorrectTire(id, correctionData)
+      await tires.correct(id, correctionData)
 
       showToast("success", "Datos de la cubierta corregidos correctamente")
 
@@ -55,7 +55,7 @@ const UpdateTire = ({ id, onClose, onSuccess }) => {
     }
   }
 
-  if (selectedLoading) {
+  if (ui.selectedLoading) {
     return (
       <Modal title="Cargando..." onClose={onClose}>
         <div className="flex items-center justify-center py-8">
@@ -66,7 +66,7 @@ const UpdateTire = ({ id, onClose, onSuccess }) => {
     )
   }
 
-  if (!selectedTire) {
+  if (!data.selectedTire) {
     return (
       <Modal title="Error" onClose={onClose}>
         <div className="text-center py-4">
@@ -86,25 +86,25 @@ const UpdateTire = ({ id, onClose, onSuccess }) => {
     <Modal title="Corregir datos de la cubierta" onClose={onClose} maxWidth="lg">
       <div className="mb-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-          <div>
-            <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Código actual:</span>
-            <p className="font-semibold">{selectedTire.code}</p>
+          <div className="border rounded px-3 py-1">
+            <span className={`${colors.muted} text-sm font-medium`}>Código actual:</span>
+            <p className="font-semibold">{data.selectedTire.code}</p>
           </div>
-          <div>
-            <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Estado actual:</span>
-            <p className="font-semibold">{selectedTire.status}</p>
+          <div className="border rounded px-3 py-1">
+            <span className={`${colors.muted}text-sm font-medium`}>Estado actual:</span>
+            <p className="font-semibold">{data.selectedTire.status}</p>
           </div>
-          <div>
-            <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Vehículo actual:</span>
+          <div className="border rounded px-3 py-1">
+            <span className={`${colors.muted}text-sm font-medium`}>Vehículo actual:</span>
             <p className="font-semibold">
-              {selectedTire.vehicle
-                ? `${selectedTire.vehicle.mobile} (${selectedTire.vehicle.licensePlate})`
+              {data.selectedTire.vehicle
+                ? `${data.selectedTire.vehicle.mobile} (${data.selectedTire.vehicle.licensePlate})`
                 : "Sin asignar"}
             </p>
           </div>
-          <div>
-            <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Kilómetros:</span>
-            <p className="font-semibold">{(selectedTire.kilometers || 0).toLocaleString()} km</p>
+          <div className="border rounded px-3 py-1">
+            <span className={`${colors.muted}text-sm font-medium`}>Kilómetros:</span>
+            <p className="font-semibold">{(data.selectedTire.kilometers || 0).toLocaleString()} km</p>
           </div>
         </div>
 
@@ -127,10 +127,10 @@ const UpdateTire = ({ id, onClose, onSuccess }) => {
         onCancel={onClose}
         isSubmitting={isSubmitting}
         defaultValues={{
-          serialNumber: selectedTire.serialNumber || "",
-          code: selectedTire.code || "",
-          brand: selectedTire.brand || "",
-          pattern: selectedTire.pattern || "",
+          serialNumber: data.selectedTire.serialNumber || "",
+          code: data.selectedTire.code || "",
+          brand: data.selectedTire.brand || "",
+          pattern: data.selectedTire.pattern || "",
           reason: "",
           orderNumber: "",
         }}

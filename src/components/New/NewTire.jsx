@@ -3,37 +3,35 @@ import ApiContext from "@context/apiContext"
 import TireForm from "@components/Forms/TireForm"
 import Modal from "@components/UI/Modal"
 import { useOrderValidation } from "@hooks/useOrderValidation"
-import { useCreateEntity } from "@hooks/useCreateEntity"
+import useCreateEntity from "@hooks/useCreateEntity"
 
-/**
- * Modal para crear una nueva cubierta
- * @param {Object} props - Propiedades del componente
- * @param {Function} props.onClose - Función para cerrar el modal
- * @param {Function} props.onSuccess - Función a ejecutar después de crear la cubierta
- */
 const NewTire = ({ onClose, onSuccess }) => {
-  const { handleCreateTire, vehicles, suggestedCode } = useContext(ApiContext)
+  const {
+    tires,
+    data
+  } = useContext(ApiContext)
+
   const { validateOrderNumber } = useOrderValidation()
 
   const { create, isSubmitting } = useCreateEntity(
-    handleCreateTire,
+    tires.create,
     "Cubierta creada con éxito",
     "No se pudo crear la cubierta",
   )
 
-  const handleSubmit = async (data) => {
-    console.log("🚀 NewTire: Datos recibidos del formulario:", data)
+  const handleSubmit = async (formData) => {
+    console.log("🚀 NewTire: Datos recibidos del formulario:", formData)
 
     const newTire = {
-      status: data.status || "Nueva",
-      code: data.code || suggestedCode,
-      orderNumber: data.orderNumber,
-      serialNumber: data.serialNumber,
-      brand: data.brand,
-      createdAt: data.createdAt || new Date().toISOString().split("T")[0],
-      pattern: data.pattern,
-      kilometers: data.kilometers || 0,
-      vehicle: data.vehicle || null,
+      status: formData.status || "Nueva",
+      code: formData.code || data.suggestedCode,
+      orderNumber: formData.orderNumber,
+      serialNumber: formData.serialNumber,
+      brand: formData.brand,
+      createdAt: formData.createdAt || new Date().toISOString().split("T")[0],
+      pattern: formData.pattern,
+      kilometers: formData.kilometers || 0,
+      vehicle: formData.vehicle || null,
     }
 
     console.log("📦 NewTire: Datos preparados para enviar:", newTire)
@@ -41,14 +39,14 @@ const NewTire = ({ onClose, onSuccess }) => {
   }
 
   return (
-    <Modal title="Nueva cubierta" onClose={onClose} maxWidth="lg">
+    <Modal title="Nueva cubierta" onClose={onClose} maxWidth="full">
       <TireForm
         onSubmit={handleSubmit}
         onCancel={onClose}
         isSubmitting={isSubmitting}
-        vehicles={vehicles}
+        vehicles={data.vehicles}
         defaultValues={{
-          code: suggestedCode,
+          code: data.suggestedCode,
           status: "Nueva",
           createdAt: new Date().toISOString().split("T")[0],
         }}

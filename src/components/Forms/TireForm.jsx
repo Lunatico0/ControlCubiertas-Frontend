@@ -2,21 +2,10 @@ import { useState } from "react"
 import { useForm } from "react-hook-form"
 import TireField from "./fields/TireField"
 import { formatOrderNumber } from "@utils/orderNumber"
+import { input } from "@utils/tokens"
+import Button from "@components/UI/Button"
+import Spinner from "@components/UI/Spinner"
 
-/**
- * Formulario flexible para cubiertas
- * @param {Object} props - Propiedades del componente
- * @param {Function} props.onSubmit - Función para manejar el envío del formulario
- * @param {Object} props.defaultValues - Valores por defecto para los campos
- * @param {Object} props.showFields - Campos a mostrar
- * @param {Array} props.vehicles - Lista de vehículos disponibles
- * @param {string} props.submitLabel - Etiqueta del botón de envío
- * @param {string} props.cancelLabel - Etiqueta del botón de cancelar
- * @param {Function} props.onCancel - Función para manejar el cancelar
- * @param {boolean} props.isSubmitting - Indica si el formulario está enviándose
- * @param {Object} props.fieldOptions - Opciones adicionales para los campos
- * @param {Function} props.validateOrderNumber - Función para validar el número de orden
- */
 const TireForm = ({
   onSubmit,
   defaultValues = {},
@@ -42,9 +31,6 @@ const TireForm = ({
 
   const [vehicleSearchFocused, setVehicleSearchFocused] = useState(false)
   const searchVehicle = watch("searchVehicle") || ""
-
-  const baseInputStyles =
-    "w-full py-3 px-4 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-900 text-black dark:text-white focus:ring-2 focus:ring-blue-500 focus:outline-none";
 
   // Función para renderizar campos condicionales
   const renderIf = (name, element) => (showFields[name] ? element : null)
@@ -131,10 +117,11 @@ const TireForm = ({
     <form className="flex flex-col gap-1" onSubmit={handleSubmit(handleFormSubmit)}>
       {renderIf(
         "status",
-        <TireField label="Estado" error={errors.status?.message}>
+        <TireField label="Estado" id='status' error={errors.status?.message}>
           <select
             {...register("status", getFieldValidation("status"))}
-            className={baseInputStyles}
+            className={input.base}
+            id="status"
             disabled={fieldOptions.status?.disabled}
           >
             <option value="Nueva">Nueva</option>
@@ -149,12 +136,13 @@ const TireForm = ({
 
       {renderIf(
         "code",
-        <TireField label="Código interno" error={errors.code?.message}>
+        <TireField label="Código interno" id='code' error={errors.code?.message}>
           <input
             {...register("code", getFieldValidation("code"))}
             type="number"
-            placeholder={defaultValues.code || ""}
-            className={baseInputStyles}
+            id='code'
+            placeholder={defaultValues.code || " "}
+            className={input.base}
             disabled={fieldOptions.code?.disabled}
           />
         </TireField>,
@@ -162,11 +150,12 @@ const TireForm = ({
 
       {renderIf(
         "orderNumber",
-        <TireField label="N° de orden" error={errors.orderNumber?.message}>
+        <TireField label="N° de orden" id='orderNumber' error={errors.orderNumber?.message}>
           <input
             type="text"
-            placeholder="N° Orden (ej: 123)"
-            className={baseInputStyles}
+            placeholder=" "
+            className={input.base}
+            id='orderNumber'
             {...register("orderNumber", {
               ...getFieldValidation("orderNumber"),
               validate: fieldOptions.orderNumber?.required === true ? validateOrder : undefined,
@@ -179,12 +168,13 @@ const TireForm = ({
 
       {renderIf(
         "serialNumber",
-        <TireField label="Número de serie" error={errors.serialNumber?.message}>
+        <TireField label="Número de serie" id='serialNumber' error={errors.serialNumber?.message}>
           <input
             {...register("serialNumber", getFieldValidation("serialNumber"))}
             type="text"
             placeholder=" "
-            className={baseInputStyles}
+            id='serialNumber'
+            className={input.base}
             disabled={fieldOptions.serialNumber?.disabled}
           />
         </TireField>,
@@ -192,12 +182,13 @@ const TireForm = ({
 
       {renderIf(
         "brand",
-        <TireField label="Marca" error={errors.brand?.message}>
+        <TireField label="Marca" id='brand' error={errors.brand?.message}>
           <input
             {...register("brand", getFieldValidation("brand"))}
             type="text"
             placeholder=" "
-            className={baseInputStyles}
+            id='brand'
+            className={input.base}
             disabled={fieldOptions.brand?.disabled}
           />
         </TireField>,
@@ -205,12 +196,13 @@ const TireForm = ({
 
       {renderIf(
         "pattern",
-        <TireField label="Dibujo" error={errors.pattern?.message}>
+        <TireField label="Dibujo" id='pattern' error={errors.pattern?.message}>
           <input
             {...register("pattern", getFieldValidation("pattern"))}
             type="text"
             placeholder=" "
-            className={baseInputStyles}
+            id='pattern'
+            className={input.base}
             disabled={fieldOptions.pattern?.disabled}
           />
         </TireField>,
@@ -218,12 +210,13 @@ const TireForm = ({
 
       {renderIf(
         "kilometers",
-        <TireField label="Km iniciales (opcional)" error={errors.kilometers?.message}>
+        <TireField label="Km iniciales (opcional)" id='kilometers' error={errors.kilometers?.message}>
           <input
             {...register("kilometers", getFieldValidation("kilometers"))}
             type="number"
             placeholder=" "
-            className={baseInputStyles}
+            id='kilometers'
+            className={input.base}
             disabled={fieldOptions.kilometers?.disabled}
           />
         </TireField>,
@@ -231,12 +224,13 @@ const TireForm = ({
 
       {renderIf(
         "kmAlta",
-        <TireField label="Kilometraje inicial" error={errors.kmAlta?.message}>
+        <TireField label="Kilometraje inicial" id='kmAlta' error={errors.kmAlta?.message}>
           <input
             {...register("kmAlta", getFieldValidation("kmAlta"))}
             type="number"
             placeholder="Kilometraje inicial"
-            className={baseInputStyles}
+            id='kmAlta'
+            className={input.base}
             disabled={fieldOptions.kmAlta?.disabled}
           />
         </TireField>,
@@ -244,12 +238,13 @@ const TireForm = ({
 
       {renderIf(
         "kmBaja",
-        <TireField label="Kilometraje final" error={errors.kmBaja?.message}>
+        <TireField label="Kilometraje final" id='kmBaja' error={errors.kmBaja?.message}>
           <input
             {...register("kmBaja", getFieldValidation("kmBaja"))}
             type="number"
+            id='kmBaja'
             placeholder="Kilometraje final"
-            className={baseInputStyles}
+            className={input.base}
             disabled={fieldOptions.kmBaja?.disabled}
           />
         </TireField>,
@@ -257,13 +252,14 @@ const TireForm = ({
 
       {renderIf(
         "createdAt",
-        <TireField label="Fecha de alta" error={errors.createdAt?.message}>
+        <TireField label="Fecha de alta" id='createdAt' error={errors.createdAt?.message}>
           <input
             {...register("createdAt", getFieldValidation("createdAt"))}
             type="date"
+            id='createdAt'
             defaultValue={new Date().toISOString().split("T")[0]}
             placeholder=" "
-            className={baseInputStyles}
+            className={input.base}
             disabled={fieldOptions.createdAt?.disabled}
           />
         </TireField>,
@@ -271,12 +267,13 @@ const TireForm = ({
 
       {renderIf(
         "vehicle",
-        <TireField label="Vehículo" error={errors.vehicle?.message}>
+        <TireField label="Vehículo" id='searchVehicle' error={errors.vehicle?.message}>
           <input
             {...register("searchVehicle", getFieldValidation("vehicle"))}
             type="text"
+            id='searchVehicle'
             placeholder="Buscar móvil..."
-            className={baseInputStyles}
+            className={input.base}
             onFocus={() => setVehicleSearchFocused(true)}
             onBlur={() => setTimeout(() => setVehicleSearchFocused(false), 150)}
             disabled={fieldOptions.vehicle?.disabled}
@@ -297,9 +294,9 @@ const TireForm = ({
                     <span>
                       {vehicle.mobile} - {vehicle.licensePlate}
                     </span>
-                    <button type="button" className="p-1 bg-green-500 text-white rounded">
+                    <Button type="button" className="p-1 bg-green-500 text-white rounded">
                       Seleccionar
-                    </button>
+                    </Button>
                   </div>
                 ))}
               {vehicles.filter((v) => v.mobile.toLowerCase().includes(searchVehicle.toLowerCase())).length === 0 && (
@@ -312,10 +309,11 @@ const TireForm = ({
 
       {renderIf(
         "reason",
-        <TireField label="Motivo" error={errors.reason?.message}>
+        <TireField label="Motivo" id='reason' error={errors.reason?.message}>
           <textarea
             {...register("reason", getFieldValidation("reason"))}
-            className={baseInputStyles}
+            className={input.base}
+            id='reason'
             placeholder={fieldOptions.reason?.placeholder || "Ingrese el motivo"}
             disabled={fieldOptions.reason?.disabled}
           />
@@ -323,22 +321,22 @@ const TireForm = ({
       )}
 
       <div className="flex gap-4 justify-center mt-4">
-        <button
+        <Button
           type="submit"
           disabled={isSubmitting}
           className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold px-6 py-2 rounded-md transition flex items-center gap-2"
         >
-          {isSubmitting && <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>}
+          {isSubmitting && <Spinner size={4} />}
           {submitLabel}
-        </button>
-        <button
+        </Button>
+        <Button
           type="button"
           onClick={onCancel}
           disabled={isSubmitting}
-          className="bg-gray-300 hover:bg-gray-400 disabled:bg-gray-200 text-gray-800 font-semibold px-6 py-2 rounded-md transition"
+          variant="secondary"
         >
           {cancelLabel}
-        </button>
+        </Button>
       </div>
     </form>
   )

@@ -5,18 +5,26 @@ import { buildCorrectionPrintData } from "@utils/print-data"
 import TireForm from "@components/Forms/TireForm"
 import Modal from "@components/UI/Modal"
 import { useOrderValidation } from "@hooks/useOrderValidation"
+import { text, button, colors } from '@utils/tokens'
 
 const EditHistoryModal = ({ tire, entry, onClose, refreshTire }) => {
-  const { handleUpdateHistoryEntry, vehicles, getReceiptNumber, loadTireById } = useContext(ApiContext)
+  const {
+    tires,
+    data,
+    orders,
+  } = useContext(ApiContext)
   const { validateOrderNumber } = useOrderValidation()
 
-  const currentVehicleId = entry.vehicle?._id || ""
-  const type = entry.type || "estado"
-  const isCorrection = type.startsWith("correccion")
-  const baseType = type.replace("correccion-", "")
+  const currentVehicleId = entry.vehicle?._id || "";
+  const type = entry.type || "estado";
+  const isCorrection = type.startsWith("correccion");
+  const baseType = type.replace("correccion-", "");
+  const defaultVehicle = entry.vehicle
+    ? { value: entry.vehicle._id, label: entry.vehicle.licensePlate }
+    : null;
 
   const { execute, isSubmitting } = useTireAction({
-    apiCall: handleUpdateHistoryEntry,
+    apiCall: tires.updateHistory,
     printBuilder: buildCorrectionPrintData,
     successMessage: "Entrada del historial actualizada correctamente",
   })
@@ -34,9 +42,9 @@ const EditHistoryModal = ({ tire, entry, onClose, refreshTire }) => {
           vehicle: data.vehicle,
           reason: data.reason,
         },
-        getReceiptNumber,
+        getReceiptNumber: orders.getNextReceipt
       },
-      refresh: loadTireById,
+      refresh: tires.loadTireById,
       close: onClose,
     })
   }
@@ -44,13 +52,13 @@ const EditHistoryModal = ({ tire, entry, onClose, refreshTire }) => {
   if (isCorrection) {
     return (
       <Modal title="Editar entrada de historial" onClose={onClose}>
-        <p className="text-red-500 font-semibold text-center">
+        <p className={`${text.error} font-semibold text-center`}>
           Esta entrada ya es una corrección y no puede ser editada nuevamente.
         </p>
         <div className="flex justify-center mt-4">
           <button
             onClick={onClose}
-            className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold px-6 py-2 rounded-md transition"
+            className={`${button.base} ${button.secondary}`}
           >
             Cerrar
           </button>
@@ -102,16 +110,16 @@ const EditHistoryModal = ({ tire, entry, onClose, refreshTire }) => {
   return (
     <Modal title="Editar entrada de historial" onClose={onClose} maxWidth="lg">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-        <div className="p-2 bg-gray-100 dark:bg-gray-800 rounded">
+        <div className={`${colors.surface} border rounded p-3`}>
           <p className="font-semibold">Código: {tire.code}</p>
         </div>
-        <div className="p-2 bg-gray-100 dark:bg-gray-800 rounded">
+        <div className={`${colors.surface} border rounded p-3`}>
           <p className="font-semibold">Serie: {tire.serialNumber}</p>
         </div>
-        <div className="p-2 bg-gray-100 dark:bg-gray-800 rounded">
+        <div className={`${colors.surface} border rounded p-3`}>
           <p className="font-semibold">Marca: {tire.brand}</p>
         </div>
-        <div className="p-2 bg-gray-100 dark:bg-gray-800 rounded">
+        <div className={`${colors.surface} border rounded p-3`}>
           <p className="font-semibold">Dibujo: {tire.pattern}</p>
         </div>
       </div>
@@ -120,13 +128,14 @@ const EditHistoryModal = ({ tire, entry, onClose, refreshTire }) => {
         onSubmit={handleSubmit}
         onCancel={onClose}
         isSubmitting={isSubmitting}
-        vehicles={vehicles}
+        vehicles={data.vehicles}
         defaultValues={{
           orderNumber: "",
           kmAlta: entry.kmAlta || "",
           kmBaja: entry.kmBaja || "",
           status: entry.status || tire.status,
           vehicle: currentVehicleId,
+          searchVehicle: entry.vehicle?.mobile || "",
           reason: `Corrección de Orden N°${entry.orderNumber}`,
         }}
         showFields={showFields}

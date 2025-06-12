@@ -7,12 +7,16 @@ import Modal from "@components/UI/Modal"
 import { useOrderValidation } from "@hooks/useOrderValidation"
 
 const DiscardTireModal = ({ tire, onClose, refreshTire }) => {
-  const { handleUpdateTireStatus, loadTireById, getReceiptNumber } = useContext(ApiContext)
+  const {
+    tires,
+    orders
+  } = useContext(ApiContext)
+
   const { validateOrderNumber } = useOrderValidation()
 
   const { execute, isSubmitting } = useTireAction({
     printBuilder: buildDiscardPrintData,
-    apiCall: handleUpdateTireStatus,
+    apiCall: tires.updateStatus,
     successMessage: "Cubierta descartada correctamente",
   })
 
@@ -22,9 +26,9 @@ const DiscardTireModal = ({ tire, onClose, refreshTire }) => {
       formData: {
         status: "Descartada",
         orderNumber: data.orderNumber,
-        getReceiptNumber,
+        getReceiptNumber: orders.getNextReceipt
       },
-      refresh: loadTireById,
+      refresh: tires.loadById,
       close: onClose,
     })
   }

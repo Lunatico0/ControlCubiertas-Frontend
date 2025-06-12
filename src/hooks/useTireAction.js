@@ -2,14 +2,6 @@ import { useState, useCallback } from "react"
 import { showToast } from "@utils/toast"
 import { usePrint } from "./usePrint"
 
-/**
- * Hook para manejar acciones sobre cubiertas
- * @param {Object} options - Opciones de configuración
- * @param {Function} options.printBuilder - Función para construir datos de impresión
- * @param {Function} options.apiCall - Función de API a llamar
- * @param {string} options.successMessage - Mensaje de éxito
- * @returns {Object} Funciones y estados para la acción
- */
 export const useTireAction = ({ printBuilder, apiCall, successMessage }) => {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const { print } = usePrint()
@@ -29,18 +21,6 @@ export const useTireAction = ({ printBuilder, apiCall, successMessage }) => {
           throw new Error("apiCall no está definido o no es una función")
         }
 
-        // Llamar a la API
-        let updated
-        if (entry) {
-          updated = await apiCall(tire._id, formData, entry)
-        } else {
-          updated = await apiCall(tire._id, formData)
-        }
-
-        if (!updated?.tire) {
-          throw new Error("Respuesta inválida del servidor")
-        }
-
         // Obtener número de recibo si es necesario
         let receipt = "0000-00000000"
         if (formData.getReceiptNumber && typeof formData.getReceiptNumber === "function") {
@@ -49,6 +29,32 @@ export const useTireAction = ({ printBuilder, apiCall, successMessage }) => {
           } catch (receiptError) {
             console.warn("⚠️ No se pudo obtener número de recibo:", receiptError)
           }
+        }
+
+        // Llamar a la API
+        let updated
+        const { getReceiptNumber, ...cleanFormData } = formData
+        if (entry) {
+          updated = await apiCall(
+            tire._id,
+            {
+              ...cleanFormData,
+              form: {
+                ...cleanFormData.form,
+                receiptNumber: receipt
+              },
+            },
+            entry
+          )
+        } else {
+          updated = await apiCall(tire._id, {
+            ...cleanFormData,
+            receiptNumber: receipt
+          })
+        }
+
+        if (!updated?.tire) {
+          throw new Error("Respuesta inválida del servidor")
         }
 
         // Imprimir comprobante si es necesario

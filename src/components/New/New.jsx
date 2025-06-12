@@ -3,11 +3,6 @@ import NewVehicle from "./NewVehicle"
 import NewTire from "./NewTire"
 import Modal from "@components/UI/Modal"
 
-/**
- * Componente principal para crear nuevos elementos
- * @param {Object} props - Propiedades del componente
- * @param {Function} props.onClose - Función para cerrar el modal
- */
 const New = ({ onClose }) => {
   const [activeModal, setActiveModal] = useState(null)
 
@@ -41,7 +36,7 @@ const New = ({ onClose }) => {
                 <img
                   src="Camion.png"
                   alt="Vehículo"
-                  className="h-24 w-auto object-contain filter brightness-0 invert"
+                  className="h-24 w-full max-w-24 object-contain filter brightness-0 invert"
                 />
               </div>
               <div className="text-left">

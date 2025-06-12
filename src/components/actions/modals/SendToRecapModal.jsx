@@ -7,12 +7,16 @@ import Modal from "@components/UI/Modal"
 import { useOrderValidation } from "@hooks/useOrderValidation"
 
 const SendToRecapModal = ({ tire, onClose, refreshTire }) => {
-  const { handleUpdateTireStatus, loadTireById, getReceiptNumber } = useContext(ApiContext)
+  const {
+    tires,
+    orders
+  } = useContext(ApiContext)
+
   const { validateOrderNumber } = useOrderValidation()
 
   const { execute, isSubmitting } = useTireAction({
     printBuilder: buildSendToRecapPrintData,
-    apiCall: handleUpdateTireStatus,
+    apiCall: tires.updateStatus,
     successMessage: "Cubierta enviada a recapado correctamente",
   })
 
@@ -22,9 +26,9 @@ const SendToRecapModal = ({ tire, onClose, refreshTire }) => {
       formData: {
         status: "A recapar",
         orderNumber: data.orderNumber,
-        getReceiptNumber,
+        getReceiptNumber: orders.getNextReceipt
       },
-      refresh: loadTireById,
+      refresh: tires.loadById,
       close: onClose,
     })
   }

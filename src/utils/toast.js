@@ -1,23 +1,21 @@
 import Swal from "sweetalert2"
 
-/**
- * Muestra una notificación toast
- * @param {string} type - Tipo de notificación (success, error, warning, info)
- * @param {string} message - Mensaje a mostrar
- * @param {Object} options - Opciones adicionales
- * @param {number} options.timer - Duración en ms (default: 3000)
- * @param {boolean} options.progressBar - Mostrar barra de progreso (default: true)
- */
+const toastColors = {
+  success: { light: "#f0fdf4", dark: "#064e3b", textLight: "#065f46", textDark: "#d1fae5" },
+  error: { light: "#fef2f2", dark: "#7f1d1d", textLight: "#991b1b", textDark: "#fee2e2" },
+  warning: { light: "#fffbeb", dark: "#78350f", textLight: "#92400e", textDark: "#fef3c7" },
+  info: { light: "#f0f9ff", dark: "#0c4a6e", textLight: "#0e7490", textDark: "#e0f2fe" },
+}
+
 export const showToast = (
   type = "success",
   message = "Operación realizada",
   { timer = 3000, progressBar = true } = {},
 ) => {
-  // Detectar modo oscuro
   const isDark = document.documentElement.classList.contains("dark")
+  const colors = toastColors[type] || toastColors.success
 
-  // Configuración base
-  const config = {
+  Swal.fire({
     toast: true,
     position: "top-end",
     icon: type,
@@ -25,44 +23,11 @@ export const showToast = (
     showConfirmButton: false,
     timer,
     timerProgressBar: progressBar,
-    background: isDark ? "#1f2937" : "#ffffff",
-    color: isDark ? "#f3f4f6" : "#1f2937",
-  }
-
-  // Ajustar colores según el tipo
-  switch (type) {
-    case "success":
-      config.background = isDark ? "#064e3b" : "#f0fdf4"
-      config.color = isDark ? "#d1fae5" : "#065f46"
-      break
-    case "error":
-      config.background = isDark ? "#7f1d1d" : "#fef2f2"
-      config.color = isDark ? "#fee2e2" : "#991b1b"
-      break
-    case "warning":
-      config.background = isDark ? "#78350f" : "#fffbeb"
-      config.color = isDark ? "#fef3c7" : "#92400e"
-      break
-    case "info":
-      config.background = isDark ? "#0c4a6e" : "#f0f9ff"
-      config.color = isDark ? "#e0f2fe" : "#0e7490"
-      break
-  }
-
-  // Mostrar toast
-  Swal.fire(config)
+    background: isDark ? colors.dark : colors.light,
+    color: isDark ? colors.textDark : colors.textLight,
+  })
 }
 
-/**
- * Muestra un diálogo de confirmación
- * @param {Object} options - Opciones de configuración
- * @param {string} options.title - Título del diálogo
- * @param {string} options.text - Texto del diálogo
- * @param {string} options.icon - Icono (warning, error, success, info, question)
- * @param {string} options.confirmButtonText - Texto del botón de confirmación
- * @param {string} options.cancelButtonText - Texto del botón de cancelación
- * @returns {Promise<boolean>} True si se confirmó, false en caso contrario
- */
 export const showConfirm = async ({
   title = "¿Estás seguro?",
   text = "Esta acción no se puede deshacer",
@@ -80,19 +45,8 @@ export const showConfirm = async ({
     confirmButtonText,
     cancelButtonText,
   })
-
   return result.isConfirmed
 }
 
-/**
- * Muestra un diálogo de error
- * @param {string} title - Título del error
- * @param {string} text - Descripción del error
- */
-export const showError = (title = "Error", text = "Ha ocurrido un error") => {
-  Swal.fire({
-    icon: "error",
-    title,
-    text,
-  })
-}
+export const showError = (title = "Error", text = "Ha ocurrido un error") =>
+  Swal.fire({ icon: "error", title, text })

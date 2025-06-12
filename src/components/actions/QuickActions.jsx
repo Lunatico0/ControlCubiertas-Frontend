@@ -7,10 +7,11 @@ import FinishRecapModal from "./modals/FinishRecapModal"
 import DiscardTireModal from "./modals/ConfirmDiscardModal"
 import UndoHistoryEntryModal from "./modals/UndoHistoryEntryModal"
 import EditHistoryModal from "./modals/EditHistoryModal"
+import { button } from "@utils/tokens"
 
 const QuickActions = ({ tire, refreshTire, historyEntry = null }) => {
   const [activeModal, setActiveModal] = useState(null)
-  const { loadTireById } = useContext(ApiContext)
+  const { tires } = useContext(ApiContext)
 
   const closeModal = () => {
     setActiveModal(null)
@@ -20,7 +21,7 @@ const QuickActions = ({ tire, refreshTire, historyEntry = null }) => {
     if (refreshTire) {
       await refreshTire()
     } else if (tire?._id) {
-      await loadTireById(tire._id)
+      await tires.loadById(tire._id)
     }
   }
 
@@ -39,7 +40,7 @@ const QuickActions = ({ tire, refreshTire, historyEntry = null }) => {
         {canAssign && (
           <button
             onClick={() => setActiveModal("assign")}
-            className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+            className={`${button.base} ${button.primary}`}
           >
             Asignar
           </button>
@@ -48,7 +49,7 @@ const QuickActions = ({ tire, refreshTire, historyEntry = null }) => {
         {canUnassign && (
           <button
             onClick={() => setActiveModal("unassign")}
-            className="px-3 py-1 bg-yellow-600 text-white rounded hover:bg-yellow-700 transition"
+            className={`${button.base} ${button.warning}`}
           >
             Desasignar
           </button>
@@ -57,7 +58,7 @@ const QuickActions = ({ tire, refreshTire, historyEntry = null }) => {
         {canSendToRecap && (
           <button
             onClick={() => setActiveModal("sendToRecap")}
-            className="px-3 py-1 bg-purple-600 text-white rounded hover:bg-purple-700 transition"
+            className={`${button.base} ${button.purple}`}
           >
             Enviar a recapar
           </button>
@@ -66,7 +67,7 @@ const QuickActions = ({ tire, refreshTire, historyEntry = null }) => {
         {canFinishRecap && (
           <button
             onClick={() => setActiveModal("finishRecap")}
-            className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 transition"
+            className={`${button.base} ${button.success}`}
           >
             Recapado listo
           </button>
@@ -75,7 +76,7 @@ const QuickActions = ({ tire, refreshTire, historyEntry = null }) => {
         {canDiscard && (
           <button
             onClick={() => setActiveModal("discard")}
-            className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 transition"
+            className={`${button.base} ${button.danger}`}
           >
             Descartar
           </button>
@@ -84,7 +85,7 @@ const QuickActions = ({ tire, refreshTire, historyEntry = null }) => {
         {canEditHistory && (
           <button
             onClick={() => setActiveModal("editHistory")}
-            className="px-3 py-1 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition"
+            className={`${button.base} ${button.indigo}`}
           >
             Editar
           </button>
@@ -93,7 +94,7 @@ const QuickActions = ({ tire, refreshTire, historyEntry = null }) => {
         {canUndoHistory && (
           <button
             onClick={() => setActiveModal("undoHistory")}
-            className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 transition"
+            className={`${button.base} ${button.danger}`}
           >
             Deshacer
           </button>
@@ -102,23 +103,13 @@ const QuickActions = ({ tire, refreshTire, historyEntry = null }) => {
 
       {/* Modales */}
       {activeModal === "assign" && <AssignTireModal tire={tire} onClose={closeModal} refreshTire={handleRefresh} />}
-
       {activeModal === "unassign" && <UnassignTireModal tire={tire} onClose={closeModal} refreshTire={handleRefresh} />}
-
-      {activeModal === "sendToRecap" && (
-        <SendToRecapModal tire={tire} onClose={closeModal} refreshTire={handleRefresh} />
-      )}
-
-      {activeModal === "finishRecap" && (
-        <FinishRecapModal tire={tire} onClose={closeModal} refreshTire={handleRefresh} />
-      )}
-
+      {activeModal === "sendToRecap" && <SendToRecapModal tire={tire} onClose={closeModal} refreshTire={handleRefresh} />}
+      {activeModal === "finishRecap" && <FinishRecapModal tire={tire} onClose={closeModal} refreshTire={handleRefresh} />}
       {activeModal === "discard" && <DiscardTireModal tire={tire} onClose={closeModal} refreshTire={handleRefresh} />}
-
       {activeModal === "editHistory" && historyEntry && (
         <EditHistoryModal tire={tire} entry={historyEntry} onClose={closeModal} refreshTire={handleRefresh} />
       )}
-
       {activeModal === "undoHistory" && historyEntry && (
         <UndoHistoryEntryModal tire={tire} entry={historyEntry} onClose={closeModal} refreshTire={handleRefresh} />
       )}

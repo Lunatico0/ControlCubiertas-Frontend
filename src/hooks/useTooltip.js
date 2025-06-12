@@ -1,12 +1,5 @@
 import { useState, useCallback } from "react"
 
-/**
- * Hook para manejar tooltips
- * @param {Object} options - Opciones de configuración
- * @param {number} options.offsetX - Desplazamiento horizontal (default: 10)
- * @param {number} options.offsetY - Desplazamiento vertical (default: 10)
- * @returns {Object} Funciones y estados para el tooltip
- */
 const useTooltip = ({ offsetX = 10, offsetY = 10 } = {}) => {
   const [tooltip, setTooltip] = useState({
     visible: false,

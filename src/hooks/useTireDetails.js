@@ -1,11 +1,6 @@
 import { useState, useEffect, useCallback, useContext } from "react"
 import ApiContext from "@context/apiContext"
 
-/**
- * Hook para manejar los detalles de una cubierta
- * @param {string} tireId - ID de la cubierta (opcional)
- * @returns {Object} Estados y funciones para manejar los detalles
- */
 export const useTireDetails = (tireId = null) => {
   const { loadTireById, selectedTire, selectedLoading } = useContext(ApiContext)
   const [error, setError] = useState(null)

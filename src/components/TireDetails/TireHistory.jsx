@@ -1,30 +1,42 @@
 import { useContext, useState } from "react"
-import { getRowStyle, dictionary } from "@utils/historyStyles"
-import useContextMenu from "@hooks/useContextMenu"
 import useTooltip from "@hooks/useTooltip"
+import useContextMenu from "@hooks/useContextMenu"
 import UndoHistoryEntryModal from "@components/actions/modals/UndoHistoryEntryModal"
+
+import { useReprint } from "@hooks/useReprint.js"
+import { buildReprintData } from "@utils/print-data"
+import { getRowStyle, dictionary } from "@utils/historyStyles"
+import { colors, text, button, utility } from "@utils/tokens"
+
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
+import MoreVertRoundedIcon from '@mui/icons-material/MoreVertRounded';
+import PrintRoundedIcon from '@mui/icons-material/PrintRounded';
+import EditNoteRoundedIcon from '@mui/icons-material/EditNoteRounded';
+import UndoRoundedIcon from '@mui/icons-material/UndoRounded';
+
+
+
 import ApiContext from "@context/apiContext"
 
-/**
- * Componente para mostrar el historial de una cubierta
- * @param {Object} props - Propiedades del componente
- * @param {Array} props.history - Historial de la cubierta
- * @param {string} props.code - Código de la cubierta
- * @param {string} props.serialNumber - Número de serie de la cubierta
- * @param {Object} props.tire - Objeto completo de la cubierta
- * @param {Function} props.onEditEntry - Función para editar una entrada
- */
 const TireHistory = ({ history = [], code, serialNumber, tire, onEditEntry }) => {
-  const { loadTireById } = useContext(ApiContext)
+  const {
+    tires
+  } = useContext(ApiContext)
   const [undoEntry, setUndoEntry] = useState(null)
   const reversedHistory = [...history].reverse()
 
   const { tooltip, showTooltip, hideTooltip } = useTooltip()
-  const { openIndex: openMenuIndex, setOpenIndex, position: menuPosition, openMenu, menuRef } = useContextMenu()
+  const {
+    openIndex: openMenuIndex,
+    position: menuPosition,
+    setOpenIndex,
+    openMenu,
+    menuRef
+  } = useContextMenu()
 
   const handleRefreshTire = async () => {
     if (tire?._id) {
-      await loadTireById(tire._id)
+      await tires.loadById(tire._id)
     }
   }
 
@@ -38,12 +50,19 @@ const TireHistory = ({ history = [], code, serialNumber, tire, onEditEntry }) =>
     setUndoEntry(entry)
   }
 
+  const { execute: reprintEntry } = useReprint()
+
+  const handleReprintEntry = (entry) => {
+    setOpenIndex(null)
+    reprintEntry({ entry, tire })
+  }
+
   if (!history || history.length === 0) {
     return (
       <div className="h-full flex flex-col">
         {/* Header fijo */}
         <div className="flex items-center justify-between p-6 pb-4 flex-shrink-0">
-          <h3 className="font-semibold">Historial</h3>
+          <h3 className={`${text.heading} text-base`}>Historial</h3>
           <span className="text-sm text-gray-500 bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-full">
             0 registro(s)
           </span>
@@ -63,7 +82,7 @@ const TireHistory = ({ history = [], code, serialNumber, tire, onEditEntry }) =>
     <div className="h-full flex flex-col">
       {/* Header fijo */}
       <div className="flex items-center justify-between p-6 pb-4 flex-shrink-0">
-        <h3 className="font-semibold">Historial</h3>
+        <h3 className={`${text.heading} text-base`}>Historial</h3>
         <span className="text-sm text-gray-500 bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-full">
           {history.length} registro(s)
         </span>
@@ -132,24 +151,34 @@ const TireHistory = ({ history = [], code, serialNumber, tire, onEditEntry }) =>
       {openMenuIndex !== null && (
         <div
           ref={menuRef}
-          className="fixed z-50 w-40 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-lg overflow-hidden"
+          className="fixed z-50 max-w-fit flex flex-col items-start flex-nowrap gap-2 p-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-lg overflow-hidden"
           style={{
             top: `${menuPosition.y}px`,
             left: `${menuPosition.x - 160}px`,
           }}
         >
           <button
-            className="w-full px-4 py-3 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 text-left transition-colors"
+            className={`${button.base} ${utility.hoverBg} w-full text-left`}
+            onClick={() => handleReprintEntry(reversedHistory[openMenuIndex])}
+          >
+            <PrintRoundedIcon fontSize="small" /> Reimprimir comprobante
+          </button>
+
+          <button
+            className={`${button.base} ${utility.hoverBg} w-full text-left`}
             onClick={() => handleEditEntry(reversedHistory[openMenuIndex])}
           >
-            ✏️ Editar entrada
+            <EditNoteRoundedIcon /> Editar entrada
           </button>
-          <button
-            className="w-full px-4 py-3 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 text-left transition-colors border-t border-gray-200 dark:border-gray-600"
-            onClick={() => handleUndoEntry(reversedHistory[openMenuIndex])}
-          >
-            ↶ Deshacer entrada
-          </button>
+
+          <div className={`${utility.borderT} w-full text-left pt-2`}>
+            <button
+              className={`${button.base} ${utility.hoverBg} w-full text-left`}
+              onClick={() => handleUndoEntry(reversedHistory[openMenuIndex])}
+            >
+              <UndoRoundedIcon fontSize="small" /> Deshacer entrada
+            </button>
+          </div>
         </div>
       )}
 
@@ -166,9 +195,6 @@ const TireHistory = ({ history = [], code, serialNumber, tire, onEditEntry }) =>
   )
 }
 
-/**
- * Componente para una fila del historial
- */
 const HistoryRow = ({ record, index, code, serialNumber, onShowTooltip, onHideTooltip, onOpenMenu, openMenuIndex }) => {
   const formatDate = (date) => {
     try {
@@ -185,7 +211,7 @@ const HistoryRow = ({ record, index, code, serialNumber, onShowTooltip, onHideTo
 
   return (
     <div
-      className={`grid grid-cols-11 gap-2 p-3 text-xs border-b border-gray-200 dark:border-gray-700 ${getRowStyle(
+      className={`grid grid-cols-11 gap-2 pt-4 pb-2 text-xs border-b border-gray-200 dark:border-gray-700 ${getRowStyle(
         record.type,
         record.flag,
       )} hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors`}
@@ -217,15 +243,19 @@ const HistoryRow = ({ record, index, code, serialNumber, onShowTooltip, onHideTo
               onMouseLeave={onHideTooltip}
               title="Ver detalles de la corrección"
             >
-              🛈
+              <InfoOutlinedIcon sx={{ fontSize: 15 }} className="text-yellow-600 dark:text-yellow-400 hover:text-yellow-700 dark:hover:text-yellow-300 cursor-pointer" />
             </span>
           )}
+
           <button
             onClick={(e) => onOpenMenu(index, e)}
-            className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors p-1 text-sm"
+            className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors text-sm"
             title="Más opciones"
           >
-            ⋮
+            <MoreVertRoundedIcon
+              fontSize="small"
+              className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 cursor-pointer"
+            />
           </button>
         </div>
       </div>

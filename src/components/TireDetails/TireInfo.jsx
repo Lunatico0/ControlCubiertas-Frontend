@@ -1,12 +1,8 @@
 import { statusStyles } from "@utils/statusStyle"
+import { colors, text, button } from "@utils/tokens"
+import EditNoteRoundedIcon from '@mui/icons-material/EditNoteRounded';
+import InfoItem from "@components/UI/InfoItem"
 
-/**
- * Componente para mostrar la información básica de una cubierta
- * @param {Object} props - Propiedades del componente
- * @param {Object} props.tire - Información de la cubierta
- * @param {Function} props.onEdit - Función para editar la cubierta
- * @param {boolean} props.compact - Si debe mostrar versión compacta
- */
 const TireInfo = ({ tire, onEdit, compact = false }) => {
   const altaEntry = tire.history?.find((h) => h.type === "alta")
   const currentVehicle = tire.vehicle
@@ -18,19 +14,17 @@ const TireInfo = ({ tire, onEdit, compact = false }) => {
 
   if (compact) {
     return (
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 items-center">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-start">
         {/* Indicador de estado compacto */}
         <div
-          className={`flex items-center justify-center ${
-            statusStyles[tire.status] || "bg-gray-100 dark:bg-gray-800"
-          } p-4 rounded-xl shadow-sm`}
+          className={`flex items-center justify-center ${statusStyles[tire.status] || "bg-gray-100 dark:bg-gray-800"} h-full p-4 rounded-xl shadow-sm`}
         >
           <div className="text-center">
-            <div className="w-16 h-16 mb-2 flex items-center justify-center mx-auto">
+            <div className="size-32 mb-2 flex items-center justify-center mx-auto">
               <img
                 src="Cubierta.png"
                 alt="Cubierta"
-                className="w-12 h-12 object-contain"
+                className="size-28 object-contain"
               />
             </div>
             <p className="text-sm font-bold uppercase tracking-wide">{tire.status}</p>
@@ -38,10 +32,10 @@ const TireInfo = ({ tire, onEdit, compact = false }) => {
         </div>
 
         {/* Información básica en 3 columnas */}
-        <div className="lg:col-span-3 grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="md:col-span-3 grid grid-cols-1 md:grid-cols-3 gap-2">
           {/* Columna 1: Identificación */}
-          <div className="space-y-3">
-            <h4 className="font-semibold text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700 pb-1">
+          <div className="py-2 rounded-xl bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+            <h4 className={`${text.heading} text-base border-b border-gray-200 dark:border-gray-700 pb-1`}>
               Identificación
             </h4>
             <InfoItem label="Código interno" value={tire.code} />
@@ -51,8 +45,8 @@ const TireInfo = ({ tire, onEdit, compact = false }) => {
           </div>
 
           {/* Columna 2: Estado y ubicación */}
-          <div className="space-y-3">
-            <h4 className="font-semibold text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700 pb-1">
+          <div className="space-y-4 py-2 rounded-xl bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+            <h4 className={`${text.heading} text-base border-b border-gray-200 dark:border-gray-700 pb-1`}>
               Estado actual
             </h4>
             <InfoItem
@@ -67,8 +61,8 @@ const TireInfo = ({ tire, onEdit, compact = false }) => {
           </div>
 
           {/* Columna 3: Estadísticas */}
-          <div className="space-y-3">
-            <h4 className="font-semibold text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700 pb-1">
+          <div className="space-y-4 py-2 rounded-xl bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+            <h4 className={`${text.heading} text-base border-b border-gray-200 dark:border-gray-700 pb-1`}>
               Estadísticas
             </h4>
             <InfoItem label="Kilómetros totales" value={`${totalKm.toLocaleString()} km`} />
@@ -84,15 +78,13 @@ const TireInfo = ({ tire, onEdit, compact = false }) => {
       </div>
     )
   }
-
   // Versión completa original
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       {/* Sección visual del estado */}
       <div
-        className={`flex flex-col items-center justify-center ${
-          statusStyles[tire.status] || "bg-gray-100 dark:bg-gray-800"
-        } p-6 rounded-xl shadow-sm`}
+        className={`flex flex-col items-center justify-center ${statusStyles[tire.status] || "bg-gray-100 dark:bg-gray-800"
+          } p-6 rounded-xl shadow-sm`}
       >
         <div className="w-32 h-32 mb-4 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center">
           <img
@@ -110,10 +102,10 @@ const TireInfo = ({ tire, onEdit, compact = false }) => {
         {onEdit && (
           <button
             onClick={onEdit}
-            className="absolute right-0 -top-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors flex items-center gap-2"
+            className={`${button.primary} absolute right-0 -top-2 flex items-center gap-2`}
           >
             <span>Editar</span>
-            <span>✏️</span>
+            <EditNoteRoundedIcon fontSize="small" />
           </button>
         )}
 
@@ -138,16 +130,16 @@ const TireInfo = ({ tire, onEdit, compact = false }) => {
         {/* Información adicional */}
         {tire.history && tire.history.length > 0 && (
           <div className="mt-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-            <h4 className="font-semibold mb-2">Resumen de actividad</h4>
+            <h4 className={`${text.heading} text-base border-b border-gray-200 dark:border-gray-700 pb-1`}>Resumen de actividad</h4>
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
-                <span className="text-gray-600 dark:text-gray-400">Última actividad:</span>
+                <span className={`${colors.muted}`}>Última actividad:</span>
                 <p className="font-medium">
                   {new Date(tire.history[tire.history.length - 1]?.date).toLocaleDateString("es-AR")}
                 </p>
               </div>
               <div>
-                <span className="text-gray-600 dark:text-gray-400">Total de registros:</span>
+                <span className={`${colors.muted}`}>Total de registros:</span>
                 <p className="font-medium">{tire.history.length}</p>
               </div>
             </div>
@@ -157,15 +149,5 @@ const TireInfo = ({ tire, onEdit, compact = false }) => {
     </div>
   )
 }
-
-/**
- * Componente auxiliar para mostrar información
- */
-const InfoItem = ({ label, value, className = "" }) => (
-  <div className="space-y-1">
-    <span className="text-xs font-medium text-gray-600 dark:text-gray-400">{label}:</span>
-    <p className={`font-semibold text-sm ${className}`}>{value}</p>
-  </div>
-)
 
 export default TireInfo

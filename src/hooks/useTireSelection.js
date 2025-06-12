@@ -1,12 +1,5 @@
 import { useState, useCallback, useMemo } from "react"
 
-/**
- * Hook para manejar la selección de cubiertas
- * @param {Array} initialTires - Lista inicial de cubiertas seleccionadas
- * @param {Object} options - Opciones adicionales
- * @param {boolean} options.allowDuplicates - Si permite duplicados (default: false)
- * @returns {Object} Funciones y estados para la selección de cubiertas
- */
 export const useTireSelection = (initialTires = [], { allowDuplicates = false } = {}) => {
   const [selectedTires, setSelectedTires] = useState(initialTires)
   const [searchQuery, setSearchQuery] = useState("")

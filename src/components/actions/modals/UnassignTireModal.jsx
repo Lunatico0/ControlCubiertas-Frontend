@@ -7,12 +7,16 @@ import Modal from "@components/UI/Modal"
 import { useOrderValidation } from "@hooks/useOrderValidation"
 
 const UnassignTireModal = ({ tire, onClose, refreshTire }) => {
-  const { handleUnassignTire, loadTireById, getReceiptNumber } = useContext(ApiContext)
+  const {
+    tires,
+    orders
+  } = useContext(ApiContext)
+
   const { validateOrderNumber } = useOrderValidation()
 
   const { execute, isSubmitting } = useTireAction({
     printBuilder: buildUnassignPrintData,
-    apiCall: handleUnassignTire,
+    apiCall: tires.unassign,
     successMessage: "Cubierta desasignada con éxito",
   })
 
@@ -22,9 +26,9 @@ const UnassignTireModal = ({ tire, onClose, refreshTire }) => {
       formData: {
         kmBaja: Number(data.kmBaja),
         orderNumber: data.orderNumber,
-        getReceiptNumber,
+        getReceiptNumber: orders.getNextReceipt
       },
-      refresh: loadTireById,
+      refresh: tires.loadById,
       close: onClose,
     })
   }

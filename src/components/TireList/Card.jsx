@@ -1,13 +1,9 @@
-import { statusStyles } from "@utils/statusStyle"
+import { statusStyles } from "@utils/statusStyle";
+import { colors, text, button } from "@utils/tokens";
+import EditNoteRoundedIcon from '@mui/icons-material/EditNoteRounded';
+import InfoRow from "@components/UI/InfoRow.jsx";
+import StatusBadge from '@components/UI/StatusBadge'
 
-/**
- * Componente de tarjeta para mostrar información de una cubierta
- * @param {Object} props - Propiedades del componente
- * @param {Object} props.tire - Datos de la cubierta
- * @param {Function} props.onCardClick - Función para manejar click en la tarjeta
- * @param {Function} props.onEdit - Función para editar la cubierta
- * @param {boolean} props.isLoading - Indica si está cargando
- */
 const TireCard = ({ tire, onCardClick, onEdit, isLoading = false }) => {
   const isRecap = tire.status === "A recapar"
   const isDiscarded = tire.status === "Descartada"
@@ -36,13 +32,10 @@ const TireCard = ({ tire, onCardClick, onEdit, isLoading = false }) => {
   return (
     <div
       className={`
-        relative group transition-all duration-300 transform hover:scale-105 hover:shadow-xl
-        bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700
-        rounded-xl overflow-hidden shadow-md cursor-pointer h-full flex flex-col
-        ${isLoading ? "opacity-50 pointer-events-none" : ""}
-        ${isRecap || isDiscarded ? "opacity-80" : ""}
+        relative group transition-all duration-300 transform hover:scale-105 ${colors.surface} ${colors.border} ${colors.shadow} rounded-xl overflow-hidden cursor-pointer h-full flex flex-col ${isLoading ? "opacity-50 pointer-events-none" : ""} ${isRecap || isDiscarded ? "opacity-80" : ""}
       `}
       onClick={handleCardClick}
+      tabIndex="0"
     >
       {/* Indicador de estado en la esquina superior */}
       <div className="absolute top-3 left-3 z-10">
@@ -53,16 +46,16 @@ const TireCard = ({ tire, onCardClick, onEdit, isLoading = false }) => {
       <button
         onClick={handleEdit}
         disabled={isLoading}
-        className="
-          absolute top-3 right-3 p-2 z-20
-          bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400
-          text-white rounded-lg shadow-sm
-          transition-all duration-200 transform hover:scale-105
+        className={`
+          absolute top-3 right-3 z-20
+          ${button.primary}
+          text-white rounded-lg
+          transition-transform transform hover:scale-105
           opacity-0 group-hover:opacity-100
-        "
+        `}
         title="Editar cubierta"
       >
-        ✏️
+        <EditNoteRoundedIcon />
       </button>
 
       {/* Imagen de la cubierta */}
@@ -84,8 +77,8 @@ const TireCard = ({ tire, onCardClick, onEdit, isLoading = false }) => {
         />
 
         {/* Overlay con información rápida */}
-        <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300 flex items-center justify-center">
-          <span className="text-white font-semibold opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 group-hover:backdrop-blur-sm transition-all duration-300 flex items-center justify-center">
+          <span className="text-white font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300">
             Ver detalles
           </span>
         </div>
@@ -95,8 +88,8 @@ const TireCard = ({ tire, onCardClick, onEdit, isLoading = false }) => {
       <div className="p-4 flex-1 flex flex-col justify-between min-h-[200px]">
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <h3 className="font-bold text-lg text-gray-900 dark:text-white">#{tire.code}</h3>
-            <span className="text-sm text-gray-500 dark:text-gray-400 truncate max-w-[100px]">{tire.serialNumber}</span>
+            <h3 className={`${text.heading} text-lg`}>#{tire.code}</h3>
+            <span className={`${colors.muted} text-sm truncate max-w-[100px]`}>{tire.serialNumber}</span>
           </div>
 
           <div className="space-y-2 text-sm">
@@ -135,53 +128,6 @@ const TireCard = ({ tire, onCardClick, onEdit, isLoading = false }) => {
         </div>
       )}
     </div>
-  )
-}
-
-/**
- * Componente para mostrar una fila de información
- */
-const InfoRow = ({ label, value, valueClass = "" }) => (
-  <div className="flex justify-between items-center">
-    <span className="text-gray-600 dark:text-gray-400 font-medium">{label}:</span>
-    <span className={`font-semibold truncate max-w-[120px] ${valueClass}`} title={value}>
-      {value}
-    </span>
-  </div>
-)
-
-/**
- * Componente para mostrar el badge de estado
- */
-const StatusBadge = ({ status }) => {
-  const getStatusColor = (status) => {
-    switch (status) {
-      case "Nueva":
-        return "bg-blue-600 dark:bg-blue-900"
-      case "1er Recapado":
-        return "bg-green-600 dark:bg-green-900"
-      case "2do Recapado":
-        return "bg-yellow-600 dark:bg-yellow-900"
-      case "3er Recapado":
-        return "bg-orange-600 dark:bg-orange-900"
-      case "A recapar":
-        return "bg-neutral-600 dark:bg-neutral-900"
-      case "Descartada":
-        return "bg-red-600 dark:bg-red-900"
-      default:
-        return "bg-gray-600 dark:bg-gray-700"
-    }
-  }
-
-  return (
-    <span
-      className={`
-        px-3 py-1 text-xs font-semibold text-white rounded-full shadow-sm
-        ${getStatusColor(status)}
-      `}
-    >
-      {status}
-    </span>
   )
 }
 

@@ -1,24 +1,15 @@
-import { useContext, useEffect, useRef } from "react"
-import ApiContext from "@context/apiContext"
+import { useContext, useEffect, useRef } from "react";
+import ApiContext from "@context/apiContext";
+import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
+import TuneRoundedIcon from '@mui/icons-material/TuneRounded';
+import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
+import { colors, text, input, button } from "@utils/tokens"
 
-/**
- * Componente para búsqueda y filtrado de cubiertas
- * @param {Object} props - Propiedades del componente
- * @param {boolean} props.showFilters - Indica si mostrar los filtros
- * @param {Function} props.setShowFilters - Función para mostrar/ocultar filtros
- */
 const SearchFilter = ({ showFilters, setShowFilters }) => {
   const modalRef = useRef(null)
   const {
-    searchQuery,
-    setSearchQuery,
-    filters,
-    setFilters,
-    availableBrands,
-    availableStatuses,
-    vehiclesWTires,
-    tireCount,
-    filteredTireData,
+    data,
+    ui,
   } = useContext(ApiContext)
 
   // Cerrar filtros al hacer clic fuera
@@ -39,15 +30,15 @@ const SearchFilter = ({ showFilters, setShowFilters }) => {
   }, [showFilters, setShowFilters])
 
   const clearFilter = (key) => {
-    setFilters((prevFilters) => ({ ...prevFilters, [key]: "" }))
+    ui.setFilters((prevFilters) => ({ ...prevFilters, [key]: "" }))
   }
 
   const clearKilometers = () => {
-    setFilters((prevFilters) => ({ ...prevFilters, kmFrom: "", kmTo: "" }))
+    ui.setFilters((prevFilters) => ({ ...prevFilters, kmFrom: "", kmTo: "" }))
   }
 
   const clearAllFilters = () => {
-    setFilters({
+    ui.setFilters({
       status: "",
       brand: "",
       vehicle: "",
@@ -55,31 +46,32 @@ const SearchFilter = ({ showFilters, setShowFilters }) => {
       kmTo: "",
       sortBy: "",
     })
-    setSearchQuery("")
+    ui.setSearchQuery("")
   }
 
-  const hasActiveFilters = Object.values(filters).some((value) => value !== "") || searchQuery !== ""
+  const hasActiveFilters = Object.values(ui.filters).some((value) => value !== "") || ui.searchQuery !== ""
 
   return (
     <div className="flex flex-col w-full justify-center sm:flex-row gap-6 mb-8">
       {/* Barra de búsqueda mejorada */}
       <div className="relative flex-1 max-w-lg">
         <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-          <span className="text-gray-400 text-lg">🔍</span>
+          <span className="text-gray-400 text-lg"><SearchRoundedIcon /></span>
         </div>
         <input
           type="search"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
+          value={ui.searchQuery}
+          onChange={(e) => ui.setSearchQuery(e.target.value)}
           placeholder="Buscar por código, marca, serie..."
-          className="w-full pl-12 pr-12 py-4 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm hover:shadow-md transition-shadow"
+          className={`w-full pl-12 pr-12 py-5 rounded-xl dark:bg-gray-800 ${input.base} hover:shadow-md transition-shadow`}
         />
-        {searchQuery && (
+
+        {ui.searchQuery && (
           <button
-            onClick={() => setSearchQuery("")}
+            onClick={() => ui.setSearchQuery("")}
             className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
           >
-            <span className="text-lg">✖</span>
+            <span className="text-lg"><CloseRoundedIcon /></span>
           </button>
         )}
       </div>
@@ -89,19 +81,17 @@ const SearchFilter = ({ showFilters, setShowFilters }) => {
         <button
           onClick={() => setShowFilters(!showFilters)}
           className={`
-            flex items-center gap-3 px-6 py-4 rounded-xl transition-all duration-200 shadow-sm hover:shadow-md font-medium
-            ${
-              hasActiveFilters
-                ? "bg-blue-600 text-white hover:bg-blue-700"
-                : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 border border-gray-300 dark:border-gray-600"
+            flex items-center gap-3 px-6 py-4 rounded-xl font-medium transition-all shadow-sm hover:shadow-md ${hasActiveFilters
+              ? button.primary
+              : `${colors.surface} ${colors.border} text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700`
             }
           `}
         >
-          <span className="text-lg">🔧</span>
+          <span className="text-lg"><TuneRoundedIcon /></span>
           <span>Filtros</span>
           {hasActiveFilters && (
             <span className="bg-white bg-opacity-20 text-xs px-2 py-1 rounded-full font-semibold">
-              {Object.values(filters).filter((v) => v !== "").length + (searchQuery ? 1 : 0)}
+              {Object.values(ui.filters).filter((v) => v !== "").length + (ui.searchQuery ? 1 : 0)}
             </span>
           )}
         </button>
@@ -110,7 +100,7 @@ const SearchFilter = ({ showFilters, setShowFilters }) => {
         {showFilters && (
           <div
             ref={modalRef}
-            className="absolute right-0 mt-3 w-96 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl z-50 p-6"
+            className="absolute right-0 mt-3 bg-white/90 dark:bg-gray-800/90 backdrop-blur-md border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl ring-1 ring-black/10 z-50 p-6"
           >
             {/* Flecha del dropdown */}
             <div className="absolute -top-2 right-6 w-4 h-4 bg-white dark:bg-gray-800 border-l border-t border-gray-200 dark:border-gray-700 rotate-45"></div>
@@ -122,110 +112,112 @@ const SearchFilter = ({ showFilters, setShowFilters }) => {
                 onClick={() => setShowFilters(false)}
                 className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-1 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
               >
-                ✖
+                <CloseRoundedIcon />
               </button>
             </div>
 
-            <div className="space-y-5">
-              {/* Ordenamiento */}
-              <FilterRow label="Ordenar por" value={filters.sortBy} onClear={() => clearFilter("sortBy")}>
-                <select
-                  className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  value={filters.sortBy}
-                  onChange={(e) => setFilters({ ...filters, sortBy: e.target.value })}
-                >
-                  <option value="">Sin ordenar</option>
-                  <option value="status">Estado</option>
-                  <option value="codeAsc">Código (ascendente)</option>
-                  <option value="codeDesc">Código (descendente)</option>
-                  <option value="kmAsc">Kilómetros (ascendente)</option>
-                  <option value="kmDesc">Kilómetros (descendente)</option>
-                </select>
-              </FilterRow>
+            <div className="space-y-5 divide-y divide-gray-200 dark:divide-gray-700">
+              <div className="space-y-5 pt-0">
+                {/* Ordenamiento */}
+                <FilterRow label="Ordenar por" value={ui.filters.sortBy} onClear={() => clearFilter("sortBy")}>
+                  <select
+                    className={`flex-1 ${input.base}`}
+                    value={ui.filters.sortBy}
+                    onChange={(e) => ui.setFilters({ ...ui.filters, sortBy: e.target.value })}
+                  >
+                    <option value="">Sin ordenar</option>
+                    <option value="status">Estado</option>
+                    <option value="codeAsc">Código (ascendente)</option>
+                    <option value="codeDesc">Código (descendente)</option>
+                    <option value="kmAsc">Kilómetros (ascendente)</option>
+                    <option value="kmDesc">Kilómetros (descendente)</option>
+                  </select>
+                </FilterRow>
 
-              {/* Estado */}
-              <FilterRow label="Estado" value={filters.status} onClear={() => clearFilter("status")}>
-                <select
-                  className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  value={filters.status}
-                  onChange={(e) => setFilters({ ...filters, status: e.target.value })}
-                >
-                  <option value="">Todos los estados</option>
-                  {availableStatuses.map((status) => (
-                    <option key={status} value={status}>
-                      {status}
-                    </option>
-                  ))}
-                </select>
-              </FilterRow>
+                {/* Estado */}
+                <FilterRow label="Estado" value={ui.filters.status} onClear={() => clearFilter("status")}>
+                  <select
+                    className={`flex-1 ${input.base}`}
+                    value={ui.filters.status}
+                    onChange={(e) => ui.setFilters({ ...ui.filters, status: e.target.value })}
+                  >
+                    <option value="">Todos los estados</option>
+                    {data.availableStatuses.map((status) => (
+                      <option key={status} value={status}>
+                        {status}
+                      </option>
+                    ))}
+                  </select>
+                </FilterRow>
 
-              {/* Marca */}
-              <FilterRow label="Marca" value={filters.brand} onClear={() => clearFilter("brand")}>
-                <select
-                  className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  value={filters.brand}
-                  onChange={(e) => setFilters({ ...filters, brand: e.target.value })}
-                >
-                  <option value="">Todas las marcas</option>
-                  {availableBrands.map((brand) => (
-                    <option key={brand} value={brand}>
-                      {brand}
-                    </option>
-                  ))}
-                </select>
-              </FilterRow>
+                {/* Marca */}
+                <FilterRow label="Marca" value={ui.filters.brand} onClear={() => clearFilter("brand")}>
+                  <select
+                    className={`flex-1 ${input.base}`}
+                    value={ui.filters.brand}
+                    onChange={(e) => ui.setFilters({ ...ui.filters, brand: e.target.value })}
+                  >
+                    <option value="">Todas las marcas</option>
+                    {data.availableBrands.map((brand) => (
+                      <option key={brand} value={brand}>
+                        {brand}
+                      </option>
+                    ))}
+                  </select>
+                </FilterRow>
 
-              {/* Vehículo */}
-              <FilterRow label="Vehículo" value={filters.vehicle} onClear={() => clearFilter("vehicle")}>
-                <select
-                  className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  value={filters.vehicle}
-                  onChange={(e) => setFilters({ ...filters, vehicle: e.target.value })}
-                >
-                  <option value="">Todos los vehículos</option>
-                  {vehiclesWTires.map((vehicle) => (
-                    <option key={vehicle} value={vehicle}>
-                      {vehicle}
-                    </option>
-                  ))}
-                </select>
-              </FilterRow>
+                {/* Vehículo */}
+                <FilterRow label="Vehículo" value={ui.filters.vehicle} onClear={() => clearFilter("vehicle")}>
+                  <select
+                    className={`flex-1 ${input.base}`}
+                    value={ui.filters.vehicle}
+                    onChange={(e) => ui.setFilters({ ...ui.filters, vehicle: e.target.value })}
+                  >
+                    <option value="">Todos los vehículos</option>
+                    {data.vehiclesWTires.map((vehicle) => (
+                      <option key={vehicle} value={vehicle}>
+                        {vehicle}
+                      </option>
+                    ))}
+                  </select>
+                </FilterRow>
 
-              {/* Kilómetros */}
-              <FilterRow label="Kilómetros" value={filters.kmFrom || filters.kmTo} onClear={clearKilometers}>
-                <div className="flex items-center gap-3 flex-1">
-                  <input
-                    type="number"
-                    placeholder="Desde"
-                    className="w-24 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    value={filters.kmFrom}
-                    onChange={(e) => setFilters({ ...filters, kmFrom: e.target.value })}
-                  />
-                  <span className="text-gray-500 text-sm font-medium">a</span>
-                  <input
-                    type="number"
-                    placeholder="Hasta"
-                    className="w-24 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    value={filters.kmTo}
-                    onChange={(e) => setFilters({ ...filters, kmTo: e.target.value })}
-                  />
-                  <span className="text-gray-500 text-sm font-medium">km</span>
-                </div>
-              </FilterRow>
+                {/* Kilómetros */}
+                <FilterRow label="Kilómetros" value={ui.filters.kmFrom || ui.filters.kmTo} onClear={clearKilometers}>
+                  <div className="flex items-center gap-3 flex-1">
+                    <input
+                      type="number"
+                      placeholder="Desde"
+                      className="w-24 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      value={ui.filters.kmFrom}
+                      onChange={(e) => ui.setFilters({ ...ui.filters, kmFrom: e.target.value })}
+                    />
+                    <span className="text-gray-500 text-sm font-medium">a</span>
+                    <input
+                      type="number"
+                      placeholder="Hasta"
+                      className="w-24 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      value={ui.filters.kmTo}
+                      onChange={(e) => ui.setFilters({ ...ui.filters, kmTo: e.target.value })}
+                    />
+                    <span className="text-gray-500 text-sm font-medium">km</span>
+                  </div>
+                </FilterRow>
+              </div>
             </div>
 
             {/* Footer */}
             <div className="flex items-center justify-between pt-6 mt-6 border-t border-gray-200 dark:border-gray-700">
-              <div className="text-sm text-gray-600 dark:text-gray-400">
-                Mostrando <span className="font-semibold">{filteredTireData.length}</span> de{" "}
-                <span className="font-semibold">{tireCount}</span> cubiertas
+              <div className={`text-sm ${colors.muted}`}>
+                Mostrando <span className="font-semibold">{data.filteredTireData.length}</span> de{" "}
+                <span className="font-semibold">{data.tireCount}</span> cubiertas
               </div>
               <button
                 onClick={clearAllFilters}
                 disabled={!hasActiveFilters}
-                className="px-4 py-2 text-sm bg-red-500 hover:bg-red-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-lg transition-colors font-medium"
+                className={`${button.danger} text-sm px-4 py-2 rounded-lg disabled:bg-gray-300 disabled:text-gray-600 disabled:cursor-not-allowed`}
               >
-                Limpiar todo
+                Limpiar filtros
               </button>
             </div>
           </div>
@@ -235,9 +227,6 @@ const SearchFilter = ({ showFilters, setShowFilters }) => {
   )
 }
 
-/**
- * Componente auxiliar para las filas de filtros
- */
 const FilterRow = ({ label, value, onClear, children }) => (
   <div className="flex items-center gap-4">
     <label className="text-sm font-medium text-gray-700 dark:text-gray-300 w-24 flex-shrink-0">{label}:</label>
@@ -248,7 +237,7 @@ const FilterRow = ({ label, value, onClear, children }) => (
       className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 disabled:opacity-30 disabled:cursor-not-allowed p-1 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
       title="Limpiar filtro"
     >
-      ✖
+      <CloseRoundedIcon />
     </button>
   </div>
 )

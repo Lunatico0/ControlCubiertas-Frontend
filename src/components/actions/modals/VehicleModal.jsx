@@ -4,23 +4,19 @@ import VehicleForm from "@components/Forms/VehicleForm"
 import Modal from "@components/UI/Modal"
 import { useTireSelection } from "@hooks/useTireSelection"
 
-/**
- * Modal para crear o editar vehículos
- * @param {Object} props - Propiedades del componente
- * @param {Object} props.vehicle - Vehículo a editar (null para crear)
- * @param {Function} props.onClose - Función para cerrar el modal
- * @param {Function} props.onSuccess - Función a ejecutar después de guardar
- * @param {boolean} props.isEdit - Indica si es una edición
- */
 const VehicleModal = ({ vehicle = null, onClose, onSuccess, isEdit = false }) => {
-  const { tires, handleCreateVehicle, handleUpdateVehicle } = useContext(ApiContext)
+  const {
+    data,
+    vehicles,
+  } = useContext(ApiContext)
+
   const isCreating = !isEdit
 
   // Filtrar cubiertas disponibles (no asignadas a otro vehículo)
   const availableTires = tires.filter((t) => !t.vehicle || (vehicle && t.vehicle._id === vehicle._id))
 
   // Cubiertas ya asignadas al vehículo
-  const initialTires = vehicle ? tires.filter((t) => t.vehicle && t.vehicle._id === vehicle._id) : []
+  const initialTires = vehicle ? data.tires.filter((t) => t.vehicle && t.vehicle._id === vehicle._id) : []
 
   const { selectedTires, searchQuery, setSearchQuery, isSearchOpen, setIsSearchOpen, handleAddTire, handleRemoveTire } =
     useTireSelection(initialTires)
@@ -34,9 +30,9 @@ const VehicleModal = ({ vehicle = null, onClose, onSuccess, isEdit = false }) =>
       }
 
       if (isCreating) {
-        await handleCreateVehicle(vehicleData)
+        await vehicles.create(vehicleData)
       } else {
-        await handleUpdateVehicle(vehicle._id, vehicleData)
+        await vehicles.update(vehicle._id, vehicleData)
       }
 
       if (onSuccess) {

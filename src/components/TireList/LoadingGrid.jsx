@@ -1,6 +1,3 @@
-/**
- * Componente para mostrar el estado de carga del grid
- */
 const LoadingGrid = () => {
   return (
     <div className="space-y-6">
@@ -20,12 +17,9 @@ const LoadingGrid = () => {
   )
 }
 
-/**
- * Componente para mostrar una tarjeta en estado de carga
- */
 const LoadingCard = () => (
-  <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden shadow-md">
-    <div className="h-48 bg-gray-200 dark:bg-gray-700 animate-pulse"></div>
+  <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden shadow-md ring-1 ring-black/5 dark:ring-white/5" aria-busy="true">
+    <div className="h-44 bg-gray-200 dark:bg-gray-700 animate-pulse"></div>
     <div className="p-4 space-y-3">
       <div className="flex justify-between">
         <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-16 animate-pulse"></div>

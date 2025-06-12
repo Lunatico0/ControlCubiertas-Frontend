@@ -439,83 +439,82 @@ export const ApiProvider = ({ children }) => {
   }, [tires])
 
   // Valor del contexto memoizado
-  const contextValue = useMemo(
-    () => ({
-      // Datos
+  const contextValue = useMemo(() => ({
+    // ==========================
+    data: {
       tires,
       vehicles,
       selectedTire,
       selectedVehicle,
       vehiclesWTires,
       availableBrands,
-      filteredTireData,
       availableStatuses,
+      filteredTireData,
       suggestedCode,
       tireCount,
+    },
 
-      // Estados
+    // ==========================
+    ui: {
       error,
       loading,
       selectedLoading,
-
-      // Filtros y búsqueda
       filters,
       searchQuery,
       setFilters,
       setSearchQuery,
+    },
 
-      // Funciones de carga
-      loadTires,
-      loadVehicles,
-      loadTireById,
-      loadVehicleById,
+    // ==========================
+    tires: {
+      load: loadTires,
+      create: handleCreateTire,
+      updateStatus: handleUpdateTireStatus,
+      assign: handleAssignTire,
+      unassign: handleUnassignTire,
+      correct: handleCorrectTire,
+      updateHistory: handleUpdateHistoryEntry,
+      undoHistory: handleUndoHistoryEntry,
+      loadById: loadTireById,
+    },
 
-      // Funciones de CRUD para tires
-      handleCreateTire,
-      handleUpdateTireStatus,
-      handleAssignTire,
-      handleUnassignTire,
-      handleCorrectTire,
-      handleUndoHistoryEntry,
-      handleUpdateHistoryEntry,
+    // ==========================
+    vehicles: {
+      load: loadVehicles,
+      create: handleCreateVehicle,
+      update: handleUpdateVehicle,
+      loadById: loadVehicleById,
+    },
 
-      // Funciones de CRUD para vehicles
-      handleCreateVehicle,
-      handleUpdateVehicle,
+    // ==========================
+    orders: {
+      checkNumber: handleCheckOrderNumber,
+      getNextReceipt: getReceiptNumber,
+    },
 
-      // Funciones de orders
-      handleCheckOrderNumber,
-      getReceiptNumber,
-
-      // Funciones de utilidad
+    // ==========================
+    utils: {
       triggerGlobalRefresh,
       replaceTireInList,
       replaceVehicleInList,
       clearError,
-
-      // Setters (para casos específicos)
       setTires,
       setSelectedTire,
       setSelectedVehicle,
-    }),
-    [
-      tires,
-      vehicles,
-      selectedTire,
-      selectedVehicle,
-      vehiclesWTires,
-      availableBrands,
-      filteredTireData,
-      availableStatuses,
-      suggestedCode,
-      tireCount,
-      error,
-      loading,
-      selectedLoading,
-      filters,
-      searchQuery,
-    ],
-  )
+    },
+
+    // ==========================
+    state: {
+      refreshTrigger,
+    }
+
+  }), [
+    // Dependencias (las mismas que antes, agrupadas si querés)
+    tires, vehicles, selectedTire, selectedVehicle,
+    vehiclesWTires, availableBrands, filteredTireData,
+    availableStatuses, suggestedCode, tireCount,
+    error, loading, selectedLoading, filters, searchQuery
+  ])
 
   return <ApiContext.Provider value={contextValue}>{children}</ApiContext.Provider>
 }

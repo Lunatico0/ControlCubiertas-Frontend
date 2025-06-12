@@ -7,12 +7,16 @@ import Modal from "@components/UI/Modal"
 import { useOrderValidation } from "@hooks/useOrderValidation"
 
 const UndoHistoryEntryModal = ({ tire, entry, onClose, refreshTire }) => {
-  const { handleUndoHistoryEntry, getReceiptNumber, loadTireById } = useContext(ApiContext)
+  const {
+    orders,
+    tires
+  } = useContext(ApiContext)
+
   const { validateOrderNumber } = useOrderValidation()
 
   const { execute, isSubmitting } = useTireAction({
     printBuilder: buildUndoPrintData,
-    apiCall: (tireId, formData) => handleUndoHistoryEntry(tireId, entry._id, formData),
+    apiCall: (tireId, formData) => tires.undoHistory(tireId, entry._id, formData),
     successMessage: "Entrada deshecha correctamente",
   })
 
@@ -21,9 +25,9 @@ const UndoHistoryEntryModal = ({ tire, entry, onClose, refreshTire }) => {
       tire,
       formData: {
         orderNumber: data.orderNumber,
-        getReceiptNumber,
+        getReceiptNumber: orders.getNextReceipt
       },
-      refresh: loadTireById,
+      refresh: tires.loadById,
       close: onClose,
     })
   }

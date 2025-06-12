@@ -1,10 +1,9 @@
-import { useState } from "react"
-import Help from './Help'
-import { New } from './New'
+import { useState } from "react";
+import Help from './Help';
+import { New } from './New';
+import AddIcon from '@mui/icons-material/Add';
+import { Button } from '@mui/material'
 
-/**
- * Componente que combina la ayuda y el botón para agregar nuevos elementos
- */
 const HelpNew = () => {
   const [isNewModalOpen, setIsNewModalOpen] = useState(false)
 
@@ -27,11 +26,12 @@ const HelpNew = () => {
       <div className="flex items-center">
         <button
           onClick={handleOpenNew}
-          className="flex items-center gap-3 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 font-medium"
+          className="inline-flex items-center gap-2 px-4 py-3 rounded-md bg-blue-600 hover:bg-blue-700 text-white font-medium shadow-md hover:shadow-lg transition-transform transform hover:scale-[1.02]"
         >
-          <span className="text-xl">➕</span>
-          <span>Agregar nuevo</span>
+          <AddIcon fontSize="small" />
+          <span className="uppercase text-sm">Agregar nuevo</span>
         </button>
+
       </div>
 
       {isNewModalOpen && <New onClose={handleCloseNew} />}

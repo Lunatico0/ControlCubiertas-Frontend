@@ -6,23 +6,14 @@ import UpdateTire from "@components/UpdateTire/UpdateTire"
 import { usePasswordCheck } from "@hooks/usePasswordCheck"
 import LoadingGrid from "./LoadingGrid"
 import EmptyState from "./EmptyState"
+import { colors } from "@utils/tokens"
 
-/**
- * Componente principal para mostrar la lista de cubiertas
- * @param {Object} props - Propiedades del componente
- * @param {Function} props.onTireSelect - Función para seleccionar una cubierta
- */
 const TireList = ({ onTireSelect }) => {
   const {
-    error,
-    loading,
-    tireCount,
-    loadTires,
-    refreshFlag,
-    loadTireById,
-    selectedTire,
-    selectedLoading,
-    filteredTireData,
+    data,
+    ui,
+    tires,
+    state
   } = useContext(ApiContext)
 
   const [tireToUpdate, setTireToUpdate] = useState(null)
@@ -36,7 +27,7 @@ const TireList = ({ onTireSelect }) => {
     try {
       setLoadingTireId(id)
       setIsTireModalOpen(true)
-      await loadTireById(id)
+      await tires.loadById(id)
 
       if (onTireSelect) {
         onTireSelect(id)
@@ -76,23 +67,23 @@ const TireList = ({ onTireSelect }) => {
   }
 
   useEffect(() => {
-    loadTires()
-  }, [refreshFlag])
+    tires.load()
+  }, [state.refreshTrigger])
 
   // Estados de carga y error
-  if (loading) {
+  if (ui.loading) {
     return <LoadingGrid />
   }
 
-  if (error) {
+  if (ui.error) {
     return (
       <div className="flex items-center justify-center min-h-64">
         <div className="text-center">
           <div className="text-red-500 text-6xl mb-4">⚠️</div>
           <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Error al cargar las cubiertas</h3>
-          <p className="text-gray-600 dark:text-gray-400 mb-4">{error}</p>
+          <p className={`${colors.muted} mb-4`}>{ui.error}</p>
           <button
-            onClick={loadTires}
+            onClick={tires.load}
             className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
           >
             Reintentar
@@ -102,25 +93,25 @@ const TireList = ({ onTireSelect }) => {
     )
   }
 
-  if (tireCount === 0) {
+  if (data.tireCount === 0) {
     return <EmptyState />
   }
 
   return (
-    <div className="space-y-6">
+    <div>
       {/* Información del listado */}
       <div className="flex items-center justify-center">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Inventario de Cubiertas</h2>
-          <p className="text-gray-600 dark:text-gray-400">
-            {filteredTireData.length} de {tireCount} cubierta(s)
+          <h2 className="text-2xl font-semibold tracking-tight text-gray-900 dark:text-white mb-1">Inventario de Cubiertas</h2>
+          <p className={`${colors.muted} text-sm`}>
+            {data.filteredTireData.length} de {data.tireCount} cubierta(s)
           </p>
         </div>
       </div>
 
       {/* Grid de tarjetas */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {filteredTireData.map((tire) => (
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pt-8">
+        {data.filteredTireData.map((tire) => (
           <TireCard
             key={tire._id}
             tire={tire}
@@ -132,10 +123,10 @@ const TireList = ({ onTireSelect }) => {
       </div>
 
       {/* Modales */}
-      {isTireModalOpen && selectedTire && (
+      {isTireModalOpen && data.selectedTire && (
         <TireDetails
-          selectedLoading={selectedLoading}
-          selectedTire={selectedTire}
+          selectedLoading={ui.selectedLoading}
+          selectedTire={data.selectedTire}
           onClose={handleCloseTireModal}
           onEdit={handleEditFromDetails}
           handlePasswordCheck={checkPassword}

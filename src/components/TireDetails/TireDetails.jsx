@@ -4,18 +4,15 @@ import TireInfo from "./TireInfo"
 import TireHistory from "./TireHistory"
 import QuickActions from "@components/actions/QuickActions"
 import EditHistoryModal from "@components/actions/modals/EditHistoryModal"
+import EditNoteRoundedIcon from '@mui/icons-material/EditNoteRounded';
+import CloseRoundedIcon from '@mui/icons-material/CloseRounded'
+import { colors, text, button } from "@utils/tokens";
 
-/**
- * Componente principal para mostrar los detalles de una cubierta
- * @param {Object} props - Propiedades del componente
- * @param {boolean} props.selectedLoading - Indica si está cargando
- * @param {Object} props.selectedTire - Cubierta seleccionada
- * @param {Function} props.onClose - Función para cerrar el modal
- * @param {Function} props.onEdit - Función para editar la cubierta
- * @param {Function} props.handlePasswordCheck - Función para verificar contraseña
- */
 const TireDetails = ({ selectedLoading, selectedTire, onClose, onEdit, handlePasswordCheck }) => {
-  const { loadTireById } = useContext(ApiContext)
+  const {
+    tires
+  } = useContext(ApiContext)
+
   const [entryToEdit, setEntryToEdit] = useState(null)
 
   // Manejar tecla ESC
@@ -32,6 +29,13 @@ const TireDetails = ({ selectedLoading, selectedTire, onClose, onEdit, handlePas
     }
   }, [onClose])
 
+  useEffect(() => {
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.body.style.overflow = ''
+    }
+  }, [])
+
   const handleEdit = async () => {
     if (handlePasswordCheck) {
       const confirmed = await handlePasswordCheck()
@@ -45,14 +49,14 @@ const TireDetails = ({ selectedLoading, selectedTire, onClose, onEdit, handlePas
 
   const handleRefreshTire = async () => {
     if (selectedTire?._id) {
-      await loadTireById(selectedTire._id)
+      await tires.loadById(selectedTire._id)
     }
   }
 
   if (selectedLoading) {
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-        <div className="bg-white dark:bg-gray-900 text-black dark:text-white rounded-xl p-6 w-full max-w-md shadow-xl">
+        <div className={`${colors.surface} ${text.heading} rounded-xl p-6 w-full max-w-md shadow-xl`}>
           <div className="flex items-center justify-center py-8">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
             <span className="ml-2">Cargando detalles de la cubierta...</span>
@@ -65,7 +69,7 @@ const TireDetails = ({ selectedLoading, selectedTire, onClose, onEdit, handlePas
   if (!selectedTire) {
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-        <div className="bg-white dark:bg-gray-900 text-black dark:text-white rounded-xl p-6 w-full max-w-md shadow-xl">
+        <div className={`${colors.surface} ${text.heading} rounded-xl p-6 w-full max-w-md shadow-xl`}>
           <div className="text-center py-4">
             <p className="text-red-500">No se pudo cargar la información de la cubierta</p>
           </div>
@@ -77,9 +81,9 @@ const TireDetails = ({ selectedLoading, selectedTire, onClose, onEdit, handlePas
   return (
     <>
       {/* Modal con backdrop */}
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" onClick={onClose}>
+      <div className="fixed inset-0 bg-black bg-opacity-50 z-50 overflow-y-auto p-4" onClick={onClose}>
         <div
-          className="bg-white dark:bg-gray-900 text-black dark:text-white rounded-xl w-full max-w-6xl shadow-2xl h-[90vh] flex flex-col"
+          className={`${colors.surface} ${text.heading} w-full max-w-6xl mx-auto shadow-2xl sm:h-full min-h-[90vh] flex flex-col bg-white dark:bg-gray-900 rounded-xl overflow-hidden`}
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header del modal - FIJO */}
@@ -88,29 +92,29 @@ const TireDetails = ({ selectedLoading, selectedTire, onClose, onEdit, handlePas
             <div className="flex items-center gap-3">
               <button
                 onClick={handleEdit}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center gap-2"
+                className={`${button.primary} flex items-center gap-2`}
               >
                 <span>Editar</span>
-                <span>✏️</span>
+                <span><EditNoteRoundedIcon fontSize="small" /></span>
               </button>
               <button
                 onClick={onClose}
                 className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
               >
-                ✖
+                <CloseRoundedIcon fontSize="small" />
               </button>
             </div>
           </div>
 
           {/* Contenido principal - FLEXIBLE */}
-          <div className="flex-1 flex flex-col min-h-0">
+          <div className="flex-1 flex flex-col min-h-0 overflow-y-auto">
             {/* Información de la cubierta - FIJO */}
             <div className="p-6 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
               <TireInfo tire={selectedTire} compact={true} />
             </div>
 
             {/* Historial - SCROLLABLE */}
-            <div className="flex-1 min-h-0">
+            <div className="flex-1 min-h-0 pb-6 overflow-x-auto">
               <TireHistory
                 history={selectedTire.history || []}
                 code={selectedTire.code}

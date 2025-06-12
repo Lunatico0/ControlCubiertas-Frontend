@@ -1,13 +1,6 @@
 import { useState, useCallback } from "react"
 import Swal from "sweetalert2"
 
-/**
- * Hook para manejar la verificación de contraseña
- * @param {Object} options - Opciones de configuración
- * @param {string} options.password - Contraseña a verificar (default: "1234")
- * @param {string} options.title - Título del modal (default: "Verificación requerida")
- * @returns {Object} Funciones y estados para verificación de contraseña
- */
 export const usePasswordCheck = ({ password = "1234", title = "Verificación requerida" } = {}) => {
   const [isChecking, setIsChecking] = useState(false)
   const [lastResult, setLastResult] = useState(null)

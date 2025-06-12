@@ -1,8 +1,3 @@
-/**
- * Genera el HTML para un recibo imprimible (ESTILO VISUAL MEJORADO)
- * @param {Object} data - Datos del recibo
- * @returns {string} HTML del recibo
- */
 export const generateReceiptHTML = (data) => {
   const styles = `
     <style>
@@ -42,13 +37,11 @@ export const generateReceiptHTML = (data) => {
         .divider {
           border: none;
           border-top: 1px dashed black;
-          margin: 12px auto;
           width: 80%;
         }
 
-        .vertical-divider{
+        .vertical-divider {
           border: 1px solid black;
-          margin: 12px auto;
         }
 
         .watermark {
@@ -78,7 +71,6 @@ export const generateReceiptHTML = (data) => {
           display: flex;
           justify-content: space-between;
           font-size: 12px;
-          padding-bottom: 6px;
           font-family: serif;
         }
 
@@ -101,15 +93,13 @@ export const generateReceiptHTML = (data) => {
         .info-status strong {
           font-family: 'Times New Roman', serif;
           font-size: 18px;
-          letter-spacing: 1px;
         }
 
         .title {
           text-align: center;
           font-weight: bold;
-          margin: 10px 0;
           font-size: 15px;
-          border-block: 1px solid black;
+          border-block: 2px solid black;
           padding: 4px 0;
         }
 
@@ -118,12 +108,23 @@ export const generateReceiptHTML = (data) => {
           justify-content: space-between;
           gap: 16px;
           font-size: 12px;
-          margin-bottom: 10px;
           flex-wrap: wrap;
         }
 
-        .details > div {
+        .details>div {
           min-width: 120px;
+          padding-block: 10px;
+        }
+
+        .details>div>p {
+          padding-bottom: .5rem;
+          margin: 0;
+        }
+
+        .correccion {
+          border: 1px solid #ccc;
+          font-size: 12px;
+          padding-inline: 1rem;
         }
 
         .footer {
@@ -136,12 +137,10 @@ export const generateReceiptHTML = (data) => {
         .signatures {
           display: flex;
           justify-content: space-between;
-          margin-top: 20px;
           gap: 32px;
         }
 
         .note {
-          margin-top: 20px;
           font-size: 11px;
         }
 
@@ -203,7 +202,7 @@ export const generateReceiptHTML = (data) => {
         </div>
 
         ${data?.correction ? `
-          <div style="margin-top: 0.5rem; padding: 0.5rem; border: 1px solid #ccc; font-size: 12px;">
+          <div class="correccion">
             <p><strong>Motivo:</strong> ${data.correction.reason || ""}</p>
             ${data.correction.editedFields ? `<p><strong>Campos editados:</strong> ${data.correction.editedFields}</p>` : ""}
           </div>` : ""}

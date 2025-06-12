@@ -7,12 +7,17 @@ import Modal from "@components/UI/Modal"
 import { useOrderValidation } from "@hooks/useOrderValidation"
 
 const AssignTireModal = ({ tire, onClose, refreshTire }) => {
-  const { vehicles, handleAssignTire, loadTireById, getReceiptNumber } = useContext(ApiContext)
+  const {
+    data,
+    tires,
+    orders
+  } = useContext(ApiContext)
+
   const { validateOrderNumber } = useOrderValidation()
 
   const { execute, isSubmitting } = useTireAction({
     printBuilder: buildAssignPrintData,
-    apiCall: handleAssignTire,
+    apiCall: tires.assign,
     successMessage: "Cubierta asignada con éxito",
   })
 
@@ -25,9 +30,9 @@ const AssignTireModal = ({ tire, onClose, refreshTire }) => {
         vehicle: data.vehicle,
         kmAlta: Number(data.kmAlta),
         orderNumber: data.orderNumber,
-        getReceiptNumber,
+        getReceiptNumber: orders.getNextReceipt,
       },
-      refresh: loadTireById,
+      refresh: tires.loadById,
       close: onClose,
     })
   }
@@ -38,7 +43,7 @@ const AssignTireModal = ({ tire, onClose, refreshTire }) => {
         onSubmit={handleSubmit}
         onCancel={onClose}
         isSubmitting={isSubmitting}
-        vehicles={vehicles}
+        vehicles={data.vehicles}
         showFields={{
           vehicle: true,
           kmAlta: true,

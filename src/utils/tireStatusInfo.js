@@ -1,76 +1,62 @@
-/**
- * Información sobre los diferentes estados de cubiertas
- */
+import FiberNewIcon from '@mui/icons-material/FiberNewRounded';
+import LooksOneIcon from '@mui/icons-material/LooksOneRounded';
+import LooksTwoIcon from '@mui/icons-material/LooksTwoRounded';
+import Looks3Icon from '@mui/icons-material/Looks3Rounded';
+import HourglassIcon from '@mui/icons-material/HourglassTopRounded';
+import CloseIcon from '@mui/icons-material/CloseRounded';
 
 const tireStatusInfo = {
   Nueva: {
-    colorClass: "text-blue-300",
+    colorClass: "bg-blue-300 dark:bg-blue-300/60",
     description: "Cubierta nueva sin uso previo",
-    icon: "🆕",
+    icon: FiberNewIcon,
     order: 1,
   },
   "1er Recapado": {
-    colorClass: "text-green-600",
+    colorClass: "bg-green-400 dark:bg-green-400/60",
     description: "Cubierta con un recapado realizado",
-    icon: "1️⃣",
+    icon: LooksOneIcon,
     order: 2,
   },
   "2do Recapado": {
-    colorClass: "text-yellow-600",
+    colorClass: "bg-yellow-300 dark:bg-yellow-300/60",
     description: "Cubierta con dos recapados realizados",
-    icon: "2️⃣",
+    icon: LooksTwoIcon,
     order: 3,
   },
   "3er Recapado": {
-    colorClass: "text-orange-600",
+    colorClass: "bg-orange-400 dark:bg-orange-400/60",
     description: "Cubierta con tres recapados realizados",
-    icon: "3️⃣",
+    icon: Looks3Icon,
     order: 4,
   },
   "A recapar": {
-    colorClass: "text-neutral-700",
-    description: "Cubierta enviada a recapado, en espera",
-    icon: "⏳",
+    colorClass: "bg-neutral-700 dark:bg-neutral-700/60",
+    description: "Cubierta enviada a recapado",
+    icon: HourglassIcon,
     order: 5,
   },
   Descartada: {
-    colorClass: "text-red-600",
-    description: "Cubierta fuera de servicio, no utilizable",
-    icon: "❌",
+    colorClass: "bg-red-500 dark:bg-red-500/60",
+    description: "Cubierta fuera de servicio",
+    icon: CloseIcon,
     order: 6,
   },
 }
 
 export default tireStatusInfo
 
-/**
- * Obtiene la lista de estados ordenados
- * @returns {Array} Lista de estados ordenados
- */
-export const getOrderedStatuses = () => {
-  return Object.keys(tireStatusInfo).sort((a, b) => tireStatusInfo[a].order - tireStatusInfo[b].order)
-}
+export const getOrderedStatuses = () =>
+  Object.keys(tireStatusInfo).sort((a, b) => tireStatusInfo[a].order - tireStatusInfo[b].order)
 
-/**
- * Verifica si un estado permite recapado
- * @param {string} status - Estado actual de la cubierta
- * @returns {boolean} True si el estado permite recapado
- */
-export const canBeRecapped = (status) => {
-  return ["Nueva", "1er Recapado", "2do Recapado"].includes(status)
-}
+export const canBeRecapped = (status) =>
+  ["Nueva", "1er Recapado", "2do Recapado"].includes(status)
 
-/**
- * Obtiene el siguiente estado después de un recapado
- * @param {string} currentStatus - Estado actual de la cubierta
- * @returns {string|null} Siguiente estado o null si no es posible
- */
-export const getNextRecapStatus = (currentStatus) => {
-  const statusMap = {
+export const getNextRecapStatus = (current) => {
+  const next = {
     Nueva: "1er Recapado",
     "1er Recapado": "2do Recapado",
     "2do Recapado": "3er Recapado",
   }
-
-  return statusMap[currentStatus] || null
+  return next[current] || null
 }

@@ -11,7 +11,9 @@ export const useUpdater = () => {
   useEffect(() => {
     if (!window.electronAPI) return
 
-    window.electronAPI.onUpdateAvailable((_, info) => {
+    const handleUpdateAvailable = (_, info) => {
+      window.electronAPI.log?.info?.(`🔔 Update available: v${info.version}`)
+
       Swal.fire({
         title: "Actualización disponible",
         text: `Hay una nueva versión (${info.version}) disponible. ¿Deseas instalarla ahora?`,
@@ -21,17 +23,22 @@ export const useUpdater = () => {
         cancelButtonText: "Recordar más tarde",
       }).then((result) => {
         if (result.isConfirmed) {
+          window.electronAPI.log?.info?.("🟡 Usuario aceptó la descarga")
           showDownloadProgress(0)
+        } else {
+          window.electronAPI.log?.info?.("⏭️ Usuario pospuso la descarga")
         }
       })
-    })
+    }
 
-    window.electronAPI.onUpdateProgress((_, progress) => {
+    const handleUpdateProgress = (_, progress) => {
+      window.electronAPI.log?.info?.(`📦 Progreso: ${progress.percent.toFixed(2)}%`)
       updateProgressBar(progress.percent)
-    })
+    }
 
-    window.electronAPI.onUpdateDownloaded((_, info) => {
+    const handleUpdateDownloaded = (_, info) => {
       closeDownloadProgress()
+      window.electronAPI.log?.info?.(`✅ Descarga completada: v${info.version}`)
 
       Swal.fire({
         title: "Actualización lista",
@@ -42,11 +49,23 @@ export const useUpdater = () => {
         cancelButtonText: "Después",
       }).then((result) => {
         if (result.isConfirmed) {
+          window.electronAPI.log?.info?.("🔁 Reinicio iniciado para instalar update")
           window.electronAPI.installUpdate()
         } else {
           showToast("info", "Puedes instalarla cuando cierres y abras la app.")
+          window.electronAPI.log?.info?.("⏸️ Instalación postergada por el usuario")
         }
       })
-    })
+    }
+
+    window.electronAPI.onUpdateAvailable(handleUpdateAvailable)
+    window.electronAPI.onUpdateProgress(handleUpdateProgress)
+    window.electronAPI.onUpdateDownloaded(handleUpdateDownloaded)
+
+    return () => {
+      window.electronAPI.removeListener("onUpdateAvailable", handleUpdateAvailable)
+      window.electronAPI.removeListener("onUpdateProgress", handleUpdateProgress)
+      window.electronAPI.removeListener("onUpdateDownloaded", handleUpdateDownloaded)
+    }
   }, [])
 }

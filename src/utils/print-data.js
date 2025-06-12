@@ -1,218 +1,139 @@
-/**
- * Construye los datos para imprimir un comprobante de asignación
- * @param {Object} tire - Datos de la cubierta
- * @param {Object} updated - Datos actualizados
- * @param {Object} formData - Datos del formulario
- * @param {string} receiptNumber - Número de recibo
- * @returns {Object} Datos para imprimir
- */
-export const buildAssignPrintData = (tire, updated, formData, receiptNumber) => ({
-  tire: {
-    code: tire.code,
-    serialNumber: tire.serialNumber,
-    brand: tire.brand,
-    pattern: tire.pattern,
-    kilometers: updated.tire.kilometers || 0,
-    status: tire.status,
-  },
-  vehicle: {
-    mobile: updated.tire.vehicle.mobile,
-    licensePlate: updated.tire.vehicle.licensePlate,
-  },
-  orderNumber: formData.orderNumber,
-  actionType: "Asignación",
-  receiptNumber: receiptNumber || "0000-00000000",
-  kmAlta: formData.kmAlta,
+const defaultVehicle = {
+  mobile: "Sin asignar",
+  licensePlate: "Sin asignar",
+}
+
+const buildBaseTire = (tire) => ({
+  code: tire.code,
+  serialNumber: tire.serialNumber,
+  brand: tire.brand,
+  pattern: tire.pattern,
 })
 
-/**
- * Construye los datos para imprimir un comprobante de desasignación
- * @param {Object} tire - Datos de la cubierta
- * @param {Object} updated - Datos actualizados
- * @param {Object} formData - Datos del formulario
- * @param {string} receiptNumber - Número de recibo
- * @returns {Object} Datos para imprimir
- */
-export const buildUnassignPrintData = (tire, updated, formData, receiptNumber) => {
-  const kmBaja = formData.kmBaja
-  const kmAlta = tire.kmAlta || 0
+const withReceipt = (data, receiptNumber) => ({
+  ...data,
+  receiptNumber: receiptNumber || "0000-00000000",
+})
 
-  return {
+export const buildAssignPrintData = (tire, updated, formData, receiptNumber) =>
+  withReceipt({
+    tire: { ...buildBaseTire(tire), kilometers: updated.tire.kilometers, status: tire.status },
+    vehicle: updated.tire.vehicle || defaultVehicle,
+    orderNumber: formData.orderNumber,
+    actionType: "Asignación",
+    kmAlta: formData.kmAlta,
+  }, receiptNumber)
+
+export const buildUnassignPrintData = (tire, updated, formData, receiptNumber) =>
+  withReceipt({
     tire: {
-      code: tire.code,
-      serialNumber: tire.serialNumber,
-      brand: tire.brand,
-      pattern: tire.pattern,
-      kmAlta,
-      kilometers: updated.tire.kilometers || 0,
+      ...buildBaseTire(tire),
+      kmAlta: tire.kmAlta || 0,
+      kilometers: updated.tire.kilometers,
       status: tire.status,
     },
-    vehicle: updated.tire.vehicle
-      ? {
-          mobile: updated.tire.vehicle.mobile,
-          licensePlate: updated.tire.vehicle.licensePlate,
-        }
-      : { mobile: "Sin asignar", licensePlate: "Sin asignar" },
+    vehicle: updated.tire.vehicle || defaultVehicle,
     orderNumber: formData.orderNumber,
     actionType: "Desasignación",
-    receiptNumber: receiptNumber || "0000-00000000",
-    kmBaja,
+    kmBaja: formData.kmBaja,
     kmRecorridos: updated.kmRecorridos,
-  }
-}
+  }, receiptNumber)
 
-/**
- * Construye los datos para imprimir un comprobante de descarte
- * @param {Object} tire - Datos de la cubierta
- * @param {Object} updated - Datos actualizados
- * @param {Object} formData - Datos del formulario
- * @param {string} receiptNumber - Número de recibo
- * @returns {Object} Datos para imprimir
- */
-export const buildDiscardPrintData = (tire, updated, formData, receiptNumber) => ({
-  tire: {
-    code: tire.code,
-    serialNumber: tire.serialNumber,
-    brand: tire.brand,
-    pattern: tire.pattern,
-    kilometers: updated.tire.kilometers || 0,
-    status: updated.tire.status,
-    prevStatus: tire.status,
-    newStatus: formData.status,
-  },
-  vehicle: updated?.tire?.vehicle
-    ? {
-        mobile: updated.tire.vehicle.mobile,
-        licensePlate: updated.tire.vehicle.licensePlate,
-      }
-    : { mobile: "Sin asignar", licensePlate: "Sin asignar" },
-  orderNumber: formData.orderNumber,
-  actionType: "Descarte",
-  receiptNumber: receiptNumber || "0000-00000000",
-})
-
-/**
- * Construye los datos para imprimir un comprobante de envío a recapado
- * @param {Object} tire - Datos de la cubierta
- * @param {Object} updated - Datos actualizados
- * @param {Object} formData - Datos del formulario
- * @param {string} receiptNumber - Número de recibo
- * @returns {Object} Datos para imprimir
- */
-export const buildSendToRecapPrintData = (tire, updated, formData, receiptNumber) => ({
-  tire: {
-    code: tire.code,
-    serialNumber: tire.serialNumber,
-    brand: tire.brand,
-    pattern: tire.pattern,
-    kilometers: updated.tire.kilometers || 0,
-    prevStatus: tire.status,
-    newStatus: updated.tire.status,
-  },
-  vehicle: updated?.tire?.vehicle
-    ? {
-        mobile: updated.tire.vehicle.mobile,
-        licensePlate: updated.tire.vehicle.licensePlate,
-      }
-    : { mobile: "Sin asignar", licensePlate: "Sin asignar" },
-  orderNumber: formData.orderNumber,
-  actionType: "Envío a recapado",
-  receiptNumber: receiptNumber || "0000-00000000",
-})
-
-/**
- * Construye los datos para imprimir un comprobante de recapado completado
- * @param {Object} tire - Datos de la cubierta
- * @param {Object} updated - Datos actualizados
- * @param {Object} formData - Datos del formulario
- * @param {string} receiptNumber - Número de recibo
- * @returns {Object} Datos para imprimir
- */
-export const buildFinishRecapPrintData = (tire, updated, formData, receiptNumber) => ({
-  tire: {
-    code: tire.code,
-    serialNumber: tire.serialNumber,
-    brand: tire.brand,
-    pattern: tire.pattern,
-    kilometers: updated.tire.kilometers || 0,
-    prevStatus: tire.status,
-    newStatus: updated.tire.status,
-  },
-  vehicle: updated?.tire?.vehicle
-    ? {
-        mobile: updated.tire.vehicle.mobile,
-        licensePlate: updated.tire.vehicle.licensePlate,
-      }
-    : { mobile: "Sin asignar", licensePlate: "Sin asignar" },
-  orderNumber: formData.orderNumber,
-  actionType: "Recapado Completado",
-  receiptNumber: receiptNumber || "0000-00000000",
-})
-
-/**
- * Construye los datos para imprimir un comprobante de corrección
- * @param {Object} tire - Datos de la cubierta
- * @param {Object} updated - Datos actualizados
- * @param {Object} formData - Datos del formulario
- * @param {string} receiptNumber - Número de recibo
- * @returns {Object} Datos para imprimir
- */
-export const buildCorrectionPrintData = (tire, updated, formData, receiptNumber) => {
-  const edited = updated.editedFields || []
-
-  return {
+export const buildDiscardPrintData = (tire, updated, formData, receiptNumber) =>
+  withReceipt({
     tire: {
-      code: tire.code,
-      serialNumber: tire.serialNumber,
-      brand: tire.brand,
-      pattern: tire.pattern,
+      ...buildBaseTire(tire),
+      kilometers: updated.tire.kilometers,
+      status: updated.tire.status,
+      prevStatus: tire.status,
+      newStatus: formData.status,
     },
+    vehicle: updated.tire.vehicle || defaultVehicle,
+    orderNumber: formData.orderNumber,
+    actionType: "Descarte",
+  }, receiptNumber)
+
+export const buildSendToRecapPrintData = (tire, updated, formData, receiptNumber) =>
+  withReceipt({
+    tire: {
+      ...buildBaseTire(tire),
+      kilometers: updated.tire.kilometers,
+      prevStatus: tire.status,
+      newStatus: updated.tire.status,
+    },
+    vehicle: updated.tire.vehicle || defaultVehicle,
+    orderNumber: formData.orderNumber,
+    actionType: "Envío a recapado",
+  }, receiptNumber)
+
+export const buildFinishRecapPrintData = (tire, updated, formData, receiptNumber) =>
+  withReceipt({
+    tire: {
+      ...buildBaseTire(tire),
+      kilometers: updated.tire.kilometers,
+      prevStatus: tire.status,
+      newStatus: updated.tire.status,
+    },
+    vehicle: updated.tire.vehicle || defaultVehicle,
+    orderNumber: formData.orderNumber,
+    actionType: "Recapado Completado",
+  }, receiptNumber)
+
+export const buildCorrectionPrintData = (tire, updated, formData, receiptNumber) => {
+  const fields = formData.form || {}
+  return withReceipt({
+    tire: buildBaseTire(tire),
     correction: {
       date: new Date().toLocaleDateString("es-AR"),
-      reason: formData.form.reason,
-      orderNumber: formData.form.orderNumber,
-      kmAlta: formData.form.kmAlta ?? "-",
-      kmBaja: formData.form.kmBaja ?? "-",
-      status: formData.form.status ?? tire.status,
-      vehicle: updated.tire.vehicle
-        ? {
-            mobile: updated.tire.vehicle.mobile,
-            licensePlate: updated.tire.vehicle.licensePlate,
-          }
-        : { mobile: "Sin asignar", licensePlate: "Sin asignar" },
-      editedFields: Array.isArray(edited) ? edited.join(", ") : edited,
+      reason: fields.reason,
+      orderNumber: fields.orderNumber,
+      kmAlta: fields.kmAlta ?? "-",
+      kmBaja: fields.kmBaja ?? "-",
+      status: fields.status ?? tire.status,
+      vehicle: updated.tire.vehicle || defaultVehicle,
+      editedFields: Array.isArray(updated.editedFields)
+        ? updated.editedFields.join(", ")
+        : updated.editedFields,
     },
     actionType: "Corrección de historial",
-    receiptNumber: receiptNumber || "0000-00000000",
-  }
+  }, receiptNumber)
 }
 
-/**
- * Construye los datos para imprimir un comprobante de deshacer entrada
- * @param {Object} tire - Datos de la cubierta
- * @param {Object} updated - Datos actualizados
- * @param {Object} formData - Datos del formulario
- * @param {string} receiptNumber - Número de recibo
- * @returns {Object} Datos para imprimir
- */
-export const buildUndoPrintData = (tire, updated, formData, receiptNumber) => ({
-  tire: {
-    code: tire.code,
-    serialNumber: tire.serialNumber,
-    brand: tire.brand,
-    pattern: tire.pattern,
-    kilometers: updated.tire.kilometers,
-    status: updated.tire.status,
-    newStatus: updated.tire.status,
-    prevStatus: tire.status,
-  },
-  vehicle: updated.vehicle
-    ? {
-        mobile: updated.vehicle.mobile,
-        licensePlate: updated.vehicle.licensePlate,
+export const buildUndoPrintData = (tire, updated, formData, receiptNumber) =>
+  withReceipt({
+    tire: {
+      ...buildBaseTire(tire),
+      kilometers: updated.tire.kilometers,
+      status: updated.tire.status,
+      prevStatus: tire.status,
+      newStatus: updated.tire.status,
+    },
+    vehicle: updated.vehicle || defaultVehicle,
+    orderNumber: formData.orderNumber,
+    actionType: "Deshacer entrada",
+  }, receiptNumber)
+
+export const buildReprintData = (entry, tire) =>
+  withReceipt({
+    tire: {
+      ...buildBaseTire(tire),
+      kilometers: entry.km,
+      status: entry.status,
+      prevStatus: entry.prevStatus,
+      newStatus: entry.newStatus,
+    },
+    vehicle: entry.vehicle || defaultVehicle,
+    orderNumber: entry.orderNumber,
+    actionType: entry.type || "Reimpresión",
+    kmAlta: entry.kmAlta,
+    kmBaja: entry.kmBaja,
+    kmRecorridos: entry.kmRecorridos,
+    correction: entry.flag
+      ? {
+        reason: entry.reason || "",
+        editedFields: Array.isArray(entry.editedFields)
+          ? entry.editedFields.join(", ")
+          : entry.editedFields || "",
       }
-    : { mobile: "Sin asignar", licensePlate: "Sin asignar" },
-  orderNumber: formData.orderNumber,
-  actionType: "Deshacer entrada",
-  receiptNumber: receiptNumber || "0000-00000000",
-})
+      : null,
+  }, entry.receiptNumber)

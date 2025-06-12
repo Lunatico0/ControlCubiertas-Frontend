@@ -2,12 +2,6 @@ import { useState, useCallback } from "react"
 import { checkOrderNumber } from "@api/orders"
 import { formatOrderNumber } from "@utils/orderNumber"
 
-/**
- * Hook para validar números de orden
- * @param {Object} options - Opciones de configuración
- * @param {boolean} options.autoFormat - Si debe formatear automáticamente (default: true)
- * @returns {Object} Funciones y estados para validación de órdenes
- */
 export const useOrderValidation = ({ autoFormat = true } = {}) => {
   const [isValidating, setIsValidating] = useState(false)
   const [validationError, setValidationError] = useState(null)
