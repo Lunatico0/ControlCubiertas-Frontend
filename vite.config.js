@@ -10,7 +10,7 @@ export default defineConfig({
   plugins: [react()],
   base: './',
   build: {
-    outDir: isElectron ? '../desktop/build' : 'dist', // Electron usa otro output
+    outDir: isElectron ? '../desktop/build' : 'dist',
     emptyOutDir: true,
   },
   resolve: {
