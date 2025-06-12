@@ -9,7 +9,7 @@
     "start": "vite",
     "vercel-build": "vite build",
     "build:web": "vite build",
-    "build:electron": "BUILD_TARGET=electron vite build",
+    "build:electron": "cross-env BUILD_TARGET=electron vite build",
     "preview": "vite preview",
     "electron:start": "electron ."
   },
@@ -32,6 +32,7 @@
     "@types/react-dom": "^18.3.5",
     "@vitejs/plugin-react": "^4.3.4",
     "autoprefixer": "^10.4.20",
+    "cross-env": "^7.0.3",
     "electron": "^35.1.2",
     "eslint": "^9.17.0",
     "eslint-plugin-react": "^7.37.2",
