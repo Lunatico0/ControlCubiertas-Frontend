@@ -1,7 +1,7 @@
 import { useState } from "react"
 import Sidebar from "@components/Sidebar/Sidebar"
 import Home from "@components/Home"
-import Vehicles from "@components/vehicleList/vehicleList"
+import Vehicles from "@components/vehicleList/VehicleList"
 import Settings from "@components/Settings"
 
 const Layout = () => {
