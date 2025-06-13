@@ -5,6 +5,7 @@ import Modal from "@components/UI/Modal"
 import { useOrderValidation } from "@hooks/useOrderValidation"
 import { showToast } from "@utils/toast"
 import { colors } from "@utils/tokens"
+import WarningAmberRoundedIcon from '@mui/icons-material/WarningAmberRounded';
 
 const UpdateTire = ({ id, onClose, onSuccess }) => {
   const {
@@ -110,7 +111,9 @@ const UpdateTire = ({ id, onClose, onSuccess }) => {
 
         <div className="mt-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
           <div className="flex items-start">
-            <span className="text-yellow-600 dark:text-yellow-400 mr-2">⚠️</span>
+            <span className="text-yellow-600 dark:text-yellow-400 mr-2">
+              <WarningAmberRoundedIcon />
+            </span>
             <div>
               <p className="text-sm font-medium text-yellow-800 dark:text-yellow-200">Importante:</p>
               <p className="text-sm text-yellow-700 dark:text-yellow-300">

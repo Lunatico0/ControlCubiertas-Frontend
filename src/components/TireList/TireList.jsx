@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from "react"
 import ApiContext from "@context/apiContext"
-import TireCard from "./Card"
+import TireCard from "./TireCard"
 import TireDetails from "@components/TireDetails/TireDetails"
 import UpdateTire from "@components/UpdateTire/UpdateTire"
 import { usePasswordCheck } from "@hooks/usePasswordCheck"
@@ -9,6 +9,7 @@ import EmptyState from "./EmptyState"
 import { colors } from "@utils/tokens"
 import { usePagination } from "@hooks/usePagination.js"
 import PaginationControls from "@components/TireList/PaginationControls.jsx"
+import WarningAmberRoundedIcon from '@mui/icons-material/WarningAmberRounded';
 
 const TireList = ({ onTireSelect }) => {
   const {
@@ -92,7 +93,9 @@ const TireList = ({ onTireSelect }) => {
     return (
       <div className="flex items-center justify-center min-h-64">
         <div className="text-center">
-          <div className="text-red-500 text-6xl mb-4">⚠️</div>
+          <div className="text-red-500 text-6xl mb-4">
+            <WarningAmberRoundedIcon/>
+          </div>
           <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Error al cargar las cubiertas</h3>
           <p className={`${colors.muted} mb-4`}>{ui.error}</p>
           <button

@@ -3,8 +3,10 @@ export const colors = {
   primary: "bg-blue-600 hover:bg-blue-700 text-white",
   danger: "bg-red-500 hover:bg-red-600 text-white",
   muted: "text-gray-500 dark:text-gray-400",
-  surface: "bg-white dark:bg-gray-800",
-  border: "border border-gray-200 dark:border-gray-700",
+  bgSidebar: 'bg-gray-100 dark:bg-gray-800',
+  bgActive: 'bg-gray-300 dark:bg-gray-700',
+  surface: "bg-white dark:bg-gray-700",
+  borderSider: "border-gray-200 dark:border-gray-600",
   shadow: "shadow-md hover:shadow-lg",
 }
 
@@ -13,6 +15,7 @@ export const text = {
   heading: "text-xl font-semibold text-gray-900 dark:text-white",
   label: "text-sm font-medium text-gray-700 dark:text-gray-300",
   value: "font-medium text-right text-gray-900 dark:text-gray-100",
+  muted: 'text-gray-500 dark:text-gray-400',
   placeholder: "placeholder-gray-500 dark:placeholder-gray-400",
   error: "text-sm text-red-500 mt-1",
 }

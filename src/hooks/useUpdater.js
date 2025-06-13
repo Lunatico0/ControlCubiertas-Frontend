@@ -13,22 +13,6 @@ export const useUpdater = () => {
 
     const handleUpdateAvailable = (_, info) => {
       window.electronAPI.log?.info?.(`🔔 Update available: v${info.version}`)
-
-      Swal.fire({
-        title: "Actualización disponible",
-        text: `Hay una nueva versión (${info.version}) disponible. ¿Deseas instalarla ahora?`,
-        icon: "info",
-        showCancelButton: true,
-        confirmButtonText: "Actualizar",
-        cancelButtonText: "Recordar más tarde",
-      }).then((result) => {
-        if (result.isConfirmed) {
-          window.electronAPI.log?.info?.("🟡 Usuario aceptó la descarga")
-          showDownloadProgress(0)
-        } else {
-          window.electronAPI.log?.info?.("⏭️ Usuario pospuso la descarga")
-        }
-      })
     }
 
     const handleUpdateProgress = (_, progress) => {

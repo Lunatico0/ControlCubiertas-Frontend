@@ -56,10 +56,8 @@ const TireCard = ({ tire, onCardClick, onEdit, isLoading = false }) => {
 
       {/* Imagen de la cubierta */}
       <div
-        className={`
-    relative h-48 w-full overflow-hidden
-    ${statusStyles[tire.status] || "bg-gray-100 dark:bg-gray-700"}
-  `}
+        className={`relative h-48 w-full overflow-hidden ${statusStyles[tire.status] || "bg-gray-100 dark:bg-gray-700"}`
+        }
       >
         {/* Capa que se blurea */}
         <div className="absolute inset-0 z-0 group-hover:bg-black/10 group-hover:blur-sm transition-all duration-300">
