@@ -7,7 +7,6 @@ import {
 } from '@constants/settingsRules';
 
 const dictionary = {
-  autoCheckForUpdates: "Verificación de actualizaciones",
   false: "Deshabilitado",
   true: "Habilitado",
   updateAvailable: "Actualización disponible",
@@ -19,8 +18,7 @@ const dictionary = {
 const settings = () => {
   const showUpdateRules = () => {
     const rules = getUpdateRules();
-    console.log(rules)
-    showToast("info", `Reglas de actualización: ${dictionary['autoCheckForUpdates']}: ${dictionary[rules.autoCheckForUpdates] || "Desconocidas"}`);
+    showToast("info", `Chequeo automatico de actualizaciones: ${dictionary[rules.autoCheckForUpdates] || "Desconocidas"}`);
   }
 
   const resetStockStatuses = () => {
