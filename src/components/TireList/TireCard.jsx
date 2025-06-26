@@ -87,6 +87,7 @@ const TireCard = ({ tire, onCardClick, onEdit, isLoading = false }) => {
 
           <div className="space-y-2 text-sm">
             <InfoRow label="Marca" value={tire.brand} />
+            <InfoRow label="Rodado" value={tire.size} />
             <InfoRow label="Dibujo" value={tire.pattern} />
             <InfoRow
               label="Vehículo"

@@ -24,6 +24,7 @@ const TireStatusSidebar = ({ tire, onEdit, onClose, refreshTire }) => (
         <SidebarInfoItem label="Código Interno" value={`#${tire.code}`} className="text-lg" />
         <SidebarInfoItem label="Número de Serie" value={tire.serialNumber} />
         <SidebarInfoItem label="Marca" value={tire.brand} />
+        <SidebarInfoItem label="Rodado" value={tire.size} />
         <SidebarInfoItem label="Dibujo" value={tire.pattern} />
         <SidebarInfoItem
           label="Vehículo Actual"

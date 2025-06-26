@@ -17,7 +17,7 @@ import UndoRoundedIcon from '@mui/icons-material/UndoRounded';
 const TireHistory = ({ history = [], code, serialNumber, tire, onEditEntry }) => {
   const { tires } = useContext(ApiContext);
   const [undoEntry, setUndoEntry] = useState(null);
-  const reversedHistory = [...history].reverse();
+  const reversedHistory = [...history];
 
   const { tooltip, showTooltip, hideTooltip } = useTooltip();
   const { openIndex, position, setOpenIndex, openMenu, menuRef } = useContextMenu();
@@ -86,17 +86,17 @@ const TireHistory = ({ history = [], code, serialNumber, tire, onEditEntry }) =>
       {openIndex !== null && (
         <div
           ref={menuRef}
-          className="fixed z-50 max-w-fit flex flex-col gap-2 p-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-lg"
-          style={{ top: `${position.y}px`, left: `${position.x - 160}px` }}
+          className="fixed z-50 max-w-fit flex flex-col items-start gap-2 p-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-lg"
+          style={{ top: `${position.y}px`, left: `${position.x}px` }}
         >
-          <button className={`${button.base} ${utility.hoverBg}`} onClick={() => handleReprintEntry(reversedHistory[openIndex])}>
+          <button className={`${button.base} ${utility.hoverBg} w-full text-start`} onClick={() => handleReprintEntry(reversedHistory[openIndex])}>
             <PrintRoundedIcon fontSize="small" /> Reimprimir comprobante
           </button>
-          <button className={`${button.base} ${utility.hoverBg}`} onClick={() => handleEditEntry(reversedHistory[openIndex])}>
+          <button className={`${button.base} ${utility.hoverBg} w-full text-start`} onClick={() => handleEditEntry(reversedHistory[openIndex])}>
             <EditNoteRoundedIcon fontSize="small" /> Editar entrada
           </button>
-          <div className={`${utility.borderT} pt-2`}>
-            <button className={`${button.base} ${utility.hoverBg}`} onClick={() => handleUndoEntry(reversedHistory[openIndex])}>
+          <div className={`${utility.borderT} pt-2 w-full text-start`}>
+            <button className={`${button.base} ${utility.hoverBg} w-full text-start`} onClick={() => handleUndoEntry(reversedHistory[openIndex])}>
               <UndoRoundedIcon fontSize="small" /> Deshacer entrada
             </button>
           </div>
@@ -134,8 +134,8 @@ const HistoryRow = ({ record, index, code, serialNumber, onShowTooltip, onHideTo
       <div className="text-center">{record.status || "-"}</div>
       <div className="text-center">{code}</div>
       <div className="text-center">{serialNumber}</div>
-      <div className="text-center flex items-center justify-center gap-2">
-        {record.flag && (
+      <div className="px-2 flex items-center justify-between gap-2">
+        {record.flag ? (
           <span
             className="text-yellow-600 dark:text-yellow-400 hover:text-yellow-700 dark:hover:text-yellow-300 cursor-pointer"
             onMouseEnter={(e) => onShowTooltip(e, {
@@ -149,6 +149,8 @@ const HistoryRow = ({ record, index, code, serialNumber, onShowTooltip, onHideTo
           >
             <InfoOutlinedIcon sx={{ fontSize: 15 }} />
           </span>
+        ) : (
+          <span className="min-w-[15px]" />
         )}
         <button onClick={(e) => onOpenMenu(index, e)} className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
           <MoreVertRoundedIcon fontSize="small" />

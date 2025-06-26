@@ -179,26 +179,32 @@ export const generateReceiptHTML = (data) => {
 
         <div class="details">
           <div>
-            <p><strong>Cubierta:</strong> #${data?.tire?.code || ""}</p>
+            <p><strong>N° interno:</strong> ${data?.tire?.code || ""}</p>
             <p><strong>N° Serie:</strong> ${data?.tire?.serialNumber || ""}</p>
             <p><strong>Marca:</strong> ${data?.tire?.brand || ""}</p>
+            <p><strong>Rodado:</strong> ${data?.tire?.size || ""}</p>
             <p><strong>Dibujo:</strong> ${data?.tire?.pattern || ""}</p>
-            ${data?.tire?.status ? `<p><strong>Estado:</strong> ${data?.tire?.status}</p>` : ""}
+            ${data?.tire?.status ? `<p><strong>Estado:</strong> ${data?.tire?.status}</p>` : `<p><strong>Estado:</strong> ${data.tire.newStatus}</p>`}
             ${data?.tire?.kilometers !== undefined ? `<p><strong>Km totales:</strong> ${data?.tire.kilometers.toLocaleString()}</p>` : ""}
           </div>
           <div>
             <p><strong>Orden:</strong> ${data?.orderNumber || data?.correction?.orderNumber || ""}</p>
-            <p><strong>Acción:</strong> ${data?.actionType || ""}</p>
-            ${data?.tire?.prevStatus ? `<p><strong>Estado anterior:</strong> ${data.tire.prevStatus}</p>` : ""}
-            ${data?.tire?.newStatus ? `<p><strong>Estado actual:</strong> ${data.tire.newStatus}</p>` : ""}
+            ${data?.tire.prevStatus ? `<p><strong>Estado anterior: </strong> ${data.tire.prevStatus}</p>` : ""}
+            ${data?.tire.newStatus ? `<p><strong>Estado actual: </strong> ${data.tire.newStatus}</p>` : ""}
             ${data?.kmAlta ? `<p><strong>Km Alta:</strong> ${data.kmAlta.toLocaleString()} km</p>` : ""}
             ${data?.kmBaja ? `<p><strong>Km Baja:</strong> ${data.kmBaja.toLocaleString()} km</p>` : ""}
             ${data?.kmRecorridos !== undefined ? `<p><strong>Km en este viaje:</strong> ${data.kmRecorridos.toLocaleString()} km</p>` : ""}
           </div>
-          <div>
-            <p><strong>Vehículo:</strong> ${data?.vehicle?.mobile || "Sin asignar"}</p>
-            <p><strong>Patente:</strong> ${data?.vehicle?.licensePlate || "Sin asignar"}</p>
-          </div>
+
+          ${data?.vehicle?.mobile !== 'Sin asignar' ? (`
+            <div>
+              <p><strong>Vehículo:</strong> ${data?.vehicle?.mobile || "Sin asignar"}</p>
+              <p><strong>Marca:</strong> ${data?.vehicle?.brand || "Sin asignar"}</p>
+              <p><strong>Patente:</strong> ${data?.vehicle?.licensePlate || "Sin asignar"}</p>
+              <p><strong>Tipo:</strong> ${data?.vehicle?.type || "Sin asignar"}</p>
+            </div>
+          `) : ''}
+
         </div>
 
         ${data?.correction ? `

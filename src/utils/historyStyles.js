@@ -1,37 +1,37 @@
-const yellowCorrection = "bg-yellow-100 dark:bg-yellow-900/10 font-semibold"
+const yellowCorrection = "bg-yellow-200 dark:bg-yellow-900/60 font-semibold"
 
 export const getRowStyle = (type, flag) => {
   const base = {
-    asignacion: "bg-green-50 dark:bg-green-900/10",
-    desasignacion: "bg-red-50 dark:bg-red-900/10",
-    estado: "bg-blue-50 dark:bg-blue-900/10",
-    alta: "bg-green-100 dark:bg-green-900/20",
-    undo: "bg-red-100 dark:bg-red-900/20 italic",
+    Asignación: "bg-green-200 dark:bg-green-900/60",
+    Desasignación: "bg-red-300 dark:bg-red-900/60",
+    Estado: "bg-neutral-300 dark:bg-neutral-900/60",
+    Alta: "bg-green-300 dark:bg-green-900/80",
+    undo: "bg-red-400 dark:bg-red-900/40 italic",
   }
 
   const corrections = [
-    "correccion",
-    "correccion-asignacion",
-    "correccion-desasignacion",
-    "correccion-estado",
+    "Corrección",
+    "Corrección-Asignación",
+    "Corrección-Desasignación",
+    "Corrección-Estado",
   ]
 
   if (corrections.includes(type)) return yellowCorrection
-  if (type === "correccion" && flag) return yellowCorrection
+  if (type === "Corrección" && flag) return yellowCorrection
 
   return base[type] || ""
 }
 
 export const getHistoryTypeLabel = (type) => {
   const map = {
-    asignacion: "Asignación",
-    desasignacion: "Desasignación",
-    estado: "Cambio de estado",
-    correccion: "Corrección",
-    "correccion-asignacion": "Corrección de asignación",
-    "correccion-desasignacion": "Corrección de desasignación",
-    "correccion-estado": "Corrección de estado",
-    alta: "Alta",
+    Asignación: "Asignación",
+    Desasignación: "Desasignación",
+    Estado: "Cambio de Estado",
+    Corrección: "Corrección",
+    "Corrección-Asignación": "Corrección de asignación",
+    "Corrección-Desasignación": "Corrección de desasignación",
+    "Corrección-Estado": "Corrección de Estado",
+    Alta: "Alta",
     undo: "Deshacer",
   }
   return map[type] || type || "Desconocido"
@@ -47,6 +47,7 @@ export const dictionary = {
   serialNumber: "N° Serie",
   pattern: "Dibujo",
   brand: "Marca",
+  size: "Rodado",
   type: "Tipo",
   reason: "Razón",
   date: "Fecha",

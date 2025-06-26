@@ -195,6 +195,20 @@ const TireForm = ({
       )}
 
       {renderIf(
+        "size",
+        <TireField label="Rodado" id='size' error={errors.size?.message}>
+          <input
+            {...register("size", getFieldValidation("size"))}
+            type="text"
+            placeholder=" "
+            id='size'
+            className={input.base}
+            disabled={fieldOptions.size?.disabled}
+          />
+        </TireField>,
+      )}
+
+      {renderIf(
         "pattern",
         <TireField label="Dibujo" id='pattern' error={errors.pattern?.message}>
           <input

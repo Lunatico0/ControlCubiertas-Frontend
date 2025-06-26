@@ -25,6 +25,10 @@ export const showToast = (
     timerProgressBar: progressBar,
     background: isDark ? colors.dark : colors.light,
     color: isDark ? colors.textDark : colors.textLight,
+    didOpen: (toast) => {
+      toast.onmouseenter = Swal.stopTimer;
+      toast.onmouseleave = Swal.resumeTimer;
+    }
   })
 }
 

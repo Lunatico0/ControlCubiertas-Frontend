@@ -36,7 +36,8 @@ const New = ({ onClose }) => {
                 <img
                   src="Camion.png"
                   alt="Vehículo"
-                  className="h-24 w-full max-w-24 object-contain filter brightness-0 invert"
+                  className="h-24 w-full max-w-24 object-contain transform
+                  group-hover:-translate-x-4 group-hover:scale-125 transition-all duration-500"
                 />
               </div>
               <div className="text-left">
@@ -56,7 +57,7 @@ const New = ({ onClose }) => {
                 <img
                   src="Cubierta.png"
                   alt="Cubierta"
-                  className="h-20 w-auto object-contain filter brightness-0 invert"
+                  className="h-20 w-auto object-contain transform group-hover:scale-125 transition-all duration-500"
                 />
               </div>
               <div className="text-left">

@@ -15,7 +15,7 @@ import {
   updateTireDataCorrection,
 } from "../api/tires"
 
-import { fetchAllVehicles, fetchVehicleById, createVehicle, updateVehicle } from "../api/vehicles"
+import { fetchAllVehicles, fetchVehicleById, createVehicle, updateVehicle, updateDetails } from "../api/vehicles"
 
 import { checkOrderNumber } from "../api/orders"
 
@@ -45,6 +45,7 @@ export const ApiProvider = ({ children }) => {
   const [filteredTireData, setFilteredTireData] = useState([])
   const [searchQuery, setSearchQuery] = useState("")
   const [filters, setFilters] = useState(initialFilters)
+  const [presetVehicleFilter, setPresetVehicleFilter] = useState(null);
 
   // Estados de carga y errores
   const [loading, setLoading] = useState(true)
@@ -334,6 +335,22 @@ export const ApiProvider = ({ children }) => {
     [replaceVehicleInList],
   )
 
+  const handleUpdateVehicleDetails = useCallback(
+    async (id, data) => {
+      try {
+        setError(null)
+        const result = await updateDetails(id, data)
+        replaceVehicleInList(result)
+        return result
+      } catch (err) {
+        console.error("Error actualizando datos del vehículo:", err)
+        setError("Error al actualizar datos del vehículo: " + err.message)
+        throw err
+      }
+    },
+    [replaceVehicleInList]
+  )
+
   // ========== FUNCIONES DE ORDERS ==========
 
   const handleCheckOrderNumber = useCallback(async (orderNumber) => {
@@ -368,66 +385,76 @@ export const ApiProvider = ({ children }) => {
 
   // Efecto para filtrar datos
   useEffect(() => {
-    let filtered = [...tires]
+    let filtered = [...tires];
 
-    // Filtro por búsqueda
-    if (searchQuery) {
-      const q = searchQuery.toLowerCase()
-      filtered = filtered.filter(
-        (tire) =>
-          tire.code.toString().includes(q) ||
-          Object.values(tire).some((value) => typeof value === "string" && value.toLowerCase().includes(q)) ||
-          tire.vehicle?.mobile?.toLowerCase().includes(q),
-      )
-    }
+    const query = searchQuery.toLowerCase();
 
-    // Filtros específicos
-    if (filters.status) {
-      filtered = filtered.filter((t) => t.status.toLowerCase() === filters.status.toLowerCase())
-    }
+    const matchesSearch = (tire) =>
+      tire.code.toString().includes(query) ||
+      Object.values(tire).some((val) => typeof val === "string" && val.toLowerCase().includes(query)) ||
+      tire.vehicle?.mobile?.toLowerCase().includes(query);
 
-    if (filters.brand) {
-      filtered = filtered.filter((t) => t.brand === filters.brand)
-    }
+    const matchesVehicle = (tire) => {
+      const v = filters.vehicle?.toLowerCase();
+      if (!v) return true;
+      if (v === "sin asignar") return !tire.vehicle || tire.vehicle === "sin asignar";
+      if (v === "con asignacion") return !!tire.vehicle && tire.vehicle !== "sin asignar";
+      return tire.vehicle?.mobile === filters.vehicle;
+    };
 
-    if (filters.vehicle) {
-      if (filters.vehicle.toLowerCase() === "sin asignar") {
-        filtered = filtered.filter((t) => !t.vehicle || t.vehicle === "sin asignar")
-      } else {
-        filtered = filtered.filter((t) => t.vehicle?.mobile === filters.vehicle)
+    const matchesKm = (tire) => {
+      const kmFrom = parseInt(filters.kmFrom);
+      const kmTo = parseInt(filters.kmTo);
+      if (filters.kmFrom && tire.kilometers < kmFrom) return false;
+      if (filters.kmTo && tire.kilometers > kmTo) return false;
+      return true;
+    };
+
+    const matchesStatus = (tire) => {
+      if (filters.status) {
+        return tire.status.toLowerCase() === filters.status.toLowerCase();
       }
-    }
+      return true;
+    };
 
-    if (filters.kmFrom) {
-      filtered = filtered.filter((t) => t.kilometers >= Number.parseInt(filters.kmFrom))
-    }
+    const matchesBrand = (tire) => {
+      if (filters.brand) return tire.brand === filters.brand;
+      return true;
+    };
 
-    if (filters.kmTo) {
-      filtered = filtered.filter((t) => t.kilometers <= Number.parseInt(filters.kmTo))
-    }
+    const matchesStockRules = (tire) => {
+      if (filters.mode === "stock") {
+        return (
+          (!tire.vehicle || tire.vehicle === "sin asignar") &&
+          filters.stockStatuses?.includes(tire.status)
+        );
+      }
+      return true;
+    };
 
-    // Ordenamiento
+
+    filtered = filtered
+      .filter(matchesSearch)
+      .filter(matchesStatus)
+      .filter(matchesBrand)
+      .filter(matchesVehicle)
+      .filter(matchesKm)
+      .filter(matchesStockRules);
+
     if (filters.sortBy) {
-      filtered.sort((a, b) => {
-        switch (filters.sortBy) {
-          case "status":
-            return STATE_ORDER.indexOf(a.status) - STATE_ORDER.indexOf(b.status)
-          case "codeAsc":
-            return a.code - b.code
-          case "codeDesc":
-            return b.code - a.code
-          case "kmAsc":
-            return a.kilometers - b.kilometers
-          case "kmDesc":
-            return b.kilometers - a.kilometers
-          default:
-            return 0
-        }
-      })
+      const compare = {
+        status: (a, b) => STATE_ORDER.indexOf(a.status) - STATE_ORDER.indexOf(b.status),
+        codeAsc: (a, b) => a.code - b.code,
+        codeDesc: (a, b) => b.code - a.code,
+        kmAsc: (a, b) => a.kilometers - b.kilometers,
+        kmDesc: (a, b) => b.kilometers - a.kilometers,
+      }[filters.sortBy];
+
+      if (compare) filtered.sort(compare);
     }
 
-    setFilteredTireData(filtered)
-  }, [searchQuery, filters, tires])
+    setFilteredTireData(filtered);
+  }, [searchQuery, filters, tires]);
 
   // Efecto para actualizar datos derivados
   useEffect(() => {
@@ -461,8 +488,10 @@ export const ApiProvider = ({ children }) => {
       selectedLoading,
       filters,
       searchQuery,
+      presetVehicleFilter,
       setFilters,
       setSearchQuery,
+      setPresetVehicleFilter,
     },
 
     // ==========================
@@ -483,6 +512,7 @@ export const ApiProvider = ({ children }) => {
       load: loadVehicles,
       create: handleCreateVehicle,
       update: handleUpdateVehicle,
+      updateData: handleUpdateVehicleDetails,
       loadById: loadVehicleById,
     },
 

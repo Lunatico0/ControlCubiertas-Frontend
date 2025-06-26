@@ -12,7 +12,7 @@ const Layout = () => {
       case "tires":
         return <Home />
       case "vehicles":
-        return <Vehicles />
+        return <Vehicles setActive={setActiveSection} />
       case "settings":
         return <Settings />
       default:

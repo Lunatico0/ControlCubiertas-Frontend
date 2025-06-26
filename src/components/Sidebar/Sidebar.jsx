@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react"
 import { colors, text, utility } from "@utils/tokens"
 import { useTheme } from "@context/ThemeContext"
+import isElectron from '@utils/isElectron'
+import { useUpdater } from "@hooks/useUpdater"
 
 import MenuRoundedIcon from '@mui/icons-material/MenuRounded'
 import DirectionsBusRoundedIcon from "@mui/icons-material/DirectionsBusRounded"
@@ -18,50 +20,51 @@ const navItems = [
 ]
 
 const Sidebar = ({ active, setActive }) => {
-  const { isDarkMode, toggleTheme } = useTheme()
-  const [expanded, setExpanded] = useState(false)
-  const [hasUpdate, setHasUpdate] = useState(false)
-  const [version, setVersion] = useState("")
+  const { isDarkMode, toggleTheme } = useTheme();
+  const [expanded, setExpanded] = useState(false);
+  const [hasUpdate, setHasUpdate] = useState(false);
+  const [version, setVersion] = useState("");
+  const electron = isElectron();
+
+  const versionSetter = async () => {
+    await window.electronAPI.getVersion()
+      .then(res => {
+        setVersion(res);
+      })
+      .catch(err => {
+        console.error("Error al obtener la versión:", err);
+        setVersion("Desconocida");
+      })
+  }
 
   useEffect(() => {
-    if (window.electronAPI?.getVersion) {
-      const version = window.electronAPI.getVersion()
-      console.log(version)
-      setVersion(version)
+    if (electron) {
+      versionSetter();
     }
-  }, [])
+  }, []);
 
-  // useEffect(() => {
-  //   const ver = window.electronAPI?.getVersion?.()
-  //   setVersion(ver)
+  const triggerUpdateCheck = useUpdater(setHasUpdate);
 
-  //   if (!window.electronAPI) return
-
-  //   window.electronAPI.onUpdateAvailable(() => {
-  //     setHasUpdate(true)
-  //   })
-
-  //   // Limpieza
-  //   return () => {
-  //     window.electronAPI.removeListener("onUpdateAvailable")
-  //   }
-  // }, [])
 
   const handleUpdateClick = () => {
-    setHasUpdate(false) // limpiamos el punto rojo
-    Swal.fire({
-      title: "Actualización disponible",
-      text: `Hay una nueva versión. ¿Deseas instalarla ahora?`,
-      icon: "info",
-      showCancelButton: true,
-      confirmButtonText: "Actualizar",
-      cancelButtonText: "Después",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        window.electronAPI.checkForUpdates()
-      }
-    })
-  }
+    window.electronAPI.checkForUpdates();
+  };
+
+  // const handleUpdateClick = () => {
+  //   setHasUpdate(false) // limpiamos el punto rojo
+  //   Swal.fire({
+  //     title: "Actualización disponible",
+  //     text: `Hay una nueva versión. ¿Deseas instalarla ahora?`,
+  //     icon: "info",
+  //     showCancelButton: true,
+  //     confirmButtonText: "Actualizar",
+  //     cancelButtonText: "Después",
+  //   }).then((result) => {
+  //     if (result.isConfirmed) {
+  //       window.electronAPI.checkForUpdates()
+  //     }
+  //   })
+  // }
 
   return (
     <div
@@ -73,7 +76,7 @@ const Sidebar = ({ active, setActive }) => {
       {/* Top */}
       <div>
         <div className={`flex items-center justify-between px-4 py-3 border-b ${colors.borderSider}`}>
-          {expanded && <span className={`${text.value} font-bold text-sm`}>Control Cubiertas</span>}
+          {expanded && (<span className={`${text.value} font-bold text-sm`}>Control Cubiertas</span>)}
           <button onClick={() => setExpanded(!expanded)} className={`ml-auto ${text.value}`}>
             <MenuRoundedIcon />
           </button>
@@ -97,18 +100,23 @@ const Sidebar = ({ active, setActive }) => {
       {/* Bottom */}
       <div className={`px-2 py-3 ${utility.borderT} ${colors.borderSider}`}>
         {/* Botón actualizar */}
-        <div
-          className={`relative flex items-center gap-2 px-2 py-2 rounded-lg cursor-pointer transition-colors ${colors.shadow} ${utility.hoverBg} ${text.value}`}
-          onClick={handleUpdateClick}
-        >
-          <CloudDownloadRoundedIcon fontSize="small" />
+        {isElectron() && (
+          <div
+            className={`relative flex items-center gap-2 px-2 py-2 rounded-lg cursor-pointer transition-colors ${colors.shadow} ${utility.hoverBg} ${text.value}`}
+            onClick={() => {
+              setHasUpdate(false);
+              triggerUpdateCheck();
+            }}
+          >
+            <CloudDownloadRoundedIcon fontSize="small" />
 
-          {hasUpdate && (
-            <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 rounded-full animate-ping" />
-          )}
+            {hasUpdate && (
+              <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 rounded-full animate-ping" />
+            )}
 
-          {expanded && <span className={text.value}>Actualizar</span>}
-        </div>
+            {expanded && <span className={text.value}>Actualizar</span>}
+          </div>
+        )}
 
         {/* Botón toggle modo */}
         <div
@@ -121,13 +129,13 @@ const Sidebar = ({ active, setActive }) => {
         </div>
 
         {/* Versión */}
-        {expanded && (
+        {expanded && version && (
           <div className={`text-xs ${text.value} mt-4 select-none pl-1`}>
             versión: <span className={text.muted}>{version}</span>
           </div>
         )}
       </div>
-    </div>
+    </div >
   )
 }
 

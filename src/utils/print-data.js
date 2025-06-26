@@ -7,6 +7,7 @@ const buildBaseTire = (tire) => ({
   code: tire.code,
   serialNumber: tire.serialNumber,
   brand: tire.brand,
+  size: tire.size,
   pattern: tire.pattern,
 })
 
@@ -14,6 +15,18 @@ const withReceipt = (data, receiptNumber) => ({
   ...data,
   receiptNumber: receiptNumber || "0000-00000000",
 })
+
+export const buildCreateTirePrintData = (tire, receiptNumber) =>
+  withReceipt({
+    tire: {
+      ...buildBaseTire(tire),
+      kilometers: tire.kilometers || 0,
+      status: tire.status,
+    },
+    vehicle: tire.vehicle || defaultVehicle,
+    orderNumber: tire.orderNumber,
+    actionType: "Alta de cubierta",
+  }, receiptNumber);
 
 export const buildAssignPrintData = (tire, updated, formData, receiptNumber) =>
   withReceipt({

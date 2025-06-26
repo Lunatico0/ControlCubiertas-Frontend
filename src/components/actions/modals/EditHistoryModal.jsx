@@ -72,9 +72,9 @@ const EditHistoryModal = ({ tire, entry, onClose, refreshTire }) => {
     orderNumber: true,
     status: true,
     reason: true,
-    kmAlta: ["asignacion"].includes(baseType),
-    kmBaja: ["desasignacion"].includes(baseType),
-    vehicle: ["asignacion"].includes(baseType),
+    kmAlta: ["Asignación"].includes(baseType),
+    kmBaja: ["Desasignación"].includes(baseType),
+    vehicle: ["Asignación"].includes(baseType),
   }
 
   const fieldOptions = {
@@ -91,19 +91,19 @@ const EditHistoryModal = ({ tire, entry, onClose, refreshTire }) => {
       requiredMessage: "El motivo de corrección es obligatorio",
     },
     kmAlta: {
-      required: ["asignacion"].includes(baseType),
+      required: ["Asignación"].includes(baseType),
       requiredMessage: "El kilometraje inicial es obligatorio",
-      disabled: !["asignacion"].includes(baseType),
+      disabled: !["Asignación"].includes(baseType),
     },
     kmBaja: {
-      required: ["desasignacion"].includes(baseType),
+      required: ["Desasignación"].includes(baseType),
       requiredMessage: "El kilometraje final es obligatorio",
-      disabled: !["desasignacion"].includes(baseType),
+      disabled: !["Desasignación"].includes(baseType),
     },
     vehicle: {
-      required: ["asignacion"].includes(baseType),
+      required: ["Asignación"].includes(baseType),
       requiredMessage: "Debe seleccionar un vehículo",
-      disabled: !["asignacion"].includes(baseType),
+      disabled: !["Asignación"].includes(baseType),
     },
   }
 

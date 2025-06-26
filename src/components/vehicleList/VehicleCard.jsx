@@ -1,5 +1,3 @@
-// src/components/VehicleCard.jsx
-
 import { colors, text, button } from "@utils/tokens";
 import DirectionsBusFilledRoundedIcon from "@mui/icons-material/DirectionsBusFilledRounded";
 import EditNoteRoundedIcon from "@mui/icons-material/EditNoteRounded";
@@ -58,20 +56,34 @@ const VehicleCard = ({ vehicle, onClick = () => { }, onEdit = () => { }, isLoadi
             <span className={`${colors.muted} text-sm`}>{vehicle.licensePlate}</span>
           </div>
 
-          <p className={`${colors.muted} text-sm`}>{vehicle.brand}</p>
-          <p className="text-sm text-gray-700 dark:text-gray-200">
-            {tireCount > 0
-              ? `${tireCount} cubierta(s) asignada(s)`
-              : "Sin cubiertas asignadas"}
-          </p>
+          <div className={`${vehicle.type && 'flex'} items-center justify-between`}>
+            <p className={`${colors.muted} text-sm`}>{vehicle.brand}</p>
+            <p className={`${colors.muted} text-sm`}>{vehicle.type}</p>
+          </div>
         </div>
 
         {/* Estado */}
-        {tireCount === 0 && (
+        {/* {tireCount === 0 ? (
           <div className="mt-3 text-xs text-orange-600 dark:text-orange-400 font-medium">
             ¡Este vehículo no tiene cubiertas asignadas!
           </div>
-        )}
+        ) : (
+          <p className="text-sm text-gray-700 dark:text-gray-200">
+            {tireCount > 0 && `${tireCount} cubierta(s) asignada(s)`}
+          </p>
+        )} */}
+
+        <p className={`${tireCount < 1 ? 'mt-3 text-xs text-orange-600 dark:text-orange-400 font-medium'
+          :
+          'text-sm text-gray-700 dark:text-gray-200'}`}>
+          {
+            tireCount == 0 ?
+              '¡Este vehículo no tiene cubiertas asignadas!'
+              :
+              `${tireCount} cubierta(s) asignada(s)`
+          }
+        </p>
+
       </div>
     </div>
   );

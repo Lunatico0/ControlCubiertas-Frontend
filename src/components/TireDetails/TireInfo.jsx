@@ -19,33 +19,36 @@ export const TireInfoVisual = ({ tire }) => (
 
 // Tarjetas con la información detallada
 export const TireInfoData = ({ tire }) => {
-  const altaEntry = tire.history?.find(h => h.type === "alta");
+  const altaEntry = tire.history?.find(h => h.type === "Alta");
   const currentVehicle = tire.vehicle;
   const totalKm = tire.kilometers || 0;
-  const totalAssignments = tire.history?.filter(h => h.type === "asignacion").length || 0;
+  const totalAssignments = tire.history?.filter(h => h.type === "Asignación").length || 0;
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
       {/* Identificación */}
-      <div className="p-4 rounded-xl bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+      <div
+        className="px-4 py-2 flex flex-col gap-1 rounded-xl bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700"
+      >
         <h4 className={`${text.heading} text-base font-semibold border-b border-gray-200 dark:border-gray-700 pb-2 mb-2`}>
           Identificación
         </h4>
         <InfoItem label="Código interno" value={tire.code} />
         <InfoItem label="Número de serie" value={tire.serialNumber} />
         <InfoItem label="Marca" value={tire.brand} />
+        <InfoItem label="Rodado" value={tire.size} />
         <InfoItem label="Dibujo" value={tire.pattern} />
       </div>
 
       {/* Estado actual */}
-      <div className="p-4 rounded-xl bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+      <div className="px-4 py-2 flex flex-col gap-1 rounded-xl bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
         <h4 className={`${text.heading} text-base font-semibold border-b border-gray-200 dark:border-gray-700 pb-2 mb-2`}>
           Estado actual
         </h4>
         <InfoItem
           label="Vehículo actual"
           value={currentVehicle ? `${currentVehicle.mobile} (${currentVehicle.licensePlate})` : "Sin asignar"}
-          className={currentVehicle ? "text-green-600 dark:text-green-400" : "text-gray-500"}
+          className={`${currentVehicle ? "text-green-600 dark:text-green-400" : "text-gray-500"}`}
         />
         <InfoItem
           label="Fecha de alta"
@@ -54,7 +57,7 @@ export const TireInfoData = ({ tire }) => {
       </div>
 
       {/* Estadísticas */}
-      <div className="p-4 rounded-xl bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+      <div className="px-4 py-2 flex flex-col gap-1 rounded-xl bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
         <h4 className={`${text.heading} text-base font-semibold border-b border-gray-200 dark:border-gray-700 pb-2 mb-2`}>
           Estadísticas
         </h4>

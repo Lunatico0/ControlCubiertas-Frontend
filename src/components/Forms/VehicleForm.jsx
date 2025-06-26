@@ -4,6 +4,7 @@ import TireSearchBox from "./fields/TireSearchBox"
 import SelectedTiresList from "./fields/SelectedTiresList"
 import AddCircleRoundedIcon from '@mui/icons-material/AddCircleRounded';
 import Button from '@components/UI/Button'
+import Spinner from '@components/UI/Spinner'
 import { button } from '@utils/tokens'
 
 const VehicleForm = ({
@@ -114,6 +115,7 @@ const VehicleForm = ({
         <Button
           type="submit"
           disabled={isSubmitting}
+          onClick={()=> console.log('Actualizando')}
           className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold px-6 py-2 rounded-md transition flex items-center gap-2"
         >
           {isSubmitting && <Spinner size={4} />}

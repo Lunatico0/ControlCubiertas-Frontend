@@ -1,23 +1,18 @@
 import { useContext, useState, useEffect } from "react"
+import Modal from "@components/UI/Modal";
 import ApiContext from "@context/apiContext"
 import TireHistory from "./TireHistory"
+import { TireInfoData } from './TireInfo'
+import TireStatusSidebar from './TireStatusSidebar'
 import QuickActions from "@components/actions/QuickActions"
 import EditHistoryModal from "@components/actions/modals/EditHistoryModal"
 import EditNoteRoundedIcon from '@mui/icons-material/EditNoteRounded'
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded'
 import { colors, text, button } from "@utils/tokens"
-import { TireInfoData } from './TireInfo'
-import TireStatusSidebar from './TireStatusSidebar'
 
 const TireDetails = ({ selectedLoading, selectedTire, onClose, onEdit, handlePasswordCheck }) => {
   const { tires } = useContext(ApiContext)
   const [entryToEdit, setEntryToEdit] = useState(null)
-
-  useEffect(() => {
-    const escHandler = (e) => e.key === "Escape" && onClose()
-    document.addEventListener("keydown", escHandler)
-    return () => document.removeEventListener("keydown", escHandler)
-  }, [onClose])
 
   useEffect(() => {
     document.body.style.overflow = 'hidden'
@@ -25,10 +20,6 @@ const TireDetails = ({ selectedLoading, selectedTire, onClose, onEdit, handlePas
   }, [])
 
   const handleEdit = async () => {
-    if (handlePasswordCheck) {
-      const confirmed = await handlePasswordCheck()
-      if (!confirmed) return
-    }
     onEdit?.(selectedTire._id)
   }
 
@@ -53,7 +44,7 @@ const TireDetails = ({ selectedLoading, selectedTire, onClose, onEdit, handlePas
 
   return (
     <>
-      <div className="fixed inset-0 bg-black bg-opacity-50 z-50 overflow-y-auto p-4" onClick={onClose}>
+      <Modal padding='none' onClose={onClose} maxWidth="7xl" maxHeight='100dvh'>
         <div
           className="w-full max-w-7xl mx-auto shadow-2xl rounded-xl overflow-hidden flex flex-col lg:flex-row h-full max-h-[95vh] bg-white dark:bg-gray-900"
           onClick={(e) => e.stopPropagation()}
@@ -100,7 +91,7 @@ const TireDetails = ({ selectedLoading, selectedTire, onClose, onEdit, handlePas
             </div>
           </div>
         </div>
-      </div>
+      </Modal>
 
       {entryToEdit && (
         <EditHistoryModal

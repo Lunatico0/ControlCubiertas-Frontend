@@ -4,14 +4,13 @@ import TireForm from "@components/Forms/TireForm"
 import Modal from "@components/UI/Modal"
 import { useOrderValidation } from "@hooks/useOrderValidation"
 import useCreateEntity from "@hooks/useCreateEntity"
+import { buildCreateTirePrintData } from "@utils/print-data"
+import usePrint from "@hooks/usePrint"
 
 const NewTire = ({ onClose, onSuccess }) => {
-  const {
-    tires,
-    data
-  } = useContext(ApiContext)
-
+  const { tires, data, orders } = useContext(ApiContext)
   const { validateOrderNumber } = useOrderValidation()
+  const { print } = usePrint()
 
   const { create, isSubmitting } = useCreateEntity(
     tires.create,
@@ -27,6 +26,7 @@ const NewTire = ({ onClose, onSuccess }) => {
       code: formData.code || data.suggestedCode,
       orderNumber: formData.orderNumber,
       serialNumber: formData.serialNumber,
+      size: formData.size,
       brand: formData.brand,
       createdAt: formData.createdAt || new Date().toISOString().split("T")[0],
       pattern: formData.pattern,
@@ -34,8 +34,16 @@ const NewTire = ({ onClose, onSuccess }) => {
       vehicle: formData.vehicle || null,
     }
 
-    console.log("📦 NewTire: Datos preparados para enviar:", newTire)
-    await create(newTire, onSuccess || onClose)
+    try {
+      const created = await create(newTire)
+      const receipt = await orders.getNextReceipt()
+      const printData = buildCreateTirePrintData({...created, orderNumber: formData.orderNumber }, receipt)
+      print(printData)
+
+      onSuccess?.()
+    } catch (err) {
+      console.error("Error al crear e imprimir cubierta:", err)
+    }
   }
 
   return (
@@ -57,6 +65,7 @@ const NewTire = ({ onClose, onSuccess }) => {
           orderNumber: true,
           brand: true,
           pattern: true,
+          size: true,
           kilometers: true,
           createdAt: true,
           vehicle: true,
@@ -86,6 +95,10 @@ const NewTire = ({ onClose, onSuccess }) => {
           pattern: {
             required: true,
             requiredMessage: "El dibujo es obligatorio",
+          },
+          size: {
+            required: true,
+            requiredMessage: "El rodado es obligatorio",
           },
           // Estos campos son opcionales
           kilometers: {

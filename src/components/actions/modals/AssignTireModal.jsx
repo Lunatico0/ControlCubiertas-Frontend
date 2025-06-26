@@ -22,8 +22,6 @@ const AssignTireModal = ({ tire, onClose, refreshTire }) => {
   })
 
   const handleSubmit = async (data) => {
-    console.log("🚀 AssignTireModal: Iniciando asignación con datos:", data)
-
     await execute({
       tire,
       formData: {

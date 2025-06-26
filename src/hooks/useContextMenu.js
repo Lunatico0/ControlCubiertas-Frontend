@@ -9,9 +9,15 @@ const useContextMenu = (customRef = null) => {
     e.preventDefault()
     e.stopPropagation()
 
-    const rect = e.currentTarget.getBoundingClientRect()
-    const x = Math.min(rect.right, window.innerWidth - 160)
-    const y = Math.min(rect.bottom, window.innerHeight - 100)
+    const clickX = e.clientX
+    const clickY = e.clientY
+    const screenW = window.innerWidth
+    const screenH = window.innerHeight
+    const menuW = 180
+    const menuH = 120
+
+    const x = Math.min(clickX, screenW - menuW - 16)
+    const y = Math.min(clickY, screenH - menuH - 16)
 
     setPosition({ x, y })
     setOpenIndex(index)
