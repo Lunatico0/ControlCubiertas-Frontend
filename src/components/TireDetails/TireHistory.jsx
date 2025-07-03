@@ -3,7 +3,7 @@ import ApiContext from "@context/apiContext";
 import useTooltip from "@hooks/useTooltip";
 import useContextMenu from "@hooks/useContextMenu";
 import { useReprint } from "@hooks/useReprint.js";
-import UndoHistoryEntryModal from "@components/actions/modals/UndoHistoryEntryModal";
+import UndoHistoryEntryModal from "@components/Actions/modals/UndoHistoryEntryModal";
 import { buildReprintData } from "@utils/print-data";
 import { getRowStyle, dictionary } from "@utils/historyStyles";
 import { colors, text, button, utility } from "@utils/tokens";

@@ -4,8 +4,8 @@ import ApiContext from "@context/apiContext"
 import TireHistory from "./TireHistory"
 import { TireInfoData } from './TireInfo'
 import TireStatusSidebar from './TireStatusSidebar'
-import QuickActions from "@components/actions/QuickActions"
-import EditHistoryModal from "@components/actions/modals/EditHistoryModal"
+import QuickActions from "@components/Actions/QuickActions"
+import EditHistoryModal from "@components/Actions/modals/EditHistoryModal"
 import EditNoteRoundedIcon from '@mui/icons-material/EditNoteRounded'
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded'
 import { colors, text, button } from "@utils/tokens"

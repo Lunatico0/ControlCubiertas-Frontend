@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import Swal from "sweetalert2";
 import { showToast } from "@utils/toast";
 import { getUpdateRules } from '@constants/settingsRules';
+import { formatReleaseNotes } from '@utils/formatReleaseNotes'
 import {
   showInteractiveDownloadProgress,
   updateProgressBar,
@@ -70,19 +71,12 @@ export const useUpdater = (setHasUpdate) => {
     }
 
     const info = updateInfoRef.current;
-    const releaseNotes = typeof info.releaseNotes === "string" ? info.releaseNotes : "";
-
-    const cleanReleaseNotes = releaseNotes
-      .replace(/[.…]+$/gm, '')
-      .replace(/(\r\n|\n|\r)+/g, ' ')
-      .replace(/\s+/g, ' ')
-      .trim();
 
     Swal.fire({
       title: `Actualización lista: v${info.version}`,
       html: `
-        <div style="overflow-y:auto; overflow-x:hidden; white-space:pre-line; font-size:13px; padding:5px; background:#f9f9f9; border:1px solid #ccc; border-radius:4px; text-align:left; max-height:100px;">
-          ${cleanReleaseNotes.length > 0 ? cleanReleaseNotes : "Sin notas disponibles"}
+        <div style="overflow-y:auto; overflow-x:hidden; white-space:pre-line; font-size:13px; padding:5px; background:#f9f9f9; border:1px solid #ccc; border-radius:4px; text-align:left; max-height:120px;">
+          ${formatReleaseNotes(info.releaseNotes)}
         </div>
         <hr/>
         <label style="display:block; margin-top:10px;">

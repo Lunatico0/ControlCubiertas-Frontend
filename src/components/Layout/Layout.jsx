@@ -1,8 +1,8 @@
 import { useState } from "react"
 import Sidebar from "@components/Sidebar/Sidebar"
 import Home from "@components/Home"
-import Vehicles from "@components/vehicleList/VehicleList"
-import Settings from "@components/Settings"
+import Vehicles from "@components/VehicleList/VehicleList"
+import Settings from "@components/Settings/Settings"
 
 const Layout = () => {
   const [activeSection, setActiveSection] = useState("tires")
@@ -24,7 +24,7 @@ const Layout = () => {
     <div className="flex h-screen overflow-hidden bg-gray-200 dark:bg-gray-900 text-white">
       <Sidebar active={activeSection} setActive={setActiveSection} />
 
-      <main className="flex-1 overflow-y-auto h-screen pl-14">
+      <main className="flex-1 overflow-y-auto h-screen md:pl-14">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {renderSection()}
         </div>

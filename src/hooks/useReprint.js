@@ -6,12 +6,14 @@ import { generateReceiptHTML } from "@utils/receipt-html"
 
 export const useReprint = () => {
   const { printHtml, isPrinting } = usePrintEngine()
+  const layoutMode = localStorage.getItem("receiptLayout") || "dynamic";
+
 
   const execute = useCallback(
     async ({ entry, tire }) => {
       try {
         const data = buildReprintData(entry, tire)
-        const html = generateReceiptHTML(data) // ✅ Generar HTML como en usePrint
+        const html = generateReceiptHTML(data, layoutMode)
         const title = `Reimpresión-${data?.receiptNumber || "recibo"}`
 
         const result = await printHtml(html, title)

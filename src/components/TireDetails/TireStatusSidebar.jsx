@@ -1,5 +1,5 @@
 import { statusStyles } from "@utils/statusStyle";
-import QuickActions from "@components/actions/QuickActions";
+import QuickActions from "@components/Actions/QuickActions";
 import { button } from "@utils/tokens";
 import EditNoteRoundedIcon from '@mui/icons-material/EditNoteRounded';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';

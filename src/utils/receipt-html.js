@@ -1,4 +1,5 @@
-export const generateReceiptHTML = (data) => {
+export const generateReceiptHTML = (data, layoutMode) => {
+
   const styles = `
     <style>
       * {
@@ -196,7 +197,7 @@ export const generateReceiptHTML = (data) => {
             ${data?.kmRecorridos !== undefined ? `<p><strong>Km en este viaje:</strong> ${data.kmRecorridos.toLocaleString()} km</p>` : ""}
           </div>
 
-          ${data?.vehicle?.mobile !== 'Sin asignar' ? (`
+          ${layoutMode === "fixed" || data?.vehicle?.mobile !== 'Sin asignar' ? (`
             <div>
               <p><strong>Vehículo:</strong> ${data?.vehicle?.mobile || "Sin asignar"}</p>
               <p><strong>Marca:</strong> ${data?.vehicle?.brand || "Sin asignar"}</p>
