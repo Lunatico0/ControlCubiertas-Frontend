@@ -1,28 +1,57 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
+/* Dark mode por clase .dark (preserva el comportamiento de Tailwind v3 darkMode:'class'). */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ============================================================================
+   TOKENS DEL TEMA — ÚNICO lugar para colores, fuentes y tamaños.
+   Cambiar un token acá se propaga a toda la app.
+   Uso: --color-brand-500  ->  className="bg-brand-500 text-brand-500 border-brand-500"
+        --font-display      ->  className="font-display"
+   ============================================================================ */
+@theme {
+  /* --- MARCA / primario -----------------------------------------------------
+     Dirección "logística limpia con carácter" (ver ART-DIRECTION.md): naranja
+     quemado del rubro. Para cambiar el color primario de TODA la app, editá esta
+     escala. (Alternativas sugeridas: verde ruta / petróleo.) */
+  --color-brand-50:  #fdf3ec;
+  --color-brand-100: #fbe3d2;
+  --color-brand-200: #f6c2a0;
+  --color-brand-300: #f09d6b;
+  --color-brand-400: #ea7e3f;
+  --color-brand-500: #e2671f; /* primario */
+  --color-brand-600: #c2551a; /* hover */
+  --color-brand-700: #9b4316;
+  --color-brand-800: #7c3815;
+  --color-brand-900: #652f14;
+
+  /* --- TIPOGRAFÍA -----------------------------------------------------------
+     Fuentes nuevas del ART-DIRECTION, ya disponibles como utilidades
+     (font-display / font-mono). El cuerpo sigue en Inter por ahora para no
+     alterar el visual actual; cambiá --font-sans a IBM Plex cuando rediseñemos. */
+  --font-sans: "Inter", system-ui, Avenir, Helvetica, Arial, sans-serif;
+  --font-display: "Space Grotesk", system-ui, sans-serif; /* títulos */
+  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, monospace; /* cifras/datos */
+
+  /* --- COLORES DEL CICLO DE CUBIERTA ----------------------------------------
+     Valores ACTUALES preservados (mismos nombres de clase: bg-nueva, etc.).
+     Se ajustarán a la paleta nueva en el rediseño visual. */
+  --color-nueva: #0000ff;
+  --color-primer-recap: #1db51d;
+  --color-segundo-recap: #ffff00;
+  --color-tercer-recap: #ff8000;
+  --color-recap: #666666;
+  --color-descartada: #ef2222;
+  --color-vehiculo: #b2f2bb;
+  --color-cubierta: #a5d8ff;
+}
+
+/* Base mínima. (Se quitó el fondo oscuro #242424 que traía el template de Vite
+   y ensuciaba el tema claro.) */
 :root {
-  margin: 0;
-  padding: 0;
   box-sizing: border-box;
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
 }
