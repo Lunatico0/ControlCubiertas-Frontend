@@ -10,6 +10,7 @@ import RequireAuth from '@components/Auth/RequireAuth.jsx'
 import AdminLayout from '@components/Portal/AdminLayout.jsx'
 import Dashboard from '@components/Portal/Dashboard.jsx'
 import Users from '@components/Portal/Users.jsx'
+import CompanySettings from '@components/Portal/CompanySettings.jsx'
 
 function App() {
   useUpdater()
@@ -38,10 +39,7 @@ function App() {
           >
             <Route index element={<Dashboard />} />
             <Route path="usuarios" element={<Users />} />
-            <Route
-              path="empresa"
-              element={<p className="text-sm text-slate-400">Configuración de empresa — próximamente.</p>}
-            />
+            <Route path="empresa" element={<CompanySettings />} />
           </Route>
 
           {/* App operativa: protegida + ApiProvider (que carga datos en el mount). */}

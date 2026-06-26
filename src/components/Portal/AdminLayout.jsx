@@ -42,7 +42,7 @@ const AdminLayout = () => {
   const initials = displayName.slice(0, 2).toUpperCase()
 
   return (
-    <div className="dark flex h-screen overflow-hidden bg-slate-900 text-slate-100">
+    <div className="dark flex h-screen overflow-hidden bg-slate-900 text-slate-100 text-left">
       {/* Sidebar */}
       <aside className="hidden w-64 shrink-0 flex-col border-r border-slate-800 bg-slate-950 md:flex">
         <div className="flex items-center gap-3 px-6 py-5">
