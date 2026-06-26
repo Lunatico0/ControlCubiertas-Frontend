@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { colors, text, utility } from "@utils/tokens";
 import { useTheme } from "@context/ThemeContext";
+import { useAuth } from "@context/AuthContext";
 import isElectron from "@utils/isElectron";
 import { useUpdater } from "@hooks/useUpdater";
 
@@ -12,6 +13,7 @@ import CloudDownloadRoundedIcon from "@mui/icons-material/CloudDownloadRounded";
 import DarkModeRoundedIcon from "@mui/icons-material/DarkModeRounded";
 import LightModeRoundedIcon from "@mui/icons-material/LightModeRounded";
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
+import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
 
 const navItems = [
   { icon: <TireRepairRoundedIcon />, label: "Cubiertas", key: "tires" },
@@ -21,6 +23,7 @@ const navItems = [
 
 const Sidebar = ({ active, setActive }) => {
   const { isDarkMode, toggleTheme } = useTheme();
+  const { logout, user } = useAuth();
   const [expanded, setExpanded] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -131,9 +134,27 @@ const Sidebar = ({ active, setActive }) => {
             )}
           </div>
 
+          {/* Cerrar sesión */}
+          <div
+            className={`mt-3 flex items-center gap-2 px-2 py-2 rounded-lg cursor-pointer transition-colors
+              ${colors.shadow} ${utility.hoverBg} ${text.value}`}
+            onClick={logout}
+            title="Cerrar sesión"
+          >
+            <LogoutRoundedIcon fontSize="small" />
+            {(expanded || isMobile) && <span className={text.value}>Salir</span>}
+          </div>
+
+          {/* Usuario logueado */}
+          {(expanded || isMobile) && user?.email && (
+            <div className={`text-xs ${text.muted} mt-3 select-none truncate pl-1`} title={user.email}>
+              {user.email}
+            </div>
+          )}
+
           {/* Versión */}
           {(expanded || isMobile) && version && (
-            <div className={`text-xs ${text.value} mt-4 select-none pl-1`}>
+            <div className={`text-xs ${text.value} mt-1 select-none pl-1`}>
               versión: <span className={text.muted}>{version}</span>
             </div>
           )}
