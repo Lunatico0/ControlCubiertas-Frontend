@@ -14,6 +14,7 @@ import DarkModeRoundedIcon from "@mui/icons-material/DarkModeRounded";
 import LightModeRoundedIcon from "@mui/icons-material/LightModeRounded";
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
+import AdminPanelSettingsRoundedIcon from '@mui/icons-material/AdminPanelSettingsRounded';
 
 const navItems = [
   { icon: <TireRepairRoundedIcon />, label: "Cubiertas", key: "tires" },
@@ -23,7 +24,7 @@ const navItems = [
 
 const Sidebar = ({ active, setActive }) => {
   const { isDarkMode, toggleTheme } = useTheme();
-  const { logout, user } = useAuth();
+  const { logout, user, isAdmin } = useAuth();
   const [expanded, setExpanded] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -31,6 +32,11 @@ const Sidebar = ({ active, setActive }) => {
   const [version, setVersion] = useState("");
   const electron = isElectron();
   const triggerUpdateCheck = useUpdater(setHasUpdate);
+
+  // El ítem de administración solo lo ve el tenant-admin (gating por rol en el front).
+  const items = isAdmin
+    ? [...navItems, { icon: <AdminPanelSettingsRoundedIcon />, label: "Administración", key: "admin" }]
+    : navItems;
 
   useEffect(() => {
     setIsMobile(window.innerWidth < 768);
@@ -86,7 +92,7 @@ const Sidebar = ({ active, setActive }) => {
           </div>
 
           <nav className="flex flex-col p-2 pt-6 space-y-4">
-            {navItems.map(({ icon, label, key }) => (
+            {items.map(({ icon, label, key }) => (
               <div
                 key={label}
                 onClick={() => {

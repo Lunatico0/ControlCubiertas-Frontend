@@ -3,6 +3,7 @@ import Sidebar from "@components/Sidebar/Sidebar"
 import Home from "@components/Home"
 import Vehicles from "@components/VehicleList/VehicleList"
 import Settings from "@components/Settings/Settings"
+import AdminPanel from "@components/Portal/AdminPanel"
 
 const Layout = () => {
   const [activeSection, setActiveSection] = useState("tires")
@@ -15,6 +16,8 @@ const Layout = () => {
         return <Vehicles setActive={setActiveSection} />
       case "settings":
         return <Settings />
+      case "admin":
+        return <AdminPanel />
       default:
         return <Home />
     }
