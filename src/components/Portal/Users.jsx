@@ -98,7 +98,7 @@ const Users = () => {
         </div>
         <button
           onClick={() => setShowForm(true)}
-          className="inline-flex items-center gap-2 rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-brand-600 focus:ring-2 focus:ring-brand-500/40"
+          className="inline-flex items-center gap-2 rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-slate-900 transition hover:bg-brand-600 focus:ring-2 focus:ring-brand-500/40"
         >
           <PersonAddAltRoundedIcon fontSize="small" />
           Nuevo usuario
@@ -171,7 +171,7 @@ const Users = () => {
           <div className="mt-5 flex justify-end">
             <button
               onClick={() => setTempCred(null)}
-              className="rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-brand-600"
+              className="rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-slate-900 transition hover:bg-brand-600"
             >
               Listo
             </button>

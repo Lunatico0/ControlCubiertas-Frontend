@@ -33,7 +33,7 @@ const ChangePassword = () => {
   return (
     <div className="flex min-h-screen items-center justify-center bg-slate-100 p-6 dark:bg-slate-950">
       <div className="w-full max-w-sm rounded-xl border border-slate-200 bg-white p-8 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-        <span className="grid h-11 w-11 place-items-center rounded-lg bg-brand-500 text-white">
+        <span className="grid h-11 w-11 place-items-center rounded-lg bg-brand-500 text-slate-900">
           <LockResetOutlinedIcon />
         </span>
 
@@ -111,7 +111,7 @@ const ChangePassword = () => {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full rounded-lg bg-brand-500 px-4 py-2.5 font-medium text-white transition hover:bg-brand-600 focus:ring-2 focus:ring-brand-500/40 disabled:cursor-not-allowed disabled:opacity-60"
+            className="w-full rounded-lg bg-brand-500 px-4 py-2.5 font-medium text-slate-900 transition hover:bg-brand-600 focus:ring-2 focus:ring-brand-500/40 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {isSubmitting ? "Guardando…" : "Guardar y continuar"}
           </button>

@@ -180,7 +180,7 @@ const CompanySettings = () => {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="rounded-lg bg-brand-500 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-brand-600 focus:ring-2 focus:ring-brand-500/40 disabled:cursor-not-allowed disabled:opacity-60"
+            className="rounded-lg bg-brand-500 px-5 py-2.5 text-sm font-medium text-slate-900 transition hover:bg-brand-600 focus:ring-2 focus:ring-brand-500/40 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {isSubmitting ? "Guardando…" : "Guardar cambios"}
           </button>

@@ -11,19 +11,20 @@
    ============================================================================ */
 @theme {
   /* --- MARCA / primario -----------------------------------------------------
-     Dirección "logística limpia con carácter" (ver ART-DIRECTION.md): naranja
-     quemado del rubro. Para cambiar el color primario de TODA la app, editá esta
-     escala. (Alternativas sugeridas: verde ruta / petróleo.) */
-  --color-brand-50:  #fdf3ec;
-  --color-brand-100: #fbe3d2;
-  --color-brand-200: #f6c2a0;
-  --color-brand-300: #f09d6b;
-  --color-brand-400: #ea7e3f;
-  --color-brand-500: #e2671f; /* primario */
-  --color-brand-600: #c2551a; /* hover */
-  --color-brand-700: #9b4316;
-  --color-brand-800: #7c3815;
-  --color-brand-900: #652f14;
+     Dirección "logística limpia con carácter" (ver ART-DIRECTION.md): verde lima
+     vibrante. OJO: el lima es brillante → los fills sólidos (bg-brand-500/600) van
+     con texto OSCURO (text-slate-900), no blanco. Para cambiar el primario de TODA
+     la app, editá esta escala. */
+  --color-brand-50:  #f7fee7;
+  --color-brand-100: #ecfccb;
+  --color-brand-200: #d9f99d;
+  --color-brand-300: #bef264;
+  --color-brand-400: #a3e635;
+  --color-brand-500: #84cc16; /* primario */
+  --color-brand-600: #65a30d; /* hover */
+  --color-brand-700: #4d7c0f;
+  --color-brand-800: #3f6212;
+  --color-brand-900: #365314;
 
   /* --- TIPOGRAFÍA -----------------------------------------------------------
      Fuentes nuevas del ART-DIRECTION, ya disponibles como utilidades

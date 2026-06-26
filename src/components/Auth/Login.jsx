@@ -45,7 +45,7 @@ const Login = () => {
       {/* Panel de marca — solo desktop */}
       <aside className="hidden lg:flex lg:w-1/2 flex-col justify-between bg-slate-900 p-12 text-white">
         <div className="flex items-center gap-3">
-          <span className="grid h-11 w-11 place-items-center rounded-lg bg-brand-500 text-white">
+          <span className="grid h-11 w-11 place-items-center rounded-lg bg-brand-500 text-slate-900">
             <LocalShippingOutlinedIcon fontSize="medium" />
           </span>
           <span className="font-display text-xl font-semibold tracking-tight">ControlCubiertas</span>
@@ -66,7 +66,7 @@ const Login = () => {
         <div className="w-full max-w-sm">
           {/* Marca compacta — solo mobile */}
           <div className="mb-10 flex items-center gap-3 lg:hidden">
-            <span className="grid h-10 w-10 place-items-center rounded-lg bg-brand-500 text-white">
+            <span className="grid h-10 w-10 place-items-center rounded-lg bg-brand-500 text-slate-900">
               <LocalShippingOutlinedIcon />
             </span>
             <span className="font-display text-lg font-semibold text-slate-900 dark:text-white">
@@ -140,7 +140,7 @@ const Login = () => {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full rounded-lg bg-brand-500 px-4 py-2.5 font-medium text-white transition hover:bg-brand-600 focus:ring-2 focus:ring-brand-500/40 disabled:cursor-not-allowed disabled:opacity-60"
+              className="w-full rounded-lg bg-brand-500 px-4 py-2.5 font-medium text-slate-900 transition hover:bg-brand-600 focus:ring-2 focus:ring-brand-500/40 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {isSubmitting ? "Ingresando…" : "Ingresar"}
             </button>
