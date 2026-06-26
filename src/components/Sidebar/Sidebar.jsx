@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { colors, text, utility } from "@utils/tokens";
 import { useTheme } from "@context/ThemeContext";
 import { useAuth } from "@context/AuthContext";
@@ -32,11 +33,7 @@ const Sidebar = ({ active, setActive }) => {
   const [version, setVersion] = useState("");
   const electron = isElectron();
   const triggerUpdateCheck = useUpdater(setHasUpdate);
-
-  // El ítem de administración solo lo ve el tenant-admin (gating por rol en el front).
-  const items = isAdmin
-    ? [...navItems, { icon: <AdminPanelSettingsRoundedIcon />, label: "Administración", key: "admin" }]
-    : navItems;
+  const navigate = useNavigate();
 
   useEffect(() => {
     setIsMobile(window.innerWidth < 768);
@@ -92,7 +89,7 @@ const Sidebar = ({ active, setActive }) => {
           </div>
 
           <nav className="flex flex-col p-2 pt-6 space-y-4">
-            {items.map(({ icon, label, key }) => (
+            {navItems.map(({ icon, label, key }) => (
               <div
                 key={label}
                 onClick={() => {
@@ -106,6 +103,20 @@ const Sidebar = ({ active, setActive }) => {
                 {(expanded || isMobile) && <span className={text.value}>{label}</span>}
               </div>
             ))}
+
+            {/* Acceso al portal de administración: navega a /admin (solo tenant-admin). */}
+            {isAdmin && (
+              <div
+                onClick={() => {
+                  navigate("/admin");
+                  if (isMobile) setIsMobileOpen(false);
+                }}
+                className={`flex items-center gap-3 px-2 py-2 rounded-lg cursor-pointer transition-colors ${colors.shadow} ${utility.hoverBg} text-gray-400`}
+              >
+                <span className={`text-xl ${text.value}`}><AdminPanelSettingsRoundedIcon /></span>
+                {(expanded || isMobile) && <span className={text.value}>Administración</span>}
+              </div>
+            )}
           </nav>
         </div>
 

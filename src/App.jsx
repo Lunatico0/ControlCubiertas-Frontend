@@ -7,6 +7,9 @@ import { ApiProvider } from '@context/apiContext'
 import Login from '@components/Auth/Login.jsx'
 import ChangePassword from '@components/Auth/ChangePassword.jsx'
 import RequireAuth from '@components/Auth/RequireAuth.jsx'
+import AdminLayout from '@components/Portal/AdminLayout.jsx'
+import Dashboard from '@components/Portal/Dashboard.jsx'
+import Users from '@components/Portal/Users.jsx'
 
 function App() {
   useUpdater()
@@ -24,6 +27,23 @@ function App() {
               </RequireAuth>
             }
           />
+          {/* Portal del tenant-admin: shell propio (dark), gateado por rol. */}
+          <Route
+            path="/admin"
+            element={
+              <RequireAuth requireAdmin>
+                <AdminLayout />
+              </RequireAuth>
+            }
+          >
+            <Route index element={<Dashboard />} />
+            <Route path="usuarios" element={<Users />} />
+            <Route
+              path="empresa"
+              element={<p className="text-sm text-slate-400">Configuración de empresa — próximamente.</p>}
+            />
+          </Route>
+
           {/* App operativa: protegida + ApiProvider (que carga datos en el mount). */}
           <Route
             path="/*"
