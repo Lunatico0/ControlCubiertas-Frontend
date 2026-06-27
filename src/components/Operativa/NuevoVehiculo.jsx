@@ -18,9 +18,11 @@ const PRESETS = {
   camion64: { label: "Camión 6×4", sub: "10 ruedas", tipo: "Camión", axles: ["simple", "dual", "dual"] },
   semi3: { label: "Semi 3 ejes", sub: "12 ruedas", tipo: "Semi", axles: ["dual", "dual", "dual"] },
   bus: { label: "Bus", sub: "6 ruedas", tipo: "Bus", axles: ["simple", "dual"] },
+  moto: { label: "Moto", sub: "2 ruedas", tipo: "Moto", axles: ["moto", "moto"] },
 }
-const TIPOS = ["Camión", "Semi", "Acoplado", "Bus", "Auto"]
-const tiresOf = (axles) => axles.reduce((n, t) => n + (t === "dual" ? 4 : 2), 0)
+const TIPOS = ["Camión", "Semi", "Acoplado", "Bus", "Auto", "Moto"]
+const wheelsOfAxle = (t) => (t === "dual" ? 4 : t === "moto" ? 1 : 2)
+const tiresOf = (axles) => axles.reduce((n, t) => n + wheelsOfAxle(t), 0)
 
 const NuevoVehiculo = ({ onClose, onCreated }) => {
   const { vehicles } = useContext(ApiContext)
@@ -150,19 +152,25 @@ const NuevoVehiculo = ({ onClose, onCreated }) => {
             <div className="flex flex-col gap-[9px]">
               {axles.map((t, i) => {
                 const dual = t === "dual"
+                const moto = t === "moto"
                 const canRemove = axles.length > 1
                 const seg = (on) => ({ background: on ? "var(--ink-lime)" : "transparent", color: on ? "var(--bg)" : "var(--tx-3)" })
+                const sub = (i === 0 ? "Dirección · " : "") + (moto ? "Rueda única (1 cubierta)" : dual ? "Dual (4 cubiertas)" : "Simple (2 cubiertas)")
                 return (
                   <div key={i} className="flex items-center gap-[11px] rounded-[10px] px-[13px] py-[11px]" style={{ border: "1px solid var(--bd)", background: "var(--input)" }}>
                     <span className="flex h-[30px] w-[30px] flex-none items-center justify-center rounded-[7px] text-[12px] font-semibold" style={{ background: "var(--bd-2)", fontFamily: "'IBM Plex Mono'", color: "var(--tx-2)" }}>{i + 1}</span>
                     <div className="min-w-0 flex-1">
                       <div className="text-[13px] font-semibold" style={{ color: "var(--tx)" }}>Eje {i + 1}</div>
-                      <div className="text-[11px]" style={{ color: "var(--tx-5)" }}>{(i === 0 ? "Dirección · " : "") + (dual ? "Dual (4 cubiertas)" : "Simple (2 cubiertas)")}</div>
+                      <div className="text-[11px]" style={{ color: "var(--tx-5)" }}>{sub}</div>
                     </div>
-                    <div className="flex gap-1 rounded-[8px] p-[3px]" style={{ border: "1px solid var(--bd-strong)", background: "var(--bg)" }}>
-                      <button onClick={() => setAxleType(i, "simple")} className="h-[30px] rounded-[6px] px-[11px] text-[12px] font-semibold" style={seg(!dual)}>Simple</button>
-                      <button onClick={() => setAxleType(i, "dual")} className="h-[30px] rounded-[6px] px-[11px] text-[12px] font-semibold" style={seg(dual)}>Dual</button>
-                    </div>
+                    {moto ? (
+                      <span className="inline-flex h-[30px] items-center rounded-[7px] px-[13px] text-[12px] font-semibold" style={{ background: tint("var(--ink-lime)", 10), color: "var(--ink-lime)" }}>Rueda única</span>
+                    ) : (
+                      <div className="flex gap-1 rounded-[8px] p-[3px]" style={{ border: "1px solid var(--bd-strong)", background: "var(--bg)" }}>
+                        <button onClick={() => setAxleType(i, "simple")} className="h-[30px] rounded-[6px] px-[11px] text-[12px] font-semibold" style={seg(!dual)}>Simple</button>
+                        <button onClick={() => setAxleType(i, "dual")} className="h-[30px] rounded-[6px] px-[11px] text-[12px] font-semibold" style={seg(dual)}>Dual</button>
+                      </div>
+                    )}
                     <button onClick={() => canRemove && removeAxle(i)} title="Quitar eje" className="inline-flex h-8 w-8 flex-none items-center justify-center rounded-[8px]" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: canRemove ? "var(--ink-red)" : "var(--bd-hover)", cursor: canRemove ? "pointer" : "not-allowed" }}>
                       <RemoveRoundedIcon sx={{ fontSize: 15 }} />
                     </button>
@@ -195,14 +203,22 @@ const NuevoVehiculo = ({ onClose, onCreated }) => {
             <div className="relative z-[1] flex flex-col gap-5">
               {axles.map((t, i) => {
                 const dual = t === "dual"
+                const moto = t === "moto"
                 const left = dual ? ["IE", "II"] : ["I"]
                 const right = dual ? ["DI", "DE"] : ["D"]
                 const Wheel = ({ label }) => (
-                  <div className="flex flex-col items-center gap-[3px]">
+                  <div className="relative" style={{ width: 17, height: 34 }}>
                     <div className="h-[34px] w-[17px] rounded-[5px]" style={{ border: "2px solid var(--bd-hover)", background: "var(--elev)" }} />
-                    <span className="text-[8px]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-7)" }}>{label}</span>
+                    {label && <span className="absolute left-1/2 -translate-x-1/2 text-[8px]" style={{ top: 38, fontFamily: "'IBM Plex Mono'", color: "var(--tx-7)" }}>{label}</span>}
                   </div>
                 )
+                if (moto) {
+                  return (
+                    <div key={i} className="flex items-center justify-center">
+                      <div className="rounded-[5px]" style={{ width: 15, height: 38, border: "2px solid var(--bd-hover)", background: "var(--elev)" }} />
+                    </div>
+                  )
+                }
                 return (
                   <div key={i} className="flex items-center justify-center">
                     <div className="flex gap-1">{left.map((l) => <Wheel key={l} label={l} />)}</div>
