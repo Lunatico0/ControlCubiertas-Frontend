@@ -9,7 +9,8 @@ import LocalShippingOutlinedIcon from "@mui/icons-material/LocalShippingOutlined
 import RemoveRoundedIcon from "@mui/icons-material/RemoveRounded"
 import CheckRoundedIcon from "@mui/icons-material/CheckRounded"
 import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded"
-import { metaOf, tint, fmtKm, StateBadge, Pips } from "./status"
+import ArrowUpwardRoundedIcon from "@mui/icons-material/ArrowUpwardRounded"
+import { metaOf, tint, fmtKm, fmtDate, StateBadge, Pips } from "./status"
 import TireDrawer from "./TireDrawer"
 
 const TABS = [
@@ -19,6 +20,25 @@ const TABS = [
   { key: "recapar", label: "A recapar" },
 ]
 
+// Orden del ciclo de vida (para ordenar por estado de forma significativa, no alfabética).
+const STATE_ORDER = ["Nueva", "1er Recapado", "2do Recapado", "3er Recapado", "A recapar", "Descartada"]
+
+// Columnas de la tabla. `sort` define el criterio; null = no ordenable.
+const COLUMNS = [
+  { key: "code", label: "Código", sort: (a, b) => (a.code ?? 0) - (b.code ?? 0) },
+  { key: "status", label: "Estado", sort: (a, b) => STATE_ORDER.indexOf(a.status) - STATE_ORDER.indexOf(b.status) },
+  { key: "brand", label: "Marca / Rodado", sort: (a, b) => (a.brand || "").localeCompare(b.brand || "") },
+  { key: "location", label: "Ubicación", sort: (a, b) => (a.vehicle?.mobile || "~").localeCompare(b.vehicle?.mobile || "~") },
+  { key: "km", label: "Km", align: "right", sort: (a, b) => (a.kilometers || 0) - (b.kilometers || 0) },
+  { key: "updatedAt", label: "Actualizada", align: "right", sort: (a, b) => new Date(a.updatedAt || 0) - new Date(b.updatedAt || 0) },
+  { key: "actions", label: "Acciones", align: "right", sort: null },
+]
+const GRID_COLS = "0.8fr 1fr 1.2fr 0.9fr 0.6fr 0.8fr 1.1fr"
+
+// Atajo de teclado según plataforma (⌘K en Mac/iOS, Ctrl+K en el resto).
+const IS_MAC = typeof navigator !== "undefined" && /Mac|iPhone|iPad|iPod/i.test(navigator.platform || navigator.userAgent || "")
+const SHORTCUT_LABEL = IS_MAC ? "⌘K" : "Ctrl K"
+
 const Cubiertas = () => {
   const { data, ui } = useContext(ApiContext)
   const tires = data?.tires || []
@@ -26,14 +46,17 @@ const Cubiertas = () => {
 
   const [query, setQuery] = useState("")
   const [tab, setTab] = useState("todas")
-  const [view, setView] = useState("table") // tabla densa por defecto (decisión del brief)
+  const [view, setView] = useState("table")
   const [selectedId, setSelectedId] = useState(null)
+  const [pendingAction, setPendingAction] = useState(null)
+  const [sortBy, setSortBy] = useState("code")
+  const [sortDir, setSortDir] = useState("asc")
   const searchRef = useRef(null)
 
-  // Atajo "/" para enfocar la búsqueda.
+  // Atajo Ctrl/Cmd + K para enfocar la búsqueda.
   useEffect(() => {
     const onKey = (e) => {
-      if (e.key === "/" && !/^(INPUT|TEXTAREA)$/.test(document.activeElement?.tagName || "")) {
+      if (e.key.toLowerCase() === "k" && (e.metaKey || e.ctrlKey)) {
         e.preventDefault()
         searchRef.current?.focus()
       }
@@ -54,7 +77,7 @@ const Cubiertas = () => {
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
-    return tires.filter((t) => {
+    const base = tires.filter((t) => {
       if (tab === "stock" && t.vehicle) return false
       if (tab === "circulacion" && !t.vehicle) return false
       if (tab === "recapar" && t.status !== "A recapar") return false
@@ -66,23 +89,28 @@ const Cubiertas = () => {
         t.vehicle?.mobile?.toLowerCase().includes(q)
       )
     })
-  }, [tires, query, tab])
+    const col = COLUMNS.find((c) => c.key === sortBy)
+    if (!col?.sort) return base
+    const sorted = [...base].sort(col.sort)
+    return sortDir === "desc" ? sorted.reverse() : sorted
+  }, [tires, query, tab, sortBy, sortDir])
 
-  const soon = (msg) => showToast("info", msg || "Llega en el próximo hito del rediseño")
+  const toggleSort = (key) => {
+    if (sortBy === key) setSortDir((d) => (d === "asc" ? "desc" : "asc"))
+    else { setSortBy(key); setSortDir("asc") }
+  }
+
+  const openDrawer = (id, action = null) => () => { setSelectedId(id); setPendingAction(action) }
+  const closeDrawer = () => { setSelectedId(null); setPendingAction(null) }
 
   const inputStyle = { background: "var(--card)", border: "1.5px solid var(--bd)", color: "var(--tx)" }
 
   return (
     <div>
       {/* Toolbar sticky */}
-      <div
-        className="sticky top-0 z-[5] px-7 pb-4 pt-5"
-        style={{ background: "var(--bg)", borderBottom: "1px solid var(--bd-faint)" }}
-      >
+      <div className="sticky top-0 z-[5] px-7 pb-4 pt-5" style={{ background: "var(--bg)", borderBottom: "1px solid var(--bd-faint)" }}>
         <div className="mb-4 flex items-center gap-4">
-          <h1 className="text-[24px] font-bold tracking-[-.02em]" style={{ fontFamily: "'Space Grotesk'", color: "var(--tx)" }}>
-            Cubiertas
-          </h1>
+          <h1 className="text-[24px] font-bold tracking-[-.02em]" style={{ fontFamily: "'Space Grotesk'", color: "var(--tx)" }}>Cubiertas</h1>
           <div className="relative ml-2 max-w-[460px] flex-1">
             <span className="absolute left-[15px] top-1/2 -translate-y-1/2" style={{ color: "var(--tx-7)" }}>
               <SearchRoundedIcon sx={{ fontSize: 18 }} />
@@ -92,70 +120,38 @@ const Cubiertas = () => {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Buscar código, marca, N° de serie…"
-              className="h-[46px] w-full rounded-[11px] pl-[42px] pr-[42px] text-[14.5px] outline-none"
+              className="h-[46px] w-full rounded-[11px] pl-[42px] pr-[58px] text-[14.5px] outline-none"
               style={inputStyle}
               onFocus={(e) => (e.target.style.borderColor = "var(--ink-lime)")}
               onBlur={(e) => (e.target.style.borderColor = "var(--bd)")}
             />
-            <span
-              className="absolute right-[13px] top-1/2 -translate-y-1/2 rounded-[5px] px-[7px] py-[3px] text-[11px]"
-              style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-5)", border: "1px solid var(--bd-strong)" }}
-            >
-              /
+            <span className="absolute right-[13px] top-1/2 -translate-y-1/2 rounded-[5px] px-[7px] py-[3px] text-[11px]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-5)", border: "1px solid var(--bd-strong)" }}>
+              {SHORTCUT_LABEL}
             </span>
           </div>
-          <button
-            onClick={() => soon("Alta de cubierta — próximo hito")}
-            className="ml-auto inline-flex h-[46px] items-center gap-2 rounded-[11px] px-[18px] text-[14.5px] font-bold"
-            style={{ background: "var(--ink-lime)", color: "#0A0C0D" }}
-          >
+          <button onClick={() => showToast("info", "Alta de cubierta — próximo hito")} className="ml-auto inline-flex h-[46px] items-center gap-2 rounded-[11px] px-[18px] text-[14.5px] font-bold" style={{ background: "var(--ink-lime)", color: "#0A0C0D" }}>
             <AddRoundedIcon sx={{ fontSize: 18 }} /> Alta de cubierta
           </button>
         </div>
 
         <div className="flex items-center gap-[14px]">
-          {/* Filtros rápidos */}
           <div className="flex flex-wrap gap-2">
             {TABS.map((f) => {
               const on = tab === f.key
               return (
-                <button
-                  key={f.key}
-                  onClick={() => setTab(f.key)}
-                  className="inline-flex h-[38px] items-center gap-2 rounded-[9px] px-[15px] text-[13.5px] font-semibold"
-                  style={{
-                    border: `1px solid ${on ? "var(--ink-lime)" : "var(--bd)"}`,
-                    background: on ? tint("var(--ink-lime)", 12) : "var(--card)",
-                    color: on ? "var(--tx)" : "var(--tx-3)",
-                  }}
-                >
+                <button key={f.key} onClick={() => setTab(f.key)} className="inline-flex h-[38px] items-center gap-2 rounded-[9px] px-[15px] text-[13.5px] font-semibold"
+                  style={{ border: `1px solid ${on ? "var(--ink-lime)" : "var(--bd)"}`, background: on ? tint("var(--ink-lime)", 12) : "var(--card)", color: on ? "var(--tx)" : "var(--tx-3)" }}>
                   {f.label}
-                  <span
-                    className="rounded-full px-[7px] py-px text-[11.5px]"
-                    style={{ fontFamily: "'IBM Plex Mono'", background: "var(--elev)", color: "var(--tx-5)" }}
-                  >
-                    {counts[f.key]}
-                  </span>
+                  <span className="rounded-full px-[7px] py-px text-[11.5px]" style={{ fontFamily: "'IBM Plex Mono'", background: "var(--elev)", color: "var(--tx-5)" }}>{counts[f.key]}</span>
                 </button>
               )
             })}
           </div>
-          {/* Toggle de vista */}
           <div className="ml-auto flex gap-[3px] rounded-[9px] p-[3px]" style={{ border: "1px solid var(--bd)", background: "var(--card)" }}>
-            {[
-              { key: "grid", icon: <GridViewRoundedIcon sx={{ fontSize: 17 }} /> },
-              { key: "table", icon: <ViewListRoundedIcon sx={{ fontSize: 17 }} /> },
-            ].map((v) => {
+            {[{ key: "grid", icon: <GridViewRoundedIcon sx={{ fontSize: 17 }} /> }, { key: "table", icon: <ViewListRoundedIcon sx={{ fontSize: 17 }} /> }].map((v) => {
               const on = view === v.key
               return (
-                <button
-                  key={v.key}
-                  onClick={() => setView(v.key)}
-                  className="flex h-8 w-[38px] items-center justify-center rounded-[6px]"
-                  style={{ background: on ? "var(--hover)" : "transparent", color: on ? "var(--ink-lime)" : "var(--tx-5)" }}
-                >
-                  {v.icon}
-                </button>
+                <button key={v.key} onClick={() => setView(v.key)} className="flex h-8 w-[38px] items-center justify-center rounded-[6px]" style={{ background: on ? "var(--hover)" : "transparent", color: on ? "var(--ink-lime)" : "var(--tx-5)" }}>{v.icon}</button>
               )
             })}
           </div>
@@ -176,12 +172,7 @@ const Cubiertas = () => {
             {filtered.map((t) => {
               const m = metaOf(t.status)
               return (
-                <div
-                  key={t._id}
-                  onClick={() => setSelectedId(t._id)}
-                  className="flex cursor-pointer flex-col gap-[13px] rounded-[13px] p-4"
-                  style={{ border: "1px solid var(--bd)", background: "var(--card)" }}
-                >
+                <div key={t._id} onClick={openDrawer(t._id)} className="flex cursor-pointer flex-col gap-[13px] rounded-[13px] p-4" style={{ border: "1px solid var(--bd)", background: "var(--card)" }}>
                   <div className="flex items-start justify-between gap-2.5">
                     <div>
                       <div className="text-[11px]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-6)" }}>{t.serialNumber || "—"}</div>
@@ -198,6 +189,7 @@ const Cubiertas = () => {
                     <Row label="Rodado" value={t.size} mono />
                     <Row label="Ubicación" value={t.vehicle?.mobile || "En depósito"} valueColor={t.vehicle ? "var(--ink-blue)" : "var(--tx-4)"} />
                     <Row label="Km" value={fmtKm(t.kilometers)} mono strong />
+                    <Row label="Actualizada" value={fmtDate(t.updatedAt)} mono />
                   </div>
                 </div>
               )
@@ -206,21 +198,29 @@ const Cubiertas = () => {
         ) : (
           /* ---------- TABLA ---------- */
           <div className="overflow-hidden rounded-[13px]" style={{ border: "1px solid var(--bd)", background: "var(--card)" }}>
-            <div
-              className="grid gap-3 px-[18px] py-3 text-[10.5px] font-semibold uppercase tracking-[.05em]"
-              style={{ gridTemplateColumns: "0.9fr 1.1fr 1.2fr 1fr 0.7fr 1.2fr", fontFamily: "'IBM Plex Mono'", background: "var(--elev)", borderBottom: "1px solid var(--bd)", color: "var(--tx-6)" }}
-            >
-              <div>Código</div><div>Estado</div><div>Marca / Rodado</div><div>Ubicación</div><div className="text-right">Km</div><div className="text-right">Acciones</div>
+            <div className="grid gap-3 px-[18px] py-3 text-[10.5px] font-semibold uppercase tracking-[.05em]" style={{ gridTemplateColumns: GRID_COLS, fontFamily: "'IBM Plex Mono'", background: "var(--elev)", borderBottom: "1px solid var(--bd)", color: "var(--tx-6)" }}>
+              {COLUMNS.map((c) => {
+                const active = sortBy === c.key
+                return (
+                  <div
+                    key={c.key}
+                    onClick={c.sort ? () => toggleSort(c.key) : undefined}
+                    className={`flex items-center gap-1 ${c.align === "right" ? "justify-end" : ""}`}
+                    style={{ cursor: c.sort ? "pointer" : "default", color: active ? "var(--ink-lime)" : "var(--tx-6)" }}
+                  >
+                    {c.label}
+                    {active && (
+                      <ArrowUpwardRoundedIcon sx={{ fontSize: 13, transform: sortDir === "desc" ? "rotate(180deg)" : "none" }} />
+                    )}
+                  </div>
+                )
+              })}
             </div>
             {filtered.map((t) => {
               const m = metaOf(t.status)
               return (
-                <div
-                  key={t._id}
-                  className="grid items-center gap-3 py-3 pl-[14px] pr-[18px]"
-                  style={{ gridTemplateColumns: "0.9fr 1.1fr 1.2fr 1fr 0.7fr 1.2fr", borderLeft: `4px solid ${m.color}`, borderBottom: "1px solid var(--bd-faint)" }}
-                >
-                  <div className="cursor-pointer" onClick={() => setSelectedId(t._id)}>
+                <div key={t._id} className="grid items-center gap-3 py-3 pl-[14px] pr-[18px]" style={{ gridTemplateColumns: GRID_COLS, borderLeft: `4px solid ${m.color}`, borderBottom: "1px solid var(--bd-faint)" }}>
+                  <div className="cursor-pointer" onClick={openDrawer(t._id)}>
                     <div className="text-[15px] font-bold" style={{ fontFamily: "'Space Grotesk'", color: "var(--tx)" }}>#{t.code}</div>
                     <div className="text-[10.5px]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-6)" }}>{t.serialNumber || "—"}</div>
                   </div>
@@ -231,17 +231,18 @@ const Cubiertas = () => {
                   </div>
                   <div className="text-[12.5px] font-medium" style={{ color: t.vehicle ? "var(--ink-blue)" : "var(--tx-4)" }}>{t.vehicle?.mobile || "En depósito"}</div>
                   <div className="text-right text-[13px] font-semibold" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx)" }}>{fmtKm(t.kilometers)}</div>
+                  <div className="text-right text-[12px]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-5)" }}>{fmtDate(t.updatedAt)}</div>
                   <div className="flex items-center justify-end gap-1.5">
                     {!t.vehicle && t.status !== "Descartada" && (
-                      <ActionBtn onClick={() => soon("Asignar a vehículo — próximo hito")} color="var(--ink-lime)" icon={<LocalShippingOutlinedIcon sx={{ fontSize: 15 }} />} />
+                      <ActionBtn onClick={openDrawer(t._id, "assign")} title="Asignar a vehículo" color="var(--ink-lime)" icon={<LocalShippingOutlinedIcon sx={{ fontSize: 15 }} />} />
                     )}
                     {t.vehicle && (
-                      <ActionBtn onClick={() => soon("Desasignar — próximo hito")} color="var(--tx-3)" icon={<RemoveRoundedIcon sx={{ fontSize: 15 }} />} />
+                      <ActionBtn onClick={openDrawer(t._id, "unassign")} title="Desasignar" color="var(--tx-3)" icon={<RemoveRoundedIcon sx={{ fontSize: 15 }} />} />
                     )}
                     {t.status === "A recapar" && (
-                      <ActionBtn onClick={() => soon("Recapado listo — próximo hito")} color="var(--ink-teal)" icon={<CheckRoundedIcon sx={{ fontSize: 15 }} />} />
+                      <ActionBtn onClick={openDrawer(t._id, "recap")} title="Recapado listo" color="var(--ink-teal)" icon={<CheckRoundedIcon sx={{ fontSize: 15 }} />} />
                     )}
-                    <ActionBtn onClick={() => setSelectedId(t._id)} color="var(--tx-3)" icon={<ChevronRightRoundedIcon sx={{ fontSize: 16 }} />} />
+                    <ActionBtn onClick={openDrawer(t._id)} title="Ver detalle" color="var(--tx-3)" icon={<ChevronRightRoundedIcon sx={{ fontSize: 16 }} />} />
                   </div>
                 </div>
               )
@@ -250,7 +251,7 @@ const Cubiertas = () => {
         )}
       </div>
 
-      {selectedId && <TireDrawer tireId={selectedId} onClose={() => setSelectedId(null)} />}
+      {selectedId && <TireDrawer tireId={selectedId} initialAction={pendingAction} onClose={closeDrawer} />}
     </div>
   )
 }
@@ -262,12 +263,8 @@ const Row = ({ label, value, valueColor, mono, strong }) => (
   </div>
 )
 
-const ActionBtn = ({ onClick, color, icon }) => (
-  <button
-    onClick={onClick}
-    className="flex h-9 w-9 items-center justify-center rounded-[8px]"
-    style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color }}
-  >
+const ActionBtn = ({ onClick, color, icon, title }) => (
+  <button onClick={onClick} title={title} className="flex h-9 w-9 items-center justify-center rounded-[8px]" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color }}>
     {icon}
   </button>
 )

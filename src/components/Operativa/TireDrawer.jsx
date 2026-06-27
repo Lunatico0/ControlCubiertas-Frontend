@@ -29,13 +29,13 @@ const InfoRow = ({ label, value, mono, color }) => (
   </div>
 )
 
-const TireDrawer = ({ tireId, onClose }) => {
+const TireDrawer = ({ tireId, initialAction, onClose }) => {
   const { tires, orders, data } = useContext(ApiContext)
   const vehicles = data?.vehicles || []
 
   const [tire, setTire] = useState(null)
   const [loading, setLoading] = useState(true)
-  const [action, setAction] = useState(null) // null | "assign" | "unassign" | "recap"
+  const [action, setAction] = useState(initialAction || null) // null | "assign" | "unassign" | "recap"
   const [form, setForm] = useState({})
 
   // Acciones reales del ApiContext. tires.* (handlers) ya hacen replaceTireInList →
