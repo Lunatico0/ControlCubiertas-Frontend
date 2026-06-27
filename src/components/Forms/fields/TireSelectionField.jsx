@@ -1,6 +1,6 @@
 import { input, colors } from "@utils/tokens"
 import SelectedTiresList from "./SelectedTiresList"
-import TireField from '@components/Forms/fields'
+import TireField from '@components/Forms/fields/TireField'
 
 const TireSelectionField = ({
   availableTires,
