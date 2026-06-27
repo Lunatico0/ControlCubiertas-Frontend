@@ -31,7 +31,7 @@ const Inicio = ({ onNavigate }) => {
   const soon = (m) => showToast("info", m)
 
   const TILES = [
-    { key: "alta", title: "Alta de cubierta", sub: "Registrar una nueva", icon: <AddRoundedIcon />, primary: true, onClick: () => soon("Alta de cubierta — próximo hito") },
+    { key: "alta", title: "Alta de cubierta", sub: "Registrar una nueva", icon: <AddRoundedIcon />, primary: true, onClick: () => onNavigate("cubiertas", { alta: true }) },
     { key: "buscar", title: "Buscar cubierta", sub: "Ver el inventario", icon: <TripOriginRoundedIcon />, accent: "var(--ink-lime)", onClick: () => onNavigate("cubiertas") },
     { key: "asignar", title: "Asignar a vehículo", sub: "Montar una cubierta", icon: <LocalShippingOutlinedIcon />, accent: "var(--ink-blue)", onClick: () => onNavigate("cubiertas", { tab: "stock" }) },
     { key: "comp", title: "Comprobantes", sub: "Imprimir / reimprimir", icon: <ReceiptLongRoundedIcon />, accent: "var(--ink-purple)", onClick: () => onNavigate("comprobantes") },

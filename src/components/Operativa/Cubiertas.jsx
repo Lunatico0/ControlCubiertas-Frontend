@@ -12,6 +12,7 @@ import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded"
 import ArrowUpwardRoundedIcon from "@mui/icons-material/ArrowUpwardRounded"
 import { metaOf, tint, fmtKm, fmtDate, StateBadge, Pips } from "./status"
 import TireDrawer from "./TireDrawer"
+import AltaDrawer from "./AltaDrawer"
 
 const TABS = [
   { key: "todas", label: "Todas" },
@@ -49,6 +50,7 @@ const Cubiertas = ({ intent }) => {
   const [view, setView] = useState("table")
   const [selectedId, setSelectedId] = useState(null)
   const [pendingAction, setPendingAction] = useState(null)
+  const [showAlta, setShowAlta] = useState(false)
   const [sortBy, setSortBy] = useState("code")
   const [sortDir, setSortDir] = useState("asc")
   const searchRef = useRef(null)
@@ -70,6 +72,7 @@ const Cubiertas = ({ intent }) => {
     if (!intent) return
     if (intent.query != null) setQuery(intent.query)
     if (intent.tab) setTab(intent.tab)
+    if (intent.alta) setShowAlta(true)
   }, [intent])
 
   const counts = useMemo(
@@ -136,7 +139,7 @@ const Cubiertas = ({ intent }) => {
               {SHORTCUT_LABEL}
             </span>
           </div>
-          <button onClick={() => showToast("info", "Alta de cubierta — próximo hito")} className="ml-auto inline-flex h-[46px] items-center gap-2 rounded-[11px] px-[18px] text-[14.5px] font-bold" style={{ background: "var(--ink-lime)", color: "#0A0C0D" }}>
+          <button onClick={() => setShowAlta(true)} className="ml-auto inline-flex h-[46px] items-center gap-2 rounded-[11px] px-[18px] text-[14.5px] font-bold" style={{ background: "var(--ink-lime)", color: "#0A0C0D" }}>
             <AddRoundedIcon sx={{ fontSize: 18 }} /> Alta de cubierta
           </button>
         </div>
@@ -259,6 +262,7 @@ const Cubiertas = ({ intent }) => {
       </div>
 
       {selectedId && <TireDrawer tireId={selectedId} initialAction={pendingAction} onClose={closeDrawer} />}
+      {showAlta && <AltaDrawer onClose={() => setShowAlta(false)} />}
     </div>
   )
 }
