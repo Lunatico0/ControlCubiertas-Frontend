@@ -7,6 +7,7 @@ import DashboardRoundedIcon from "@mui/icons-material/DashboardRounded"
 import GroupRoundedIcon from "@mui/icons-material/GroupRounded"
 import ApartmentRoundedIcon from "@mui/icons-material/ApartmentRounded"
 import CreditCardRoundedIcon from "@mui/icons-material/CreditCardRounded"
+import ReceiptLongRoundedIcon from "@mui/icons-material/ReceiptLongRounded"
 import LocalShippingRoundedIcon from "@mui/icons-material/LocalShippingRounded"
 import LaunchRoundedIcon from "@mui/icons-material/LaunchRounded"
 import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded"
@@ -18,6 +19,7 @@ const navItems = [
   { to: "/admin", end: true, label: "Resumen", icon: <DashboardRoundedIcon fontSize="small" /> },
   { to: "/admin/usuarios", label: "Usuarios", icon: <GroupRoundedIcon fontSize="small" /> },
   { to: "/admin/empresa", label: "Empresa", icon: <ApartmentRoundedIcon fontSize="small" /> },
+  { to: "/admin/comprobante", label: "Comprobante", icon: <ReceiptLongRoundedIcon fontSize="small" /> },
 ]
 
 const linkClass = ({ isActive }) =>

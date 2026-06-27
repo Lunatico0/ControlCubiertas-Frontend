@@ -11,6 +11,7 @@ import AdminLayout from '@components/Portal/AdminLayout.jsx'
 import Dashboard from '@components/Portal/Dashboard.jsx'
 import Users from '@components/Portal/Users.jsx'
 import CompanySettings from '@components/Portal/CompanySettings.jsx'
+import EditorComprobante from '@components/Portal/EditorComprobante.jsx'
 import OperativaLayout from '@components/Operativa/OperativaLayout.jsx'
 
 function App() {
@@ -42,6 +43,16 @@ function App() {
             <Route path="usuarios" element={<Users />} />
             <Route path="empresa" element={<CompanySettings />} />
           </Route>
+
+          {/* Editor de comprobante: pantalla full propia (design system operativo), gateada por rol. */}
+          <Route
+            path="/admin/comprobante"
+            element={
+              <RequireAuth requireAdmin>
+                <EditorComprobante />
+              </RequireAuth>
+            }
+          />
 
           {/* Rediseño de la operación (work-in-progress) — preview sin romper la actual. */}
           <Route
