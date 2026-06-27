@@ -33,7 +33,7 @@ const OperativaLayout = () => {
   return (
     <div
       data-app-theme={isDarkMode ? "dark" : "light"}
-      className="flex h-screen w-full overflow-hidden"
+      className="flex h-screen w-full overflow-hidden text-left"
       style={{ background: "var(--bg)", color: "var(--tx)", fontFamily: "'IBM Plex Sans',system-ui,sans-serif" }}
     >
       {/* ============ SIDEBAR ============ */}
