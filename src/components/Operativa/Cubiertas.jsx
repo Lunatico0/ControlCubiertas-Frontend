@@ -39,7 +39,7 @@ const GRID_COLS = "0.8fr 1fr 1.2fr 0.9fr 0.6fr 0.8fr 1.1fr"
 const IS_MAC = typeof navigator !== "undefined" && /Mac|iPhone|iPad|iPod/i.test(navigator.platform || navigator.userAgent || "")
 const SHORTCUT_LABEL = IS_MAC ? "⌘K" : "Ctrl K"
 
-const Cubiertas = () => {
+const Cubiertas = ({ intent }) => {
   const { data, ui } = useContext(ApiContext)
   const tires = data?.tires || []
   const loading = ui?.loading
@@ -64,6 +64,13 @@ const Cubiertas = () => {
     window.addEventListener("keydown", onKey)
     return () => window.removeEventListener("keydown", onKey)
   }, [])
+
+  // Aplica la intención de navegación que llega desde Inicio (búsqueda o filtro).
+  useEffect(() => {
+    if (!intent) return
+    if (intent.query != null) setQuery(intent.query)
+    if (intent.tab) setTab(intent.tab)
+  }, [intent])
 
   const counts = useMemo(
     () => ({

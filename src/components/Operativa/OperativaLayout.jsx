@@ -10,6 +10,7 @@ import DarkModeRoundedIcon from "@mui/icons-material/DarkModeRounded"
 import LightModeRoundedIcon from "@mui/icons-material/LightModeRounded"
 import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded"
 import Cubiertas from "./Cubiertas"
+import Inicio from "./Inicio"
 
 // Shell de la app operativa (rediseño Claude Design). Usa el design system de
 // tokens (var(--x)) + data-app-theme para tema claro/oscuro. Las pantallas internas
@@ -26,6 +27,12 @@ const OperativaLayout = () => {
   const { isDarkMode, toggleTheme } = useTheme()
   const { user, logout } = useAuth()
   const [active, setActive] = useState("cubiertas")
+  const [intent, setIntent] = useState(null) // intención de navegación para Cubiertas (query/tab)
+
+  const navigate = (section, intentData = null) => {
+    setIntent(intentData)
+    setActive(section)
+  }
 
   const displayName = user?.name || user?.email?.split("@")[0] || "Operario"
   const initials = displayName.slice(0, 2).toUpperCase()
@@ -62,7 +69,7 @@ const OperativaLayout = () => {
             return (
               <div
                 key={item.key}
-                onClick={() => setActive(item.key)}
+                onClick={() => navigate(item.key)}
                 className="flex cursor-pointer items-center gap-[13px] rounded-[9px] px-[13px] py-3 text-[14.5px] transition-colors"
                 style={{
                   fontWeight: on ? 600 : 500,
@@ -122,8 +129,10 @@ const OperativaLayout = () => {
       {/* ============ MAIN ============ */}
       <main className="relative flex min-w-0 flex-1 flex-col overflow-hidden">
         <div className="flex-1 overflow-auto">
-          {active === "cubiertas" ? (
-            <Cubiertas />
+          {active === "inicio" ? (
+            <Inicio onNavigate={navigate} />
+          ) : active === "cubiertas" ? (
+            <Cubiertas intent={intent} />
           ) : (
             <div className="mx-auto flex h-full max-w-[900px] flex-col items-center justify-center gap-3 p-8 text-center">
               <div className="text-[22px] font-bold" style={{ fontFamily: "'Space Grotesk'", color: "var(--tx)" }}>
