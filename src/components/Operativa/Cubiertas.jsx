@@ -9,19 +9,8 @@ import LocalShippingOutlinedIcon from "@mui/icons-material/LocalShippingOutlined
 import RemoveRoundedIcon from "@mui/icons-material/RemoveRounded"
 import CheckRoundedIcon from "@mui/icons-material/CheckRounded"
 import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded"
-
-// Mapa estado → color del design system + nivel de recapado (pips).
-const STATUS_META = {
-  "Nueva": { color: "var(--st-lime)", level: 0 },
-  "1er Recapado": { color: "var(--st-teal)", level: 1 },
-  "2do Recapado": { color: "var(--st-blue)", level: 2 },
-  "3er Recapado": { color: "var(--st-purple)", level: 3 },
-  "A recapar": { color: "var(--st-orange)", level: 0 },
-  "Descartada": { color: "var(--st-red)", level: 0 },
-}
-const metaOf = (status) => STATUS_META[status] || { color: "var(--tx-5)", level: 0 }
-const tint = (color, pct) => `color-mix(in srgb, ${color} ${pct}%, transparent)`
-const fmtKm = (n) => `${(n ?? 0).toLocaleString("es-AR")} km`
+import { metaOf, tint, fmtKm, StateBadge, Pips } from "./status"
+import TireDrawer from "./TireDrawer"
 
 const TABS = [
   { key: "todas", label: "Todas" },
@@ -29,27 +18,6 @@ const TABS = [
   { key: "circulacion", label: "En circulación" },
   { key: "recapar", label: "A recapar" },
 ]
-
-const StateBadge = ({ status, small }) => {
-  const m = metaOf(status)
-  return (
-    <span
-      className="inline-flex items-center gap-1.5 rounded-full font-semibold"
-      style={{ color: m.color, background: tint(m.color, 14), padding: small ? "3px 10px" : "4px 10px", fontSize: "11.5px" }}
-    >
-      <span className="rounded-full" style={{ width: 6, height: 6, background: m.color }} />
-      {status}
-    </span>
-  )
-}
-
-const Pips = ({ level }) => (
-  <div className="flex gap-[5px]">
-    {[0, 1, 2].map((i) => (
-      <span key={i} className="rounded-[3px]" style={{ width: 18, height: 6, background: i < level ? "var(--st-teal)" : "var(--bd-strong)" }} />
-    ))}
-  </div>
-)
 
 const Cubiertas = () => {
   const { data, ui } = useContext(ApiContext)
@@ -59,6 +27,7 @@ const Cubiertas = () => {
   const [query, setQuery] = useState("")
   const [tab, setTab] = useState("todas")
   const [view, setView] = useState("table") // tabla densa por defecto (decisión del brief)
+  const [selectedId, setSelectedId] = useState(null)
   const searchRef = useRef(null)
 
   // Atajo "/" para enfocar la búsqueda.
@@ -209,7 +178,7 @@ const Cubiertas = () => {
               return (
                 <div
                   key={t._id}
-                  onClick={() => soon("Detalle de cubierta — próximo hito (drawer)")}
+                  onClick={() => setSelectedId(t._id)}
                   className="flex cursor-pointer flex-col gap-[13px] rounded-[13px] p-4"
                   style={{ border: "1px solid var(--bd)", background: "var(--card)" }}
                 >
@@ -251,7 +220,7 @@ const Cubiertas = () => {
                   className="grid items-center gap-3 py-3 pl-[14px] pr-[18px]"
                   style={{ gridTemplateColumns: "0.9fr 1.1fr 1.2fr 1fr 0.7fr 1.2fr", borderLeft: `4px solid ${m.color}`, borderBottom: "1px solid var(--bd-faint)" }}
                 >
-                  <div className="cursor-pointer" onClick={() => soon("Detalle de cubierta — próximo hito (drawer)")}>
+                  <div className="cursor-pointer" onClick={() => setSelectedId(t._id)}>
                     <div className="text-[15px] font-bold" style={{ fontFamily: "'Space Grotesk'", color: "var(--tx)" }}>#{t.code}</div>
                     <div className="text-[10.5px]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-6)" }}>{t.serialNumber || "—"}</div>
                   </div>
@@ -272,7 +241,7 @@ const Cubiertas = () => {
                     {t.status === "A recapar" && (
                       <ActionBtn onClick={() => soon("Recapado listo — próximo hito")} color="var(--ink-teal)" icon={<CheckRoundedIcon sx={{ fontSize: 15 }} />} />
                     )}
-                    <ActionBtn onClick={() => soon("Detalle — próximo hito (drawer)")} color="var(--tx-3)" icon={<ChevronRightRoundedIcon sx={{ fontSize: 16 }} />} />
+                    <ActionBtn onClick={() => setSelectedId(t._id)} color="var(--tx-3)" icon={<ChevronRightRoundedIcon sx={{ fontSize: 16 }} />} />
                   </div>
                 </div>
               )
@@ -280,6 +249,8 @@ const Cubiertas = () => {
           </div>
         )}
       </div>
+
+      {selectedId && <TireDrawer tireId={selectedId} onClose={() => setSelectedId(null)} />}
     </div>
   )
 }
