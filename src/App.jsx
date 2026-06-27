@@ -11,6 +11,7 @@ import AdminLayout from '@components/Portal/AdminLayout.jsx'
 import Dashboard from '@components/Portal/Dashboard.jsx'
 import Users from '@components/Portal/Users.jsx'
 import CompanySettings from '@components/Portal/CompanySettings.jsx'
+import OperativaLayout from '@components/Operativa/OperativaLayout.jsx'
 
 function App() {
   useUpdater()
@@ -42,7 +43,19 @@ function App() {
             <Route path="empresa" element={<CompanySettings />} />
           </Route>
 
-          {/* App operativa: protegida + ApiProvider (que carga datos en el mount). */}
+          {/* Rediseño de la operación (work-in-progress) — preview sin romper la actual. */}
+          <Route
+            path="/op"
+            element={
+              <RequireAuth>
+                <ApiProvider>
+                  <OperativaLayout />
+                </ApiProvider>
+              </RequireAuth>
+            }
+          />
+
+          {/* App operativa actual: protegida + ApiProvider (que carga datos en el mount). */}
           <Route
             path="/*"
             element={

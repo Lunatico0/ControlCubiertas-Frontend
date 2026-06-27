@@ -56,3 +56,29 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+/* ============================================================================
+   DESIGN SYSTEM — App operativa (Claude Design). Tokens en CSS vars; el tema se
+   conmuta con el atributo data-app-theme en el contenedor raíz del shell. Se usan
+   vía style inline o arbitrary values: style={{background:"var(--card)"}}.
+   ============================================================================ */
+:root,
+[data-app-theme="dark"] {
+  --bg:#0A0C0D; --sidebar:#070809; --card:#121517; --elev:#0E1112; --input:#0C0E0F; --hover:#15191B; --toast:#1A1E20;
+  --bd:#21262A; --bd-soft:#1C2124; --bd-faint:#181C1E; --bd-strong:#2A3033; --bd-2:#23282B; --bd-hover:#3A4145;
+  --tx:#FFFFFF; --tx-2:#D6D9D5; --tx-3:#9AA0A4; --tx-4:#8B9197; --tx-5:#7B8186; --tx-6:#6B7177; --tx-7:#5E646A;
+  --ink-lime:#C4ED2B; --ink-teal:#3FD9BE; --ink-orange:#F0A85A; --ink-blue:#6E97F5; --ink-purple:#9D90F5; --ink-red:#F0716A;
+  --st-lime:#C4ED2B; --st-teal:#1FD0B4; --st-blue:#6E97F5; --st-purple:#B39CF7; --st-orange:#F0851F; --st-red:#F0564A;
+  --scroll:#23282B;
+}
+[data-app-theme="light"] {
+  --bg:#ECEFE8; --sidebar:#FFFFFF; --card:#FFFFFF; --elev:#F5F7F1; --input:#F0F2EB; --hover:#ECEFE5; --toast:#FFFFFF;
+  --bd:#E3E7DC; --bd-soft:#ECEFE6; --bd-faint:#EAEDE4; --bd-strong:#D7DBCE; --bd-2:#E3E7DC; --bd-hover:#C2C8B6;
+  --tx:#15170F; --tx-2:#3C4234; --tx-3:#5C6353; --tx-4:#6B7262; --tx-5:#838A76; --tx-6:#969D86; --tx-7:#A7AE9A;
+  --ink-lime:#4C7A07; --ink-teal:#0A8A6F; --ink-orange:#C25A0E; --ink-blue:#2350D8; --ink-purple:#7B3FD6; --ink-red:#CF2417;
+  --st-lime:#6FAF0A; --st-teal:#06AE8C; --st-blue:#2E63E6; --st-purple:#8A47E0; --st-orange:#E86A0C; --st-red:#E12414;
+  --scroll:#D7DBCE;
+}
+/* Animaciones del rediseño (drawer/toast) — se usan en hitos posteriores. */
+@keyframes opDrawerIn { from { transform: translateX(24px); opacity:.4 } to { transform: translateX(0); opacity:1 } }
+@keyframes opToastIn  { from { transform: translateY(14px); opacity:0 } to { transform: translateY(0); opacity:1 } }
