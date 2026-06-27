@@ -5,12 +5,12 @@ import HomeRoundedIcon from "@mui/icons-material/HomeRounded"
 import TripOriginRoundedIcon from "@mui/icons-material/TripOriginRounded"
 import LocalShippingOutlinedIcon from "@mui/icons-material/LocalShippingOutlined"
 import ReceiptLongRoundedIcon from "@mui/icons-material/ReceiptLongRounded"
-import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined"
 import DarkModeRoundedIcon from "@mui/icons-material/DarkModeRounded"
 import LightModeRoundedIcon from "@mui/icons-material/LightModeRounded"
 import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded"
 import Cubiertas from "./Cubiertas"
 import Inicio from "./Inicio"
+import Vehiculos from "./Vehiculos"
 
 // Shell de la app operativa (rediseño Claude Design). Usa el design system de
 // tokens (var(--x)) + data-app-theme para tema claro/oscuro. Las pantallas internas
@@ -20,7 +20,6 @@ const NAV = [
   { key: "cubiertas", label: "Cubiertas", icon: <TripOriginRoundedIcon sx={{ fontSize: 20 }} /> },
   { key: "vehiculos", label: "Vehículos", icon: <LocalShippingOutlinedIcon sx={{ fontSize: 20 }} /> },
   { key: "comprobantes", label: "Comprobantes", icon: <ReceiptLongRoundedIcon sx={{ fontSize: 20 }} /> },
-  { key: "config", label: "Configuración", icon: <SettingsOutlinedIcon sx={{ fontSize: 20 }} /> },
 ]
 
 const OperativaLayout = () => {
@@ -133,6 +132,8 @@ const OperativaLayout = () => {
             <Inicio onNavigate={navigate} />
           ) : active === "cubiertas" ? (
             <Cubiertas intent={intent} />
+          ) : active === "vehiculos" ? (
+            <Vehiculos onNavigate={navigate} />
           ) : (
             <div className="mx-auto flex h-full max-w-[900px] flex-col items-center justify-center gap-3 p-8 text-center">
               <div className="text-[22px] font-bold" style={{ fontFamily: "'Space Grotesk'", color: "var(--tx)" }}>
