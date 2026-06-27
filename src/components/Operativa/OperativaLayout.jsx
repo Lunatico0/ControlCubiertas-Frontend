@@ -9,6 +9,7 @@ import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined"
 import DarkModeRoundedIcon from "@mui/icons-material/DarkModeRounded"
 import LightModeRoundedIcon from "@mui/icons-material/LightModeRounded"
 import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded"
+import Cubiertas from "./Cubiertas"
 
 // Shell de la app operativa (rediseño Claude Design). Usa el design system de
 // tokens (var(--x)) + data-app-theme para tema claro/oscuro. Las pantallas internas
@@ -121,12 +122,16 @@ const OperativaLayout = () => {
       {/* ============ MAIN ============ */}
       <main className="relative flex min-w-0 flex-1 flex-col overflow-hidden">
         <div className="flex-1 overflow-auto">
-          <div className="mx-auto flex h-full max-w-[900px] flex-col items-center justify-center gap-3 p-8 text-center">
-            <div className="text-[22px] font-bold" style={{ fontFamily: "'Space Grotesk'", color: "var(--tx)" }}>
-              {NAV.find((n) => n.key === active)?.label}
+          {active === "cubiertas" ? (
+            <Cubiertas />
+          ) : (
+            <div className="mx-auto flex h-full max-w-[900px] flex-col items-center justify-center gap-3 p-8 text-center">
+              <div className="text-[22px] font-bold" style={{ fontFamily: "'Space Grotesk'", color: "var(--tx)" }}>
+                {NAV.find((n) => n.key === active)?.label}
+              </div>
+              <p style={{ color: "var(--tx-4)" }}>Pantalla en construcción — próximo hito del rediseño.</p>
             </div>
-            <p style={{ color: "var(--tx-4)" }}>Pantalla en construcción — próximo hito del rediseño.</p>
-          </div>
+          )}
         </div>
       </main>
     </div>
