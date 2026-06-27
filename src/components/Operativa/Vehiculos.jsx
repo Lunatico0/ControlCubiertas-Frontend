@@ -3,8 +3,8 @@ import ApiContext from "@context/apiContext"
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded"
 import AddRoundedIcon from "@mui/icons-material/AddRounded"
 import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded"
-import { showToast } from "@utils/toast"
 import { tint } from "./status"
+import NuevoVehiculo from "./NuevoVehiculo"
 
 // Lista de vehículos del tenant. Coherente con el inventario (tabla densa + search).
 // Las cubiertas montadas se cuentan desde data.tires (tire.vehicle), NO desde
@@ -18,6 +18,7 @@ const Vehiculos = ({ onNavigate }) => {
   const tires = data?.tires || []
   const loading = ui?.loading
   const [query, setQuery] = useState("")
+  const [showAlta, setShowAlta] = useState(false)
 
   const mounted = useMemo(() => {
     const m = {}
@@ -62,7 +63,7 @@ const Vehiculos = ({ onNavigate }) => {
               onBlur={(e) => (e.target.style.borderColor = "var(--bd)")}
             />
           </div>
-          <button onClick={() => showToast("info", "Alta de vehículo — próximo hito")} className="ml-auto inline-flex h-[46px] items-center gap-2 rounded-[11px] px-[18px] text-[14.5px] font-bold" style={{ background: "var(--ink-lime)", color: "#0A0C0D" }}>
+          <button onClick={() => setShowAlta(true)} className="ml-auto inline-flex h-[46px] items-center gap-2 rounded-[11px] px-[18px] text-[14.5px] font-bold" style={{ background: "var(--ink-lime)", color: "var(--bg)" }}>
             <AddRoundedIcon sx={{ fontSize: 18 }} /> Nuevo vehículo
           </button>
         </div>
@@ -112,6 +113,8 @@ const Vehiculos = ({ onNavigate }) => {
           </div>
         )}
       </div>
+
+      {showAlta && <NuevoVehiculo onClose={() => setShowAlta(false)} />}
     </div>
   )
 }
