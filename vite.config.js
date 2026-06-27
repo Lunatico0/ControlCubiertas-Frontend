@@ -9,7 +9,8 @@ const isElectron = process.env.BUILD_TARGET === 'electron';
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
-  base: './',
+  // Electron carga por file:// (rutas relativas); web/Vercel sirve desde la raíz del dominio.
+  base: isElectron ? './' : '/',
   build: {
     outDir: isElectron ? '../desktop/build' : 'dist',
     emptyOutDir: true,
