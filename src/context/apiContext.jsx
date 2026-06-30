@@ -15,7 +15,7 @@ import {
   updateTireDataCorrection,
 } from "../api/tires"
 
-import { fetchAllVehicles, fetchVehicleById, createVehicle, updateVehicle, updateDetails } from "../api/vehicles"
+import { fetchAllVehicles, fetchVehicleById, createVehicle, updateVehicle, updateDetails, updateVehicleAxles } from "../api/vehicles"
 
 import { checkOrderNumber } from "../api/orders"
 
@@ -351,6 +351,22 @@ export const ApiProvider = ({ children }) => {
     [replaceVehicleInList]
   )
 
+  const handleUpdateVehicleAxles = useCallback(
+    async (id, data) => {
+      try {
+        setError(null)
+        const result = await updateVehicleAxles(id, data)
+        await loadVehicles()
+        return result
+      } catch (err) {
+        console.error("Error configurando ejes del vehículo:", err)
+        setError("Error al configurar ejes: " + err.message)
+        throw err
+      }
+    },
+    [loadVehicles]
+  )
+
   // ========== FUNCIONES DE ORDERS ==========
 
   const handleCheckOrderNumber = useCallback(async (orderNumber) => {
@@ -513,6 +529,7 @@ export const ApiProvider = ({ children }) => {
       create: handleCreateVehicle,
       update: handleUpdateVehicle,
       updateData: handleUpdateVehicleDetails,
+      updateAxles: handleUpdateVehicleAxles,
       loadById: loadVehicleById,
     },
 

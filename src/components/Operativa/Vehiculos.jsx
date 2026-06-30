@@ -7,9 +7,11 @@ import LocalShippingOutlinedIcon from "@mui/icons-material/LocalShippingOutlined
 import TripOriginRoundedIcon from "@mui/icons-material/TripOriginRounded"
 import GridViewRoundedIcon from "@mui/icons-material/GridViewRounded"
 import ViewListRoundedIcon from "@mui/icons-material/ViewListRounded"
+import ReportProblemRoundedIcon from "@mui/icons-material/ReportProblemRounded"
 import { metaOf, tint, fmtKm } from "./status"
 import { generatePositions } from "./axles"
 import NuevoVehiculo from "./NuevoVehiculo"
+import ConfigurarEjes from "./ConfigurarEjes"
 
 // Lista de vehículos (rediseño Claude Design). Dos vistas con toggle (persistido por
 // device): CARDS con el esquema de ejes/posiciones, y TABLA densa. El esquema se deriva
@@ -26,6 +28,8 @@ const Vehiculos = ({ onNavigate }) => {
   const loading = ui?.loading
   const [query, setQuery] = useState("")
   const [showAlta, setShowAlta] = useState(false)
+  const [showConfigEjes, setShowConfigEjes] = useState(false)
+  const pendingAxles = vehicles.filter((v) => !(v.axles && v.axles.length)).length
   const [vview, setVview] = useState(() => localStorage.getItem("op_vehview") || "grid")
   const setView = (v) => {
     setVview(v)
@@ -91,7 +95,12 @@ const Vehiculos = ({ onNavigate }) => {
             <span className="absolute left-[15px] top-1/2 -translate-y-1/2" style={{ color: "var(--tx-7)" }}><SearchRoundedIcon sx={{ fontSize: 18 }} /></span>
             <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Buscar móvil, patente o marca…" className="h-[46px] w-full rounded-[11px] pl-[42px] pr-4 text-[14.5px] outline-none" style={inputStyle} onFocus={(e) => (e.target.style.borderColor = "var(--ink-lime)")} onBlur={(e) => (e.target.style.borderColor = "var(--bd)")} />
           </div>
-          <button onClick={() => setShowAlta(true)} className="ml-auto inline-flex h-[46px] items-center gap-2 rounded-[11px] px-[18px] text-[14.5px] font-bold" style={{ background: "var(--ink-lime)", color: "var(--bg)" }}>
+          {pendingAxles > 0 && (
+            <button onClick={() => setShowConfigEjes(true)} title="Configurar ejes de vehículos migrados" className="ml-auto inline-flex h-[46px] items-center gap-2 rounded-[11px] px-4 text-[13.5px] font-semibold" style={{ color: "var(--ink-orange)", background: tint("var(--ink-orange)", 12), border: `1px solid ${tint("var(--ink-orange)", 30)}` }}>
+              <ReportProblemRoundedIcon sx={{ fontSize: 17 }} /> Configurar ejes ({pendingAxles})
+            </button>
+          )}
+          <button onClick={() => setShowAlta(true)} className={`${pendingAxles > 0 ? "" : "ml-auto "}inline-flex h-[46px] items-center gap-2 rounded-[11px] px-[18px] text-[14.5px] font-bold`} style={{ background: "var(--ink-lime)", color: "var(--bg)" }}>
             <AddRoundedIcon sx={{ fontSize: 18 }} /> Nuevo vehículo
           </button>
           {/* toggle cards/tabla */}
@@ -177,6 +186,7 @@ const Vehiculos = ({ onNavigate }) => {
       </div>
 
       {showAlta && <NuevoVehiculo onClose={() => setShowAlta(false)} />}
+      {showConfigEjes && <ConfigurarEjes onClose={() => setShowConfigEjes(false)} />}
     </div>
   )
 }
