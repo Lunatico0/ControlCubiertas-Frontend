@@ -9,6 +9,7 @@ import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded"
 import LocalShippingOutlinedIcon from "@mui/icons-material/LocalShippingOutlined"
 import RemoveRoundedIcon from "@mui/icons-material/RemoveRounded"
 import CheckRoundedIcon from "@mui/icons-material/CheckRounded"
+import { buildAssignPrintData, buildUnassignPrintData, buildFinishRecapPrintData } from "@utils/print-data"
 import { metaOf, tint, fmtKm, fmtDate, StateBadge, Pips } from "./status"
 
 const RECAP_STATES = ["1er Recapado", "2do Recapado", "3er Recapado"]
@@ -42,9 +43,9 @@ const TireDrawer = ({ tireId, initialAction, onClose }) => {
 
   // Acciones reales del ApiContext. tires.* (handlers) ya hacen replaceTireInList →
   // la LISTA se refresca sola. El `refresh` re-fetchea el drawer (historial fresco).
-  const assignAct = useTireAction({ apiCall: tires.assign, successMessage: "Cubierta asignada con éxito" })
-  const unassignAct = useTireAction({ apiCall: tires.unassign, successMessage: "Cubierta desasignada" })
-  const recapAct = useTireAction({ apiCall: tires.updateStatus, successMessage: "Recapado registrado" })
+  const assignAct = useTireAction({ apiCall: tires.assign, successMessage: "Cubierta asignada con éxito", printBuilder: buildAssignPrintData })
+  const unassignAct = useTireAction({ apiCall: tires.unassign, successMessage: "Cubierta desasignada", printBuilder: buildUnassignPrintData })
+  const recapAct = useTireAction({ apiCall: tires.updateStatus, successMessage: "Recapado registrado", printBuilder: buildFinishRecapPrintData })
   const submitting = assignAct.isSubmitting || unassignAct.isSubmitting || recapAct.isSubmitting
 
   const load = (id) =>
