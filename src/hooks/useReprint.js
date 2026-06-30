@@ -3,6 +3,7 @@ import { showToast } from "@utils/toast"
 import usePrintEngine from "./usePrintEngine"
 import { buildReprintData } from "@utils/print-data"
 import { generateReceiptHTML } from "@utils/receipt-html"
+import { getCompanyCached } from "@api/company"
 
 export const useReprint = () => {
   const { printHtml, isPrinting } = usePrintEngine()
@@ -12,8 +13,9 @@ export const useReprint = () => {
   const execute = useCallback(
     async ({ entry, tire }) => {
       try {
+        const company = await getCompanyCached()
         const data = buildReprintData(entry, tire)
-        const html = generateReceiptHTML(data, layoutMode)
+        const html = generateReceiptHTML(data, layoutMode, company?.receiptDesign, company)
         const title = `Reimpresión-${data?.receiptNumber || "recibo"}`
 
         const result = await printHtml(html, title)

@@ -1,16 +1,6 @@
 import usePrintEngine from "./usePrintEngine"
 import { generateReceiptHTML } from "@utils/receipt-html"
-import { fetchCompany } from "@api/company"
-
-// El diseño del comprobante (receiptDesign) y los datos de empresa cambian rara vez;
-// los traemos UNA vez por sesión y los cacheamos. Si el fetch falla (ej: backend viejo
-// sin /api/company), queda null → generateReceiptHTML usa sus defaults (TMBC histórico),
-// así la impresión nunca se rompe por esto.
-let companyPromise = null
-const getCompanyCached = () => {
-  if (!companyPromise) companyPromise = fetchCompany().catch(() => null)
-  return companyPromise
-}
+import { getCompanyCached } from "@api/company"
 
 export const usePrint = () => {
   const { printHtml, isPrinting } = usePrintEngine()

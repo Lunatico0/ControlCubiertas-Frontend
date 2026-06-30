@@ -3,12 +3,14 @@ import ApiContext from "@context/apiContext"
 import { fetchTireById } from "@api/tires"
 import { fetchVehiclePositions } from "@api/vehicles"
 import { useTireAction } from "@hooks/useTireAction"
+import { useReprint } from "@hooks/useReprint"
 import { showToast } from "@utils/toast"
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded"
 import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded"
 import LocalShippingOutlinedIcon from "@mui/icons-material/LocalShippingOutlined"
 import RemoveRoundedIcon from "@mui/icons-material/RemoveRounded"
 import CheckRoundedIcon from "@mui/icons-material/CheckRounded"
+import LocalPrintshopOutlinedIcon from "@mui/icons-material/LocalPrintshopOutlined"
 import { buildAssignPrintData, buildUnassignPrintData, buildFinishRecapPrintData } from "@utils/print-data"
 import { metaOf, tint, fmtKm, fmtDate, StateBadge, Pips } from "./status"
 
@@ -46,6 +48,7 @@ const TireDrawer = ({ tireId, initialAction, onClose }) => {
   const assignAct = useTireAction({ apiCall: tires.assign, successMessage: "Cubierta asignada con éxito", printBuilder: buildAssignPrintData })
   const unassignAct = useTireAction({ apiCall: tires.unassign, successMessage: "Cubierta desasignada", printBuilder: buildUnassignPrintData })
   const recapAct = useTireAction({ apiCall: tires.updateStatus, successMessage: "Recapado registrado", printBuilder: buildFinishRecapPrintData })
+  const reprintAct = useReprint()
   const submitting = assignAct.isSubmitting || unassignAct.isSubmitting || recapAct.isSubmitting
 
   const load = (id) =>
@@ -300,7 +303,17 @@ const TireDrawer = ({ tireId, initialAction, onClose }) => {
                           <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11.5px]" style={{ color: "var(--tx-5)" }}>
                             {h.status && <span style={{ color: hm.color }}>{h.status}</span>}
                             {(h.km != null || h.kmAlta != null) && <span style={{ fontFamily: "'IBM Plex Mono'" }}>{fmtKm(h.km ?? h.kmAlta)}</span>}
-                            {h.receiptNumber && <span style={{ fontFamily: "'IBM Plex Mono'" }}>Comp. {h.receiptNumber}</span>}
+                            {h.receiptNumber && (
+                              <button
+                                onClick={() => reprintAct.execute({ entry: h, tire })}
+                                disabled={reprintAct.isPrinting}
+                                title="Reimprimir comprobante"
+                                className="inline-flex items-center gap-1 rounded-[6px] px-2 py-0.5"
+                                style={{ fontFamily: "'IBM Plex Mono'", color: "var(--ink-lime)", border: "1px solid var(--bd-strong)", background: "var(--elev)" }}
+                              >
+                                <LocalPrintshopOutlinedIcon sx={{ fontSize: 13 }} /> Comp. {h.receiptNumber}
+                              </button>
+                            )}
                           </div>
                         </li>
                       )
