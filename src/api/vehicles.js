@@ -8,5 +8,7 @@ export const updateVehicle = async (id, data) => (await vehiclesAPI.put(`/${id}`
 export const updateDetails = async (id, data) => (await vehiclesAPI.put(`/details/${id}`, data)).data
 // Configurar el esquema de ejes de un vehículo existente (migración A4). data: { axles, kilometers? }
 export const updateVehicleAxles = async (id, data) => (await vehiclesAPI.patch(`/${id}/axles`, data)).data
+// Esquema de posiciones del vehículo + qué cubierta ocupa cada una. Para el selector al montar.
+export const fetchVehiclePositions = async (id) => (await vehiclesAPI.get(`/${id}/positions`)).data
 
 export default vehiclesAPI

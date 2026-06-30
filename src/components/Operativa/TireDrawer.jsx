@@ -1,6 +1,7 @@
 import { useState, useEffect, useContext } from "react"
 import ApiContext from "@context/apiContext"
 import { fetchTireById } from "@api/tires"
+import { fetchVehiclePositions } from "@api/vehicles"
 import { useTireAction } from "@hooks/useTireAction"
 import { showToast } from "@utils/toast"
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded"
@@ -37,6 +38,7 @@ const TireDrawer = ({ tireId, initialAction, onClose }) => {
   const [loading, setLoading] = useState(true)
   const [action, setAction] = useState(initialAction || null) // null | "assign" | "unassign" | "recap"
   const [form, setForm] = useState({})
+  const [positions, setPositions] = useState(null) // posiciones del vehículo elegido al asignar (null = sin cargar)
 
   // Acciones reales del ApiContext. tires.* (handlers) ya hacen replaceTireInList →
   // la LISTA se refresca sola. El `refresh` re-fetchea el drawer (historial fresco).
@@ -67,15 +69,27 @@ const TireDrawer = ({ tireId, initialAction, onClose }) => {
     return () => window.removeEventListener("keydown", onKey)
   }, [onClose, action])
 
+  // Al elegir vehículo en la asignación, traer su esquema de posiciones (ejes + ocupación).
+  useEffect(() => {
+    if (action !== "assign" || !form.vehicle) { setPositions(null); return }
+    let alive = true
+    fetchVehiclePositions(form.vehicle)
+      .then((d) => alive && setPositions(d.positions || []))
+      .catch(() => alive && setPositions([]))
+    return () => { alive = false }
+  }, [form.vehicle, action])
+
   const openAction = (a) => { setForm({}); setAction(a) }
   const reload = (id) => load(id) // re-fetch del drawer tras la acción → mata Bug 1
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }))
 
   const doAssign = () => {
     if (!form.vehicle || !form.kmAlta || !form.orderNumber) return showToast("warning", "Completá vehículo, km y N° de orden")
+    // Si el vehículo tiene ejes configurados, la posición es obligatoria; si no, se asigna sin posición.
+    if (positions && positions.length > 0 && !form.position) return showToast("warning", "Elegí la posición en el vehículo")
     assignAct.execute({
       tire,
-      formData: { vehicle: form.vehicle, kmAlta: Number(form.kmAlta), orderNumber: form.orderNumber, getReceiptNumber: orders.getNextReceipt },
+      formData: { vehicle: form.vehicle, kmAlta: Number(form.kmAlta), orderNumber: form.orderNumber, position: form.position || null, getReceiptNumber: orders.getNextReceipt },
       refresh: reload,
       close: () => setAction(null),
     })
@@ -147,13 +161,51 @@ const TireDrawer = ({ tireId, initialAction, onClose }) => {
                 {action === "assign" && (
                   <>
                     <Field label="Vehículo">
-                      <select className="w-full rounded-[9px] px-3 py-2.5 text-[14px] outline-none" style={fieldStyle} value={form.vehicle || ""} onChange={set("vehicle")}>
+                      <select className="w-full rounded-[9px] px-3 py-2.5 text-[14px] outline-none" style={fieldStyle} value={form.vehicle || ""} onChange={(e) => setForm((f) => ({ ...f, vehicle: e.target.value, position: "" }))}>
                         <option value="">Seleccionar vehículo…</option>
                         {vehicles.map((v) => (
                           <option key={v._id} value={v._id}>{v.mobile}{v.licensePlate ? ` · ${v.licensePlate}` : ""}</option>
                         ))}
                       </select>
                     </Field>
+
+                    {form.vehicle && positions && (
+                      positions.length === 0 ? (
+                        <div className="mb-3 rounded-[9px] px-3 py-2.5 text-[12.5px]" style={{ background: "var(--input)", border: "1px dashed var(--bd-strong)", color: "var(--tx-5)" }}>
+                          Este vehículo no tiene ejes configurados — se asignará sin posición.
+                        </div>
+                      ) : (
+                        <Field label="Posición en el vehículo">
+                          <div className="flex flex-wrap gap-2">
+                            {positions.map((p) => {
+                              const occupied = !!p.tire
+                              const selected = form.position === p.code
+                              return (
+                                <button
+                                  key={p.code}
+                                  type="button"
+                                  disabled={occupied}
+                                  onClick={() => setForm((f) => ({ ...f, position: p.code }))}
+                                  title={occupied ? `Ocupada por #${p.tire.code}` : p.label}
+                                  className="rounded-[8px] px-2.5 py-2 text-[11.5px] font-semibold"
+                                  style={{
+                                    border: `1.5px solid ${selected ? "var(--ink-lime)" : "var(--bd-strong)"}`,
+                                    background: selected ? tint("var(--ink-lime)", 14) : "var(--input)",
+                                    color: occupied ? "var(--tx-6)" : selected ? "var(--ink-lime)" : "var(--tx-2)",
+                                    fontFamily: "'IBM Plex Mono'",
+                                    cursor: occupied ? "not-allowed" : "pointer",
+                                    opacity: occupied ? 0.55 : 1,
+                                  }}
+                                >
+                                  {p.code}{occupied ? ` · #${p.tire.code}` : ""}
+                                </button>
+                              )
+                            })}
+                          </div>
+                        </Field>
+                      )
+                    )}
+
                     <Field label="Kilometraje inicial">
                       <input type="number" min="0" className="w-full rounded-[9px] px-3 py-2.5 text-[14px] outline-none" style={fieldStyle} value={form.kmAlta || ""} onChange={set("kmAlta")} placeholder="0" />
                     </Field>
