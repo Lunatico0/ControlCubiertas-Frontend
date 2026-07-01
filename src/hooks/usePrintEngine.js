@@ -22,11 +22,34 @@ const usePrintEngine = () => {
               <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
             </head>
             <body>
-              <div class="receipt-container">${htmlContent}</div>
+              <div id="print-root"><div class="receipt-container">${htmlContent}</div></div>
               <script>
                 function notifyParent(printed) {
                   if (window.opener) {
                     window.opener.postMessage({ printed }, "*");
+                  }
+                }
+
+                // Red de seguridad: si el contenido excede el área imprimible de la A4
+                // (297mm - 18mm de márgenes ≈ 1045px CSS a 96dpi), lo escala lo justo para
+                // que SIEMPRE entre en una sola hoja, sin importar cuántos datos tenga.
+                function fitToPage() {
+                  try {
+                    var root = document.getElementById("print-root");
+                    var content = root && root.querySelector(".receipt-container");
+                    if (!content) return;
+                    var maxH = 1045;
+                    var h = content.scrollHeight;
+                    if (h > maxH) {
+                      var scale = maxH / h;
+                      content.style.transformOrigin = "top left";
+                      content.style.transform = "scale(" + scale + ")";
+                      content.style.width = (100 / scale) + "%";
+                      root.style.height = maxH + "px";
+                      root.style.overflow = "hidden";
+                    }
+                  } catch (err) {
+                    console.error("fitToPage error", err);
                   }
                 }
 
@@ -47,7 +70,7 @@ const usePrintEngine = () => {
                 window.onload = function() {
                   // Esperar a que carguen las tipografías para que el impreso coincida con el preview.
                   var ready = (document.fonts && document.fonts.ready) ? document.fonts.ready : Promise.resolve();
-                  ready.then(() => setTimeout(launchPrint, 250)).catch(() => setTimeout(launchPrint, 500));
+                  ready.then(() => { fitToPage(); setTimeout(launchPrint, 250); }).catch(() => { fitToPage(); setTimeout(launchPrint, 500); });
                 };
 
                 window.addEventListener("beforeunload", () => notifyParent(true));
