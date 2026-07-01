@@ -9,9 +9,10 @@ import CloseRoundedIcon from "@mui/icons-material/CloseRounded"
 import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded"
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined"
 import UndoRoundedIcon from "@mui/icons-material/UndoRounded"
+import CheckRoundedIcon from "@mui/icons-material/CheckRounded"
 import LocalPrintshopOutlinedIcon from "@mui/icons-material/LocalPrintshopOutlined"
 import { buildAssignPrintData, buildUnassignPrintData, buildFinishRecapPrintData, buildDiscardPrintData, buildUndoPrintData, buildCorrectionPrintData } from "@utils/print-data"
-import { metaOf, tint, fmtKm, fmtDate, StateBadge, Pips, STATUS_META } from "./status"
+import { metaOf, tint, fmtKm, fmtDate, StateBadge, STATUS_META } from "./status"
 import { OpActionBtn } from "./opActions"
 
 const RECAP_STATES = ["1er Recapado", "2do Recapado", "3er Recapado"]
@@ -26,12 +27,63 @@ const Field = ({ label, children }) => (
   </div>
 )
 
-const InfoRow = ({ label, value, mono, color }) => (
-  <div className="flex items-center justify-between py-2" style={{ borderBottom: "1px solid var(--bd-faint)" }}>
-    <span className="text-[12.5px]" style={{ color: "var(--tx-5)" }}>{label}</span>
-    <span className="text-[13px] font-medium" style={{ color: color || "var(--tx-2)", fontFamily: mono ? "'IBM Plex Mono'" : undefined }}>{value}</span>
-  </div>
+// Botón chico de una entrada del timeline (Reimprimir / Corregir / Deshacer), con hover coloreable.
+const TimelineBtn = ({ onClick, disabled, icon, label, hover }) => (
+  <button
+    type="button" onClick={onClick} disabled={disabled}
+    className="inline-flex items-center gap-1.5 rounded-[7px] px-[11px] py-[5px] text-[11.5px] font-semibold"
+    style={{ border: "1px solid var(--bd-strong)", background: "var(--card)", color: "var(--tx-2)", fontFamily: "'IBM Plex Sans'", cursor: disabled ? "default" : "pointer", opacity: disabled ? 0.5 : 1 }}
+    onMouseEnter={(e) => { if (hover && !disabled) { e.currentTarget.style.borderColor = hover; e.currentTarget.style.color = hover } }}
+    onMouseLeave={(e) => { e.currentTarget.style.borderColor = "var(--bd-strong)"; e.currentTarget.style.color = "var(--tx-2)" }}
+  >
+    {icon}{label}
+  </button>
 )
+
+// ----- Lifecycle stepper (ciclo de vida de la cubierta) -----
+const RECAP_CYCLE = ["Nueva", "1er Recapado", "2do Recapado", "3er Recapado"]
+const STEP_LABELS = ["Nueva", "1er Rec.", "2do Rec.", "3er Rec.", "Baja"]
+const STEP_STYLE = {
+  done: { fill: "color-mix(in srgb, var(--ink-teal) 16%, transparent)", ring: "var(--ink-teal)", fg: "var(--ink-teal)" },
+  active: { fill: "color-mix(in srgb, var(--ink-lime) 16%, transparent)", ring: "var(--ink-lime)", fg: "var(--ink-lime)" },
+  warn: { fill: "color-mix(in srgb, var(--ink-orange) 16%, transparent)", ring: "var(--ink-orange)", fg: "var(--ink-orange)" },
+  x: { fill: "color-mix(in srgb, var(--ink-red) 16%, transparent)", ring: "var(--ink-red)", fg: "var(--ink-red)" },
+  pending: { fill: "var(--input)", ring: "var(--bd-strong)", fg: "var(--tx-6)" },
+}
+const lifecycleSteps = (tire, history) => {
+  const discarded = tire.status === "Descartada"
+  const arecapar = tire.status === "A recapar"
+  const curIdx = RECAP_CYCLE.indexOf(tire.status)
+  const seen = history.map((h) => RECAP_CYCLE.indexOf(h.status)).filter((x) => x >= 0)
+  const level = curIdx >= 0 ? curIdx : (seen.length ? Math.max(...seen) : 0)
+  return STEP_LABELS.map((label, i) => {
+    if (i === 4) return { label, kind: discarded ? "x" : "pending" }
+    if (i < level) return { label, kind: "done" }
+    if (i === level) return { label, kind: discarded ? "done" : arecapar ? "warn" : "active" }
+    return { label, kind: "pending" }
+  })
+}
+
+// Descripción legible + chips de datos para cada entrada del historial.
+const histDetail = (h) => {
+  const t = (h.type || "").toLowerCase()
+  if (t.startsWith("asign")) return `Montada${h.vehicle?.mobile ? ` en ${h.vehicle.mobile}` : " en un vehículo"}`
+  if (t.startsWith("desasign")) return "Desmontada del vehículo"
+  if (t === "alta") return "Ingreso a stock"
+  if (t.startsWith("correcc")) return "Corrección de un movimiento anterior"
+  if (h.status === "Descartada") return "Baja definitiva"
+  if (h.status) return `Cambio de estado a ${h.status}`
+  return "Movimiento"
+}
+const histBits = (h) => {
+  const bits = []
+  const km = h.km ?? h.kmAlta
+  if (km != null) bits.push({ k: "Km", val: fmtKm(km) })
+  if (h.kmBaja != null) bits.push({ k: "Km baja", val: fmtKm(h.kmBaja) })
+  if (h.orderNumber) bits.push({ k: "Orden", val: h.orderNumber })
+  if (h.receiptNumber) bits.push({ k: "Comp.", val: h.receiptNumber })
+  return bits
+}
 
 const TireDrawer = ({ tireId, initialAction, onClose }) => {
   const { tires, orders, data } = useContext(ApiContext)
@@ -178,7 +230,17 @@ const TireDrawer = ({ tireId, initialAction, onClose }) => {
 
   const history = [...(tire?.history || [])].sort((a, b) => new Date(b.date) - new Date(a.date))
   const lastReceiptEntry = history.find((h) => h.receiptNumber) // para "Imprimir recibo" (último comprobante)
-  const m = tire ? metaOf(tire.status) : null
+  const steps = tire ? lifecycleSteps(tire, history) : []
+  const infoItems = tire ? [
+    { label: "Marca", value: tire.brand || "—" },
+    { label: "Rodado", value: tire.size || "—", mono: true },
+    { label: "Dibujo", value: tire.pattern || "—" },
+    { label: "N° de serie", value: tire.serialNumber || "—", mono: true },
+    { label: "Ubicación", value: tire.vehicle?.mobile || "En depósito", accent: tire.vehicle ? "var(--ink-blue)" : undefined },
+    ...(tire.position ? [{ label: "Posición", value: tire.position, mono: true }] : []),
+    { label: "Kilómetros", value: fmtKm(tire.kilometers), mono: true },
+    { label: "Fecha de alta", value: fmtDate(tire.createdAt), mono: true },
+  ] : []
   const recapOptions = RECAP_STATES.filter((s) => RECAP_STATES.indexOf(s) > RECAP_STATES.indexOf(tire?.status))
 
   const ACTION_TITLES = { assign: "Asignar a vehículo", unassign: "Desasignar cubierta", recap: "Registrar recapado", discard: "Descartar cubierta", undo: "Deshacer entrada", editHist: "Corregir entrada de historial" }
@@ -354,24 +416,42 @@ const TireDrawer = ({ tireId, initialAction, onClose }) => {
                 </div>
               </div>
             ) : (
-              /* ---------- Vista de detalle ---------- */
-              <div className="flex-1 overflow-auto p-5">
-                <div className="mb-4 flex items-center gap-3">
-                  <span className="text-[10px] tracking-[.06em]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-6)" }}>RECAPADOS</span>
-                  <Pips level={m.level} />
+              /* ---------- Vista de detalle · sidePanel (Claude Design) ---------- */
+              <div className="flex-1 overflow-auto" style={{ padding: "22px 24px" }}>
+                {/* Lifecycle stepper */}
+                <div className="mb-4 text-[10.5px] tracking-[.06em]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-6)" }}>CICLO DE VIDA</div>
+                <div className="mb-6 flex items-start">
+                  {steps.map((st, i) => {
+                    const S = STEP_STYLE[st.kind]
+                    const prevDone = i > 0 && steps[i - 1].kind === "done"
+                    const doneLine = st.kind === "done"
+                    return (
+                      <div key={i} className="flex min-w-0 flex-1 flex-col items-center">
+                        <div className="flex w-full items-center">
+                          <div style={{ height: 2, flex: 1, background: i === 0 ? "transparent" : prevDone ? "var(--ink-teal)" : "var(--bd)" }} />
+                          <div className="flex flex-none items-center justify-center" style={{ width: 30, height: 30, borderRadius: "50%", background: S.fill, border: `2px solid ${S.ring}`, color: S.fg }}>
+                            {st.kind === "done" ? <CheckRoundedIcon sx={{ fontSize: 15 }} /> : st.kind === "x" ? <CloseRoundedIcon sx={{ fontSize: 14 }} /> : <span style={{ width: 8, height: 8, borderRadius: "50%", background: "currentColor" }} />}
+                          </div>
+                          <div style={{ height: 2, flex: 1, background: i === steps.length - 1 ? "transparent" : doneLine ? "var(--ink-teal)" : "var(--bd)" }} />
+                        </div>
+                        <div className="mt-2 text-center text-[10px] font-semibold leading-tight" style={{ color: st.kind === "pending" ? "var(--tx-6)" : S.ring, whiteSpace: "nowrap" }}>{st.label}</div>
+                      </div>
+                    )
+                  })}
                 </div>
 
-                <div className="mb-5">
-                  <InfoRow label="Marca" value={tire.brand} />
-                  <InfoRow label="Rodado" value={tire.size} mono />
-                  <InfoRow label="Dibujo" value={tire.pattern || "—"} />
-                  <InfoRow label="Ubicación" value={tire.vehicle?.mobile || "En depósito"} color={tire.vehicle ? "var(--ink-blue)" : "var(--tx-2)"} />
-                  <InfoRow label="Kilómetros" value={fmtKm(tire.kilometers)} mono />
-                  <InfoRow label="Fecha de alta" value={fmtDate(tire.createdAt)} mono />
+                {/* Info grid */}
+                <div className="mb-6 grid" style={{ gridTemplateColumns: "1fr 1fr", gap: "16px 18px", padding: "18px 19px", border: "1px solid var(--bd-soft)", borderRadius: 12, background: "var(--input)" }}>
+                  {infoItems.map((it) => (
+                    <div key={it.label}>
+                      <div className="mb-[3px] text-[11px] font-medium" style={{ color: "var(--tx-5)" }}>{it.label}</div>
+                      <div className="text-[14px] font-semibold" style={{ color: it.accent || "var(--tx)", fontFamily: it.mono ? "'IBM Plex Mono'" : undefined }}>{it.value}</div>
+                    </div>
+                  ))}
                 </div>
 
-                {/* Acciones reales (estilo Claude Design) */}
-                <div className="mb-6 flex flex-wrap gap-2">
+                {/* Acciones (estilo Claude Design) */}
+                <div className="mb-7 flex flex-wrap gap-2">
                   {!tire.vehicle && tire.status !== "Descartada" && <OpActionBtn type="assign" size={44} onClick={() => openAction("assign")} />}
                   {tire.vehicle && <OpActionBtn type="unassign" size={44} onClick={() => openAction("unassign")} />}
                   {tire.status === "A recapar" && <OpActionBtn type="recap" size={44} onClick={() => openAction("recap")} />}
@@ -380,59 +460,52 @@ const TireDrawer = ({ tireId, initialAction, onClose }) => {
                 </div>
 
                 {/* Timeline del historial */}
-                <div className="mb-2 text-[10px] tracking-[.06em]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-6)" }}>HISTORIAL</div>
+                <div className="mb-4 flex items-center justify-between">
+                  <div className="text-[10.5px] tracking-[.06em]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-6)" }}>HISTORIAL DE MOVIMIENTOS</div>
+                  <span className="rounded-full px-2.5 py-[3px] text-[11px] font-semibold" style={{ fontFamily: "'IBM Plex Mono'", background: "var(--bd-soft)", color: "var(--tx-4)" }}>{history.length}</span>
+                </div>
                 {history.length === 0 ? (
                   <p className="text-[13px]" style={{ color: "var(--tx-5)" }}>Esta cubierta todavía no tiene movimientos registrados.</p>
                 ) : (
-                  <ol className="relative ml-1" style={{ borderLeft: "1.5px solid var(--bd)" }}>
+                  <div>
                     {history.map((h, i) => {
                       const hm = metaOf(h.status)
+                      const isCorr = /^correcc/i.test(h.type || "")
+                      const last = i === history.length - 1
                       return (
-                        <li key={h._id || i} className="relative py-3 pl-5">
-                          <span className="absolute left-0 top-[18px] -translate-x-1/2 rounded-full" style={{ width: 10, height: 10, background: hm.color, boxShadow: "0 0 0 3px var(--card)" }} />
-                          <div className="flex items-center justify-between gap-2">
-                            <span className="text-[13px] font-semibold" style={{ color: "var(--tx)" }}>{h.type || "Movimiento"}</span>
-                            <span className="text-[11px]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-6)" }}>{fmtDate(h.date)}</span>
+                        <div key={h._id || i} className="flex gap-[14px]">
+                          <div className="flex flex-none flex-col items-center" style={{ width: 26 }}>
+                            <div className="flex items-center justify-center" style={{ width: 26, height: 26, borderRadius: "50%", background: tint(hm.color, 15) }}>
+                              <span style={{ width: 9, height: 9, borderRadius: "50%", background: hm.color }} />
+                            </div>
+                            {!last && <div style={{ flex: 1, width: 2, background: "var(--bd)", margin: "2px 0", minHeight: 12 }} />}
                           </div>
-                          <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11.5px]" style={{ color: "var(--tx-5)" }}>
-                            {h.status && <span style={{ color: hm.color }}>{h.status}</span>}
-                            {(h.km != null || h.kmAlta != null) && <span style={{ fontFamily: "'IBM Plex Mono'" }}>{fmtKm(h.km ?? h.kmAlta)}</span>}
-                            {h.receiptNumber && (
-                              <button
-                                onClick={() => reprintAct.execute({ entry: h, tire })}
-                                disabled={reprintAct.isPrinting}
-                                title="Reimprimir comprobante"
-                                className="inline-flex items-center gap-1 rounded-[6px] px-2 py-0.5"
-                                style={{ fontFamily: "'IBM Plex Mono'", color: "var(--ink-lime)", border: "1px solid var(--bd-strong)", background: "var(--elev)" }}
-                              >
-                                <LocalPrintshopOutlinedIcon sx={{ fontSize: 13 }} /> Comp. {h.receiptNumber}
-                              </button>
+                          <div className="min-w-0 flex-1 pb-[18px]">
+                            <div className="flex items-baseline justify-between gap-2.5">
+                              <span className="text-[14px] font-semibold" style={{ color: hm.color, fontFamily: "'Space Grotesk'" }}>{h.type || "Movimiento"}</span>
+                              <span className="flex-none text-[11.5px]" style={{ color: "var(--tx-6)", fontFamily: "'IBM Plex Mono'" }}>{fmtDate(h.date)}</span>
+                            </div>
+                            <div className="mt-[3px] text-[12.5px]" style={{ color: "var(--tx-4)" }}>{histDetail(h)}</div>
+                            {histBits(h).length > 0 && (
+                              <div className="mt-[9px] flex flex-wrap gap-[6px]">
+                                {histBits(h).map((bit, bi) => (
+                                  <span key={bi} className="rounded-[6px] px-[9px] py-[2px] text-[11px]" style={{ background: "var(--hover)", border: "1px solid var(--bd)" }}>
+                                    <span style={{ color: "var(--tx-6)" }}>{bit.k} </span>
+                                    <span style={{ fontFamily: "'IBM Plex Mono'", fontWeight: 600, color: "var(--tx-2)" }}>{bit.val}</span>
+                                  </span>
+                                ))}
+                              </div>
                             )}
-                            {h.type && !/^correcc/i.test(h.type) && (
-                              <button
-                                onClick={() => openEntryAction("editHist", h)}
-                                title="Corregir esta entrada"
-                                className="inline-flex items-center gap-1 rounded-[6px] px-2 py-0.5"
-                                style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-3)", border: "1px solid var(--bd-strong)", background: "var(--elev)" }}
-                              >
-                                <EditOutlinedIcon sx={{ fontSize: 13 }} /> Corregir
-                              </button>
-                            )}
-                            {h.type && !/^correcc/i.test(h.type) && h.type !== "Alta" && (
-                              <button
-                                onClick={() => openEntryAction("undo", h)}
-                                title="Deshacer este movimiento"
-                                className="inline-flex items-center gap-1 rounded-[6px] px-2 py-0.5"
-                                style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-3)", border: "1px solid var(--bd-strong)", background: "var(--elev)" }}
-                              >
-                                <UndoRoundedIcon sx={{ fontSize: 13 }} /> Deshacer
-                              </button>
-                            )}
+                            <div className="mt-[10px] flex flex-wrap gap-[6px]">
+                              {h.receiptNumber && <TimelineBtn onClick={() => reprintAct.execute({ entry: h, tire })} disabled={reprintAct.isPrinting} icon={<LocalPrintshopOutlinedIcon sx={{ fontSize: 13 }} />} label="Reimprimir" hover="var(--bd-hover)" />}
+                              {!isCorr && <TimelineBtn onClick={() => openEntryAction("editHist", h)} icon={<EditOutlinedIcon sx={{ fontSize: 13 }} />} label="Corregir" hover="var(--ink-blue)" />}
+                              {!isCorr && h.type !== "Alta" && <TimelineBtn onClick={() => openEntryAction("undo", h)} icon={<UndoRoundedIcon sx={{ fontSize: 13 }} />} label="Deshacer" hover="var(--ink-red)" />}
+                            </div>
                           </div>
-                        </li>
+                        </div>
                       )
                     })}
-                  </ol>
+                  </div>
                 )}
               </div>
             )}
