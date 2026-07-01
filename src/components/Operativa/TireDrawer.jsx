@@ -7,15 +7,12 @@ import { useReprint } from "@hooks/useReprint"
 import { showToast } from "@utils/toast"
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded"
 import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded"
-import LocalShippingOutlinedIcon from "@mui/icons-material/LocalShippingOutlined"
-import RemoveRoundedIcon from "@mui/icons-material/RemoveRounded"
-import CheckRoundedIcon from "@mui/icons-material/CheckRounded"
-import DeleteOutlineRoundedIcon from "@mui/icons-material/DeleteOutlineRounded"
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined"
 import UndoRoundedIcon from "@mui/icons-material/UndoRounded"
 import LocalPrintshopOutlinedIcon from "@mui/icons-material/LocalPrintshopOutlined"
 import { buildAssignPrintData, buildUnassignPrintData, buildFinishRecapPrintData, buildDiscardPrintData, buildUndoPrintData, buildCorrectionPrintData } from "@utils/print-data"
 import { metaOf, tint, fmtKm, fmtDate, StateBadge, Pips, STATUS_META } from "./status"
+import { OpActionBtn } from "./opActions"
 
 const RECAP_STATES = ["1er Recapado", "2do Recapado", "3er Recapado"]
 
@@ -180,6 +177,7 @@ const TireDrawer = ({ tireId, initialAction, onClose }) => {
   const actionHandlers = { assign: doAssign, unassign: doUnassign, recap: doRecap, discard: doDiscard, undo: doUndo, editHist: doEditHist }
 
   const history = [...(tire?.history || [])].sort((a, b) => new Date(b.date) - new Date(a.date))
+  const lastReceiptEntry = history.find((h) => h.receiptNumber) // para "Imprimir recibo" (último comprobante)
   const m = tire ? metaOf(tire.status) : null
   const recapOptions = RECAP_STATES.filter((s) => RECAP_STATES.indexOf(s) > RECAP_STATES.indexOf(tire?.status))
 
@@ -372,28 +370,13 @@ const TireDrawer = ({ tireId, initialAction, onClose }) => {
                   <InfoRow label="Fecha de alta" value={fmtDate(tire.createdAt)} mono />
                 </div>
 
-                {/* Acciones reales */}
+                {/* Acciones reales (estilo Claude Design) */}
                 <div className="mb-6 flex flex-wrap gap-2">
-                  {!tire.vehicle && tire.status !== "Descartada" && (
-                    <button onClick={() => openAction("assign")} className="inline-flex h-10 items-center gap-2 rounded-[9px] px-4 text-[13px] font-semibold" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--ink-lime)" }}>
-                      <LocalShippingOutlinedIcon sx={{ fontSize: 16 }} /> Asignar
-                    </button>
-                  )}
-                  {tire.vehicle && (
-                    <button onClick={() => openAction("unassign")} className="inline-flex h-10 items-center gap-2 rounded-[9px] px-4 text-[13px] font-semibold" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--tx-2)" }}>
-                      <RemoveRoundedIcon sx={{ fontSize: 16 }} /> Desasignar
-                    </button>
-                  )}
-                  {tire.status === "A recapar" && (
-                    <button onClick={() => openAction("recap")} className="inline-flex h-10 items-center gap-2 rounded-[9px] px-4 text-[13px] font-semibold" style={{ border: "1px solid " + tint("var(--ink-teal)", 40), background: tint("var(--ink-teal)", 10), color: "var(--ink-teal)" }}>
-                      <CheckRoundedIcon sx={{ fontSize: 16 }} /> Recapado listo
-                    </button>
-                  )}
-                  {!tire.vehicle && tire.status !== "Descartada" && (
-                    <button onClick={() => openAction("discard")} className="inline-flex h-10 items-center gap-2 rounded-[9px] px-4 text-[13px] font-semibold" style={{ border: "1px solid " + tint("var(--ink-red)", 40), background: tint("var(--ink-red)", 8), color: "var(--ink-red)" }}>
-                      <DeleteOutlineRoundedIcon sx={{ fontSize: 16 }} /> Descartar
-                    </button>
-                  )}
+                  {!tire.vehicle && tire.status !== "Descartada" && <OpActionBtn type="assign" size={44} onClick={() => openAction("assign")} />}
+                  {tire.vehicle && <OpActionBtn type="unassign" size={44} onClick={() => openAction("unassign")} />}
+                  {tire.status === "A recapar" && <OpActionBtn type="recap" size={44} onClick={() => openAction("recap")} />}
+                  {lastReceiptEntry && <OpActionBtn type="print" size={44} onClick={() => reprintAct.execute({ entry: lastReceiptEntry, tire })} disabled={reprintAct.isPrinting} />}
+                  {!tire.vehicle && tire.status !== "Descartada" && <OpActionBtn type="discard" size={44} onClick={() => openAction("discard")} />}
                 </div>
 
                 {/* Timeline del historial */}

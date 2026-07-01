@@ -5,14 +5,11 @@ import SearchRoundedIcon from "@mui/icons-material/SearchRounded"
 import AddRoundedIcon from "@mui/icons-material/AddRounded"
 import GridViewRoundedIcon from "@mui/icons-material/GridViewRounded"
 import ViewListRoundedIcon from "@mui/icons-material/ViewListRounded"
-import LocalShippingOutlinedIcon from "@mui/icons-material/LocalShippingOutlined"
-import RemoveRoundedIcon from "@mui/icons-material/RemoveRounded"
-import CheckRoundedIcon from "@mui/icons-material/CheckRounded"
-import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded"
 import ArrowUpwardRoundedIcon from "@mui/icons-material/ArrowUpwardRounded"
 import TuneRoundedIcon from "@mui/icons-material/TuneRounded"
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded"
 import { metaOf, tint, fmtKm, fmtDate, StateBadge, Pips } from "./status"
+import { OpActionBtn } from "./opActions"
 import TireDrawer from "./TireDrawer"
 import AltaDrawer from "./AltaDrawer"
 
@@ -257,6 +254,12 @@ const Cubiertas = ({ intent }) => {
                     <Row label="Km" value={fmtKm(t.kilometers)} mono strong />
                     <Row label="Actualizada" value={fmtDate(t.updatedAt)} mono />
                   </div>
+                  <div className="flex gap-2 border-t pt-[11px]" style={{ borderColor: "var(--bd-soft)" }} onClick={(e) => e.stopPropagation()}>
+                    {!t.vehicle && t.status !== "Descartada" && <OpActionBtn type="assign" full onClick={openDrawer(t._id, "assign")} />}
+                    {t.vehicle && <OpActionBtn type="unassign" full onClick={openDrawer(t._id, "unassign")} />}
+                    {t.status === "A recapar" && <OpActionBtn type="recap" full onClick={openDrawer(t._id, "recap")} />}
+                    <OpActionBtn type="view" square onClick={openDrawer(t._id)} />
+                  </div>
                 </div>
               )
             })}
@@ -299,16 +302,11 @@ const Cubiertas = ({ intent }) => {
                   <div className="text-right text-[13px] font-semibold" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx)" }}>{fmtKm(t.kilometers)}</div>
                   <div className="text-right text-[12px]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-5)" }}>{fmtDate(t.updatedAt)}</div>
                   <div className="flex items-center justify-end gap-1.5">
-                    {!t.vehicle && t.status !== "Descartada" && (
-                      <ActionBtn onClick={openDrawer(t._id, "assign")} title="Asignar a vehículo" color="var(--ink-lime)" icon={<LocalShippingOutlinedIcon sx={{ fontSize: 15 }} />} />
-                    )}
-                    {t.vehicle && (
-                      <ActionBtn onClick={openDrawer(t._id, "unassign")} title="Desasignar" color="var(--tx-3)" icon={<RemoveRoundedIcon sx={{ fontSize: 15 }} />} />
-                    )}
-                    {t.status === "A recapar" && (
-                      <ActionBtn onClick={openDrawer(t._id, "recap")} title="Recapado listo" color="var(--ink-teal)" icon={<CheckRoundedIcon sx={{ fontSize: 15 }} />} />
-                    )}
-                    <ActionBtn onClick={openDrawer(t._id)} title="Ver detalle" color="var(--tx-3)" icon={<ChevronRightRoundedIcon sx={{ fontSize: 16 }} />} />
+                    {!t.vehicle && t.status !== "Descartada" && <OpActionBtn type="assign" square size={36} onClick={openDrawer(t._id, "assign")} />}
+                    {t.vehicle && <OpActionBtn type="unassign" square size={36} onClick={openDrawer(t._id, "unassign")} />}
+                    {t.status === "A recapar" && <OpActionBtn type="recap" square size={36} onClick={openDrawer(t._id, "recap")} />}
+                    {!t.vehicle && t.status !== "Descartada" && <OpActionBtn type="discard" square size={36} onClick={openDrawer(t._id, "discard")} />}
+                    <OpActionBtn type="view" square size={36} onClick={openDrawer(t._id)} />
                   </div>
                 </div>
               )
@@ -328,12 +326,6 @@ const Row = ({ label, value, valueColor, mono, strong }) => (
     <span style={{ color: "var(--tx-5)" }}>{label}</span>
     <span style={{ color: valueColor || "var(--tx-2)", fontWeight: strong ? 600 : 500, fontFamily: mono ? "'IBM Plex Mono'" : undefined }}>{value}</span>
   </div>
-)
-
-const ActionBtn = ({ onClick, color, icon, title }) => (
-  <button onClick={onClick} title={title} className="flex h-9 w-9 items-center justify-center rounded-[8px]" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color }}>
-    {icon}
-  </button>
 )
 
 export default Cubiertas
