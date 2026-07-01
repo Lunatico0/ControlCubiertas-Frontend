@@ -10,8 +10,9 @@ import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded"
 import LocalShippingOutlinedIcon from "@mui/icons-material/LocalShippingOutlined"
 import RemoveRoundedIcon from "@mui/icons-material/RemoveRounded"
 import CheckRoundedIcon from "@mui/icons-material/CheckRounded"
+import DeleteOutlineRoundedIcon from "@mui/icons-material/DeleteOutlineRounded"
 import LocalPrintshopOutlinedIcon from "@mui/icons-material/LocalPrintshopOutlined"
-import { buildAssignPrintData, buildUnassignPrintData, buildFinishRecapPrintData } from "@utils/print-data"
+import { buildAssignPrintData, buildUnassignPrintData, buildFinishRecapPrintData, buildDiscardPrintData } from "@utils/print-data"
 import { metaOf, tint, fmtKm, fmtDate, StateBadge, Pips } from "./status"
 
 const RECAP_STATES = ["1er Recapado", "2do Recapado", "3er Recapado"]
@@ -39,7 +40,7 @@ const TireDrawer = ({ tireId, initialAction, onClose }) => {
 
   const [tire, setTire] = useState(null)
   const [loading, setLoading] = useState(true)
-  const [action, setAction] = useState(initialAction || null) // null | "assign" | "unassign" | "recap"
+  const [action, setAction] = useState(initialAction || null) // null | "assign" | "unassign" | "recap" | "discard"
   const [form, setForm] = useState({})
   const [positions, setPositions] = useState(null) // posiciones del vehículo elegido al asignar (null = sin cargar)
 
@@ -48,8 +49,9 @@ const TireDrawer = ({ tireId, initialAction, onClose }) => {
   const assignAct = useTireAction({ apiCall: tires.assign, successMessage: "Cubierta asignada con éxito", printBuilder: buildAssignPrintData })
   const unassignAct = useTireAction({ apiCall: tires.unassign, successMessage: "Cubierta desasignada", printBuilder: buildUnassignPrintData })
   const recapAct = useTireAction({ apiCall: tires.updateStatus, successMessage: "Recapado registrado", printBuilder: buildFinishRecapPrintData })
+  const discardAct = useTireAction({ apiCall: tires.updateStatus, successMessage: "Cubierta descartada", printBuilder: buildDiscardPrintData })
   const reprintAct = useReprint()
-  const submitting = assignAct.isSubmitting || unassignAct.isSubmitting || recapAct.isSubmitting
+  const submitting = assignAct.isSubmitting || unassignAct.isSubmitting || recapAct.isSubmitting || discardAct.isSubmitting
 
   const load = (id) =>
     fetchTireById(id)
@@ -116,12 +118,22 @@ const TireDrawer = ({ tireId, initialAction, onClose }) => {
       close: () => setAction(null),
     })
   }
+  const doDiscard = () => {
+    if (!form.orderNumber) return showToast("warning", "Completá el N° de orden")
+    discardAct.execute({
+      tire,
+      formData: { status: "Descartada", orderNumber: form.orderNumber, getReceiptNumber: orders.getNextReceipt },
+      refresh: reload,
+      close: () => setAction(null),
+    })
+  }
+  const actionHandlers = { assign: doAssign, unassign: doUnassign, recap: doRecap, discard: doDiscard }
 
   const history = [...(tire?.history || [])].sort((a, b) => new Date(b.date) - new Date(a.date))
   const m = tire ? metaOf(tire.status) : null
   const recapOptions = RECAP_STATES.filter((s) => RECAP_STATES.indexOf(s) > RECAP_STATES.indexOf(tire?.status))
 
-  const ACTION_TITLES = { assign: "Asignar a vehículo", unassign: "Desasignar cubierta", recap: "Registrar recapado" }
+  const ACTION_TITLES = { assign: "Asignar a vehículo", unassign: "Desasignar cubierta", recap: "Registrar recapado", discard: "Descartar cubierta" }
 
   return (
     <div className="fixed inset-0 z-50 flex justify-end" style={{ background: "rgba(0,0,0,.45)" }} onClick={onClose}>
@@ -231,6 +243,12 @@ const TireDrawer = ({ tireId, initialAction, onClose }) => {
                   </Field>
                 )}
 
+                {action === "discard" && (
+                  <div className="mb-3 rounded-[9px] px-3 py-2.5 text-[12.5px]" style={{ background: tint("var(--ink-red)", 8), border: "1px solid " + tint("var(--ink-red)", 35), color: "var(--ink-red)" }}>
+                    Vas a dar de baja definitiva esta cubierta (#{tire.code}). Queda registrado en el historial con su comprobante.
+                  </div>
+                )}
+
                 <Field label="N° de orden">
                   <input className="w-full rounded-[9px] px-3 py-2.5 text-[14px] outline-none" style={fieldStyle} value={form.orderNumber || ""} onChange={set("orderNumber")} placeholder="Ej. 2026-000123" />
                 </Field>
@@ -240,12 +258,12 @@ const TireDrawer = ({ tireId, initialAction, onClose }) => {
                     Cancelar
                   </button>
                   <button
-                    onClick={action === "assign" ? doAssign : action === "unassign" ? doUnassign : doRecap}
+                    onClick={actionHandlers[action]}
                     disabled={submitting}
                     className="flex-1 rounded-[9px] py-2.5 text-[13px] font-bold"
-                    style={{ background: "var(--ink-lime)", color: "#0A0C0D", opacity: submitting ? 0.6 : 1 }}
+                    style={{ background: action === "discard" ? "var(--ink-red)" : "var(--ink-lime)", color: action === "discard" ? "#fff" : "#0A0C0D", opacity: submitting ? 0.6 : 1 }}
                   >
-                    {submitting ? "Guardando…" : "Confirmar"}
+                    {submitting ? "Guardando…" : action === "discard" ? "Descartar" : "Confirmar"}
                   </button>
                 </div>
               </div>
@@ -281,6 +299,11 @@ const TireDrawer = ({ tireId, initialAction, onClose }) => {
                   {tire.status === "A recapar" && (
                     <button onClick={() => openAction("recap")} className="inline-flex h-10 items-center gap-2 rounded-[9px] px-4 text-[13px] font-semibold" style={{ border: "1px solid " + tint("var(--ink-teal)", 40), background: tint("var(--ink-teal)", 10), color: "var(--ink-teal)" }}>
                       <CheckRoundedIcon sx={{ fontSize: 16 }} /> Recapado listo
+                    </button>
+                  )}
+                  {!tire.vehicle && tire.status !== "Descartada" && (
+                    <button onClick={() => openAction("discard")} className="inline-flex h-10 items-center gap-2 rounded-[9px] px-4 text-[13px] font-semibold" style={{ border: "1px solid " + tint("var(--ink-red)", 40), background: tint("var(--ink-red)", 8), color: "var(--ink-red)" }}>
+                      <DeleteOutlineRoundedIcon sx={{ fontSize: 16 }} /> Descartar
                     </button>
                   )}
                 </div>
