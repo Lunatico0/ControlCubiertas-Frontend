@@ -10,6 +10,8 @@ import RemoveRoundedIcon from "@mui/icons-material/RemoveRounded"
 import CheckRoundedIcon from "@mui/icons-material/CheckRounded"
 import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded"
 import ArrowUpwardRoundedIcon from "@mui/icons-material/ArrowUpwardRounded"
+import TuneRoundedIcon from "@mui/icons-material/TuneRounded"
+import CloseRoundedIcon from "@mui/icons-material/CloseRounded"
 import { metaOf, tint, fmtKm, fmtDate, StateBadge, Pips } from "./status"
 import TireDrawer from "./TireDrawer"
 import AltaDrawer from "./AltaDrawer"
@@ -53,7 +55,17 @@ const Cubiertas = ({ intent }) => {
   const [showAlta, setShowAlta] = useState(false)
   const [sortBy, setSortBy] = useState("code")
   const [sortDir, setSortDir] = useState("asc")
+  // Filtros avanzados (panel desplegable)
+  const [showFilters, setShowFilters] = useState(false)
+  const [fBrand, setFBrand] = useState("")
+  const [fStatus, setFStatus] = useState("")
+  const [fKmMin, setFKmMin] = useState("")
+  const [fKmMax, setFKmMax] = useState("")
   const searchRef = useRef(null)
+
+  const brands = useMemo(() => [...new Set(tires.map((t) => t.brand).filter(Boolean))].sort((a, b) => a.localeCompare(b, "es")), [tires])
+  const activeFilters = (fBrand ? 1 : 0) + (fStatus ? 1 : 0) + (fKmMin || fKmMax ? 1 : 0)
+  const clearFilters = () => { setFBrand(""); setFStatus(""); setFKmMin(""); setFKmMax("") }
 
   // Atajo Ctrl/Cmd + K para enfocar la búsqueda.
   useEffect(() => {
@@ -87,10 +99,16 @@ const Cubiertas = ({ intent }) => {
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
+    const kmMin = fKmMin !== "" ? Number(fKmMin) : null
+    const kmMax = fKmMax !== "" ? Number(fKmMax) : null
     const base = tires.filter((t) => {
       if (tab === "stock" && t.vehicle) return false
       if (tab === "circulacion" && !t.vehicle) return false
       if (tab === "recapar" && t.status !== "A recapar") return false
+      if (fBrand && t.brand !== fBrand) return false
+      if (fStatus && t.status !== fStatus) return false
+      if (kmMin != null && (t.kilometers || 0) < kmMin) return false
+      if (kmMax != null && (t.kilometers || 0) > kmMax) return false
       if (!q) return true
       return (
         String(t.code ?? "").includes(q) ||
@@ -103,7 +121,7 @@ const Cubiertas = ({ intent }) => {
     if (!col?.sort) return base
     const sorted = [...base].sort(col.sort)
     return sortDir === "desc" ? sorted.reverse() : sorted
-  }, [tires, query, tab, sortBy, sortDir])
+  }, [tires, query, tab, sortBy, sortDir, fBrand, fStatus, fKmMin, fKmMax])
 
   const toggleSort = (key) => {
     if (sortBy === key) setSortDir((d) => (d === "asc" ? "desc" : "asc"))
@@ -157,7 +175,12 @@ const Cubiertas = ({ intent }) => {
               )
             })}
           </div>
-          <div className="ml-auto flex gap-[3px] rounded-[9px] p-[3px]" style={{ border: "1px solid var(--bd)", background: "var(--card)" }}>
+          <button onClick={() => setShowFilters((v) => !v)} className="ml-auto inline-flex h-[38px] items-center gap-2 rounded-[9px] px-[14px] text-[13.5px] font-semibold"
+            style={{ border: `1px solid ${showFilters || activeFilters ? "var(--ink-lime)" : "var(--bd)"}`, background: showFilters || activeFilters ? tint("var(--ink-lime)", 12) : "var(--card)", color: showFilters || activeFilters ? "var(--tx)" : "var(--tx-3)" }}>
+            <TuneRoundedIcon sx={{ fontSize: 16 }} /> Filtros
+            {activeFilters > 0 && <span className="rounded-full px-[7px] py-px text-[11px]" style={{ fontFamily: "'IBM Plex Mono'", background: "var(--ink-lime)", color: "var(--bg)" }}>{activeFilters}</span>}
+          </button>
+          <div className="flex gap-[3px] rounded-[9px] p-[3px]" style={{ border: "1px solid var(--bd)", background: "var(--card)" }}>
             {[{ key: "grid", icon: <GridViewRoundedIcon sx={{ fontSize: 17 }} /> }, { key: "table", icon: <ViewListRoundedIcon sx={{ fontSize: 17 }} /> }].map((v) => {
               const on = view === v.key
               return (
@@ -166,6 +189,39 @@ const Cubiertas = ({ intent }) => {
             })}
           </div>
         </div>
+
+        {showFilters && (
+          <div className="mt-3 flex flex-wrap items-end gap-3.5 rounded-[11px] p-3.5" style={{ border: "1px solid var(--bd)", background: "var(--card)" }}>
+            <label className="flex flex-col gap-1.5">
+              <span className="text-[11px] font-semibold" style={{ color: "var(--tx-4)" }}>Marca</span>
+              <select value={fBrand} onChange={(e) => setFBrand(e.target.value)} className="h-[38px] min-w-[150px] rounded-[8px] px-2.5 text-[13px] outline-none" style={inputStyle}>
+                <option value="">Todas</option>
+                {brands.map((b) => <option key={b} value={b}>{b}</option>)}
+              </select>
+            </label>
+            <label className="flex flex-col gap-1.5">
+              <span className="text-[11px] font-semibold" style={{ color: "var(--tx-4)" }}>Estado</span>
+              <select value={fStatus} onChange={(e) => setFStatus(e.target.value)} className="h-[38px] min-w-[150px] rounded-[8px] px-2.5 text-[13px] outline-none" style={inputStyle}>
+                <option value="">Todos</option>
+                {STATE_ORDER.map((s) => <option key={s} value={s}>{s}</option>)}
+              </select>
+            </label>
+            <label className="flex flex-col gap-1.5">
+              <span className="text-[11px] font-semibold" style={{ color: "var(--tx-4)" }}>Km desde</span>
+              <input type="number" min="0" value={fKmMin} onChange={(e) => setFKmMin(e.target.value)} placeholder="0" className="h-[38px] w-[120px] rounded-[8px] px-2.5 text-[13px] outline-none" style={{ ...inputStyle, fontFamily: "'IBM Plex Mono'" }} />
+            </label>
+            <label className="flex flex-col gap-1.5">
+              <span className="text-[11px] font-semibold" style={{ color: "var(--tx-4)" }}>Km hasta</span>
+              <input type="number" min="0" value={fKmMax} onChange={(e) => setFKmMax(e.target.value)} placeholder="—" className="h-[38px] w-[120px] rounded-[8px] px-2.5 text-[13px] outline-none" style={{ ...inputStyle, fontFamily: "'IBM Plex Mono'" }} />
+            </label>
+            {activeFilters > 0 && (
+              <button onClick={clearFilters} className="inline-flex h-[38px] items-center gap-1.5 rounded-[8px] px-3 text-[12.5px] font-semibold" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--tx-3)" }}>
+                <CloseRoundedIcon sx={{ fontSize: 15 }} /> Limpiar
+              </button>
+            )}
+            <span className="ml-auto self-center text-[12px]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-5)" }}>{filtered.length} resultado{filtered.length === 1 ? "" : "s"}</span>
+          </div>
+        )}
       </div>
 
       <div className="px-7 pb-8 pt-5">

@@ -32,7 +32,9 @@ const Vehiculos = ({ onNavigate }) => {
   const [showAlta, setShowAlta] = useState(false)
   const [showConfigEjes, setShowConfigEjes] = useState(false)
   const [editVeh, setEditVeh] = useState(null)
+  const [fType, setFType] = useState("")
   const editar = (e, v) => { e.stopPropagation(); setEditVeh(v) }
+  const types = useMemo(() => [...new Set(vehicles.map((v) => v.type).filter(Boolean))].sort((a, b) => a.localeCompare(b, "es")), [vehicles])
   const pendingAxles = vehicles.filter((v) => !(v.axles && v.axles.length)).length
   const [vview, setVview] = useState(() => localStorage.getItem("op_vehview") || "grid")
   const setView = (v) => {
@@ -79,11 +81,11 @@ const Vehiculos = ({ onNavigate }) => {
         kmLabel: fmtKm(v.kilometers),
       }
     })
-    const filtered = !q
-      ? base
-      : base.filter(({ v }) => `${v.mobile} ${v.licensePlate} ${v.brand}`.toLowerCase().includes(q))
+    let filtered = base
+    if (fType) filtered = filtered.filter(({ v }) => v.type === fType)
+    if (q) filtered = filtered.filter(({ v }) => `${v.mobile} ${v.licensePlate} ${v.brand}`.toLowerCase().includes(q))
     return filtered.sort((a, b) => (a.v.mobile || "").localeCompare(b.v.mobile || "", "es", { numeric: true }))
-  }, [vehicles, mountedByVeh, query])
+  }, [vehicles, mountedByVeh, query, fType])
 
   const inputStyle = { background: "var(--card)", border: "1.5px solid var(--bd)", color: "var(--tx)" }
   const toggleBtn = (active) => ({ background: active ? "var(--ink-lime)" : "transparent", color: active ? "var(--bg)" : "var(--tx-5)" })
@@ -113,6 +115,19 @@ const Vehiculos = ({ onNavigate }) => {
             <button onClick={() => setView("table")} title="Lista" className="inline-flex h-8 w-[38px] items-center justify-center rounded-[6px]" style={toggleBtn(vview === "table")}><ViewListRoundedIcon sx={{ fontSize: 17 }} /></button>
           </div>
         </div>
+        {types.length > 1 && (
+          <div className="mt-3 flex flex-wrap gap-2">
+            {["", ...types].map((t) => {
+              const on = fType === t
+              return (
+                <button key={t || "all"} onClick={() => setFType(t)} className="inline-flex h-[34px] items-center rounded-[9px] px-[13px] text-[12.5px] font-semibold"
+                  style={{ border: `1px solid ${on ? "var(--ink-lime)" : "var(--bd)"}`, background: on ? tint("var(--ink-lime)", 12) : "var(--card)", color: on ? "var(--tx)" : "var(--tx-4)" }}>
+                  {t || "Todos"}
+                </button>
+              )
+            })}
+          </div>
+        )}
       </div>
 
       <div className="px-7 pb-8 pt-5">
