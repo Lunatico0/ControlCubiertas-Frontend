@@ -254,7 +254,7 @@ const Cubiertas = ({ intent }) => {
                     <Row label="Km" value={fmtKm(t.kilometers)} mono strong />
                     <Row label="Actualizada" value={fmtDate(t.updatedAt)} mono />
                   </div>
-                  <div className="flex gap-2 border-t pt-[11px]" style={{ borderColor: "var(--bd-soft)" }} onClick={(e) => e.stopPropagation()}>
+                  <div className="flex border-t pt-[11px]" style={{ borderColor: "var(--bd-soft)", gap: "clamp(5px, 2.5cqi, 8px)", containerType: "inline-size" }} onClick={(e) => e.stopPropagation()}>
                     {!t.vehicle && t.status !== "Descartada" && <OpActionBtn type="assign" full onClick={openDrawer(t._id, "assign")} />}
                     {t.vehicle && <OpActionBtn type="unassign" full onClick={openDrawer(t._id, "unassign")} />}
                     {t.status === "A recapar" && <OpActionBtn type="recap" full onClick={openDrawer(t._id, "recap")} />}

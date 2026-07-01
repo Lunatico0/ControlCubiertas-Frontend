@@ -30,6 +30,10 @@ export const OpActionBtn = ({ type, onClick, disabled, full, square, size = 40 }
   const a = ACTIONS[type]
   const T = TONES[a.tone]
   const label = !square ? a.label : null
+  // En botones `full` (barra de la tarjeta) el padding y el gap son ADAPTATIVOS: se
+  // encogen con el ancho de la card (unidad cqi, requiere container en el contenedor)
+  // entre un mínimo y un máximo, para que nunca desborden. minWidth:0 + ellipsis es la
+  // red de seguridad final. En botones fijos/square el padding es constante.
   return (
     <button
       type="button"
@@ -39,16 +43,18 @@ export const OpActionBtn = ({ type, onClick, disabled, full, square, size = 40 }
       onMouseEnter={(e) => { e.currentTarget.style.borderColor = T.hover; if (a.tone === "muted") e.currentTarget.style.color = "var(--tx)" }}
       onMouseLeave={(e) => { e.currentTarget.style.borderColor = T.bd; if (a.tone === "muted") e.currentTarget.style.color = T.fg }}
       style={{
-        display: "inline-flex", alignItems: "center", justifyContent: "center", gap: label ? 7 : 0,
+        display: "inline-flex", alignItems: "center", justifyContent: "center",
+        gap: label ? (full ? "clamp(4px, 2.2cqi, 7px)" : 7) : 0,
         height: size, width: square ? size : undefined, flex: full ? 1 : "none",
-        padding: label ? "0 14px" : 0,
+        minWidth: full ? 0 : undefined,
+        padding: label ? (full ? "0 clamp(6px, 3.6cqi, 14px)" : "0 14px") : 0,
         border: `1px solid ${T.bd}`, background: T.bg, color: T.fg, borderRadius: 9,
         fontSize: 13, fontWeight: 600, fontFamily: "'IBM Plex Sans'",
-        cursor: disabled ? "default" : "pointer", opacity: disabled ? 0.55 : 1, whiteSpace: "nowrap",
+        cursor: disabled ? "default" : "pointer", opacity: disabled ? 0.55 : 1, overflow: "hidden",
       }}
     >
-      <a.Icon sx={{ fontSize: square ? 17 : 16 }} />
-      {label}
+      <a.Icon sx={{ fontSize: square ? 17 : 16, flexShrink: 0 }} />
+      {label && <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", minWidth: 0 }}>{label}</span>}
     </button>
   )
 }
