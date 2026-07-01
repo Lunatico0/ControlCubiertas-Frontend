@@ -64,6 +64,18 @@ const lifecycleSteps = (tire, history) => {
   })
 }
 
+// Color de la entrada por TIPO de movimiento (no por estado): asignación y desasignación
+// SIEMPRE deben distinguirse. Los cambios de estado (recapados) sí usan el color del estado.
+const histColor = (h) => {
+  const t = h.type || ""
+  if (/^asign/i.test(t)) return "var(--ink-blue)"
+  if (/^desasign/i.test(t)) return "var(--ink-orange)"
+  if (/^correcc/i.test(t)) return "var(--ink-purple)"
+  if (t === "Alta") return "var(--ink-lime)"
+  if (/descart/i.test(t) || h.status === "Descartada") return "var(--ink-red)"
+  return metaOf(h.status).color
+}
+
 // Descripción legible + chips de datos para cada entrada del historial.
 const histDetail = (h) => {
   const t = (h.type || "").toLowerCase()
@@ -469,20 +481,20 @@ const TireDrawer = ({ tireId, initialAction, onClose }) => {
                 ) : (
                   <div>
                     {history.map((h, i) => {
-                      const hm = metaOf(h.status)
+                      const color = histColor(h)
                       const isCorr = /^correcc/i.test(h.type || "")
                       const last = i === history.length - 1
                       return (
                         <div key={h._id || i} className="flex gap-[14px]">
                           <div className="flex flex-none flex-col items-center" style={{ width: 26 }}>
-                            <div className="flex items-center justify-center" style={{ width: 26, height: 26, borderRadius: "50%", background: tint(hm.color, 15) }}>
-                              <span style={{ width: 9, height: 9, borderRadius: "50%", background: hm.color }} />
+                            <div className="flex items-center justify-center" style={{ width: 26, height: 26, borderRadius: "50%", background: tint(color, 15) }}>
+                              <span style={{ width: 9, height: 9, borderRadius: "50%", background: color }} />
                             </div>
                             {!last && <div style={{ flex: 1, width: 2, background: "var(--bd)", margin: "2px 0", minHeight: 12 }} />}
                           </div>
                           <div className="min-w-0 flex-1 pb-[18px]">
                             <div className="flex items-baseline justify-between gap-2.5">
-                              <span className="text-[14px] font-semibold" style={{ color: hm.color, fontFamily: "'Space Grotesk'" }}>{h.type || "Movimiento"}</span>
+                              <span className="text-[14px] font-semibold" style={{ color, fontFamily: "'Space Grotesk'" }}>{h.type || "Movimiento"}</span>
                               <span className="flex-none text-[11.5px]" style={{ color: "var(--tx-6)", fontFamily: "'IBM Plex Mono'" }}>{fmtDate(h.date)}</span>
                             </div>
                             <div className="mt-[3px] text-[12.5px]" style={{ color: "var(--tx-4)" }}>{histDetail(h)}</div>
