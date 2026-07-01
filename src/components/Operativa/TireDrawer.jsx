@@ -11,9 +11,11 @@ import LocalShippingOutlinedIcon from "@mui/icons-material/LocalShippingOutlined
 import RemoveRoundedIcon from "@mui/icons-material/RemoveRounded"
 import CheckRoundedIcon from "@mui/icons-material/CheckRounded"
 import DeleteOutlineRoundedIcon from "@mui/icons-material/DeleteOutlineRounded"
+import EditOutlinedIcon from "@mui/icons-material/EditOutlined"
+import UndoRoundedIcon from "@mui/icons-material/UndoRounded"
 import LocalPrintshopOutlinedIcon from "@mui/icons-material/LocalPrintshopOutlined"
-import { buildAssignPrintData, buildUnassignPrintData, buildFinishRecapPrintData, buildDiscardPrintData } from "@utils/print-data"
-import { metaOf, tint, fmtKm, fmtDate, StateBadge, Pips } from "./status"
+import { buildAssignPrintData, buildUnassignPrintData, buildFinishRecapPrintData, buildDiscardPrintData, buildUndoPrintData, buildCorrectionPrintData } from "@utils/print-data"
+import { metaOf, tint, fmtKm, fmtDate, StateBadge, Pips, STATUS_META } from "./status"
 
 const RECAP_STATES = ["1er Recapado", "2do Recapado", "3er Recapado"]
 
@@ -40,7 +42,8 @@ const TireDrawer = ({ tireId, initialAction, onClose }) => {
 
   const [tire, setTire] = useState(null)
   const [loading, setLoading] = useState(true)
-  const [action, setAction] = useState(initialAction || null) // null | "assign" | "unassign" | "recap" | "discard"
+  const [action, setAction] = useState(initialAction || null) // null | assign | unassign | recap | discard | undo | editHist
+  const [actionEntry, setActionEntry] = useState(null) // entrada del historial sobre la que opera undo/editHist
   const [form, setForm] = useState({})
   const [positions, setPositions] = useState(null) // posiciones del vehículo elegido al asignar (null = sin cargar)
 
@@ -50,8 +53,12 @@ const TireDrawer = ({ tireId, initialAction, onClose }) => {
   const unassignAct = useTireAction({ apiCall: tires.unassign, successMessage: "Cubierta desasignada", printBuilder: buildUnassignPrintData })
   const recapAct = useTireAction({ apiCall: tires.updateStatus, successMessage: "Recapado registrado", printBuilder: buildFinishRecapPrintData })
   const discardAct = useTireAction({ apiCall: tires.updateStatus, successMessage: "Cubierta descartada", printBuilder: buildDiscardPrintData })
+  // undo: firma (id, historyId, data) → el entry va por closure (actionEntry). editHist: firma
+  // (id, data, entry) → calza con el branch `entry` de useTireAction.
+  const undoAct = useTireAction({ apiCall: (tireId, formData) => tires.undoHistory(tireId, actionEntry?._id, formData), successMessage: "Entrada deshecha", printBuilder: buildUndoPrintData })
+  const editHistAct = useTireAction({ apiCall: tires.updateHistory, successMessage: "Historial corregido", printBuilder: buildCorrectionPrintData })
   const reprintAct = useReprint()
-  const submitting = assignAct.isSubmitting || unassignAct.isSubmitting || recapAct.isSubmitting || discardAct.isSubmitting
+  const submitting = assignAct.isSubmitting || unassignAct.isSubmitting || recapAct.isSubmitting || discardAct.isSubmitting || undoAct.isSubmitting || editHistAct.isSubmitting
 
   const load = (id) =>
     fetchTireById(id)
@@ -70,7 +77,7 @@ const TireDrawer = ({ tireId, initialAction, onClose }) => {
   }, [tireId])
 
   useEffect(() => {
-    const onKey = (e) => { if (e.key === "Escape") (action ? setAction(null) : onClose()) }
+    const onKey = (e) => { if (e.key === "Escape") (action ? closeAction() : onClose()) }
     window.addEventListener("keydown", onKey)
     return () => window.removeEventListener("keydown", onKey)
   }, [onClose, action])
@@ -85,9 +92,20 @@ const TireDrawer = ({ tireId, initialAction, onClose }) => {
     return () => { alive = false }
   }, [form.vehicle, action])
 
-  const openAction = (a) => { setForm({}); setAction(a) }
+  const openAction = (a) => { setForm({}); setActionEntry(null); setAction(a) }
+  const closeAction = () => { setAction(null); setActionEntry(null) }
   const reload = (id) => load(id) // re-fetch del drawer tras la acción → mata Bug 1
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }))
+  // Tipo base de una entrada (sin el prefijo "corrección-"), para decidir qué campos corregir.
+  const editBaseType = (entry) => (entry?.type || "").replace(/^correcc[ií]on-/i, "")
+  // Abrir una acción sobre una entrada del historial (deshacer / corregir), prellenando el form.
+  const openEntryAction = (a, entry) => {
+    setActionEntry(entry)
+    setForm(a === "editHist"
+      ? { status: entry.status || tire.status, kmAlta: entry.kmAlta ?? "", kmBaja: entry.kmBaja ?? "", vehicle: entry.vehicle?._id || "", reason: `Corrección de Orden N°${entry.orderNumber || ""}`, orderNumber: "" }
+      : {})
+    setAction(a)
+  }
 
   const doAssign = () => {
     if (!form.vehicle || !form.kmAlta || !form.orderNumber) return showToast("warning", "Completá vehículo, km y N° de orden")
@@ -97,7 +115,7 @@ const TireDrawer = ({ tireId, initialAction, onClose }) => {
       tire,
       formData: { vehicle: form.vehicle, kmAlta: Number(form.kmAlta), orderNumber: form.orderNumber, position: form.position || null, getReceiptNumber: orders.getNextReceipt },
       refresh: reload,
-      close: () => setAction(null),
+      close: closeAction,
     })
   }
   const doUnassign = () => {
@@ -106,7 +124,7 @@ const TireDrawer = ({ tireId, initialAction, onClose }) => {
       tire,
       formData: { kmBaja: Number(form.kmBaja), orderNumber: form.orderNumber, getReceiptNumber: orders.getNextReceipt },
       refresh: reload,
-      close: () => setAction(null),
+      close: closeAction,
     })
   }
   const doRecap = () => {
@@ -115,7 +133,7 @@ const TireDrawer = ({ tireId, initialAction, onClose }) => {
       tire,
       formData: { status: form.status, orderNumber: form.orderNumber, getReceiptNumber: orders.getNextReceipt },
       refresh: reload,
-      close: () => setAction(null),
+      close: closeAction,
     })
   }
   const doDiscard = () => {
@@ -124,16 +142,48 @@ const TireDrawer = ({ tireId, initialAction, onClose }) => {
       tire,
       formData: { status: "Descartada", orderNumber: form.orderNumber, getReceiptNumber: orders.getNextReceipt },
       refresh: reload,
-      close: () => setAction(null),
+      close: closeAction,
     })
   }
-  const actionHandlers = { assign: doAssign, unassign: doUnassign, recap: doRecap, discard: doDiscard }
+  const doUndo = () => {
+    if (!form.orderNumber) return showToast("warning", "Completá el N° de orden")
+    undoAct.execute({
+      tire,
+      formData: { orderNumber: form.orderNumber, getReceiptNumber: orders.getNextReceipt },
+      refresh: reload,
+      close: closeAction,
+    })
+  }
+  const doEditHist = () => {
+    const base = editBaseType(actionEntry)
+    if (!form.orderNumber || !form.status || !form.reason) return showToast("warning", "Completá N° de orden, estado y motivo")
+    if (base === "Asignación" && (!form.vehicle || !form.kmAlta)) return showToast("warning", "Completá vehículo y km inicial")
+    if (base === "Desasignación" && !form.kmBaja) return showToast("warning", "Completá el km final")
+    editHistAct.execute({
+      tire,
+      entry: actionEntry,
+      formData: {
+        form: {
+          orderNumber: form.orderNumber,
+          status: form.status,
+          reason: form.reason,
+          kmAlta: form.kmAlta !== "" && form.kmAlta != null ? Number(form.kmAlta) : undefined,
+          kmBaja: form.kmBaja !== "" && form.kmBaja != null ? Number(form.kmBaja) : undefined,
+          vehicle: form.vehicle || undefined,
+        },
+        getReceiptNumber: orders.getNextReceipt,
+      },
+      refresh: reload,
+      close: closeAction,
+    })
+  }
+  const actionHandlers = { assign: doAssign, unassign: doUnassign, recap: doRecap, discard: doDiscard, undo: doUndo, editHist: doEditHist }
 
   const history = [...(tire?.history || [])].sort((a, b) => new Date(b.date) - new Date(a.date))
   const m = tire ? metaOf(tire.status) : null
   const recapOptions = RECAP_STATES.filter((s) => RECAP_STATES.indexOf(s) > RECAP_STATES.indexOf(tire?.status))
 
-  const ACTION_TITLES = { assign: "Asignar a vehículo", unassign: "Desasignar cubierta", recap: "Registrar recapado", discard: "Descartar cubierta" }
+  const ACTION_TITLES = { assign: "Asignar a vehículo", unassign: "Desasignar cubierta", recap: "Registrar recapado", discard: "Descartar cubierta", undo: "Deshacer entrada", editHist: "Corregir entrada de historial" }
 
   return (
     <div className="fixed inset-0 z-50 flex justify-end" style={{ background: "rgba(0,0,0,.45)" }} onClick={onClose}>
@@ -152,7 +202,7 @@ const TireDrawer = ({ tireId, initialAction, onClose }) => {
             <div className="flex items-start justify-between gap-3 p-5" style={{ borderBottom: "1px solid var(--bd-soft)" }}>
               <div className="flex items-center gap-3">
                 {action && (
-                  <button onClick={() => setAction(null)} className="rounded-[7px] p-1" style={{ color: "var(--tx-4)" }} title="Volver">
+                  <button onClick={closeAction} className="rounded-[7px] p-1" style={{ color: "var(--tx-4)" }} title="Volver">
                     <ArrowBackRoundedIcon sx={{ fontSize: 20 }} />
                   </button>
                 )}
@@ -249,6 +299,44 @@ const TireDrawer = ({ tireId, initialAction, onClose }) => {
                   </div>
                 )}
 
+                {action === "undo" && (
+                  <div className="mb-3 rounded-[9px] px-3 py-2.5 text-[12.5px]" style={{ background: "var(--input)", border: "1px solid var(--bd-strong)", color: "var(--tx-4)" }}>
+                    Vas a revertir el movimiento «<b style={{ color: "var(--tx-2)" }}>{actionEntry?.type}</b>» del {fmtDate(actionEntry?.date)}. La reversión queda registrada con su comprobante.
+                  </div>
+                )}
+
+                {action === "editHist" && (
+                  <>
+                    <Field label="Estado">
+                      <select className="w-full rounded-[9px] px-3 py-2.5 text-[14px] outline-none" style={fieldStyle} value={form.status || ""} onChange={set("status")}>
+                        <option value="">Seleccionar estado…</option>
+                        {Object.keys(STATUS_META).map((s) => <option key={s} value={s}>{s}</option>)}
+                      </select>
+                    </Field>
+                    {editBaseType(actionEntry) === "Asignación" && (
+                      <>
+                        <Field label="Vehículo">
+                          <select className="w-full rounded-[9px] px-3 py-2.5 text-[14px] outline-none" style={fieldStyle} value={form.vehicle || ""} onChange={set("vehicle")}>
+                            <option value="">Seleccionar vehículo…</option>
+                            {vehicles.map((v) => <option key={v._id} value={v._id}>{v.mobile}{v.licensePlate ? ` · ${v.licensePlate}` : ""}</option>)}
+                          </select>
+                        </Field>
+                        <Field label="Kilometraje inicial">
+                          <input type="number" min="0" className="w-full rounded-[9px] px-3 py-2.5 text-[14px] outline-none" style={fieldStyle} value={form.kmAlta ?? ""} onChange={set("kmAlta")} placeholder="0" />
+                        </Field>
+                      </>
+                    )}
+                    {editBaseType(actionEntry) === "Desasignación" && (
+                      <Field label="Kilometraje final">
+                        <input type="number" min="0" className="w-full rounded-[9px] px-3 py-2.5 text-[14px] outline-none" style={fieldStyle} value={form.kmBaja ?? ""} onChange={set("kmBaja")} placeholder="0" />
+                      </Field>
+                    )}
+                    <Field label="Motivo de la corrección">
+                      <input className="w-full rounded-[9px] px-3 py-2.5 text-[14px] outline-none" style={fieldStyle} value={form.reason || ""} onChange={set("reason")} placeholder="Ej. Corrección de km mal cargado" />
+                    </Field>
+                  </>
+                )}
+
                 <Field label="N° de orden">
                   <input className="w-full rounded-[9px] px-3 py-2.5 text-[14px] outline-none" style={fieldStyle} value={form.orderNumber || ""} onChange={set("orderNumber")} placeholder="Ej. 2026-000123" />
                 </Field>
@@ -263,7 +351,7 @@ const TireDrawer = ({ tireId, initialAction, onClose }) => {
                     className="flex-1 rounded-[9px] py-2.5 text-[13px] font-bold"
                     style={{ background: action === "discard" ? "var(--ink-red)" : "var(--ink-lime)", color: action === "discard" ? "#fff" : "#0A0C0D", opacity: submitting ? 0.6 : 1 }}
                   >
-                    {submitting ? "Guardando…" : action === "discard" ? "Descartar" : "Confirmar"}
+                    {submitting ? "Guardando…" : action === "discard" ? "Descartar" : action === "undo" ? "Deshacer" : action === "editHist" ? "Guardar" : "Confirmar"}
                   </button>
                 </div>
               </div>
@@ -335,6 +423,26 @@ const TireDrawer = ({ tireId, initialAction, onClose }) => {
                                 style={{ fontFamily: "'IBM Plex Mono'", color: "var(--ink-lime)", border: "1px solid var(--bd-strong)", background: "var(--elev)" }}
                               >
                                 <LocalPrintshopOutlinedIcon sx={{ fontSize: 13 }} /> Comp. {h.receiptNumber}
+                              </button>
+                            )}
+                            {h.type && !/^correcc/i.test(h.type) && (
+                              <button
+                                onClick={() => openEntryAction("editHist", h)}
+                                title="Corregir esta entrada"
+                                className="inline-flex items-center gap-1 rounded-[6px] px-2 py-0.5"
+                                style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-3)", border: "1px solid var(--bd-strong)", background: "var(--elev)" }}
+                              >
+                                <EditOutlinedIcon sx={{ fontSize: 13 }} /> Corregir
+                              </button>
+                            )}
+                            {h.type && !/^correcc/i.test(h.type) && h.type !== "Alta" && (
+                              <button
+                                onClick={() => openEntryAction("undo", h)}
+                                title="Deshacer este movimiento"
+                                className="inline-flex items-center gap-1 rounded-[6px] px-2 py-0.5"
+                                style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-3)", border: "1px solid var(--bd-strong)", background: "var(--elev)" }}
+                              >
+                                <UndoRoundedIcon sx={{ fontSize: 13 }} /> Deshacer
                               </button>
                             )}
                           </div>
