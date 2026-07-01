@@ -17,6 +17,9 @@ const usePrintEngine = () => {
               <title>${title}</title>
               <meta charset="UTF-8" />
               <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+              <link rel="preconnect" href="https://fonts.googleapis.com" />
+              <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+              <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
             </head>
             <body>
               <div class="receipt-container">${htmlContent}</div>
@@ -27,20 +30,24 @@ const usePrintEngine = () => {
                   }
                 }
 
+                function launchPrint() {
+                  try {
+                    window.print();
+                    window.onafterprint = () => {
+                      notifyParent(true);
+                      setTimeout(() => window.close(), 500);
+                    };
+                    window.onbeforeunload = () => notifyParent(true);
+                  } catch (err) {
+                    console.error("Print error", err);
+                    notifyParent(false);
+                  }
+                }
+
                 window.onload = function() {
-                  setTimeout(() => {
-                    try {
-                      window.print();
-                      window.onafterprint = () => {
-                        notifyParent(true);
-                        setTimeout(() => window.close(), 500);
-                      };
-                      window.onbeforeunload = () => notifyParent(true);
-                    } catch (err) {
-                      console.error("Print error", err);
-                      notifyParent(false);
-                    }
-                  }, 500);
+                  // Esperar a que carguen las tipografías para que el impreso coincida con el preview.
+                  var ready = (document.fonts && document.fonts.ready) ? document.fonts.ready : Promise.resolve();
+                  ready.then(() => setTimeout(launchPrint, 250)).catch(() => setTimeout(launchPrint, 500));
                 };
 
                 window.addEventListener("beforeunload", () => notifyParent(true));

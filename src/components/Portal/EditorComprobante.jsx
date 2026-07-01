@@ -8,6 +8,7 @@ import FileUploadRoundedIcon from "@mui/icons-material/FileUploadRounded"
 import DeleteOutlineRoundedIcon from "@mui/icons-material/DeleteOutlineRounded"
 import KeyboardArrowUpRoundedIcon from "@mui/icons-material/KeyboardArrowUpRounded"
 import KeyboardArrowDownRoundedIcon from "@mui/icons-material/KeyboardArrowDownRounded"
+import { renderComprobanteHTML } from "@utils/receipt-template"
 
 // Editor del comprobante impreso (Claude Design). Pantalla dedicada del portal admin:
 // controles a la izquierda + preview A4 en vivo a la derecha. Persiste en el tenant
@@ -33,13 +34,6 @@ const SAMPLE = {
 }
 const FONTS = [["Grotesk", "'Space Grotesk', sans-serif"], ["Plex Sans", "'IBM Plex Sans', sans-serif"], ["Plex Mono", "'IBM Plex Mono', monospace"], ["Serif", "Georgia, serif"]]
 const ACCENTS = ["#1F7A43", "#2358C5", "#334155", "#C2410C", "#6D28D9"]
-const FS = {
-  S: { base: "10px", h1: "15px", h2: "14px", label: "8.5px", small: "8.5px" },
-  M: { base: "11.5px", h1: "18px", h2: "16px", label: "9.5px", small: "9.5px" },
-  L: { base: "13px", h1: "21px", h2: "18px", label: "10.5px", small: "10.5px" },
-}
-const LOGO_H = { S: "30px", M: "44px", L: "60px" }
-const LOGO_W = { S: "80px", M: "110px", L: "150px" }
 
 // Toggle on/off
 const Toggle = ({ on, onClick, w = 38, knob = 16 }) => (
@@ -127,14 +121,15 @@ const EditorComprobante = () => {
     }
   }
 
-  const fs = FS[d.textSize]
-  const accent = d.accent
-  const headerAlign = d.align === "center" ? "center" : "flex-start"
-  const logoJustify = { left: "flex-start", center: "center", right: "flex-end" }[d.logoPos]
-  const docSections = d.sections.filter((s) => s.on).map((s) => SAMPLE[s.key]).filter(Boolean)
-  const copies = d.duplicado
-    ? [{ label: "ORIGINAL", cut: false, padTop: "30px", labelTop: "18px" }, { label: "DUPLICADO", cut: true, padTop: "40px", labelTop: "40px" }]
-    : [{ label: "ORIGINAL", cut: false, padTop: "30px", labelTop: "18px" }]
+  // El preview usa EXACTAMENTE el mismo generador que la impresión real (receipt-template),
+  // con datos de ejemplo → lo que se ve acá es lo que sale impreso, sin divergencia posible.
+  const previewHtml = renderComprobanteHTML({
+    design: d,
+    company: { name: empresa, cuit, phone: telefono, address: direccion },
+    footer,
+    meta: { numero: "0001-00000016", fecha: "27/06/2026", tipo: "Asignación" },
+    sectionData: SAMPLE,
+  })
 
   return (
     <div data-app-theme="dark" className="fixed inset-0 z-[60] flex flex-col" style={{ background: "var(--bg)", color: "var(--tx)", fontFamily: "'IBM Plex Sans',system-ui,sans-serif" }}>
@@ -259,54 +254,7 @@ const EditorComprobante = () => {
             <div className="mb-3.5 flex items-center gap-2 text-[11px]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-5)" }}>
               <span className="h-[7px] w-[7px] rounded-full" style={{ background: "var(--ink-lime)" }} />VISTA PREVIA · HOJA A4 · {d.duplicado ? "Original + Duplicado" : "Solo original"}
             </div>
-            <div style={{ background: "#FFFFFF", borderRadius: 3, boxShadow: "0 12px 40px rgba(0,0,0,.45)", overflow: "hidden" }}>
-              {copies.map((copy, ci) => (
-                <div key={ci} style={{ position: "relative", padding: `${copy.padTop} 32px 26px 32px`, minHeight: 340, fontFamily: d.font }}>
-                  {copy.cut && (
-                    <div style={{ position: "absolute", top: 0, left: 0, right: 0, display: "flex", alignItems: "center", gap: 9, padding: "0 16px", transform: "translateY(-50%)" }}>
-                      <div style={{ flex: 1, borderTop: "1.5px dashed #BFBFBF" }} />
-                      <span style={{ fontSize: "8.5px", fontFamily: "'IBM Plex Mono'", color: "#AAAAAA", letterSpacing: ".08em" }}>✂ CORTAR AQUÍ</span>
-                      <div style={{ flex: 1, borderTop: "1.5px dashed #BFBFBF" }} />
-                    </div>
-                  )}
-                  <div style={{ position: "absolute", top: copy.labelTop, right: 32, fontFamily: "'IBM Plex Mono'", fontSize: "8.5px", letterSpacing: ".12em", color: accent, border: `1px solid ${accent}`, padding: "2px 8px", borderRadius: 4 }}>{copy.label}</div>
-
-                  {d.showHeader && (
-                    <div style={{ display: "flex", flexDirection: "column", alignItems: headerAlign, gap: 9, marginBottom: 13, width: "100%" }}>
-                      <div style={{ display: "flex", width: "100%", justifyContent: logoJustify }}>
-                        {d.logo
-                          ? <img src={d.logo} alt="logo" style={{ height: LOGO_H[d.logoSize], maxWidth: 240, objectFit: "contain" }} />
-                          : <div style={{ height: LOGO_H[d.logoSize], width: LOGO_W[d.logoSize], border: "1.5px dashed #CFCFCF", borderRadius: 5, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'IBM Plex Mono'", fontSize: 10, color: "#BBBBBB", letterSpacing: ".1em" }}>LOGO</div>}
-                      </div>
-                      <div style={{ width: "100%", textAlign: d.align }}>
-                        <div style={{ fontSize: fs.h1, fontWeight: 700, color: "#16181A", letterSpacing: "-.01em" }}>{empresa || "Tu empresa"}</div>
-                        <div style={{ fontSize: fs.small, color: "#5C6066", lineHeight: 1.6, marginTop: 2 }}>CUIT {cuit || "—"} · Tel {telefono || "—"}<br />{direccion || "—"}</div>
-                      </div>
-                    </div>
-                  )}
-
-                  <div style={{ height: "2.5px", background: accent, borderRadius: 2, marginBottom: 13 }} />
-
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 14, marginBottom: 15 }}>
-                    <div><div style={{ fontSize: fs.small, fontFamily: "'IBM Plex Mono'", color: "#8A8E92", letterSpacing: ".04em" }}>COMPROBANTE N°</div><div style={{ fontSize: fs.h2, fontWeight: 700, color: "#16181A", fontFamily: "'IBM Plex Mono'", marginTop: 1 }}>0001-00000016</div></div>
-                    <div style={{ textAlign: "right" }}><div style={{ fontSize: fs.small, color: "#8A8E92" }}>Fecha: <span style={{ color: "#16181A", fontWeight: 600 }}>27/06/2026</span></div><span style={{ display: "inline-block", marginTop: 5, fontSize: fs.small, fontWeight: 700, color: "#FFFFFF", background: accent, padding: "3px 11px", borderRadius: 5, letterSpacing: ".02em" }}>Asignación</span></div>
-                  </div>
-
-                  {docSections.map((sec) => (
-                    <div key={sec.heading} style={{ marginBottom: 13 }}>
-                      <div style={{ fontSize: fs.label, fontWeight: 700, letterSpacing: ".05em", textTransform: "uppercase", color: accent, marginBottom: 5 }}>{sec.heading}</div>
-                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 22px" }}>
-                        {sec.rows.map((r) => (
-                          <div key={r.k} style={{ display: "flex", justifyContent: "space-between", gap: 10, fontSize: fs.base, borderBottom: "1px dotted #D8D8D8", padding: "3px 0" }}><span style={{ color: "#6A6E72" }}>{r.k}</span><span style={{ color: "#16181A", fontWeight: 600, textAlign: "right" }}>{r.v}</span></div>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-
-                  <div style={{ marginTop: 14, paddingTop: 9, borderTop: "1px solid #E4E4E4", fontSize: fs.small, color: "#7A7E82", lineHeight: 1.5, textAlign: d.align }}>{footer}</div>
-                </div>
-              ))}
-            </div>
+            <div style={{ background: "#FFFFFF", borderRadius: 3, boxShadow: "0 12px 40px rgba(0,0,0,.45)", overflow: "hidden" }} dangerouslySetInnerHTML={{ __html: previewHtml }} />
           </div>
         </div>
       </div>
