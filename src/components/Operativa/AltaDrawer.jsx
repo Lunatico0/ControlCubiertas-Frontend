@@ -1,6 +1,8 @@
 import { useState, useEffect, useContext } from "react"
 import ApiContext from "@context/apiContext"
 import { showToast } from "@utils/toast"
+import { buildCreateTirePrintData } from "@utils/print-data"
+import usePrint from "@hooks/usePrint"
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded"
 
 // Drawer de alta de cubierta nueva. Crea en depósito (status "Nueva"); la asignación
@@ -23,7 +25,8 @@ const todayLocal = () => {
 }
 
 const AltaDrawer = ({ onClose, onCreated }) => {
-  const { tires, data } = useContext(ApiContext)
+  const { tires, data, orders } = useContext(ApiContext)
+  const { print } = usePrint()
   const [form, setForm] = useState({
     code: data?.suggestedCode || "",
     serialNumber: "",
@@ -52,7 +55,11 @@ const AltaDrawer = ({ onClose, onCreated }) => {
       // Bug 2 (Fase 04): anclar la fecha a mediodía LOCAL para que no se corra de día
       // al serializar a UTC (input date da "YYYY-MM-DD" = medianoche UTC → -1 día en GMT-3).
       const createdAt = form.createdAt ? `${form.createdAt}T12:00:00` : new Date().toISOString()
-      await tires.create({
+      // Reservar el N° de comprobante ANTES de crear, para persistirlo en el history "Alta".
+      // El backend incrementa el contador por cada llamada → correlativo sin duplicados.
+      let receipt = "0000-00000000"
+      try { receipt = await orders.getNextReceipt() } catch { /* si falla, se imprime sin N° */ }
+      const created = await tires.create({
         status: "Nueva",
         code: form.code,
         serialNumber: form.serialNumber,
@@ -63,7 +70,26 @@ const AltaDrawer = ({ onClose, onCreated }) => {
         createdAt,
         orderNumber: form.orderNumber,
         vehicle: null,
+        receiptNumber: receipt,
       })
+      // Imprimir el comprobante de alta (mismo layout unificado que el resto de las acciones).
+      try {
+        const printData = buildCreateTirePrintData({
+          code: form.code || created?.code || created?.tire?.code || "",
+          serialNumber: form.serialNumber,
+          brand: form.brand,
+          size: form.size,
+          pattern: form.pattern,
+          kilometers: Number(form.kilometers) || 0,
+          status: "Nueva",
+          orderNumber: form.orderNumber,
+          vehicle: null,
+        }, receipt)
+        await print(printData)
+      } catch (printErr) {
+        console.error("Error al imprimir el comprobante de alta:", printErr)
+        showToast("warning", "La cubierta se creó, pero hubo un problema al imprimir el comprobante")
+      }
       showToast("success", "Cubierta creada con éxito")
       onCreated?.()
       onClose()

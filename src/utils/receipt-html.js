@@ -64,6 +64,6 @@ export const generateReceiptHTML = (data, layoutMode, receiptDesign = null, comp
   const footer = company?.receiptFooter || "Comprobante interno de movimiento de cubiertas. Documento no válido como factura."
 
   const body = renderComprobanteHTML({ design: receiptDesign || {}, company: company || {}, footer, meta, sectionData })
-  const styles = `<style>*{box-sizing:border-box}html,body{margin:0;padding:0}@media print{@page{size:A4;margin:12mm}}</style>`
+  const styles = `<style>*{box-sizing:border-box}html,body{margin:0;padding:0}@media print{@page{size:A4;margin:9mm}}</style>`
   return `${styles}<div style="max-width:210mm;margin:0 auto;background:#ffffff">${body}</div>`
 }

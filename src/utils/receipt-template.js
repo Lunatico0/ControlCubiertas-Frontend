@@ -37,12 +37,13 @@ export function renderComprobanteHTML({ design = {}, company = {}, footer = "", 
   const duplicado = design.duplicado !== false
   const sections = (design.sections && design.sections.length ? design.sections : DEFAULT_SECTIONS).filter((s) => s.on)
 
+  // Con duplicado, las dos copias deben entrar en UNA hoja A4 → padding compacto.
   const copies = duplicado
-    ? [{ label: "ORIGINAL", cut: false, padTop: "30px", labelTop: "18px" }, { label: "DUPLICADO", cut: true, padTop: "40px", labelTop: "40px" }]
-    : [{ label: "ORIGINAL", cut: false, padTop: "30px", labelTop: "18px" }]
+    ? [{ label: "ORIGINAL", cut: false, padTop: "18px", labelTop: "12px" }, { label: "DUPLICADO", cut: true, padTop: "26px", labelTop: "26px" }]
+    : [{ label: "ORIGINAL", cut: false, padTop: "22px", labelTop: "16px" }]
 
   const headerHTML = showHeader ? `
-    <div style="display:flex;flex-direction:column;align-items:${headerAlign};gap:9px;margin-bottom:13px;width:100%">
+    <div style="display:flex;flex-direction:column;align-items:${headerAlign};gap:6px;margin-bottom:9px;width:100%">
       <div style="display:flex;width:100%;justify-content:${logoJustify}">
         ${design.logo
           ? `<img src="${design.logo}" alt="logo" style="height:${logoH};max-width:240px;object-fit:contain" />`
@@ -50,33 +51,33 @@ export function renderComprobanteHTML({ design = {}, company = {}, footer = "", 
       </div>
       <div style="width:100%;text-align:${align}">
         <div style="font-size:${fs.h1};font-weight:700;color:#16181A;letter-spacing:-.01em">${esc(company.name) || "Tu empresa"}</div>
-        <div style="font-size:${fs.small};color:#5C6066;line-height:1.6;margin-top:2px">CUIT ${esc(company.cuit) || "—"} · Tel ${esc(company.phone) || "—"}<br/>${esc(company.address) || "—"}</div>
+        <div style="font-size:${fs.small};color:#5C6066;line-height:1.5;margin-top:2px">CUIT ${esc(company.cuit) || "—"} · Tel ${esc(company.phone) || "—"}<br/>${esc(company.address) || "—"}</div>
       </div>
     </div>` : ""
 
   const sectionsHTML = sections.map((s) => {
     const sd = sectionData[s.key]
     if (!sd || !sd.rows || !sd.rows.length) return ""
-    return `<div style="margin-bottom:13px">
-      <div style="font-size:${fs.label};font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:${accent};margin-bottom:5px">${esc(sd.heading || s.label)}</div>
+    return `<div style="margin-bottom:9px">
+      <div style="font-size:${fs.label};font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:${accent};margin-bottom:4px">${esc(sd.heading || s.label)}</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 22px">
-        ${sd.rows.map((r) => `<div style="display:flex;justify-content:space-between;gap:10px;font-size:${fs.base};border-bottom:1px dotted #D8D8D8;padding:3px 0"><span style="color:#6A6E72">${esc(r.k)}</span><span style="color:#16181A;font-weight:600;text-align:right">${esc(r.v)}</span></div>`).join("")}
+        ${sd.rows.map((r) => `<div style="display:flex;justify-content:space-between;gap:10px;font-size:${fs.base};border-bottom:1px dotted #D8D8D8;padding:2.5px 0"><span style="color:#6A6E72">${esc(r.k)}</span><span style="color:#16181A;font-weight:600;text-align:right">${esc(r.v)}</span></div>`).join("")}
       </div>
     </div>`
   }).join("")
 
   const copyHTML = (copy) => `
-    <div style="position:relative;padding:${copy.padTop} 32px 26px 32px;min-height:340px;font-family:${font};color:#16181A">
+    <div style="position:relative;padding:${copy.padTop} 32px 16px 32px;font-family:${font};color:#16181A;break-inside:avoid;page-break-inside:avoid">
       ${copy.cut ? `<div style="position:absolute;top:0;left:0;right:0;display:flex;align-items:center;gap:9px;padding:0 16px;transform:translateY(-50%)"><div style="flex:1;border-top:1.5px dashed #BFBFBF"></div><span style="font-size:8.5px;font-family:'IBM Plex Mono';color:#AAAAAA;letter-spacing:.08em">CORTAR AQUÍ</span><div style="flex:1;border-top:1.5px dashed #BFBFBF"></div></div>` : ""}
       <div style="position:absolute;top:${copy.labelTop};right:32px;font-family:'IBM Plex Mono';font-size:8.5px;letter-spacing:.12em;color:${accent};border:1px solid ${accent};padding:2px 8px;border-radius:4px">${copy.label}</div>
       ${headerHTML}
-      <div style="height:2.5px;background:${accent};border-radius:2px;margin-bottom:13px"></div>
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:14px;margin-bottom:15px">
+      <div style="height:2.5px;background:${accent};border-radius:2px;margin-bottom:9px"></div>
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:14px;margin-bottom:10px">
         <div><div style="font-size:${fs.small};font-family:'IBM Plex Mono';color:#8A8E92;letter-spacing:.04em">COMPROBANTE N°</div><div style="font-size:${fs.h2};font-weight:700;color:#16181A;font-family:'IBM Plex Mono';margin-top:1px">${esc(meta.numero) || "0000-00000000"}</div></div>
         <div style="text-align:right"><div style="font-size:${fs.small};color:#8A8E92">Fecha: <span style="color:#16181A;font-weight:600">${esc(meta.fecha)}</span></div>${meta.tipo ? `<span style="display:inline-block;margin-top:5px;font-size:${fs.small};font-weight:700;color:#FFFFFF;background:${accent};padding:3px 11px;border-radius:5px;letter-spacing:.02em">${esc(meta.tipo)}</span>` : ""}</div>
       </div>
       ${sectionsHTML}
-      <div style="margin-top:14px;padding-top:9px;border-top:1px solid #E4E4E4;font-size:${fs.small};color:#7A7E82;line-height:1.5;text-align:${align}">${esc(footer)}</div>
+      <div style="margin-top:10px;padding-top:7px;border-top:1px solid #E4E4E4;font-size:${fs.small};color:#7A7E82;line-height:1.45;text-align:${align}">${esc(footer)}</div>
     </div>`
 
   return copies.map((c) => copyHTML(c)).join("")
