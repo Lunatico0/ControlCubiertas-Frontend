@@ -9,7 +9,7 @@ import LocalShippingOutlinedIcon from "@mui/icons-material/LocalShippingOutlined
 import ReceiptLongRoundedIcon from "@mui/icons-material/ReceiptLongRounded"
 import Inventory2OutlinedIcon from "@mui/icons-material/Inventory2Outlined"
 import WarningAmberRoundedIcon from "@mui/icons-material/WarningAmberRounded"
-import { tint } from "./status"
+import { tint, metaOf } from "./status"
 
 // Pantalla de Inicio del operario: saludo + buscador grande + accesos directos.
 // onNavigate(section, intent) lo provee el OperativaLayout para saltar al inventario
@@ -24,7 +24,7 @@ const Inicio = ({ onNavigate }) => {
   const counts = {
     stock: tires.filter((t) => !t.vehicle).length,
     circ: tires.filter((t) => t.vehicle).length,
-    recapar: tires.filter((t) => t.status === "A recapar").length,
+    recapar: tires.filter((t) => metaOf(t.status).role === "recap").length,
   }
 
   const goSearch = () => onNavigate("cubiertas", { query: q.trim() })

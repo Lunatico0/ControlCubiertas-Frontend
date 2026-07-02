@@ -1,17 +1,40 @@
-// Helpers compartidos de la operativa: mapa de estado → color del design system +
-// nivel de recapado, badge de estado, pips y formateadores. Usados por el inventario
-// (Cubiertas) y el drawer de detalle (TireDrawer).
+// Helpers compartidos de la operativa: catálogo de estados (color + nivel + rol),
+// badge, pips y formateadores. Los estados son CONFIGURABLES por tenant: el catálogo se
+// arma desde tenant.stockStatuses ([{name,role}]) y lo setea ApiProvider al cargar, vía
+// setStatusCatalog(). El color es automático por rol + posición en la escalera (no se
+// configura). metaOf() lee el catálogo del módulo (evita prop-drilling y ciclos de import).
 
-export const STATUS_META = {
-  "Nueva": { color: "var(--st-lime)", level: 0 },
-  "1er Recapado": { color: "var(--st-teal)", level: 1 },
-  "2do Recapado": { color: "var(--st-blue)", level: 2 },
-  "3er Recapado": { color: "var(--st-purple)", level: 3 },
-  "A recapar": { color: "var(--st-orange)", level: 0 },
-  "Descartada": { color: "var(--st-red)", level: 0 },
+// Paleta de la escalera (initial + stock) por posición; cicla si hay más estados que colores.
+const STOCK_PALETTE = ["--st-lime", "--st-teal", "--st-blue", "--st-purple"]
+const FALLBACK = { color: "var(--tx-5)", level: 0, role: "stock" }
+
+// Color por rol: recap y discard tienen color fijo (semántica); initial/stock por posición.
+export const colorForStatus = (role, stockIndex) => {
+  if (role === "recap") return "var(--st-orange)"
+  if (role === "discard") return "var(--st-red)"
+  return `var(${STOCK_PALETTE[stockIndex % STOCK_PALETTE.length]})`
 }
 
-export const metaOf = (status) => STATUS_META[status] || { color: "var(--tx-5)", level: 0 }
+// Construye el mapa nombre → {color, level, role} desde la config del tenant [{name,role}].
+// level = posición dentro de la escalera (initial=0, 1er stock=1, ...), alimenta los pips.
+export const buildStatusMeta = (statuses = []) => {
+  const meta = {}
+  let stockIndex = 0
+  for (const s of statuses) {
+    if (!s?.name) continue
+    const isScale = s.role === "initial" || s.role === "stock"
+    const idx = isScale ? stockIndex++ : 0
+    meta[s.name] = { color: colorForStatus(s.role, idx), level: idx, role: s.role }
+  }
+  return meta
+}
+
+// Catálogo activo del tenant (seteado por ApiProvider al cargar la empresa).
+let _catalog = {}
+export const setStatusCatalog = (catalog) => { _catalog = catalog || {} }
+export const getStatusCatalog = () => _catalog
+
+export const metaOf = (status) => _catalog[status] || FALLBACK
 export const tint = (color, pct) => `color-mix(in srgb, ${color} ${pct}%, transparent)`
 export const fmtKm = (n) => `${(n ?? 0).toLocaleString("es-AR")} km`
 export const fmtDate = (d) => (d ? new Date(d).toLocaleDateString("es-AR") : "—")

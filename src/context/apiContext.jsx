@@ -18,6 +18,8 @@ import {
 import { fetchAllVehicles, fetchVehicleById, createVehicle, updateVehicle, updateDetails, updateVehicleAxles } from "../api/vehicles"
 
 import { checkOrderNumber } from "../api/orders"
+import { getCompanyCached } from "../api/company"
+import { buildStatusMeta, setStatusCatalog } from "../components/Operativa/status"
 
 const ApiContext = createContext()
 
@@ -57,6 +59,8 @@ export const ApiProvider = ({ children }) => {
   const [availableStatuses, setAvailableStatuses] = useState([])
   const [vehiclesWTires, setVehiclesWTires] = useState([])
   const [suggestedCode, setSuggestedCode] = useState("")
+  // Estados de cubierta configurables del tenant [{name,role}] — fuente para /op.
+  const [statuses, setStatuses] = useState([])
 
   // Estados de control
   const [refreshTrigger, setRefreshTrigger] = useState(0)
@@ -392,6 +396,17 @@ export const ApiProvider = ({ children }) => {
     initializeData()
   }, [])
 
+  // Cargar los estados configurables del tenant y setear el catálogo (colores/roles) para /op.
+  useEffect(() => {
+    getCompanyCached()
+      .then((c) => {
+        const st = Array.isArray(c?.stockStatuses) ? c.stockStatuses : []
+        setStatuses(st)
+        setStatusCatalog(buildStatusMeta(st))
+      })
+      .catch(() => {})
+  }, [])
+
   // Efecto para recargar cuando cambia refreshTrigger
   useEffect(() => {
     if (refreshTrigger > 0) {
@@ -481,6 +496,20 @@ export const ApiProvider = ({ children }) => {
     }
   }, [tires])
 
+  // Estados configurables derivados (para /op): catálogo + roles + escalera + orden.
+  const statusHelpers = useMemo(() => {
+    const byRole = (role) => statuses.find((s) => s.role === role)?.name
+    return {
+      statuses,
+      statusMeta: buildStatusMeta(statuses),
+      initialStatus: byRole("initial"),
+      discardStatus: byRole("discard"),
+      recapStatus: byRole("recap"),
+      stockScale: statuses.filter((s) => s.role === "initial" || s.role === "stock").map((s) => s.name),
+      stateOrder: statuses.map((s) => s.name),
+    }
+  }, [statuses])
+
   // Valor del contexto memoizado
   const contextValue = useMemo(() => ({
     // ==========================
@@ -495,6 +524,7 @@ export const ApiProvider = ({ children }) => {
       filteredTireData,
       suggestedCode,
       tireCount,
+      ...statusHelpers,
     },
 
     // ==========================
@@ -559,7 +589,7 @@ export const ApiProvider = ({ children }) => {
     // Dependencias (las mismas que antes, agrupadas si querés)
     tires, vehicles, selectedTire, selectedVehicle,
     vehiclesWTires, availableBrands, filteredTireData,
-    availableStatuses, suggestedCode, tireCount,
+    availableStatuses, suggestedCode, tireCount, statusHelpers,
     error, loading, selectedLoading, filters, searchQuery
   ])
 

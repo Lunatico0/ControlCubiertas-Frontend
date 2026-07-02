@@ -27,6 +27,7 @@ const todayLocal = () => {
 const AltaDrawer = ({ onClose, onCreated }) => {
   const { tires, data, orders } = useContext(ApiContext)
   const { print } = usePrint()
+  const initialStatus = data?.initialStatus || "Nueva" // estado de alta configurable del tenant
   const [form, setForm] = useState({
     code: data?.suggestedCode || "",
     serialNumber: "",
@@ -60,7 +61,7 @@ const AltaDrawer = ({ onClose, onCreated }) => {
       let receipt = "0000-00000000"
       try { receipt = await orders.getNextReceipt() } catch { /* si falla, se imprime sin N° */ }
       const created = await tires.create({
-        status: "Nueva",
+        status: initialStatus,
         code: form.code,
         serialNumber: form.serialNumber,
         brand: form.brand,
@@ -81,7 +82,7 @@ const AltaDrawer = ({ onClose, onCreated }) => {
           size: form.size,
           pattern: form.pattern,
           kilometers: Number(form.kilometers) || 0,
-          status: "Nueva",
+          status: initialStatus,
           orderNumber: form.orderNumber,
           vehicle: null,
         }, receipt)

@@ -20,13 +20,18 @@ const TABS = [
   { key: "recapar", label: "A recapar" },
 ]
 
-// Orden del ciclo de vida (para ordenar por estado de forma significativa, no alfabética).
-const STATE_ORDER = ["Nueva", "1er Recapado", "2do Recapado", "3er Recapado", "A recapar", "Descartada"]
+// Rank de estado para ordenar de forma significativa (no alfabética): escalera por nivel,
+// luego a-recapar, luego baja. Deriva del catálogo del tenant vía metaOf (rol + nivel).
+const statusRank = (status) => {
+  const m = metaOf(status)
+  const base = { initial: 0, stock: 0, recap: 1000, discard: 2000 }[m.role] ?? 0
+  return base + (m.level || 0)
+}
 
 // Columnas de la tabla. `sort` define el criterio; null = no ordenable.
 const COLUMNS = [
   { key: "code", label: "Código", sort: (a, b) => (a.code ?? 0) - (b.code ?? 0) },
-  { key: "status", label: "Estado", sort: (a, b) => STATE_ORDER.indexOf(a.status) - STATE_ORDER.indexOf(b.status) },
+  { key: "status", label: "Estado", sort: (a, b) => statusRank(a.status) - statusRank(b.status) },
   { key: "brand", label: "Marca / Rodado", sort: (a, b) => (a.brand || "").localeCompare(b.brand || "") },
   { key: "location", label: "Ubicación", sort: (a, b) => (a.vehicle?.mobile || "~").localeCompare(b.vehicle?.mobile || "~") },
   { key: "km", label: "Km", align: "right", sort: (a, b) => (a.kilometers || 0) - (b.kilometers || 0) },
@@ -89,7 +94,7 @@ const Cubiertas = ({ intent }) => {
       todas: tires.length,
       stock: tires.filter((t) => !t.vehicle).length,
       circulacion: tires.filter((t) => t.vehicle).length,
-      recapar: tires.filter((t) => t.status === "A recapar").length,
+      recapar: tires.filter((t) => metaOf(t.status).role === "recap").length,
     }),
     [tires],
   )
@@ -101,7 +106,7 @@ const Cubiertas = ({ intent }) => {
     const base = tires.filter((t) => {
       if (tab === "stock" && t.vehicle) return false
       if (tab === "circulacion" && !t.vehicle) return false
-      if (tab === "recapar" && t.status !== "A recapar") return false
+      if (tab === "recapar" && metaOf(t.status).role !== "recap") return false
       if (fBrand && t.brand !== fBrand) return false
       if (fStatus && t.status !== fStatus) return false
       if (kmMin != null && (t.kilometers || 0) < kmMin) return false
@@ -200,7 +205,7 @@ const Cubiertas = ({ intent }) => {
               <span className="text-[11px] font-semibold" style={{ color: "var(--tx-4)" }}>Estado</span>
               <select value={fStatus} onChange={(e) => setFStatus(e.target.value)} className="h-[38px] min-w-[150px] rounded-[8px] px-2.5 text-[13px] outline-none" style={inputStyle}>
                 <option value="">Todos</option>
-                {STATE_ORDER.map((s) => <option key={s} value={s}>{s}</option>)}
+                {(data?.stateOrder || []).map((s) => <option key={s} value={s}>{s}</option>)}
               </select>
             </label>
             <label className="flex flex-col gap-1.5">
@@ -255,9 +260,9 @@ const Cubiertas = ({ intent }) => {
                     <Row label="Actualizada" value={fmtDate(t.updatedAt)} mono />
                   </div>
                   <div className="flex border-t pt-[11px]" style={{ borderColor: "var(--bd-soft)", gap: "clamp(5px, 2.5cqi, 8px)", containerType: "inline-size" }} onClick={(e) => e.stopPropagation()}>
-                    {!t.vehicle && t.status !== "Descartada" && <OpActionBtn type="assign" full onClick={openDrawer(t._id, "assign")} />}
+                    {!t.vehicle && metaOf(t.status).role !== "discard" && <OpActionBtn type="assign" full onClick={openDrawer(t._id, "assign")} />}
                     {t.vehicle && <OpActionBtn type="unassign" full onClick={openDrawer(t._id, "unassign")} />}
-                    {t.status === "A recapar" && <OpActionBtn type="recap" full onClick={openDrawer(t._id, "recap")} />}
+                    {metaOf(t.status).role === "recap" && <OpActionBtn type="recap" full onClick={openDrawer(t._id, "recap")} />}
                     <OpActionBtn type="view" square onClick={openDrawer(t._id)} />
                   </div>
                 </div>
@@ -302,10 +307,10 @@ const Cubiertas = ({ intent }) => {
                   <div className="text-right text-[13px] font-semibold" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx)" }}>{fmtKm(t.kilometers)}</div>
                   <div className="text-right text-[12px]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-5)" }}>{fmtDate(t.updatedAt)}</div>
                   <div className="flex items-center justify-end gap-1.5">
-                    {!t.vehicle && t.status !== "Descartada" && <OpActionBtn type="assign" square size={36} onClick={openDrawer(t._id, "assign")} />}
+                    {!t.vehicle && metaOf(t.status).role !== "discard" && <OpActionBtn type="assign" square size={36} onClick={openDrawer(t._id, "assign")} />}
                     {t.vehicle && <OpActionBtn type="unassign" square size={36} onClick={openDrawer(t._id, "unassign")} />}
-                    {t.status === "A recapar" && <OpActionBtn type="recap" square size={36} onClick={openDrawer(t._id, "recap")} />}
-                    {!t.vehicle && t.status !== "Descartada" && <OpActionBtn type="discard" square size={36} onClick={openDrawer(t._id, "discard")} />}
+                    {metaOf(t.status).role === "recap" && <OpActionBtn type="recap" square size={36} onClick={openDrawer(t._id, "recap")} />}
+                    {!t.vehicle && metaOf(t.status).role !== "discard" && <OpActionBtn type="discard" square size={36} onClick={openDrawer(t._id, "discard")} />}
                     <OpActionBtn type="view" square size={36} onClick={openDrawer(t._id)} />
                   </div>
                 </div>

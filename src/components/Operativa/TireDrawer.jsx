@@ -12,10 +12,8 @@ import UndoRoundedIcon from "@mui/icons-material/UndoRounded"
 import CheckRoundedIcon from "@mui/icons-material/CheckRounded"
 import LocalPrintshopOutlinedIcon from "@mui/icons-material/LocalPrintshopOutlined"
 import { buildAssignPrintData, buildUnassignPrintData, buildFinishRecapPrintData, buildDiscardPrintData, buildUndoPrintData, buildCorrectionPrintData } from "@utils/print-data"
-import { metaOf, tint, fmtKm, fmtDate, StateBadge, STATUS_META } from "./status"
+import { metaOf, tint, fmtKm, fmtDate, StateBadge } from "./status"
 import { OpActionBtn } from "./opActions"
-
-const RECAP_STATES = ["1er Recapado", "2do Recapado", "3er Recapado"]
 
 const fieldStyle = { background: "var(--input)", border: "1.5px solid var(--bd)", color: "var(--tx)" }
 const labelCls = "mb-1.5 block text-[12.5px] font-medium"
@@ -41,8 +39,6 @@ const TimelineBtn = ({ onClick, disabled, icon, label, hover }) => (
 )
 
 // ----- Lifecycle stepper (ciclo de vida de la cubierta) -----
-const RECAP_CYCLE = ["Nueva", "1er Recapado", "2do Recapado", "3er Recapado"]
-const STEP_LABELS = ["Nueva", "1er Rec.", "2do Rec.", "3er Rec.", "Baja"]
 const STEP_STYLE = {
   done: { fill: "color-mix(in srgb, var(--ink-teal) 16%, transparent)", ring: "var(--ink-teal)", fg: "var(--ink-teal)" },
   active: { fill: "color-mix(in srgb, var(--ink-lime) 16%, transparent)", ring: "var(--ink-lime)", fg: "var(--ink-lime)" },
@@ -50,14 +46,19 @@ const STEP_STYLE = {
   x: { fill: "color-mix(in srgb, var(--ink-red) 16%, transparent)", ring: "var(--ink-red)", fg: "var(--ink-red)" },
   pending: { fill: "var(--input)", ring: "var(--bd-strong)", fg: "var(--tx-6)" },
 }
-const lifecycleSteps = (tire, history) => {
-  const discarded = tire.status === "Descartada"
-  const arecapar = tire.status === "A recapar"
-  const curIdx = RECAP_CYCLE.indexOf(tire.status)
-  const seen = history.map((h) => RECAP_CYCLE.indexOf(h.status)).filter((x) => x >= 0)
+const abbr = (name) => String(name || "").replace(/recapado/i, "Rec.")
+// Los pasos salen de la ESCALERA del tenant (initial+stock, en orden) + un paso final "Baja".
+// El nivel actual se deriva por rol/posición; "a recapar" (recap) y descartada (discard) no
+// son parte de la escalera → se resuelven por rol.
+const lifecycleSteps = (tire, history, scale = []) => {
+  const discarded = metaOf(tire.status).role === "discard"
+  const arecapar = metaOf(tire.status).role === "recap"
+  const curIdx = scale.indexOf(tire.status)
+  const seen = history.map((h) => scale.indexOf(h.status)).filter((x) => x >= 0)
   const level = curIdx >= 0 ? curIdx : (seen.length ? Math.max(...seen) : 0)
-  return STEP_LABELS.map((label, i) => {
-    if (i === 4) return { label, kind: discarded ? "x" : "pending" }
+  const labels = [...scale.map(abbr), "Baja"]
+  return labels.map((label, i) => {
+    if (i === labels.length - 1) return { label, kind: discarded ? "x" : "pending" }
     if (i < level) return { label, kind: "done" }
     if (i === level) return { label, kind: discarded ? "done" : arecapar ? "warn" : "active" }
     return { label, kind: "pending" }
@@ -72,7 +73,7 @@ const histColor = (h) => {
   if (/^desasign/i.test(t)) return "var(--ink-orange)"
   if (/^correcc/i.test(t)) return "var(--ink-purple)"
   if (t === "Alta") return "var(--ink-lime)"
-  if (/descart/i.test(t) || h.status === "Descartada") return "var(--ink-red)"
+  if (/descart/i.test(t) || metaOf(h.status).role === "discard") return "var(--ink-red)"
   return metaOf(h.status).color
 }
 
@@ -83,7 +84,7 @@ const histDetail = (h) => {
   if (t.startsWith("desasign")) return "Desmontada del vehículo"
   if (t === "alta") return "Ingreso a stock"
   if (t.startsWith("correcc")) return "Corrección de un movimiento anterior"
-  if (h.status === "Descartada") return "Baja definitiva"
+  if (metaOf(h.status).role === "discard") return "Baja definitiva"
   if (h.status) return `Cambio de estado a ${h.status}`
   return "Movimiento"
 }
@@ -100,6 +101,7 @@ const histBits = (h) => {
 const TireDrawer = ({ tireId, initialAction, onClose }) => {
   const { tires, orders, data } = useContext(ApiContext)
   const vehicles = data?.vehicles || []
+  const { statuses = [], stockScale = [], discardStatus } = data || {}
 
   const [tire, setTire] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -201,7 +203,7 @@ const TireDrawer = ({ tireId, initialAction, onClose }) => {
     if (!form.orderNumber) return showToast("warning", "Completá el N° de orden")
     discardAct.execute({
       tire,
-      formData: { status: "Descartada", orderNumber: form.orderNumber, getReceiptNumber: orders.getNextReceipt },
+      formData: { status: discardStatus, orderNumber: form.orderNumber, getReceiptNumber: orders.getNextReceipt },
       refresh: reload,
       close: closeAction,
     })
@@ -242,7 +244,7 @@ const TireDrawer = ({ tireId, initialAction, onClose }) => {
 
   const history = [...(tire?.history || [])].sort((a, b) => new Date(b.date) - new Date(a.date))
   const lastReceiptEntry = history.find((h) => h.receiptNumber) // para "Imprimir recibo" (último comprobante)
-  const steps = tire ? lifecycleSteps(tire, history) : []
+  const steps = tire ? lifecycleSteps(tire, history, stockScale) : []
   const infoItems = tire ? [
     { label: "Marca", value: tire.brand || "—" },
     { label: "Rodado", value: tire.size || "—", mono: true },
@@ -253,7 +255,8 @@ const TireDrawer = ({ tireId, initialAction, onClose }) => {
     { label: "Kilómetros", value: fmtKm(tire.kilometers), mono: true },
     { label: "Fecha de alta", value: fmtDate(tire.createdAt), mono: true },
   ] : []
-  const recapOptions = RECAP_STATES.filter((s) => RECAP_STATES.indexOf(s) > RECAP_STATES.indexOf(tire?.status))
+  // Opciones de "recapado listo": los estados de la escalera con rol stock (los recapados).
+  const recapOptions = statuses.filter((s) => s.role === "stock").map((s) => s.name)
 
   const ACTION_TITLES = { assign: "Asignar a vehículo", unassign: "Desasignar cubierta", recap: "Registrar recapado", discard: "Descartar cubierta", undo: "Deshacer entrada", editHist: "Corregir entrada de historial" }
 
@@ -382,7 +385,7 @@ const TireDrawer = ({ tireId, initialAction, onClose }) => {
                     <Field label="Estado">
                       <select className="w-full rounded-[9px] px-3 py-2.5 text-[14px] outline-none" style={fieldStyle} value={form.status || ""} onChange={set("status")}>
                         <option value="">Seleccionar estado…</option>
-                        {Object.keys(STATUS_META).map((s) => <option key={s} value={s}>{s}</option>)}
+                        {statuses.map((s) => <option key={s.name} value={s.name}>{s.name}</option>)}
                       </select>
                     </Field>
                     {editBaseType(actionEntry) === "Asignación" && (
@@ -464,11 +467,11 @@ const TireDrawer = ({ tireId, initialAction, onClose }) => {
 
                 {/* Acciones (estilo Claude Design) */}
                 <div className="mb-7 flex flex-wrap gap-2">
-                  {!tire.vehicle && tire.status !== "Descartada" && <OpActionBtn type="assign" size={44} onClick={() => openAction("assign")} />}
+                  {!tire.vehicle && metaOf(tire.status).role !== "discard" && <OpActionBtn type="assign" size={44} onClick={() => openAction("assign")} />}
                   {tire.vehicle && <OpActionBtn type="unassign" size={44} onClick={() => openAction("unassign")} />}
-                  {tire.status === "A recapar" && <OpActionBtn type="recap" size={44} onClick={() => openAction("recap")} />}
+                  {metaOf(tire.status).role === "recap" && <OpActionBtn type="recap" size={44} onClick={() => openAction("recap")} />}
                   {lastReceiptEntry && <OpActionBtn type="print" size={44} onClick={() => reprintAct.execute({ entry: lastReceiptEntry, tire })} disabled={reprintAct.isPrinting} />}
-                  {!tire.vehicle && tire.status !== "Descartada" && <OpActionBtn type="discard" size={44} onClick={() => openAction("discard")} />}
+                  {!tire.vehicle && metaOf(tire.status).role !== "discard" && <OpActionBtn type="discard" size={44} onClick={() => openAction("discard")} />}
                 </div>
 
                 {/* Timeline del historial */}
