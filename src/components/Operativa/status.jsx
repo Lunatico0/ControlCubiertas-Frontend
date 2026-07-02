@@ -24,7 +24,8 @@ export const buildStatusMeta = (statuses = []) => {
     if (!s?.name) continue
     const isScale = s.role === "initial" || s.role === "stock"
     const idx = isScale ? stockIndex++ : 0
-    meta[s.name] = { color: colorForStatus(s.role, idx), level: idx, role: s.role }
+    // color persistido (preset/custom del panel) o, si no hay, el automático por rol+posición.
+    meta[s.name] = { color: s.color || colorForStatus(s.role, idx), level: idx, role: s.role }
   }
   return meta
 }

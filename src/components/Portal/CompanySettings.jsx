@@ -1,8 +1,11 @@
 import { useState, useEffect } from "react"
 import { useForm } from "react-hook-form"
-import CloseRoundedIcon from "@mui/icons-material/CloseRounded"
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined"
+import CheckRoundedIcon from "@mui/icons-material/CheckRounded"
+import RemoveRoundedIcon from "@mui/icons-material/RemoveRounded"
 import AddRoundedIcon from "@mui/icons-material/AddRounded"
-import { getCompany, updateCompany } from "@api/admin"
+import ArrowForwardRoundedIcon from "@mui/icons-material/ArrowForwardRounded"
+import { getCompany, updateCompany, getSummary } from "@api/admin"
 import { showToast } from "@utils/toast"
 
 const inputClass =
@@ -10,56 +13,78 @@ const inputClass =
 const labelClass = "mb-1.5 block text-sm font-medium text-slate-300"
 const cardClass = "rounded-xl border border-slate-800 bg-slate-950/60 p-6"
 
+// Presets de color + fallback automático (mismo criterio que /op: escalera por posición).
+const COLOR_PRESETS = ["#C4ED2B", "#3FD9BE", "#6E97F5", "#B39CF7", "#F0A85A", "#F0716A", "#5AC8F0", "#F078C8", "#9AE86A", "#E8C84A"]
+const STOCK_HEX = ["#C4ED2B", "#3FD9BE", "#6E97F5", "#B39CF7"]
+const autoColor = (role, stockIdx) => (role === "recap" ? "#F0A85A" : role === "discard" ? "#F0716A" : STOCK_HEX[stockIdx % STOCK_HEX.length])
+const ORDINALS = { 1: "1er", 2: "2do", 3: "3er", 4: "4to", 5: "5to", 6: "6to", 7: "7mo", 8: "8vo", 9: "9no", 10: "10mo" }
+const ordinal = (n) => ORDINALS[n] || `${n}º`
+const ROLE_LABEL = { initial: "Inicial", stock: "Recapado", recap: "A recapar", discard: "Baja" }
+const isFixed = (role) => role === "initial" || role === "recap" || role === "discard"
+
 const CompanySettings = () => {
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { isSubmitting, isDirty },
-  } = useForm()
+  const { register, handleSubmit, reset, formState: { isSubmitting } } = useForm()
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
-  const [meta, setMeta] = useState(null) // plan/status/dbName (no editables)
-  const [stockStatuses, setStockStatuses] = useState([])
-  const [newStatus, setNewStatus] = useState("")
+  const [meta, setMeta] = useState(null)
+  const [statuses, setStatuses] = useState([]) // [{name, role, color?}] ordenado
+  const [usage, setUsage] = useState({}) // { nombreEstado: cantidadDeCubiertas }
+  const [editing, setEditing] = useState(null) // índice del estado en edición (popover)
 
   useEffect(() => {
-    getCompany()
-      .then((c) => {
+    Promise.all([getCompany(), getSummary().catch(() => null)])
+      .then(([c, s]) => {
         reset({
-          name: c.name || "",
-          cuit: c.cuit || "",
-          phone: c.phone || "",
-          address: c.address || "",
-          receiptPrefix: c.receiptPrefix || "",
-          receiptFooter: c.receiptFooter || "",
+          name: c.name || "", cuit: c.cuit || "", phone: c.phone || "",
+          address: c.address || "", receiptPrefix: c.receiptPrefix || "", receiptFooter: c.receiptFooter || "",
         })
-        setStockStatuses(c.stockStatuses || [])
+        setStatuses(Array.isArray(c.stockStatuses) ? c.stockStatuses : [])
+        setUsage(s?.cubiertas?.byStatus || {})
         setMeta({ plan: c.plan, status: c.status, dbName: c.dbName })
       })
       .catch((e) => setError(e.message || "No se pudo cargar la empresa"))
       .finally(() => setLoading(false))
   }, [reset])
 
-  const addStatus = () => {
-    const v = newStatus.trim()
-    if (v && !stockStatuses.includes(v)) setStockStatuses((prev) => [...prev, v])
-    setNewStatus("")
+  // Color efectivo (persistido o automático por posición en la escalera).
+  const colorAt = (i) => {
+    const s = statuses[i]
+    if (s.color) return s.color
+    const stockIdx = statuses.slice(0, i + 1).filter((x) => x.role === "initial" || x.role === "stock").length - 1
+    return autoColor(s.role, stockIdx < 0 ? 0 : stockIdx)
   }
-  const removeStatus = (s) => setStockStatuses((prev) => prev.filter((x) => x !== s))
+  const patchAt = (i, patch) => setStatuses((prev) => prev.map((s, idx) => (idx === i ? { ...s, ...patch } : s)))
+  const recapCount = statuses.filter((s) => s.role === "stock").length
+
+  // Reconstruye el ciclo ordenado (inicial → recapados → a recapar → baja).
+  const rebuild = (stocks) => {
+    const initial = statuses.filter((s) => s.role === "initial")
+    const recap = statuses.filter((s) => s.role === "recap")
+    const discard = statuses.filter((s) => s.role === "discard")
+    setStatuses([...initial, ...stocks, ...recap, ...discard])
+  }
+  const addRecap = () => {
+    const stocks = statuses.filter((s) => s.role === "stock")
+    if (stocks.length >= 10) return
+    rebuild([...stocks, { name: `${ordinal(stocks.length + 1)} Recapado`, role: "stock" }])
+  }
+  const removeRecap = () => {
+    const stocks = statuses.filter((s) => s.role === "stock")
+    if (!stocks.length) return
+    const last = stocks[stocks.length - 1]
+    if ((usage[last.name] || 0) > 0) return showToast("warning", `No se puede quitar "${last.name}": ${usage[last.name]} cubierta(s) lo usan.`)
+    rebuild(stocks.slice(0, -1))
+  }
 
   const onSubmit = async (data) => {
     try {
-      const updated = await updateCompany({ ...data, stockStatuses })
+      const updated = await updateCompany({ ...data, stockStatuses: statuses })
       reset({
-        name: updated.name || "",
-        cuit: updated.cuit || "",
-        phone: updated.phone || "",
-        address: updated.address || "",
-        receiptPrefix: updated.receiptPrefix || "",
-        receiptFooter: updated.receiptFooter || "",
+        name: updated.name || "", cuit: updated.cuit || "", phone: updated.phone || "",
+        address: updated.address || "", receiptPrefix: updated.receiptPrefix || "", receiptFooter: updated.receiptFooter || "",
       })
-      setStockStatuses(updated.stockStatuses || [])
+      setStatuses(Array.isArray(updated.stockStatuses) ? updated.stockStatuses : [])
+      setEditing(null)
       showToast("success", "Datos de la empresa actualizados")
     } catch (err) {
       showToast("error", err.message || "No se pudieron guardar los cambios")
@@ -115,42 +140,89 @@ const CompanySettings = () => {
           </div>
         </section>
 
-        {/* Estados de stock */}
+        {/* Estados de stock (ciclo de vida configurable) */}
         <section className={cardClass}>
           <h2 className="font-display text-lg font-semibold text-white">Estados de stock</h2>
-          <p className="mt-1 text-sm text-slate-400">Los estados que tus cubiertas pueden tener en depósito.</p>
-          <div className="mt-4 flex flex-wrap gap-2">
-            {stockStatuses.map((s) => (
-              <span key={s} className="inline-flex items-center gap-1.5 rounded-full bg-slate-800 px-3 py-1 text-sm text-slate-200">
-                {s}
-                <button type="button" onClick={() => removeStatus(s)} className="text-slate-500 transition hover:text-red-400" aria-label={`Quitar ${s}`}>
-                  <CloseRoundedIcon sx={{ fontSize: 14 }} />
-                </button>
-              </span>
-            ))}
-            {stockStatuses.length === 0 && <span className="text-sm text-slate-500">Sin estados configurados.</span>}
+          <p className="mt-1 text-sm text-slate-400">
+            El ciclo tiene estados fijos que siempre existen; podés ajustar su nombre y color. La cantidad de recapados define cuántos estados intermedios hay.
+          </p>
+
+          {/* Recapados permitidos (stepper) */}
+          <div className="mt-4 mb-5 flex items-center gap-4 rounded-xl border border-slate-800 bg-slate-900/50 p-4">
+            <div className="min-w-0 flex-1">
+              <div className="text-sm font-semibold text-slate-200">Recapados permitidos</div>
+              <div className="mt-0.5 text-xs text-slate-500">Cuántas veces se puede recapar antes de descartar. Agrega o quita estados intermedios.</div>
+            </div>
+            <div className="flex flex-none items-center gap-1 rounded-lg border border-slate-700 bg-slate-950 p-1">
+              <button type="button" onClick={removeRecap} disabled={recapCount === 0} title="Menos"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-slate-700 text-slate-300 transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-40">
+                <RemoveRoundedIcon sx={{ fontSize: 17 }} />
+              </button>
+              <div className="w-12 text-center font-display text-2xl font-bold text-white">{recapCount}</div>
+              <button type="button" onClick={addRecap} disabled={recapCount >= 10} title="Más"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-slate-700 text-slate-300 transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-40">
+                <AddRoundedIcon sx={{ fontSize: 17 }} />
+              </button>
+            </div>
           </div>
-          <div className="mt-3 flex gap-2">
-            <input
-              value={newStatus}
-              onChange={(e) => setNewStatus(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault()
-                  addStatus()
-                }
-              }}
-              placeholder="Agregar estado…"
-              className={`${inputClass} max-w-xs`}
-            />
-            <button
-              type="button"
-              onClick={addStatus}
-              className="inline-flex items-center gap-1 rounded-lg border border-slate-700 px-3 py-2.5 text-sm font-medium text-slate-200 transition hover:bg-slate-800"
-            >
-              <AddRoundedIcon fontSize="small" />
-              Agregar
-            </button>
+
+          {/* Ciclo · chips editables */}
+          <div className="mb-2.5 font-mono text-[10px] tracking-wider text-slate-500">CICLO · {statuses.length} ESTADOS · TOCÁ PARA EDITAR</div>
+          <div className="flex flex-wrap items-center gap-x-1.5 gap-y-2">
+            {statuses.map((s, i) => {
+              const inUse = (usage[s.name] || 0) > 0
+              const fixed = isFixed(s.role)
+              return (
+                <div key={i} className="relative flex items-center gap-1.5">
+                  <button type="button" onClick={() => setEditing(editing === i ? null : i)}
+                    className="inline-flex items-center gap-2 rounded-full border border-slate-700 bg-slate-900 px-3 py-1.5 transition hover:border-slate-500"
+                    title={ROLE_LABEL[s.role]}>
+                    <span className="h-[11px] w-[11px] flex-none rounded-full" style={{ background: colorAt(i) }} />
+                    <span className="text-[12.5px] font-semibold text-slate-100">{s.name}</span>
+                    {fixed && <LockOutlinedIcon sx={{ fontSize: 12 }} className="text-slate-500" />}
+                    {inUse && <CheckRoundedIcon sx={{ fontSize: 13 }} className="text-emerald-400" />}
+                  </button>
+
+                  {editing === i && (
+                    <div className="absolute left-0 top-10 z-20 w-60 rounded-xl border border-slate-700 bg-slate-900 p-3.5 shadow-2xl">
+                      <div className="mb-1.5 font-mono text-[10px] font-semibold tracking-wider text-slate-500">NOMBRE</div>
+                      <input
+                        value={s.name}
+                        onChange={(e) => patchAt(i, { name: e.target.value })}
+                        disabled={inUse}
+                        title={inUse ? "En uso por cubiertas — no se puede renombrar" : ""}
+                        className="mb-3 h-9 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 text-[13.5px] font-semibold text-white outline-none focus:border-brand-500 disabled:opacity-50"
+                      />
+                      {inUse && <div className="-mt-2 mb-3 text-[11px] text-slate-500">En uso ({usage[s.name]}) — el nombre no se puede cambiar.</div>}
+
+                      <div className="mb-2 font-mono text-[10px] font-semibold tracking-wider text-slate-500">COLOR</div>
+                      <div className="grid grid-cols-5 gap-2">
+                        {COLOR_PRESETS.map((c) => {
+                          const sel = (colorAt(i) || "").toLowerCase() === c.toLowerCase()
+                          return (
+                            <button key={c} type="button" onClick={() => patchAt(i, { color: c })}
+                              className="aspect-square w-full rounded-md transition hover:scale-110"
+                              style={{ background: c, border: `2px solid ${sel ? "#fff" : "transparent"}`, outline: "1px solid rgba(255,255,255,.1)", outlineOffset: -1 }} />
+                          )
+                        })}
+                      </div>
+                      <label className="mt-3 flex items-center gap-2 text-[11px] text-slate-400">
+                        <input type="color" value={/^#[0-9a-f]{6}$/i.test(colorAt(i)) ? colorAt(i) : "#C4ED2B"} onChange={(e) => patchAt(i, { color: e.target.value })}
+                          className="h-7 w-9 cursor-pointer rounded border border-slate-700 bg-transparent p-0.5" />
+                        Color personalizado
+                      </label>
+                    </div>
+                  )}
+
+                  {i < statuses.length - 1 && <ArrowForwardRoundedIcon sx={{ fontSize: 14 }} className="text-slate-600" />}
+                </div>
+              )
+            })}
+          </div>
+
+          <div className="mt-4 space-y-1 text-[11.5px] text-slate-500">
+            <div className="flex items-center gap-1.5"><LockOutlinedIcon sx={{ fontSize: 12 }} /> Estados fijos: no se eliminan (inicial, a recapar y baja).</div>
+            <div className="flex items-center gap-1.5"><CheckRoundedIcon sx={{ fontSize: 13 }} className="text-emerald-400" /> En uso por cubiertas: no se pueden quitar ni renombrar.</div>
           </div>
         </section>
 
@@ -159,29 +231,17 @@ const CompanySettings = () => {
           <section className={cardClass}>
             <h2 className="mb-4 font-display text-lg font-semibold text-white">Plan</h2>
             <div className="flex flex-wrap gap-6 text-sm">
-              <div>
-                <p className="text-slate-500">Plan</p>
-                <p className="mt-0.5 font-medium capitalize text-slate-200">{meta.plan || "—"}</p>
-              </div>
-              <div>
-                <p className="text-slate-500">Estado</p>
-                <p className="mt-0.5 font-medium capitalize text-slate-200">{meta.status || "—"}</p>
-              </div>
-              <div>
-                <p className="text-slate-500">Base de datos</p>
-                <p className="mt-0.5 font-mono text-xs text-slate-400">{meta.dbName}</p>
-              </div>
+              <div><p className="text-slate-500">Plan</p><p className="mt-0.5 font-medium capitalize text-slate-200">{meta.plan || "—"}</p></div>
+              <div><p className="text-slate-500">Estado</p><p className="mt-0.5 font-medium capitalize text-slate-200">{meta.status || "—"}</p></div>
+              <div><p className="text-slate-500">Base de datos</p><p className="mt-0.5 font-mono text-xs text-slate-400">{meta.dbName}</p></div>
             </div>
             <p className="mt-3 text-xs text-slate-500">El plan y el estado los administra el equipo de ControlCubiertas.</p>
           </section>
         )}
 
         <div className="flex justify-end">
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="rounded-lg bg-brand-500 px-5 py-2.5 text-sm font-medium text-slate-900 transition hover:bg-brand-600 focus:ring-2 focus:ring-brand-500/40 disabled:cursor-not-allowed disabled:opacity-60"
-          >
+          <button type="submit" disabled={isSubmitting}
+            className="rounded-lg bg-brand-500 px-5 py-2.5 text-sm font-medium text-slate-900 transition hover:bg-brand-600 focus:ring-2 focus:ring-brand-500/40 disabled:cursor-not-allowed disabled:opacity-60">
             {isSubmitting ? "Guardando…" : "Guardar cambios"}
           </button>
         </div>
