@@ -54,25 +54,26 @@ function App() {
             }
           />
 
-          {/* Rediseño de la operación (work-in-progress) — preview sin romper la actual. */}
+          {/* UI vieja preservada en /legacy un tiempo, por adaptación (se retira más adelante). */}
           <Route
-            path="/op"
+            path="/legacy/*"
             element={
               <RequireAuth>
                 <ApiProvider>
-                  <OperativaLayout />
+                  <Layout />
                 </ApiProvider>
               </RequireAuth>
             }
           />
 
-          {/* App operativa actual: protegida + ApiProvider (que carga datos en el mount). */}
+          {/* Operación (rediseño): ahora la interfaz PRINCIPAL, en / y el resto de rutas.
+              React Router v6 rankea /legacy/* y /admin por encima de este catch-all. */}
           <Route
             path="/*"
             element={
               <RequireAuth>
                 <ApiProvider>
-                  <Layout />
+                  <OperativaLayout />
                 </ApiProvider>
               </RequireAuth>
             }
