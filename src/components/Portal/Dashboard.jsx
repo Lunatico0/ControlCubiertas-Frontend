@@ -13,19 +13,22 @@ import GroupRoundedIcon from "@mui/icons-material/GroupRounded"
 import ApartmentRoundedIcon from "@mui/icons-material/ApartmentRounded"
 import OpenInNewRoundedIcon from "@mui/icons-material/OpenInNewRounded"
 
-// Paleta de estados (independiente del brand): coherente entre donut y barras.
+// Paleta de estados del design system (coherente entre donut y barras).
 const STATUS_COLORS = {
-  Nueva: "#a3e635",
-  Recapadas: "#2dd4bf",
-  "A recapar": "#f59e0b",
-  Descartadas: "#64748b",
+  Nueva: "var(--st-lime)",
+  Recapadas: "var(--st-teal)",
+  "A recapar": "var(--st-orange)",
+  Descartadas: "var(--st-red)",
 }
+const card = { background: "var(--card)", border: "1px solid var(--bd)" }
+const tintBg = (c, pct = 14) => `color-mix(in srgb, ${c} ${pct}%, transparent)`
 
-// El backend devuelve byStatus con los 6 estados del ciclo; el dashboard los agrupa
-// en 4 categorías legibles (los 3 recapados suman "Recapadas").
+// El backend devuelve byStatus con los estados del ciclo; el dashboard los agrupa en 4
+// categorías legibles (los recapados suman "Recapadas").
 const groupStatuses = (byStatus = {}) => {
-  const recapadas =
-    (byStatus["1er Recapado"] || 0) + (byStatus["2do Recapado"] || 0) + (byStatus["3er Recapado"] || 0)
+  const recapadas = Object.entries(byStatus)
+    .filter(([k]) => /recapad/i.test(k))
+    .reduce((s, [, v]) => s + (v || 0), 0)
   return [
     { label: "Nueva", value: byStatus["Nueva"] || 0 },
     { label: "Recapadas", value: recapadas },
@@ -42,22 +45,12 @@ const Donut = ({ segments, size = 176, stroke = 22 }) => {
   return (
     <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
       <g transform={`rotate(-90 ${size / 2} ${size / 2})`}>
-        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="#1e293b" strokeWidth={stroke} />
+        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="var(--bd-strong)" strokeWidth={stroke} />
         {segments.map((seg, i) => {
           const len = (seg.value / total) * c
           const el = (
-            <circle
-              key={i}
-              cx={size / 2}
-              cy={size / 2}
-              r={r}
-              fill="none"
-              stroke={seg.color}
-              strokeWidth={stroke}
-              strokeDasharray={`${len} ${c - len}`}
-              strokeDashoffset={-offset}
-              strokeLinecap="butt"
-            />
+            <circle key={i} cx={size / 2} cy={size / 2} r={r} fill="none" stroke={seg.color} strokeWidth={stroke}
+              strokeDasharray={`${len} ${c - len}`} strokeDashoffset={-offset} strokeLinecap="butt" />
           )
           offset += len
           return el
@@ -68,17 +61,15 @@ const Donut = ({ segments, size = 176, stroke = 22 }) => {
 }
 
 const StatCard = ({ icon, tint, value, label, sublabel }) => (
-  <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-5">
+  <div className="rounded-xl p-5" style={card}>
     <div className="flex items-start justify-between">
       <div>
-        <p className="text-sm text-slate-400">{label}</p>
-        <p className="mt-1 font-display text-3xl font-bold text-white">{value}</p>
+        <p className="text-sm" style={{ color: "var(--tx-4)" }}>{label}</p>
+        <p className="mt-1 font-display text-3xl font-bold" style={{ color: "var(--tx)", fontFamily: "'Space Grotesk'" }}>{value}</p>
       </div>
-      <span className="grid h-11 w-11 place-items-center rounded-lg" style={{ backgroundColor: `${tint}1f`, color: tint }}>
-        {icon}
-      </span>
+      <span className="grid h-11 w-11 place-items-center rounded-lg" style={{ background: tintBg(tint, 12), color: tint }}>{icon}</span>
     </div>
-    {sublabel && <p className="mt-3 text-xs text-slate-500">{sublabel}</p>}
+    {sublabel && <p className="mt-3 text-xs" style={{ color: "var(--tx-6)" }}>{sublabel}</p>}
   </div>
 )
 
@@ -90,16 +81,13 @@ const Dashboard = () => {
   const [error, setError] = useState("")
 
   useEffect(() => {
-    getSummary()
-      .then(setData)
-      .catch((e) => setError(e.message || "No se pudo cargar el resumen"))
-      .finally(() => setLoading(false))
+    getSummary().then(setData).catch((e) => setError(e.message || "No se pudo cargar el resumen")).finally(() => setLoading(false))
   }, [])
 
   const displayName = user?.name || user?.email?.split("@")[0] || "admin"
 
-  if (loading) return <p className="text-sm text-slate-400">Cargando resumen…</p>
-  if (error) return <p className="text-sm text-red-400">{error}</p>
+  if (loading) return <p className="text-sm" style={{ color: "var(--tx-5)" }}>Cargando resumen…</p>
+  if (error) return <p className="text-sm" style={{ color: "var(--ink-red)" }}>{error}</p>
 
   const { cubiertas, vehiculos, senales } = data
   const segments = groupStatuses(cubiertas.byStatus)
@@ -107,28 +95,28 @@ const Dashboard = () => {
 
   return (
     <div className="mx-auto max-w-6xl">
-      <h1 className="font-display text-3xl font-bold text-white">¡Hola, {displayName}!</h1>
-      <p className="mt-1 text-slate-400">Este es el estado general de tu flota hoy.</p>
+      <h1 className="font-display text-3xl font-bold" style={{ color: "var(--tx)", fontFamily: "'Space Grotesk'" }}>¡Hola, {displayName}!</h1>
+      <p className="mt-1" style={{ color: "var(--tx-4)" }}>Este es el estado general de tu flota hoy.</p>
 
       {/* Métricas */}
       <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard icon={<StyleRoundedIcon />} tint="#a3e635" value={cubiertas.total} label="Total de cubiertas" sublabel="Todas las ubicaciones" />
-        <StatCard icon={<LocalShippingRoundedIcon />} tint="#2dd4bf" value={cubiertas.enCirculacion} label="En circulación" sublabel="Asignadas a vehículos" />
-        <StatCard icon={<WarehouseRoundedIcon />} tint="#60a5fa" value={cubiertas.enDeposito} label="En depósito" sublabel="Disponibles en depósito" />
-        <StatCard icon={<DirectionsBusRoundedIcon />} tint="#a78bfa" value={vehiculos.total} label="Vehículos" sublabel="En la flota activa" />
+        <StatCard icon={<StyleRoundedIcon />} tint="var(--ink-lime)" value={cubiertas.total} label="Total de cubiertas" sublabel="Todas las ubicaciones" />
+        <StatCard icon={<LocalShippingRoundedIcon />} tint="var(--ink-teal)" value={cubiertas.enCirculacion} label="En circulación" sublabel="Asignadas a vehículos" />
+        <StatCard icon={<WarehouseRoundedIcon />} tint="var(--ink-blue)" value={cubiertas.enDeposito} label="En depósito" sublabel="Disponibles en depósito" />
+        <StatCard icon={<DirectionsBusRoundedIcon />} tint="var(--ink-purple)" value={vehiculos.total} label="Vehículos" sublabel="En la flota activa" />
       </div>
 
       <div className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-2">
         {/* Estado de cubiertas */}
-        <section className="rounded-xl border border-slate-800 bg-slate-950/60 p-6">
-          <h2 className="font-display text-lg font-semibold text-white">Estado de cubiertas</h2>
+        <section className="rounded-xl p-6" style={card}>
+          <h2 className="font-display text-lg font-semibold" style={{ color: "var(--tx)", fontFamily: "'Space Grotesk'" }}>Estado de cubiertas</h2>
           <div className="mt-4 flex flex-col items-center gap-6 sm:flex-row">
             <div className="relative shrink-0">
               <Donut segments={segments} />
               <div className="absolute inset-0 grid place-items-center">
                 <div className="text-center">
-                  <div className="font-display text-2xl font-bold text-white">{cubiertas.total}</div>
-                  <div className="text-xs text-slate-500">cubiertas</div>
+                  <div className="font-display text-2xl font-bold" style={{ color: "var(--tx)", fontFamily: "'Space Grotesk'" }}>{cubiertas.total}</div>
+                  <div className="text-xs" style={{ color: "var(--tx-6)" }}>cubiertas</div>
                 </div>
               </div>
             </div>
@@ -138,16 +126,14 @@ const Dashboard = () => {
                 return (
                   <li key={s.label}>
                     <div className="flex items-center justify-between text-sm">
-                      <span className="flex items-center gap-2 text-slate-300">
-                        <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: s.color }} />
+                      <span className="flex items-center gap-2" style={{ color: "var(--tx-3)" }}>
+                        <span className="h-2.5 w-2.5 rounded-full" style={{ background: s.color }} />
                         {s.label}
                       </span>
-                      <span className="text-slate-400">
-                        {s.value} · {pct}%
-                      </span>
+                      <span style={{ color: "var(--tx-5)" }}>{s.value} · {pct}%</span>
                     </div>
-                    <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-slate-800">
-                      <div className="h-full rounded-full" style={{ width: `${pct}%`, backgroundColor: s.color }} />
+                    <div className="mt-1.5 h-1.5 overflow-hidden rounded-full" style={{ background: "var(--bd-strong)" }}>
+                      <div className="h-full rounded-full" style={{ width: `${pct}%`, background: s.color }} />
                     </div>
                   </li>
                 )
@@ -157,34 +143,26 @@ const Dashboard = () => {
         </section>
 
         {/* Atención requerida */}
-        <section className="rounded-xl border border-slate-800 bg-slate-950/60 p-6">
-          <h2 className="font-display text-lg font-semibold text-white">Atención requerida</h2>
+        <section className="rounded-xl p-6" style={card}>
+          <h2 className="font-display text-lg font-semibold" style={{ color: "var(--tx)", fontFamily: "'Space Grotesk'" }}>Atención requerida</h2>
           <div className="mt-4 space-y-3">
-            <button
-              onClick={() => navigate("/")}
-              className="flex w-full items-center gap-4 rounded-lg border border-amber-500/30 bg-amber-500/10 p-4 text-left transition hover:bg-amber-500/15"
-            >
-              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-lg bg-amber-500/20 text-amber-400">
-                <WarningAmberRoundedIcon />
-              </span>
+            <button onClick={() => navigate("/")} className="flex w-full items-center gap-4 rounded-lg p-4 text-left"
+              style={{ background: tintBg("var(--ink-orange)", 10), border: "1px solid " + tintBg("var(--ink-orange)", 30) }}>
+              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-lg" style={{ background: tintBg("var(--ink-orange)", 20), color: "var(--ink-orange)" }}><WarningAmberRoundedIcon /></span>
               <span className="flex-1">
-                <span className="block font-semibold text-white">{senales.aRecapar} cubiertas</span>
-                <span className="block text-sm text-slate-400">Pendientes de recapado</span>
+                <span className="block font-semibold" style={{ color: "var(--tx)" }}>{senales.aRecapar} cubiertas</span>
+                <span className="block text-sm" style={{ color: "var(--tx-4)" }}>Pendientes de recapado</span>
               </span>
-              <ChevronRightRoundedIcon className="text-slate-500" />
+              <ChevronRightRoundedIcon style={{ color: "var(--tx-6)" }} />
             </button>
-            <button
-              onClick={() => navigate("/")}
-              className="flex w-full items-center gap-4 rounded-lg border border-slate-700/60 bg-slate-800/40 p-4 text-left transition hover:bg-slate-800/70"
-            >
-              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-lg bg-slate-700/40 text-slate-300">
-                <DirectionsBusRoundedIcon />
-              </span>
+            <button onClick={() => navigate("/")} className="flex w-full items-center gap-4 rounded-lg p-4 text-left"
+              style={{ background: "var(--elev)", border: "1px solid var(--bd)" }}>
+              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-lg" style={{ background: "var(--bd-strong)", color: "var(--tx-3)" }}><DirectionsBusRoundedIcon /></span>
               <span className="flex-1">
-                <span className="block font-semibold text-white">{senales.vehiculosSinCubiertas} vehículos</span>
-                <span className="block text-sm text-slate-400">Sin cubiertas asignadas</span>
+                <span className="block font-semibold" style={{ color: "var(--tx)" }}>{senales.vehiculosSinCubiertas} vehículos</span>
+                <span className="block text-sm" style={{ color: "var(--tx-4)" }}>Sin cubiertas asignadas</span>
               </span>
-              <ChevronRightRoundedIcon className="text-slate-500" />
+              <ChevronRightRoundedIcon style={{ color: "var(--tx-6)" }} />
             </button>
           </div>
         </section>
@@ -192,11 +170,11 @@ const Dashboard = () => {
 
       {/* Acciones rápidas */}
       <section className="mt-6">
-        <h2 className="mb-3 font-display text-lg font-semibold text-white">Acciones rápidas</h2>
+        <h2 className="mb-3 font-display text-lg font-semibold" style={{ color: "var(--tx)", fontFamily: "'Space Grotesk'" }}>Acciones rápidas</h2>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-          <QuickAction icon={<OpenInNewRoundedIcon />} tint="#a3e635" title="Abrir operación" subtitle="Ir a la aplicación operativa" onClick={() => navigate("/")} />
-          <QuickAction icon={<GroupRoundedIcon />} tint="#2dd4bf" title="Gestionar usuarios" subtitle="Administrar el equipo" onClick={() => navigate("/admin/usuarios")} />
-          <QuickAction icon={<ApartmentRoundedIcon />} tint="#a78bfa" title="Configuración de empresa" subtitle="Editar datos y preferencias" onClick={() => navigate("/admin/empresa")} />
+          <QuickAction icon={<OpenInNewRoundedIcon />} tint="var(--ink-lime)" title="Abrir operación" subtitle="Ir a la aplicación operativa" onClick={() => navigate("/")} />
+          <QuickAction icon={<GroupRoundedIcon />} tint="var(--ink-teal)" title="Gestionar usuarios" subtitle="Administrar el equipo" onClick={() => navigate("/admin/usuarios")} />
+          <QuickAction icon={<ApartmentRoundedIcon />} tint="var(--ink-purple)" title="Configuración de empresa" subtitle="Editar datos y preferencias" onClick={() => navigate("/admin/empresa")} />
         </div>
       </section>
     </div>
@@ -204,18 +182,13 @@ const Dashboard = () => {
 }
 
 const QuickAction = ({ icon, tint, title, subtitle, onClick }) => (
-  <button
-    onClick={onClick}
-    className="flex items-center gap-3 rounded-xl border border-slate-800 bg-slate-950/60 p-4 text-left transition hover:border-slate-700 hover:bg-slate-900"
-  >
-    <span className="grid h-11 w-11 shrink-0 place-items-center rounded-lg" style={{ backgroundColor: `${tint}1f`, color: tint }}>
-      {icon}
-    </span>
+  <button onClick={onClick} className="flex items-center gap-3 rounded-xl p-4 text-left" style={{ background: "var(--card)", border: "1px solid var(--bd)" }}>
+    <span className="grid h-11 w-11 shrink-0 place-items-center rounded-lg" style={{ background: tintBg(tint, 12), color: tint }}>{icon}</span>
     <span className="flex-1">
-      <span className="block font-medium text-white">{title}</span>
-      <span className="block text-sm text-slate-500">{subtitle}</span>
+      <span className="block font-medium" style={{ color: "var(--tx)" }}>{title}</span>
+      <span className="block text-sm" style={{ color: "var(--tx-6)" }}>{subtitle}</span>
     </span>
-    <ChevronRightRoundedIcon className="text-slate-600" />
+    <ChevronRightRoundedIcon style={{ color: "var(--tx-7)" }} />
   </button>
 )
 

@@ -3,31 +3,32 @@ import { NavLink, useNavigate, Outlet } from "react-router-dom"
 import { useAuth } from "@context/AuthContext"
 import { getCompany } from "@api/admin"
 
-import DashboardRoundedIcon from "@mui/icons-material/DashboardRounded"
+import HomeRoundedIcon from "@mui/icons-material/HomeRounded"
 import GroupRoundedIcon from "@mui/icons-material/GroupRounded"
 import ApartmentRoundedIcon from "@mui/icons-material/ApartmentRounded"
-import CreditCardRoundedIcon from "@mui/icons-material/CreditCardRounded"
 import ReceiptLongRoundedIcon from "@mui/icons-material/ReceiptLongRounded"
-import LocalShippingRoundedIcon from "@mui/icons-material/LocalShippingRounded"
-import LaunchRoundedIcon from "@mui/icons-material/LaunchRounded"
+import EditRoundedIcon from "@mui/icons-material/EditRounded"
+import OpenInNewRoundedIcon from "@mui/icons-material/OpenInNewRounded"
 import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded"
 import HeadsetMicRoundedIcon from "@mui/icons-material/HeadsetMicRounded"
+import CreditCardRoundedIcon from "@mui/icons-material/CreditCardRounded"
 
-// Portal del tenant-admin: shell dark propio, separado de la operación. La operación
-// se alcanza con "Ir a la operación"; el contenido de cada sección entra por <Outlet/>.
-const navItems = [
-  { to: "/admin", end: true, label: "Resumen", icon: <DashboardRoundedIcon fontSize="small" /> },
-  { to: "/admin/usuarios", label: "Usuarios", icon: <GroupRoundedIcon fontSize="small" /> },
-  { to: "/admin/empresa", label: "Empresa", icon: <ApartmentRoundedIcon fontSize="small" /> },
-  { to: "/admin/comprobante", label: "Comprobante", icon: <ReceiptLongRoundedIcon fontSize="small" /> },
+// Portal del tenant-admin: shell dark propio (design system operativo), separado de la
+// operación. Cada sección entra por <Outlet/>. "Comprobantes" (histórico) es un hito
+// aparte → queda como "próximamente" hasta que exista su vista.
+const NAV = [
+  { to: "/admin", end: true, label: "Resumen", Icon: HomeRoundedIcon },
+  { to: "/admin/usuarios", label: "Usuarios", Icon: GroupRoundedIcon },
+  { to: "/admin/empresa", label: "Empresa", Icon: ApartmentRoundedIcon },
+  { to: "/admin/comprobante", label: "Editor de comprobante", Icon: EditRoundedIcon },
 ]
 
-const linkClass = ({ isActive }) =>
-  `flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition ${
-    isActive
-      ? "bg-brand-500/15 text-brand-300"
-      : "text-slate-400 hover:bg-slate-800/60 hover:text-slate-200"
-  }`
+const Logo = () => (
+  <svg width="34" height="34" viewBox="0 0 40 40" fill="none">
+    <circle cx="20" cy="20" r="18" stroke="var(--ink-lime)" strokeWidth="3.4" strokeDasharray="78 22" strokeLinecap="round" transform="rotate(-50 20 20)" />
+    <circle cx="20" cy="20" r="6.4" stroke="var(--ink-lime)" strokeWidth="3.4" />
+  </svg>
+)
 
 const AdminLayout = () => {
   const { user, logout } = useAuth()
@@ -35,104 +36,106 @@ const AdminLayout = () => {
   const [companyName, setCompanyName] = useState("")
 
   useEffect(() => {
-    getCompany()
-      .then((c) => setCompanyName(c?.name || ""))
-      .catch(() => {})
+    getCompany().then((c) => setCompanyName(c?.name || "")).catch(() => {})
   }, [])
 
   const displayName = user?.name || user?.email?.split("@")[0] || "admin"
   const initials = displayName.slice(0, 2).toUpperCase()
 
+  const navStyle = ({ isActive }) => ({
+    display: "flex", alignItems: "center", gap: 13, padding: "11px 13px", borderRadius: 9,
+    fontSize: 14, fontWeight: isActive ? 600 : 500, cursor: "pointer",
+    color: isActive ? "var(--ink-lime)" : "var(--tx-4)",
+    background: isActive ? "color-mix(in srgb, var(--ink-lime) 12%, transparent)" : "transparent",
+    boxShadow: isActive ? "inset 3px 0 0 var(--ink-lime)" : "none",
+  })
+
   return (
-    <div className="dark flex h-screen overflow-hidden bg-slate-900 text-slate-100 text-left">
+    <div data-app-theme="dark" className="flex h-screen overflow-hidden text-left" style={{ background: "var(--bg)", color: "var(--tx)", fontFamily: "'IBM Plex Sans',system-ui,sans-serif" }}>
       {/* Sidebar */}
-      <aside className="hidden w-64 shrink-0 flex-col border-r border-slate-800 bg-slate-950 md:flex">
-        <div className="flex items-center gap-3 px-6 py-5">
-          <span className="grid h-9 w-9 place-items-center rounded-lg bg-brand-500 text-slate-900">
-            <LocalShippingRoundedIcon fontSize="small" />
-          </span>
-          <span className="font-display text-base font-semibold leading-tight tracking-tight">
-            Control<span className="text-brand-400">Cubiertas</span>
-          </span>
+      <aside className="hidden w-64 flex-none flex-col md:flex" style={{ background: "var(--sidebar)", borderRight: "1px solid var(--bd-faint)" }}>
+        <div className="flex items-center gap-3 px-5 py-5">
+          <Logo />
+          <div style={{ lineHeight: 0.98, fontFamily: "'Space Grotesk'", fontWeight: 700, fontSize: 16, letterSpacing: ".02em" }}>
+            <div style={{ color: "var(--tx)" }}>CONTROL</div>
+            <div style={{ color: "var(--ink-lime)" }}>CUBIERTAS</div>
+          </div>
         </div>
 
-        <div className="px-3 pb-2 pt-4 text-xs font-medium uppercase tracking-wider text-slate-500">Panel</div>
+        <div className="px-5 pb-2 pt-3.5 text-[10px] font-semibold tracking-[.16em]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-6)" }}>PANEL</div>
         <nav className="flex flex-1 flex-col gap-1 px-3">
-          {navItems.map((item) => (
-            <NavLink key={item.to} to={item.to} end={item.end} className={linkClass}>
-              {item.icon}
-              {item.label}
+          {NAV.map(({ to, end, label, Icon }) => (
+            <NavLink key={to} to={to} end={end} style={navStyle}>
+              <span className="inline-flex flex-none items-center justify-center" style={{ width: 20, height: 20 }}><Icon sx={{ fontSize: 19 }} /></span>
+              <span>{label}</span>
             </NavLink>
           ))}
 
-          <div className="my-3 border-t border-slate-800" />
-          <div className="flex items-center justify-between rounded-lg px-3 py-2.5 text-sm text-slate-500">
-            <span className="flex items-center gap-3">
-              <CreditCardRoundedIcon fontSize="small" />
-              Cuenta
-            </span>
-            <span className="rounded bg-slate-800 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-slate-400">
-              Próximamente
-            </span>
+          {/* Comprobantes (histórico): hito aparte, aún no disponible */}
+          <div className="flex items-center gap-[13px] rounded-[9px] px-[13px] py-[11px] text-[14px]" style={{ color: "var(--tx-6)", cursor: "default" }}>
+            <span className="inline-flex flex-none items-center justify-center" style={{ width: 20, height: 20 }}><ReceiptLongRoundedIcon sx={{ fontSize: 19 }} /></span>
+            <span>Comprobantes</span>
+            <span className="ml-auto rounded-full px-2 py-0.5 text-[9px] font-semibold tracking-[.05em]" style={{ fontFamily: "'IBM Plex Mono'", color: "#A99CF5", background: "rgba(124,111,245,.16)" }}>PRÓXIMAMENTE</span>
+          </div>
+
+          <div className="my-3.5 h-px" style={{ background: "var(--bd-faint)" }} />
+          <div className="flex items-center gap-[13px] rounded-[9px] px-[13px] py-[11px] text-[14px]" style={{ color: "var(--tx-6)", cursor: "default" }}>
+            <span className="inline-flex flex-none items-center justify-center" style={{ width: 20, height: 20 }}><CreditCardRoundedIcon sx={{ fontSize: 18 }} /></span>
+            <span>Cuenta</span>
+            <span className="ml-auto rounded-full px-2 py-0.5 text-[9px] font-semibold tracking-[.05em]" style={{ fontFamily: "'IBM Plex Mono'", color: "#A99CF5", background: "rgba(124,111,245,.16)" }}>PRÓXIMAMENTE</span>
           </div>
         </nav>
 
-        {/* Footer */}
-        <div className="border-t border-slate-800 p-3">
-          <button className="mb-2 flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-slate-400 transition hover:bg-slate-800/60 hover:text-slate-200">
-            <HeadsetMicRoundedIcon fontSize="small" />
-            <span className="text-left leading-tight">
-              ¿Necesitás ayuda?
-              <span className="block text-xs text-slate-500">Centro de ayuda</span>
-            </span>
-          </button>
-          <div className="flex items-center gap-3 rounded-lg px-3 py-2.5">
-            <span className="grid h-8 w-8 place-items-center rounded-full bg-brand-500 text-xs font-semibold text-slate-900">
-              {initials}
-            </span>
-            <span className="min-w-0 flex-1 leading-tight">
-              <span className="block truncate text-sm font-medium text-slate-200">{displayName}</span>
-              <span className="block text-xs text-slate-500">Tenant Admin</span>
-            </span>
-            <button onClick={logout} title="Cerrar sesión" className="text-slate-500 transition hover:text-slate-300">
-              <LogoutRoundedIcon fontSize="small" />
-            </button>
+        {/* Ayuda */}
+        <div className="p-3.5">
+          <div className="flex items-center gap-3 rounded-[11px] p-3.5" style={{ background: "var(--elev)", border: "1px solid var(--bd-soft)" }}>
+            <span className="flex flex-none items-center justify-center rounded-lg" style={{ width: 32, height: 32, background: "color-mix(in srgb, var(--ink-lime) 12%, transparent)", color: "var(--ink-lime)" }}><HeadsetMicRoundedIcon sx={{ fontSize: 18 }} /></span>
+            <div style={{ lineHeight: 1.3 }}>
+              <div className="text-[12.5px] font-semibold" style={{ color: "var(--ink-lime)" }}>¿Necesitás ayuda?</div>
+              <div className="text-[11.5px]" style={{ color: "var(--tx-5)" }}>Centro de ayuda</div>
+            </div>
           </div>
+        </div>
+
+        {/* Usuario + logout */}
+        <div className="flex items-center gap-[11px] p-3" style={{ borderTop: "1px solid var(--bd-faint)" }}>
+          <span className="flex flex-none items-center justify-center rounded-full text-xs font-bold" style={{ width: 34, height: 34, background: "var(--ink-lime)", color: "var(--bg)", fontFamily: "'Space Grotesk'" }}>{initials}</span>
+          <span className="min-w-0 flex-1" style={{ lineHeight: 1.3 }}>
+            <span className="block truncate text-[12.5px] font-semibold" style={{ color: "var(--tx)" }}>{displayName}</span>
+            <span className="block text-[11px]" style={{ color: "var(--tx-5)" }}>Tenant Admin</span>
+          </span>
+          <button onClick={logout} title="Cerrar sesión" className="inline-flex p-1" style={{ color: "var(--tx-6)" }}>
+            <LogoutRoundedIcon sx={{ fontSize: 17 }} />
+          </button>
         </div>
       </aside>
 
       {/* Columna principal */}
-      <div className="flex flex-1 flex-col overflow-hidden">
-        <header className="flex items-center justify-between gap-4 border-b border-slate-800 bg-slate-900/80 px-6 py-3 backdrop-blur">
-          <div className="flex items-center gap-2 rounded-lg border border-slate-800 bg-slate-950 px-3 py-2 text-sm">
-            <ApartmentRoundedIcon fontSize="small" className="text-slate-500" />
-            <span className="font-medium text-slate-200">{companyName || "Tu empresa"}</span>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => navigate("/")}
-              className="inline-flex items-center gap-2 rounded-lg border border-brand-500/40 bg-brand-500/10 px-3 py-2 text-sm font-medium text-brand-300 transition hover:bg-brand-500/20"
-            >
-              <LaunchRoundedIcon fontSize="small" />
-              Ir a la operación
+      <main className="relative flex min-w-0 flex-1 flex-col overflow-hidden">
+        {/* Top bar */}
+        <div className="z-[2] flex h-[74px] flex-none items-center gap-3.5 px-6" style={{ background: "var(--bg)", borderBottom: "1px solid var(--bd-faint)" }}>
+          <div className="ml-auto flex items-center gap-3">
+            <div className="inline-flex items-center gap-2.5 rounded-[10px] px-3.5 py-2.5" style={{ background: "var(--elev)", border: "1px solid var(--bd)" }}>
+              <ApartmentRoundedIcon sx={{ fontSize: 17 }} style={{ color: "var(--tx-5)" }} />
+              <span className="text-[13.5px] font-semibold" style={{ color: "var(--tx)" }}>{companyName || "Tu empresa"}</span>
+            </div>
+            <button onClick={() => navigate("/")} className="inline-flex items-center gap-2 rounded-[10px] px-4 py-2.5 text-[13.5px] font-semibold" style={{ background: "color-mix(in srgb, var(--ink-lime) 6%, transparent)", border: "1px solid color-mix(in srgb, var(--ink-lime) 45%, transparent)", color: "var(--ink-lime)" }}>
+              <OpenInNewRoundedIcon sx={{ fontSize: 16 }} /> Ir a la operación
             </button>
-            <div className="flex items-center gap-2.5 pl-1">
-              <span className="grid h-9 w-9 place-items-center rounded-full bg-brand-500 text-xs font-semibold text-slate-900">
-                {initials}
-              </span>
-              <span className="hidden leading-tight sm:block">
-                <span className="block text-sm font-medium text-slate-200">{displayName}</span>
-                <span className="block text-xs text-slate-500">Tenant Admin</span>
+            <div className="flex items-center gap-2.5 rounded-[10px] py-1.5 pl-2 pr-3" style={{ background: "var(--elev)", border: "1px solid var(--bd)" }}>
+              <span className="flex flex-none items-center justify-center rounded-full text-[11.5px] font-bold" style={{ width: 30, height: 30, background: "var(--ink-lime)", color: "var(--bg)", fontFamily: "'Space Grotesk'" }}>{initials}</span>
+              <span className="hidden sm:block" style={{ lineHeight: 1.25 }}>
+                <span className="block text-[13px] font-semibold" style={{ color: "var(--tx)" }}>{displayName}</span>
+                <span className="block text-[11px]" style={{ color: "var(--tx-5)" }}>Tenant Admin</span>
               </span>
             </div>
           </div>
-        </header>
+        </div>
 
-        <main className="flex-1 overflow-y-auto p-6 lg:p-8">
+        <div className="relative z-[1] flex-1 overflow-auto" style={{ padding: "28px 30px" }}>
           <Outlet />
-        </main>
-      </div>
+        </div>
+      </main>
     </div>
   )
 }
