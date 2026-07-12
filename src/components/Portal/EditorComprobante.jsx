@@ -1,9 +1,7 @@
 import { useState, useEffect, useRef } from "react"
-import { useNavigate } from "react-router-dom"
 import { getCompany, updateCompany } from "@api/admin"
 import { showToast } from "@utils/toast"
 import { tint } from "@components/Operativa/status"
-import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded"
 import FileUploadRoundedIcon from "@mui/icons-material/FileUploadRounded"
 import DeleteOutlineRoundedIcon from "@mui/icons-material/DeleteOutlineRounded"
 import KeyboardArrowUpRoundedIcon from "@mui/icons-material/KeyboardArrowUpRounded"
@@ -57,7 +55,6 @@ const onFocusLime = (e) => (e.target.style.borderColor = "var(--ink-lime)")
 const onBlurBd = (e) => (e.target.style.borderColor = "var(--bd-strong)")
 
 const EditorComprobante = () => {
-  const navigate = useNavigate()
   const fileRef = useRef(null)
   const [empresa, setEmpresa] = useState("")
   const [cuit, setCuit] = useState("")
@@ -132,15 +129,16 @@ const EditorComprobante = () => {
   })
 
   return (
-    <div data-app-theme="dark" className="fixed inset-0 z-[60] flex flex-col" style={{ background: "var(--bg)", color: "var(--tx)", fontFamily: "'IBM Plex Sans',system-ui,sans-serif" }}>
-      {/* TOP BAR */}
-      <div className="flex h-[66px] flex-none items-center gap-3.5 px-6" style={{ background: "var(--sidebar)", borderBottom: "1px solid var(--bd-faint)" }}>
-        <button onClick={() => navigate("/admin")} title="Volver al panel" className="inline-flex h-[38px] w-[38px] items-center justify-center rounded-[9px]" style={{ border: "1px solid var(--bd)", background: "var(--elev)", color: "var(--tx-3)" }}>
-          <ArrowBackRoundedIcon sx={{ fontSize: 18 }} />
-        </button>
+    // Vive dentro del <Outlet/> del AdminLayout → el sidebar y la top bar del portal
+    // quedan visibles. El margin negativo anula el padding del área de contenido (28/30) y
+    // ocupa el alto bajo la top bar (74px), tal como el diseño. data-app-theme="dark" fijo:
+    // el editor es una pantalla inmersiva oscura aunque el portal esté en modo claro.
+    <div data-app-theme="dark" className="flex flex-col overflow-hidden" style={{ margin: "-28px -30px", height: "calc(100vh - 74px)", background: "var(--bg)", color: "var(--tx)", fontFamily: "'IBM Plex Sans',system-ui,sans-serif" }}>
+      {/* TOP BAR del editor */}
+      <div className="flex h-[62px] flex-none items-center gap-3.5 px-6" style={{ background: "var(--sidebar)", borderBottom: "1px solid var(--bd-faint)" }}>
         <div style={{ lineHeight: 1.2 }}>
           <div className="text-[16px] font-bold" style={{ fontFamily: "'Space Grotesk'", color: "var(--tx)" }}>Editor de comprobante</div>
-          <div className="text-[11.5px]" style={{ color: "var(--tx-5)", fontFamily: "'IBM Plex Mono'" }}>Empresa · Diseño del comprobante impreso</div>
+          <div className="text-[11.5px]" style={{ color: "var(--tx-5)", fontFamily: "'IBM Plex Mono'" }}>Diseño del comprobante impreso · A4</div>
         </div>
         <div className="ml-auto flex items-center gap-2.5">
           <button onClick={reset} className="h-10 rounded-[9px] px-[15px] text-[13.5px] font-semibold" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--tx)" }}>Restablecer</button>

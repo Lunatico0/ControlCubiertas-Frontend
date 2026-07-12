@@ -42,17 +42,9 @@ function App() {
             <Route index element={<Dashboard />} />
             <Route path="usuarios" element={<Users />} />
             <Route path="empresa" element={<CompanySettings />} />
+            {/* Editor de comprobante: vista del portal (dentro del shell, con sidebar visible). */}
+            <Route path="comprobante" element={<EditorComprobante />} />
           </Route>
-
-          {/* Editor de comprobante: pantalla full propia (design system operativo), gateada por rol. */}
-          <Route
-            path="/admin/comprobante"
-            element={
-              <RequireAuth requireAdmin>
-                <EditorComprobante />
-              </RequireAuth>
-            }
-          />
 
           {/* UI vieja preservada en /legacy un tiempo, por adaptación (se retira más adelante). */}
           <Route
