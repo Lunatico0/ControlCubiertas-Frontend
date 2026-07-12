@@ -4,8 +4,8 @@ import { showToast } from "@utils/toast"
 import { createUser } from "../../api/admin"
 
 const inputClass =
-  "w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-slate-900 placeholder:text-slate-400 outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
-const labelClass = "mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300"
+  "w-full rounded-[10px] border border-(--bd) bg-(--input) px-3 py-2.5 text-sm text-(--tx) placeholder:text-(--tx-6) outline-none transition focus:border-(--ink-lime)"
+const labelClass = "mb-1.5 block text-sm font-medium text-(--tx-3)"
 
 // Alta de usuario del tenant. Devuelve { user, tempPassword } al padre: la password
 // temporal se muestra UNA vez (el usuario nuevo entra con ella y la cambia).
@@ -39,11 +39,11 @@ const UserForm = ({ onClose, onCreated }) => {
             className={inputClass}
             {...register("email", { required: "Ingresá el email" })}
           />
-          {errors.email && <p className="mt-1 text-xs text-red-600">{errors.email.message}</p>}
+          {errors.email && <p className="mt-1 text-xs text-(--ink-red)">{errors.email.message}</p>}
         </div>
 
         <div>
-          <label htmlFor="u-name" className={labelClass}>Nombre <span className="text-slate-400">(opcional)</span></label>
+          <label htmlFor="u-name" className={labelClass}>Nombre <span className="text-(--tx-6)">(opcional)</span></label>
           <input
             id="u-name"
             type="text"
@@ -66,14 +66,14 @@ const UserForm = ({ onClose, onCreated }) => {
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg border border-slate-300 px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
+            className="rounded-[10px] border border-(--bd-strong) bg-(--elev) px-4 py-2.5 text-sm font-medium text-(--tx-3) transition hover:bg-(--hover)"
           >
             Cancelar
           </button>
           <button
             type="submit"
             disabled={isSubmitting}
-            className="rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-slate-900 transition hover:bg-brand-600 focus:ring-2 focus:ring-brand-500/40 disabled:cursor-not-allowed disabled:opacity-60"
+            className="rounded-[10px] bg-(--ink-lime) px-4 py-2.5 text-sm font-bold text-(--bg) transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {isSubmitting ? "Creando…" : "Crear usuario"}
           </button>
