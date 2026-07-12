@@ -36,7 +36,7 @@ const ACCENTS = ["#1F7A43", "#2358C5", "#334155", "#C2410C", "#6D28D9"]
 // Toggle on/off
 const Toggle = ({ on, onClick, w = 38, knob = 16 }) => (
   <button onClick={onClick} className="relative inline-flex flex-none" style={{ width: w, height: knob + 6, borderRadius: 20, border: "none", background: on ? "var(--ink-lime)" : "var(--bd-strong)", cursor: "pointer" }}>
-    <span className="absolute rounded-full" style={{ top: 3, left: on ? w - knob - 3 : 3, width: knob, height: knob, background: "#fff", transition: "left .15s" }} />
+    <span className="absolute rounded-full" style={{ top: 3, left: on ? w - knob - 3 : 3, width: knob, height: knob, background: "#fff", boxShadow: "0 1px 2px rgba(0,0,0,.25)", transition: "left .15s" }} />
   </button>
 )
 // Control segmentado
@@ -129,11 +129,11 @@ const EditorComprobante = () => {
   })
 
   return (
-    // Vive dentro del <Outlet/> del AdminLayout → el sidebar y la top bar del portal
-    // quedan visibles. El margin negativo anula el padding del área de contenido (28/30) y
-    // ocupa el alto bajo la top bar (74px), tal como el diseño. data-app-theme="dark" fijo:
-    // el editor es una pantalla inmersiva oscura aunque el portal esté en modo claro.
-    <div data-app-theme="dark" className="flex flex-col overflow-hidden" style={{ margin: "-28px -30px", height: "calc(100vh - 74px)", background: "var(--bg)", color: "var(--tx)", fontFamily: "'IBM Plex Sans',system-ui,sans-serif" }}>
+    // Vive dentro del <Outlet/> del AdminLayout → hereda su tema (claro/oscuro), sin
+    // data-app-theme propio, y el sidebar + top bar del portal quedan visibles. El margin
+    // negativo anula el padding del área de contenido (28/30) y ocupa el alto bajo la top
+    // bar (74px), tal como el diseño.
+    <div className="flex flex-col overflow-hidden" style={{ margin: "-28px -30px", height: "calc(100vh - 74px)", background: "var(--bg)", color: "var(--tx)", fontFamily: "'IBM Plex Sans',system-ui,sans-serif" }}>
       {/* TOP BAR del editor */}
       <div className="flex h-[62px] flex-none items-center gap-3.5 px-6" style={{ background: "var(--sidebar)", borderBottom: "1px solid var(--bd-faint)" }}>
         <div style={{ lineHeight: 1.2 }}>
@@ -222,7 +222,7 @@ const EditorComprobante = () => {
             <div className="flex gap-[11px]">
               {ACCENTS.map((c) => {
                 const on = d.accent === c
-                return <button key={c} onClick={() => setDesign({ accent: c })} title={c} className="h-[34px] w-[34px] rounded-full" style={{ background: c, border: `2px solid ${on ? "var(--ink-lime)" : "rgba(255,255,255,.10)"}`, outline: `2px solid ${on ? c : "transparent"}`, outlineOffset: -5, cursor: "pointer" }} />
+                return <button key={c} onClick={() => setDesign({ accent: c })} title={c} className="h-[34px] w-[34px] rounded-full" style={{ background: c, border: `2px solid ${on ? "var(--ink-lime)" : "color-mix(in srgb, var(--tx) 12%, transparent)"}`, outline: `2px solid ${on ? c : "transparent"}`, outlineOffset: -5, cursor: "pointer" }} />
               })}
             </div>
           </div>
