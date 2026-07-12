@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react"
 import { NavLink, useNavigate, Outlet } from "react-router-dom"
 import { useAuth } from "@context/AuthContext"
+import { useTheme } from "@context/ThemeContext"
 import { getCompany } from "@api/admin"
 
 import HomeRoundedIcon from "@mui/icons-material/HomeRounded"
@@ -12,6 +13,8 @@ import OpenInNewRoundedIcon from "@mui/icons-material/OpenInNewRounded"
 import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded"
 import HeadsetMicRoundedIcon from "@mui/icons-material/HeadsetMicRounded"
 import CreditCardRoundedIcon from "@mui/icons-material/CreditCardRounded"
+import DarkModeRoundedIcon from "@mui/icons-material/DarkModeRounded"
+import LightModeRoundedIcon from "@mui/icons-material/LightModeRounded"
 
 // Portal del tenant-admin: shell dark propio (design system operativo), separado de la
 // operación. Cada sección entra por <Outlet/>. "Comprobantes" (histórico) es un hito
@@ -32,6 +35,7 @@ const Logo = () => (
 
 const AdminLayout = () => {
   const { user, logout } = useAuth()
+  const { isDarkMode, toggleTheme } = useTheme()
   const navigate = useNavigate()
   const [companyName, setCompanyName] = useState("")
 
@@ -51,7 +55,7 @@ const AdminLayout = () => {
   })
 
   return (
-    <div data-app-theme="dark" className="dark flex h-screen overflow-hidden text-left" style={{ background: "var(--bg)", color: "var(--tx)", fontFamily: "'IBM Plex Sans',system-ui,sans-serif" }}>
+    <div data-app-theme={isDarkMode ? "dark" : "light"} className="flex h-screen overflow-hidden text-left" style={{ background: "var(--bg)", color: "var(--tx)", fontFamily: "'IBM Plex Sans',system-ui,sans-serif" }}>
       {/* Sidebar */}
       <aside className="hidden w-64 flex-none flex-col md:flex" style={{ background: "var(--sidebar)", borderRight: "1px solid var(--bd-faint)" }}>
         <div className="flex items-center gap-3 px-5 py-5">
@@ -75,19 +79,25 @@ const AdminLayout = () => {
           <div className="flex items-center gap-[13px] rounded-[9px] px-[13px] py-[11px] text-[14px]" style={{ color: "var(--tx-6)", cursor: "default" }}>
             <span className="inline-flex flex-none items-center justify-center" style={{ width: 20, height: 20 }}><ReceiptLongRoundedIcon sx={{ fontSize: 19 }} /></span>
             <span>Comprobantes</span>
-            <span className="ml-auto rounded-full px-2 py-0.5 text-[9px] font-semibold tracking-[.05em]" style={{ fontFamily: "'IBM Plex Mono'", color: "#A99CF5", background: "rgba(124,111,245,.16)" }}>PRÓXIMAMENTE</span>
+            <span className="ml-auto rounded-full px-2 py-0.5 text-[9px] font-semibold tracking-[.05em]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--ink-purple)", background: "color-mix(in srgb, var(--ink-purple) 16%, transparent)" }}>PRÓXIMAMENTE</span>
           </div>
 
           <div className="my-3.5 h-px" style={{ background: "var(--bd-faint)" }} />
           <div className="flex items-center gap-[13px] rounded-[9px] px-[13px] py-[11px] text-[14px]" style={{ color: "var(--tx-6)", cursor: "default" }}>
             <span className="inline-flex flex-none items-center justify-center" style={{ width: 20, height: 20 }}><CreditCardRoundedIcon sx={{ fontSize: 18 }} /></span>
             <span>Cuenta</span>
-            <span className="ml-auto rounded-full px-2 py-0.5 text-[9px] font-semibold tracking-[.05em]" style={{ fontFamily: "'IBM Plex Mono'", color: "#A99CF5", background: "rgba(124,111,245,.16)" }}>PRÓXIMAMENTE</span>
+            <span className="ml-auto rounded-full px-2 py-0.5 text-[9px] font-semibold tracking-[.05em]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--ink-purple)", background: "color-mix(in srgb, var(--ink-purple) 16%, transparent)" }}>PRÓXIMAMENTE</span>
           </div>
         </nav>
 
-        {/* Ayuda */}
-        <div className="p-3.5">
+        {/* Tema claro/oscuro + Ayuda */}
+        <div className="space-y-3 p-3.5">
+          <button onClick={toggleTheme} className="flex w-full items-center gap-[11px] rounded-[11px] px-3.5 py-3" style={{ background: "var(--elev)", border: "1px solid var(--bd-soft)" }}>
+            <span className="inline-flex h-5 w-5 flex-none items-center" style={{ color: "var(--ink-lime)" }}>
+              {isDarkMode ? <DarkModeRoundedIcon sx={{ fontSize: 18 }} /> : <LightModeRoundedIcon sx={{ fontSize: 19 }} />}
+            </span>
+            <span className="text-[13px] font-medium" style={{ color: "var(--tx-2)" }}>{isDarkMode ? "Tema oscuro" : "Tema claro"}</span>
+          </button>
           <div className="flex items-center gap-3 rounded-[11px] p-3.5" style={{ background: "var(--elev)", border: "1px solid var(--bd-soft)" }}>
             <span className="flex flex-none items-center justify-center rounded-lg" style={{ width: 32, height: 32, background: "color-mix(in srgb, var(--ink-lime) 12%, transparent)", color: "var(--ink-lime)" }}><HeadsetMicRoundedIcon sx={{ fontSize: 18 }} /></span>
             <div style={{ lineHeight: 1.3 }}>
