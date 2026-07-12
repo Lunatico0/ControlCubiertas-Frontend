@@ -51,7 +51,7 @@ const AdminLayout = () => {
   })
 
   return (
-    <div data-app-theme="dark" className="flex h-screen overflow-hidden text-left" style={{ background: "var(--bg)", color: "var(--tx)", fontFamily: "'IBM Plex Sans',system-ui,sans-serif" }}>
+    <div data-app-theme="dark" className="dark flex h-screen overflow-hidden text-left" style={{ background: "var(--bg)", color: "var(--tx)", fontFamily: "'IBM Plex Sans',system-ui,sans-serif" }}>
       {/* Sidebar */}
       <aside className="hidden w-64 flex-none flex-col md:flex" style={{ background: "var(--sidebar)", borderRight: "1px solid var(--bd-faint)" }}>
         <div className="flex items-center gap-3 px-5 py-5">
