@@ -14,7 +14,7 @@ import InsightsRoundedIcon from "@mui/icons-material/InsightsRounded"
 import EditRoundedIcon from "@mui/icons-material/EditRounded"
 import OpenInNewRoundedIcon from "@mui/icons-material/OpenInNewRounded"
 import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded"
-import HeadsetMicRoundedIcon from "@mui/icons-material/HeadsetMicRounded"
+import HelpOutlineRoundedIcon from "@mui/icons-material/HelpOutlineRounded"
 import CreditCardRoundedIcon from "@mui/icons-material/CreditCardRounded"
 import DarkModeRoundedIcon from "@mui/icons-material/DarkModeRounded"
 import LightModeRoundedIcon from "@mui/icons-material/LightModeRounded"
@@ -114,26 +114,34 @@ const AdminLayout = () => {
           </div>
         </nav>
 
-        {/* Tema claro/oscuro + Ayuda */}
-        <div className="relative space-y-3 p-3.5">
+        {/* Tema claro/oscuro */}
+        <div className="p-3.5">
           <button onClick={toggleTheme} className="flex w-full items-center gap-[11px] rounded-[11px] px-3.5 py-3" style={{ background: "var(--elev)", border: "1px solid var(--bd-soft)" }}>
             <span className="inline-flex h-5 w-5 flex-none items-center" style={{ color: "var(--ink-lime)" }}>
               {isDarkMode ? <DarkModeRoundedIcon sx={{ fontSize: 18 }} /> : <LightModeRoundedIcon sx={{ fontSize: 19 }} />}
             </span>
             <span className="text-[13px] font-medium" style={{ color: "var(--tx-2)" }}>{isDarkMode ? "Tema oscuro" : "Tema claro"}</span>
           </button>
-          <button data-tour="a-help" onClick={() => setHelpMenu((v) => !v)} className="flex w-full items-center gap-3 rounded-[11px] p-3.5 text-left" style={{ background: helpMenu ? "color-mix(in srgb, var(--ink-lime) 8%, transparent)" : "var(--elev)", border: `1px solid ${helpMenu ? "color-mix(in srgb, var(--ink-lime) 40%, transparent)" : "var(--bd-soft)"}` }}>
-            <span className="flex flex-none items-center justify-center rounded-lg" style={{ width: 32, height: 32, background: "color-mix(in srgb, var(--ink-lime) 12%, transparent)", color: "var(--ink-lime)" }}><HeadsetMicRoundedIcon sx={{ fontSize: 18 }} /></span>
-            <div style={{ lineHeight: 1.3 }}>
-              <div className="text-[12.5px] font-semibold" style={{ color: "var(--ink-lime)" }}>¿Necesitás ayuda?</div>
-              <div className="text-[11.5px]" style={{ color: "var(--tx-5)" }}>Guía y tour del panel</div>
-            </div>
+        </div>
+
+        {/* Usuario + ayuda + logout (mismo patrón que la operativa) */}
+        <div className="relative flex items-center gap-[11px] p-3" style={{ borderTop: "1px solid var(--bd-faint)" }}>
+          <span className="flex flex-none items-center justify-center rounded-full text-xs font-bold" style={{ width: 34, height: 34, background: "var(--ink-lime)", color: "var(--bg)", fontFamily: "'Space Grotesk'" }}>{initials}</span>
+          <span className="min-w-0 flex-1" style={{ lineHeight: 1.3 }}>
+            <span className="block truncate text-[12.5px] font-semibold" style={{ color: "var(--tx)" }}>{displayName}</span>
+            <span className="block text-[11px]" style={{ color: "var(--tx-5)" }}>Tenant Admin</span>
+          </span>
+          <button data-tour="a-help" onClick={() => setHelpMenu((v) => !v)} title="Ayuda" className="inline-flex rounded-[7px] p-[7px]" style={{ color: helpMenu ? "var(--ink-lime)" : "var(--tx-6)", background: helpMenu ? "color-mix(in srgb, var(--ink-lime) 12%, transparent)" : "transparent" }}>
+            <HelpOutlineRoundedIcon sx={{ fontSize: 17 }} />
+          </button>
+          <button onClick={logout} title="Cerrar sesión" className="inline-flex p-1" style={{ color: "var(--tx-6)" }}>
+            <LogoutRoundedIcon sx={{ fontSize: 17 }} />
           </button>
 
           {helpMenu && (
             <>
               <div className="fixed inset-0 z-[35]" onClick={() => setHelpMenu(false)} />
-              <div className="absolute z-[40] overflow-hidden rounded-[12px]" style={{ bottom: 84, left: 14, right: 14, background: "var(--card)", border: "1px solid var(--bd-strong)", boxShadow: "0 18px 44px rgba(0,0,0,.5)" }}>
+              <div className="absolute z-[40] overflow-hidden rounded-[12px]" style={{ bottom: 58, left: 12, right: 12, background: "var(--card)", border: "1px solid var(--bd-strong)", boxShadow: "0 18px 44px rgba(0,0,0,.5)" }}>
                 <div className="px-3.5 py-[11px] text-[10px] tracking-[.08em]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-6)", borderBottom: "1px solid var(--bd-soft)" }}>AYUDA · PANEL ADMIN</div>
                 <button onClick={() => { setHelpMenu(false); navigate("/admin"); setTourOpen(true) }} className="flex w-full items-center gap-[11px] px-3.5 py-3 text-left">
                   <span className="flex h-[30px] w-[30px] flex-none items-center justify-center rounded-[8px]" style={{ background: "color-mix(in srgb, var(--ink-lime) 13%, transparent)", color: "var(--ink-lime)" }}><PlayArrowRoundedIcon sx={{ fontSize: 16 }} /></span>
@@ -152,18 +160,6 @@ const AdminLayout = () => {
               </div>
             </>
           )}
-        </div>
-
-        {/* Usuario + logout */}
-        <div className="flex items-center gap-[11px] p-3" style={{ borderTop: "1px solid var(--bd-faint)" }}>
-          <span className="flex flex-none items-center justify-center rounded-full text-xs font-bold" style={{ width: 34, height: 34, background: "var(--ink-lime)", color: "var(--bg)", fontFamily: "'Space Grotesk'" }}>{initials}</span>
-          <span className="min-w-0 flex-1" style={{ lineHeight: 1.3 }}>
-            <span className="block truncate text-[12.5px] font-semibold" style={{ color: "var(--tx)" }}>{displayName}</span>
-            <span className="block text-[11px]" style={{ color: "var(--tx-5)" }}>Tenant Admin</span>
-          </span>
-          <button onClick={logout} title="Cerrar sesión" className="inline-flex p-1" style={{ color: "var(--tx-6)" }}>
-            <LogoutRoundedIcon sx={{ fontSize: 17 }} />
-          </button>
         </div>
       </aside>
 
