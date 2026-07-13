@@ -51,7 +51,11 @@ const Cubiertas = ({ intent }) => {
 
   const [query, setQuery] = useState("")
   const [tab, setTab] = useState("todas")
-  const [view, setView] = useState("table")
+  const [view, setViewState] = useState(() => localStorage.getItem("op_tireview") || "table")
+  const setView = (v) => {
+    setViewState(v)
+    try { localStorage.setItem("op_tireview", v) } catch { /* device sin storage */ }
+  }
   const [selectedId, setSelectedId] = useState(null)
   const [pendingAction, setPendingAction] = useState(null)
   const [showAlta, setShowAlta] = useState(false)
