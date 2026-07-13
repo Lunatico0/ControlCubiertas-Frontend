@@ -28,13 +28,15 @@ const wheelsOf = (t) => (t === "dual" ? 4 : t === "moto" ? 1 : 2)
 const tiresOf = (axles) => axles.reduce((n, t) => n + wheelsOf(t), 0)
 const sectionLabelStyle = { fontFamily: "'IBM Plex Mono'", color: "var(--tx-6)" }
 
-const ConfigurarEjes = ({ onClose }) => {
+const ConfigurarEjes = ({ onClose, vehicle }) => {
   const { data, vehicles } = useContext(ApiContext)
   const tires = data?.tires || []
-  const [view, setView] = useState("list")
-  const [sel, setSel] = useState(null)
-  const [preset, setPreset] = useState("camion42")
-  const [axles, setAxles] = useState(["simple", "dual"])
+  // Modo puntual: si viene `vehicle`, arranca directo en el editor de ESE vehículo
+  // (reconfigurar ejes desde el detalle). Sin `vehicle`, es el flujo batch de migración.
+  const [view, setView] = useState(vehicle ? "editor" : "list")
+  const [sel, setSel] = useState(vehicle || null)
+  const [preset, setPreset] = useState(vehicle?.axles?.length ? "custom" : "camion42")
+  const [axles, setAxles] = useState(vehicle?.axles?.length ? vehicle.axles.map((a) => a.type || "simple") : ["simple", "dual"])
   const [saving, setSaving] = useState(false)
 
   // Pendientes: vehículos sin esquema de ejes (axles vacío). Conteo de cubiertas montadas
@@ -52,7 +54,8 @@ const ConfigurarEjes = ({ onClose }) => {
   const total = useMemo(() => tiresOf(axles), [axles])
 
   const openEditor = (v) => { setSel(v); setPreset("camion42"); setAxles(["simple", "dual"]); setView("editor") }
-  const backToList = () => { setView("list"); setSel(null) }
+  // En modo puntual no hay lista a la que volver: "cancelar"/"volver" cierra el overlay.
+  const backToList = () => { if (vehicle) return onClose(); setView("list"); setSel(null) }
   const applyPreset = (key) => () => { setPreset(key); setAxles(PRESETS[key].axles.slice()) }
   const addAxle = () => { setAxles((a) => [...a, "dual"]); setPreset("custom") }
   const removeAxle = (i) => setAxles((a) => (a.length <= 1 ? a : a.filter((_, idx) => idx !== i)))

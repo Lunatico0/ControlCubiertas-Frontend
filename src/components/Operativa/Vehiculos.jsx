@@ -14,6 +14,7 @@ import { generatePositions } from "./axles"
 import NuevoVehiculo from "./NuevoVehiculo"
 import ConfigurarEjes from "./ConfigurarEjes"
 import EditarVehiculo from "./EditarVehiculo"
+import VehicleDrawer from "./VehicleDrawer"
 
 // Lista de vehículos (rediseño Claude Design). Dos vistas con toggle (persistido por
 // device): CARDS con el esquema de ejes/posiciones, y TABLA densa. El esquema se deriva
@@ -32,6 +33,7 @@ const Vehiculos = ({ onNavigate }) => {
   const [showAlta, setShowAlta] = useState(false)
   const [showConfigEjes, setShowConfigEjes] = useState(false)
   const [editVeh, setEditVeh] = useState(null)
+  const [detailVeh, setDetailVeh] = useState(null)
   const [fType, setFType] = useState("")
   const editar = (e, v) => { e.stopPropagation(); setEditVeh(v) }
   const types = useMemo(() => [...new Set(vehicles.map((v) => v.type).filter(Boolean))].sort((a, b) => a.localeCompare(b, "es")), [vehicles])
@@ -89,7 +91,8 @@ const Vehiculos = ({ onNavigate }) => {
 
   const inputStyle = { background: "var(--card)", border: "1.5px solid var(--bd)", color: "var(--tx)" }
   const toggleBtn = (active) => ({ background: active ? "var(--ink-lime)" : "transparent", color: active ? "var(--bg)" : "var(--tx-5)" })
-  const open = (v) => onNavigate?.("cubiertas", { query: v.mobile || "" })
+  // Click en un vehículo → abre su drawer de detalle (no navega directo al inventario).
+  const open = (v) => setDetailVeh(fleet.find((it) => String(it.v._id) === String(v._id)) || null)
 
   return (
     <div>
@@ -215,6 +218,7 @@ const Vehiculos = ({ onNavigate }) => {
       {showAlta && <NuevoVehiculo onClose={() => setShowAlta(false)} />}
       {showConfigEjes && <ConfigurarEjes onClose={() => setShowConfigEjes(false)} />}
       {editVeh && <EditarVehiculo vehicle={editVeh} onClose={() => setEditVeh(null)} />}
+      {detailVeh && <VehicleDrawer item={detailVeh} onClose={() => setDetailVeh(null)} onNavigate={onNavigate} />}
     </div>
   )
 }
