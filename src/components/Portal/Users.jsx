@@ -111,7 +111,7 @@ const Users = () => {
         <p className="text-sm" style={{ color: "var(--tx-5)" }}>Todavía no hay usuarios.</p>
       ) : (
         <div className="overflow-hidden rounded-[14px]" style={{ background: "var(--card)", border: "1px solid var(--bd)" }}>
-          <div className="grid gap-3 px-5 py-3 text-[10.5px] font-semibold uppercase tracking-[.05em]" style={{ gridTemplateColumns: COLS, background: "var(--elev)", borderBottom: "1px solid var(--bd)", fontFamily: "'IBM Plex Mono'", color: "var(--tx-6)" }}>
+          <div className="grid gap-3 px-5 py-3 text-[10.5px] font-semibold uppercase tracking-wider" style={{ gridTemplateColumns: COLS, background: "var(--elev)", borderBottom: "1px solid var(--bd)", fontFamily: "'IBM Plex Mono'", color: "var(--tx-6)" }}>
             <div>Usuario</div><div>Rol</div><div>Estado</div><div className="text-right">Acciones</div>
           </div>
           {users.map((u) => {
@@ -142,11 +142,11 @@ const Users = () => {
                 <div className="flex items-center justify-end gap-2">
                   <button onClick={() => (isYou ? navigate("/cambiar-password") : doReset(u))} disabled={!isYou && resetting}
                     title={isYou ? "Cambiar mi contraseña" : "Restablecer contraseña"}
-                    className="inline-flex h-[32px] w-[32px] flex-none items-center justify-center rounded-[8px]" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--tx-3)", cursor: "pointer" }}>
+                    className="inline-flex h-[32px] w-[32px] flex-none items-center justify-center rounded-lg" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--tx-3)", cursor: "pointer" }}>
                     <LockResetRoundedIcon sx={{ fontSize: 16 }} />
                   </button>
                   <button onClick={() => toggleStatus(u)} disabled={isYou} title={isYou ? "No podés cambiar tu propio estado" : ""}
-                    className="rounded-[8px] px-3 py-[7px] text-[12px] font-semibold" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: active ? "var(--ink-red)" : "var(--ink-teal)", opacity: isYou ? 0.4 : 1, cursor: isYou ? "not-allowed" : "pointer" }}>
+                    className="rounded-lg px-3 py-[7px] text-[12px] font-semibold" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: active ? "var(--ink-red)" : "var(--ink-teal)", opacity: isYou ? 0.4 : 1, cursor: isYou ? "not-allowed" : "pointer" }}>
                     {active ? "Desactivar" : "Activar"}
                   </button>
                 </div>

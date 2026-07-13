@@ -51,7 +51,7 @@ const Cubiertas = ({ intent }) => {
 
   const [query, setQuery] = useState("")
   const [tab, setTab] = useState("todas")
-  const [view, setViewState] = useState(() => localStorage.getItem("op_tireview") || "table")
+  const [view, setViewState] = useState(() => localStorage.getItem("op_tireview") || "grid")
   const setView = (v) => {
     setViewState(v)
     try { localStorage.setItem("op_tireview", v) } catch { /* device sin storage */ }
@@ -142,7 +142,7 @@ const Cubiertas = ({ intent }) => {
   return (
     <div>
       {/* Toolbar sticky */}
-      <div className="sticky top-0 z-[5] px-7 pb-4 pt-5" style={{ background: "var(--bg)", borderBottom: "1px solid var(--bd-faint)" }}>
+      <div className="sticky top-0 z-5 px-7 pb-4 pt-5" style={{ background: "var(--bg)", borderBottom: "1px solid var(--bd-faint)" }}>
         <div className="mb-4 flex items-center gap-4">
           <h1 className="text-[24px] font-bold tracking-[-.02em]" style={{ fontFamily: "'Space Grotesk'", color: "var(--tx)" }}>Cubiertas</h1>
           <div className="relative ml-2 max-w-[460px] flex-1">
@@ -190,7 +190,7 @@ const Cubiertas = ({ intent }) => {
             {[{ key: "grid", icon: <GridViewRoundedIcon sx={{ fontSize: 17 }} /> }, { key: "table", icon: <ViewListRoundedIcon sx={{ fontSize: 17 }} /> }].map((v) => {
               const on = view === v.key
               return (
-                <button key={v.key} onClick={() => setView(v.key)} className="flex h-8 w-[38px] items-center justify-center rounded-[6px]" style={{ background: on ? "var(--hover)" : "transparent", color: on ? "var(--ink-lime)" : "var(--tx-5)" }}>{v.icon}</button>
+                <button key={v.key} onClick={() => setView(v.key)} className="flex h-8 w-[38px] items-center justify-center rounded-md" style={{ background: on ? "var(--hover)" : "transparent", color: on ? "var(--ink-lime)" : "var(--tx-5)" }}>{v.icon}</button>
               )
             })}
           </div>
@@ -200,28 +200,28 @@ const Cubiertas = ({ intent }) => {
           <div className="mt-3 flex flex-wrap items-end gap-3.5 rounded-[11px] p-3.5" style={{ border: "1px solid var(--bd)", background: "var(--card)" }}>
             <label className="flex flex-col gap-1.5">
               <span className="text-[11px] font-semibold" style={{ color: "var(--tx-4)" }}>Marca</span>
-              <select value={fBrand} onChange={(e) => setFBrand(e.target.value)} className="h-[38px] min-w-[150px] rounded-[8px] px-2.5 text-[13px] outline-none" style={inputStyle}>
+              <select value={fBrand} onChange={(e) => setFBrand(e.target.value)} className="h-[38px] min-w-[150px] rounded-lg px-2.5 text-[13px] outline-none" style={inputStyle}>
                 <option value="">Todas</option>
                 {brands.map((b) => <option key={b} value={b}>{b}</option>)}
               </select>
             </label>
             <label className="flex flex-col gap-1.5">
               <span className="text-[11px] font-semibold" style={{ color: "var(--tx-4)" }}>Estado</span>
-              <select value={fStatus} onChange={(e) => setFStatus(e.target.value)} className="h-[38px] min-w-[150px] rounded-[8px] px-2.5 text-[13px] outline-none" style={inputStyle}>
+              <select value={fStatus} onChange={(e) => setFStatus(e.target.value)} className="h-[38px] min-w-[150px] rounded-lg px-2.5 text-[13px] outline-none" style={inputStyle}>
                 <option value="">Todos</option>
                 {(data?.stateOrder || []).map((s) => <option key={s} value={s}>{s}</option>)}
               </select>
             </label>
             <label className="flex flex-col gap-1.5">
               <span className="text-[11px] font-semibold" style={{ color: "var(--tx-4)" }}>Km desde</span>
-              <input type="number" min="0" value={fKmMin} onChange={(e) => setFKmMin(e.target.value)} placeholder="0" className="h-[38px] w-[120px] rounded-[8px] px-2.5 text-[13px] outline-none" style={{ ...inputStyle, fontFamily: "'IBM Plex Mono'" }} />
+              <input type="number" min="0" value={fKmMin} onChange={(e) => setFKmMin(e.target.value)} placeholder="0" className="h-[38px] w-[120px] rounded-lg px-2.5 text-[13px] outline-none" style={{ ...inputStyle, fontFamily: "'IBM Plex Mono'" }} />
             </label>
             <label className="flex flex-col gap-1.5">
               <span className="text-[11px] font-semibold" style={{ color: "var(--tx-4)" }}>Km hasta</span>
-              <input type="number" min="0" value={fKmMax} onChange={(e) => setFKmMax(e.target.value)} placeholder="—" className="h-[38px] w-[120px] rounded-[8px] px-2.5 text-[13px] outline-none" style={{ ...inputStyle, fontFamily: "'IBM Plex Mono'" }} />
+              <input type="number" min="0" value={fKmMax} onChange={(e) => setFKmMax(e.target.value)} placeholder="—" className="h-[38px] w-[120px] rounded-lg px-2.5 text-[13px] outline-none" style={{ ...inputStyle, fontFamily: "'IBM Plex Mono'" }} />
             </label>
             {activeFilters > 0 && (
-              <button onClick={clearFilters} className="inline-flex h-[38px] items-center gap-1.5 rounded-[8px] px-3 text-[12.5px] font-semibold" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--tx-3)" }}>
+              <button onClick={clearFilters} className="inline-flex h-[38px] items-center gap-1.5 rounded-lg px-3 text-[12.5px] font-semibold" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--tx-3)" }}>
                 <CloseRoundedIcon sx={{ fontSize: 15 }} /> Limpiar
               </button>
             )}
@@ -253,7 +253,7 @@ const Cubiertas = ({ intent }) => {
                     <StateBadge status={t.status} />
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-[10px] tracking-[.05em]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-6)" }}>RECAPADOS</span>
+                    <span className="text-[10px] tracking-wider" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-6)" }}>RECAPADOS</span>
                     <Pips level={t.recapLevel ?? m.level} />
                   </div>
                   <div className="flex flex-col gap-[5px] text-[12.5px]">
@@ -276,7 +276,7 @@ const Cubiertas = ({ intent }) => {
         ) : (
           /* ---------- TABLA ---------- */
           <div className="overflow-hidden rounded-[13px]" style={{ border: "1px solid var(--bd)", background: "var(--card)" }}>
-            <div className="grid gap-3 px-[18px] py-3 text-[10.5px] font-semibold uppercase tracking-[.05em]" style={{ gridTemplateColumns: GRID_COLS, fontFamily: "'IBM Plex Mono'", background: "var(--elev)", borderBottom: "1px solid var(--bd)", color: "var(--tx-6)" }}>
+            <div className="grid gap-3 px-[18px] py-3 text-[10.5px] font-semibold uppercase tracking-wider" style={{ gridTemplateColumns: GRID_COLS, fontFamily: "'IBM Plex Mono'", background: "var(--elev)", borderBottom: "1px solid var(--bd)", color: "var(--tx-6)" }}>
               {COLUMNS.map((c) => {
                 const active = sortBy === c.key
                 return (

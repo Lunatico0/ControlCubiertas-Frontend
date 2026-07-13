@@ -173,18 +173,18 @@ const OperativaLayout = () => {
 
           {helpMenu && (
             <>
-              <div className="fixed inset-0 z-[35]" onClick={() => setHelpMenu(false)} />
-              <div className="absolute z-[40] overflow-hidden rounded-[12px]" style={{ bottom: 58, right: 12, left: 12, background: "var(--card)", border: "1px solid var(--bd-strong)", boxShadow: "0 18px 44px rgba(0,0,0,.5)" }}>
+              <div className="fixed inset-0 z-35" onClick={() => setHelpMenu(false)} />
+              <div className="absolute z-40 overflow-hidden rounded-xl" style={{ bottom: 58, right: 12, left: 12, background: "var(--card)", border: "1px solid var(--bd-strong)", boxShadow: "0 18px 44px rgba(0,0,0,.5)" }}>
                 <div className="px-3.5 py-[11px] text-[10px] tracking-[.08em]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-6)", borderBottom: "1px solid var(--bd-soft)" }}>AYUDA</div>
                 <button onClick={() => { setHelpMenu(false); setActive("inicio"); setTourOpen(true) }} className="flex w-full items-center gap-[11px] px-3.5 py-3 text-left">
-                  <span className="flex h-[30px] w-[30px] flex-none items-center justify-center rounded-[8px]" style={{ background: "color-mix(in srgb, var(--ink-lime) 13%, transparent)", color: "var(--ink-lime)" }}><PlayArrowRoundedIcon sx={{ fontSize: 16 }} /></span>
+                  <span className="flex h-[30px] w-[30px] flex-none items-center justify-center rounded-lg" style={{ background: "color-mix(in srgb, var(--ink-lime) 13%, transparent)", color: "var(--ink-lime)" }}><PlayArrowRoundedIcon sx={{ fontSize: 16 }} /></span>
                   <span style={{ lineHeight: 1.25 }}>
                     <span className="block text-[13px] font-semibold" style={{ color: "var(--tx)" }}>Ver guía interactiva</span>
                     <span className="block text-[11px]" style={{ color: "var(--tx-5)" }}>Tour rápido por la app</span>
                   </span>
                 </button>
                 <a {...externalPageProps("/guia")} onClick={() => setHelpMenu(false)} className="flex items-center gap-[11px] px-3.5 py-3" style={{ textDecoration: "none", borderTop: "1px solid var(--bd-soft)" }}>
-                  <span className="flex h-[30px] w-[30px] flex-none items-center justify-center rounded-[8px]" style={{ background: "color-mix(in srgb, var(--ink-blue) 16%, transparent)", color: "var(--ink-blue)" }}><MenuBookRoundedIcon sx={{ fontSize: 16 }} /></span>
+                  <span className="flex h-[30px] w-[30px] flex-none items-center justify-center rounded-lg" style={{ background: "color-mix(in srgb, var(--ink-blue) 16%, transparent)", color: "var(--ink-blue)" }}><MenuBookRoundedIcon sx={{ fontSize: 16 }} /></span>
                   <span style={{ lineHeight: 1.25 }}>
                     <span className="block text-[13px] font-semibold" style={{ color: "var(--tx)" }}>Guía de uso completa</span>
                     <span className="block text-[11px]" style={{ color: "var(--tx-5)" }}>Manual detallado · pestaña nueva</span>

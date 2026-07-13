@@ -97,7 +97,7 @@ const Vehiculos = ({ onNavigate }) => {
   return (
     <div>
       {/* ===== TOOLBAR ===== */}
-      <div className="sticky top-0 z-[5] px-7 pb-4 pt-5" style={{ background: "var(--bg)", borderBottom: "1px solid var(--bd-faint)" }}>
+      <div className="sticky top-0 z-5 px-7 pb-4 pt-5" style={{ background: "var(--bg)", borderBottom: "1px solid var(--bd-faint)" }}>
         <div className="flex items-center gap-4">
           <h1 className="text-[24px] font-bold tracking-[-.02em]" style={{ fontFamily: "'Space Grotesk'", color: "var(--tx)" }}>Vehículos</h1>
           <div className="relative ml-2 max-w-[420px] flex-1">
@@ -114,8 +114,8 @@ const Vehiculos = ({ onNavigate }) => {
           </button>
           {/* toggle cards/tabla */}
           <div className="flex gap-[3px] rounded-[9px] p-[3px]" style={{ border: "1px solid var(--bd)", background: "var(--card)" }}>
-            <button onClick={() => setView("grid")} title="Tarjetas" className="inline-flex h-8 w-[38px] items-center justify-center rounded-[6px]" style={toggleBtn(vview !== "table")}><GridViewRoundedIcon sx={{ fontSize: 17 }} /></button>
-            <button onClick={() => setView("table")} title="Lista" className="inline-flex h-8 w-[38px] items-center justify-center rounded-[6px]" style={toggleBtn(vview === "table")}><ViewListRoundedIcon sx={{ fontSize: 17 }} /></button>
+            <button onClick={() => setView("grid")} title="Tarjetas" className="inline-flex h-8 w-[38px] items-center justify-center rounded-md" style={toggleBtn(vview !== "table")}><GridViewRoundedIcon sx={{ fontSize: 17 }} /></button>
+            <button onClick={() => setView("table")} title="Lista" className="inline-flex h-8 w-[38px] items-center justify-center rounded-md" style={toggleBtn(vview === "table")}><ViewListRoundedIcon sx={{ fontSize: 17 }} /></button>
           </div>
         </div>
         {types.length > 1 && (
@@ -144,13 +144,13 @@ const Vehiculos = ({ onNavigate }) => {
         ) : vview === "table" ? (
           /* ===== TABLA ===== */
           <div className="overflow-hidden rounded-[13px]" style={{ border: "1px solid var(--bd)", background: "var(--card)" }}>
-            <div className="grid gap-3 px-[18px] py-3 text-[10.5px] font-semibold uppercase tracking-[.05em]" style={{ gridTemplateColumns: TABLE_COLS, fontFamily: "'IBM Plex Mono'", background: "var(--elev)", borderBottom: "1px solid var(--bd)", color: "var(--tx-6)" }}>
+            <div className="grid gap-3 px-[18px] py-3 text-[10.5px] font-semibold uppercase tracking-wider" style={{ gridTemplateColumns: TABLE_COLS, fontFamily: "'IBM Plex Mono'", background: "var(--elev)", borderBottom: "1px solid var(--bd)", color: "var(--tx-6)" }}>
               <div>Móvil</div><div>Patente</div><div>Tipo</div><div>Cubiertas</div><div className="text-right">Km</div>
             </div>
             {fleet.map(({ v, countLabel, countColor, tipoColor, tipoBg, kmLabel }) => (
               <div key={v._id} onClick={() => open(v)} className="grid cursor-pointer items-center gap-3 px-[18px] py-[13px]" style={{ gridTemplateColumns: TABLE_COLS, borderBottom: "1px solid var(--bd-faint)" }}>
                 <div className="flex min-w-0 items-center gap-[11px]">
-                  <span className="flex h-8 w-8 flex-none items-center justify-center rounded-[8px]" style={{ background: tipoBg, color: tipoColor }}><VehTypeIcon size={17} /></span>
+                  <span className="flex h-8 w-8 flex-none items-center justify-center rounded-lg" style={{ background: tipoBg, color: tipoColor }}><VehTypeIcon size={17} /></span>
                   <span className="text-[14.5px] font-bold" style={{ fontFamily: "'Space Grotesk'", color: "var(--tx)" }}>{v.mobile || "—"}</span>
                 </div>
                 <div className="text-[13px]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-2)" }}>{v.licensePlate || "—"}</div>

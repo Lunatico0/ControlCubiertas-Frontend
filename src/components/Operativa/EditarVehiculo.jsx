@@ -82,7 +82,7 @@ const EditarVehiculo = ({ vehicle, onClose, onSaved }) => {
               {TIPOS.map((t) => {
                 const on = form.type === t
                 return (
-                  <button key={t} onClick={() => setForm((f) => ({ ...f, type: t }))} className="h-9 rounded-[8px] px-3.5 text-[13px] font-semibold" style={{ border: `1px solid ${on ? "var(--ink-lime)" : "var(--bd-strong)"}`, background: on ? tint("var(--ink-lime)", 10) : "var(--input)", color: on ? "var(--ink-lime)" : "var(--tx-3)" }}>{t}</button>
+                  <button key={t} onClick={() => setForm((f) => ({ ...f, type: t }))} className="h-9 rounded-lg px-3.5 text-[13px] font-semibold" style={{ border: `1px solid ${on ? "var(--ink-lime)" : "var(--bd-strong)"}`, background: on ? tint("var(--ink-lime)", 10) : "var(--input)", color: on ? "var(--ink-lime)" : "var(--tx-3)" }}>{t}</button>
                 )
               })}
             </div>

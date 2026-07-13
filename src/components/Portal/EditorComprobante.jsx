@@ -44,7 +44,7 @@ const Segmented = ({ options, value, onChange }) => (
   <div className="flex gap-[5px] rounded-[9px] p-1" style={{ border: "1px solid var(--bd-strong)", background: "var(--input)" }}>
     {options.map((o) => {
       const on = value === o.value
-      return <button key={o.value} onClick={() => onChange(o.value)} className="h-[34px] flex-1 rounded-[6px] text-[12.5px] font-semibold" style={{ border: "none", background: on ? "var(--ink-lime)" : "transparent", color: on ? "var(--bg)" : "var(--tx-3)" }}>{o.label}</button>
+      return <button key={o.value} onClick={() => onChange(o.value)} className="h-[34px] flex-1 rounded-md text-[12.5px] font-semibold" style={{ border: "none", background: on ? "var(--ink-lime)" : "transparent", color: on ? "var(--bg)" : "var(--tx-3)" }}>{o.label}</button>
     })}
   </div>
 )
@@ -158,12 +158,12 @@ const EditorComprobante = () => {
               <div className="ml-auto"><Toggle on={d.showHeader} onClick={() => setDesign({ showHeader: !d.showHeader })} w={42} knob={18} /></div>
             </div>
             <div className="flex flex-col gap-[11px]">
-              <label className="block"><span className={fieldLabelCls} style={{ color: "var(--tx-4)" }}>Nombre de la empresa</span><input value={empresa} onChange={(e) => setEmpresa(e.target.value)} className="w-full rounded-[8px] px-3 text-[13.5px] outline-none" style={fieldStyle} onFocus={onFocusLime} onBlur={onBlurBd} /></label>
+              <label className="block"><span className={fieldLabelCls} style={{ color: "var(--tx-4)" }}>Nombre de la empresa</span><input value={empresa} onChange={(e) => setEmpresa(e.target.value)} className="w-full rounded-lg px-3 text-[13.5px] outline-none" style={fieldStyle} onFocus={onFocusLime} onBlur={onBlurBd} /></label>
               <div className="grid grid-cols-2 gap-[11px]">
-                <label className="block"><span className={fieldLabelCls} style={{ color: "var(--tx-4)" }}>CUIT</span><input value={cuit} onChange={(e) => setCuit(e.target.value)} className="w-full rounded-[8px] px-3 text-[13.5px] outline-none" style={{ ...fieldStyle, fontFamily: "'IBM Plex Mono'" }} onFocus={onFocusLime} onBlur={onBlurBd} /></label>
-                <label className="block"><span className={fieldLabelCls} style={{ color: "var(--tx-4)" }}>Teléfono</span><input value={telefono} onChange={(e) => setTelefono(e.target.value)} className="w-full rounded-[8px] px-3 text-[13.5px] outline-none" style={{ ...fieldStyle, fontFamily: "'IBM Plex Mono'" }} onFocus={onFocusLime} onBlur={onBlurBd} /></label>
+                <label className="block"><span className={fieldLabelCls} style={{ color: "var(--tx-4)" }}>CUIT</span><input value={cuit} onChange={(e) => setCuit(e.target.value)} className="w-full rounded-lg px-3 text-[13.5px] outline-none" style={{ ...fieldStyle, fontFamily: "'IBM Plex Mono'" }} onFocus={onFocusLime} onBlur={onBlurBd} /></label>
+                <label className="block"><span className={fieldLabelCls} style={{ color: "var(--tx-4)" }}>Teléfono</span><input value={telefono} onChange={(e) => setTelefono(e.target.value)} className="w-full rounded-lg px-3 text-[13.5px] outline-none" style={{ ...fieldStyle, fontFamily: "'IBM Plex Mono'" }} onFocus={onFocusLime} onBlur={onBlurBd} /></label>
               </div>
-              <label className="block"><span className={fieldLabelCls} style={{ color: "var(--tx-4)" }}>Dirección</span><input value={direccion} onChange={(e) => setDireccion(e.target.value)} className="w-full rounded-[8px] px-3 text-[13.5px] outline-none" style={fieldStyle} onFocus={onFocusLime} onBlur={onBlurBd} /></label>
+              <label className="block"><span className={fieldLabelCls} style={{ color: "var(--tx-4)" }}>Dirección</span><input value={direccion} onChange={(e) => setDireccion(e.target.value)} className="w-full rounded-lg px-3 text-[13.5px] outline-none" style={fieldStyle} onFocus={onFocusLime} onBlur={onBlurBd} /></label>
             </div>
           </div>
 
@@ -207,7 +207,7 @@ const EditorComprobante = () => {
             <div className="mb-3.5 grid grid-cols-2 gap-1.5">
               {FONTS.map(([label, ff]) => {
                 const on = d.font === ff
-                return <button key={label} onClick={() => setDesign({ font: ff })} className="h-[38px] rounded-[8px] text-[12.5px] font-semibold" style={{ border: `1px solid ${on ? "var(--ink-lime)" : "var(--bd-strong)"}`, background: on ? tint("var(--ink-lime)", 10) : "var(--input)", color: on ? "var(--ink-lime)" : "var(--tx-2)", fontFamily: ff }}>{label}</button>
+                return <button key={label} onClick={() => setDesign({ font: ff })} className="h-[38px] rounded-lg text-[12.5px] font-semibold" style={{ border: `1px solid ${on ? "var(--ink-lime)" : "var(--bd-strong)"}`, background: on ? tint("var(--ink-lime)", 10) : "var(--input)", color: on ? "var(--ink-lime)" : "var(--tx-2)", fontFamily: ff }}>{label}</button>
               })}
             </div>
             <span className={fieldLabelCls} style={{ color: "var(--tx-4)" }}>Tamaño de texto</span>
@@ -230,7 +230,7 @@ const EditorComprobante = () => {
           {/* PIE */}
           <div className="px-[22px] py-5" style={{ borderBottom: "1px solid var(--bd-faint)" }}>
             <div className="mb-3 text-[10px] tracking-[.12em]" style={sectionLabelStyle}>PIE DE COMPROBANTE</div>
-            <textarea value={footer} onChange={(e) => setFooter(e.target.value)} rows={3} className="w-full rounded-[8px] px-3 py-2.5 text-[13px] outline-none" style={{ background: "var(--input)", border: "1px solid var(--bd-strong)", color: "var(--tx)", resize: "vertical", lineHeight: 1.5, fontFamily: "'IBM Plex Sans'" }} onFocus={onFocusLime} onBlur={onBlurBd} />
+            <textarea value={footer} onChange={(e) => setFooter(e.target.value)} rows={3} className="w-full rounded-lg px-3 py-2.5 text-[13px] outline-none" style={{ background: "var(--input)", border: "1px solid var(--bd-strong)", color: "var(--tx)", resize: "vertical", lineHeight: 1.5, fontFamily: "'IBM Plex Sans'" }} onFocus={onFocusLime} onBlur={onBlurBd} />
           </div>
 
           {/* IMPRESIÓN */}

@@ -51,7 +51,7 @@ const VehicleDrawer = ({ item, onClose, onNavigate }) => {
             </div>
             <div className="mt-[3px] text-[12px]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-5)" }}>{v.licensePlate || "—"} · {v.brand || "—"}</div>
           </div>
-          <button onClick={onClose} title="Cerrar" className="rounded-[8px] p-1.5" style={{ color: "var(--tx-5)" }}><CloseRoundedIcon sx={{ fontSize: 20 }} /></button>
+          <button onClick={onClose} title="Cerrar" className="rounded-lg p-1.5" style={{ color: "var(--tx-5)" }}><CloseRoundedIcon sx={{ fontSize: 20 }} /></button>
         </div>
 
         <div className="flex-1 overflow-auto px-6 py-[22px]">
@@ -91,11 +91,11 @@ const VehicleDrawer = ({ item, onClose, onNavigate }) => {
                       )}
                     </div>
                     {p.empty ? (
-                      <button onClick={montar} className="inline-flex h-[34px] flex-none items-center gap-1.5 rounded-[8px] px-3 text-[12px] font-semibold" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--ink-lime)" }}>
+                      <button onClick={montar} className="inline-flex h-[34px] flex-none items-center gap-1.5 rounded-lg px-3 text-[12px] font-semibold" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--ink-lime)" }}>
                         <AddRoundedIcon sx={{ fontSize: 15 }} /> Montar
                       </button>
                     ) : (
-                      <button onClick={() => verCubierta(p)} className="inline-flex h-[34px] flex-none items-center gap-1.5 rounded-[8px] px-3 text-[12px] font-semibold" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--tx-2)" }}>
+                      <button onClick={() => verCubierta(p)} className="inline-flex h-[34px] flex-none items-center gap-1.5 rounded-lg px-3 text-[12px] font-semibold" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--tx-2)" }}>
                         Ver <ChevronRightRoundedIcon sx={{ fontSize: 15 }} />
                       </button>
                     )}

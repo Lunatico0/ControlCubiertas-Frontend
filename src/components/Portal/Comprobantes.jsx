@@ -153,7 +153,7 @@ const Comprobantes = () => {
 
       {/* Tabla */}
       <div className="overflow-hidden rounded-[13px]" style={{ background: "var(--card)", border: "1px solid var(--bd)" }}>
-        <div className="grid gap-3 px-5 py-3 text-[10.5px] font-semibold uppercase tracking-[.05em]" style={{ gridTemplateColumns: COLS, background: "var(--elev)", borderBottom: "1px solid var(--bd)", fontFamily: "'IBM Plex Mono'", color: "var(--tx-6)" }}>
+        <div className="grid gap-3 px-5 py-3 text-[10.5px] font-semibold uppercase tracking-wider" style={{ gridTemplateColumns: COLS, background: "var(--elev)", borderBottom: "1px solid var(--bd)", fontFamily: "'IBM Plex Mono'", color: "var(--tx-6)" }}>
           <div>N° / Fecha</div><div>Tipo</div><div>Cubierta</div><div>Detalle</div><div>Usuario</div><div className="text-right">Acción</div>
         </div>
 
@@ -183,11 +183,11 @@ const Comprobantes = () => {
                 </div>
                 <div className="flex items-center justify-end gap-1.5">
                   <button onClick={() => reprint.execute({ entry: toEntry(c), tire: toTire(c) })} disabled={reprint.isPrinting} title="Reimprimir"
-                    className="inline-flex h-[34px] w-[34px] items-center justify-center rounded-[8px]" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--tx-3)" }}>
+                    className="inline-flex h-[34px] w-[34px] items-center justify-center rounded-lg" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--tx-3)" }}>
                     <PrintRoundedIcon sx={{ fontSize: 15 }} />
                   </button>
                   <button onClick={() => openView(c)} title="Ver"
-                    className="inline-flex h-[34px] w-[34px] items-center justify-center rounded-[8px]" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--tx-3)" }}>
+                    className="inline-flex h-[34px] w-[34px] items-center justify-center rounded-lg" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--tx-3)" }}>
                     <VisibilityRoundedIcon sx={{ fontSize: 15 }} />
                   </button>
                 </div>
@@ -202,9 +202,9 @@ const Comprobantes = () => {
             <span className="text-[12px]" style={{ color: "var(--tx-6)" }}>Mostrando {desde}–{hasta} de {total}</span>
             <div className="flex gap-1.5">
               <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page <= 1}
-                className="h-8 rounded-[8px] px-3 text-[12.5px] font-semibold" style={{ border: "1px solid var(--bd)", background: "var(--card)", color: "var(--tx-4)", opacity: page <= 1 ? 0.5 : 1, cursor: page <= 1 ? "not-allowed" : "pointer" }}>Anterior</button>
+                className="h-8 rounded-lg px-3 text-[12.5px] font-semibold" style={{ border: "1px solid var(--bd)", background: "var(--card)", color: "var(--tx-4)", opacity: page <= 1 ? 0.5 : 1, cursor: page <= 1 ? "not-allowed" : "pointer" }}>Anterior</button>
               <button onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={page >= totalPages}
-                className="h-8 rounded-[8px] px-3 text-[12.5px] font-semibold" style={{ border: "1px solid var(--bd-strong)", background: "var(--card)", color: "var(--tx)", opacity: page >= totalPages ? 0.5 : 1, cursor: page >= totalPages ? "not-allowed" : "pointer" }}>Siguiente</button>
+                className="h-8 rounded-lg px-3 text-[12.5px] font-semibold" style={{ border: "1px solid var(--bd-strong)", background: "var(--card)", color: "var(--tx)", opacity: page >= totalPages ? 0.5 : 1, cursor: page >= totalPages ? "not-allowed" : "pointer" }}>Siguiente</button>
             </div>
           </div>
         )}
@@ -212,7 +212,7 @@ const Comprobantes = () => {
 
       {/* Modal Ver: preview del comprobante (mismo generador que la impresión) */}
       {preview && (
-        <div className="fixed inset-0 z-[70] flex items-center justify-center p-4" style={{ background: "rgba(0,0,0,.55)", backdropFilter: "blur(2px)" }} onClick={() => setPreview(null)}>
+        <div className="fixed inset-0 z-70 flex items-center justify-center p-4" style={{ background: "rgba(0,0,0,.55)", backdropFilter: "blur(2px)" }} onClick={() => setPreview(null)}>
           <div className="max-h-[90dvh] overflow-auto rounded-lg" style={{ maxWidth: 560, background: "#fff", boxShadow: "0 20px 60px rgba(0,0,0,.5)" }} onClick={(e) => e.stopPropagation()} dangerouslySetInnerHTML={{ __html: preview }} />
         </div>
       )}

@@ -328,7 +328,7 @@ const TireDrawer = ({ tireId, initialAction, onClose }) => {
                                   disabled={occupied}
                                   onClick={() => setForm((f) => ({ ...f, position: p.code }))}
                                   title={occupied ? `Ocupada por #${p.tire.code}` : p.label}
-                                  className="rounded-[8px] px-2.5 py-2 text-[11.5px] font-semibold"
+                                  className="rounded-lg px-2.5 py-2 text-[11.5px] font-semibold"
                                   style={{
                                     border: `1.5px solid ${selected ? "var(--ink-lime)" : "var(--bd-strong)"}`,
                                     background: selected ? tint("var(--ink-lime)", 14) : "var(--input)",
@@ -504,7 +504,7 @@ const TireDrawer = ({ tireId, initialAction, onClose }) => {
                             {histBits(h).length > 0 && (
                               <div className="mt-[9px] flex flex-wrap gap-[6px]">
                                 {histBits(h).map((bit, bi) => (
-                                  <span key={bi} className="rounded-[6px] px-[9px] py-[2px] text-[11px]" style={{ background: "var(--hover)", border: "1px solid var(--bd)" }}>
+                                  <span key={bi} className="rounded-md px-[9px] py-[2px] text-[11px]" style={{ background: "var(--hover)", border: "1px solid var(--bd)" }}>
                                     <span style={{ color: "var(--tx-6)" }}>{bit.k} </span>
                                     <span style={{ fontFamily: "'IBM Plex Mono'", fontWeight: 600, color: "var(--tx-2)" }}>{bit.val}</span>
                                   </span>

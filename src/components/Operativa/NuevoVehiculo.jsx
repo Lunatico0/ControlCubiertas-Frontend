@@ -75,7 +75,7 @@ const NuevoVehiculo = ({ onClose, onCreated }) => {
     }
   }
 
-  const inputBase = "w-full rounded-[8px] px-3 text-[14px] outline-none"
+  const inputBase = "w-full rounded-lg px-3 text-[14px] outline-none"
   const inputStyle = { height: 42, background: "var(--input)", border: "1px solid var(--bd-strong)", color: "var(--tx)" }
   const onFocusLime = (e) => (e.target.style.borderColor = "var(--ink-lime)")
   const onBlurBd = (e) => (e.target.style.borderColor = "var(--bd-strong)")
@@ -84,7 +84,7 @@ const NuevoVehiculo = ({ onClose, onCreated }) => {
   const sectionLabelStyle = { fontFamily: "'IBM Plex Mono'", color: "var(--tx-6)" }
 
   return (
-    <div className="fixed inset-0 z-[60] flex flex-col" style={{ background: "var(--bg)" }}>
+    <div className="fixed inset-0 z-60 flex flex-col" style={{ background: "var(--bg)" }}>
       {/* ===== TOP BAR ===== */}
       <div className="flex h-16 flex-none items-center gap-3.5 px-6" style={{ background: "var(--sidebar)", borderBottom: "1px solid var(--bd-faint)" }}>
         <button onClick={onClose} title="Volver" className="inline-flex h-[38px] w-[38px] items-center justify-center rounded-[9px]" style={{ border: "1px solid var(--bd)", background: "var(--elev)", color: "var(--tx-3)" }}>
@@ -119,7 +119,7 @@ const NuevoVehiculo = ({ onClose, onCreated }) => {
               {TIPOS.map((t) => {
                 const on = form.tipo === t
                 return (
-                  <button key={t} onClick={() => setForm((f) => ({ ...f, tipo: t }))} className="h-9 rounded-[8px] px-3.5 text-[13px] font-semibold" style={{ border: `1px solid ${on ? "var(--ink-lime)" : "var(--bd-strong)"}`, background: on ? tint("var(--ink-lime)", 10) : "var(--input)", color: on ? "var(--ink-lime)" : "var(--tx-3)" }}>{t}</button>
+                  <button key={t} onClick={() => setForm((f) => ({ ...f, tipo: t }))} className="h-9 rounded-lg px-3.5 text-[13px] font-semibold" style={{ border: `1px solid ${on ? "var(--ink-lime)" : "var(--bd-strong)"}`, background: on ? tint("var(--ink-lime)", 10) : "var(--input)", color: on ? "var(--ink-lime)" : "var(--tx-3)" }}>{t}</button>
                 )
               })}
             </div>
@@ -166,12 +166,12 @@ const NuevoVehiculo = ({ onClose, onCreated }) => {
                     {moto ? (
                       <span className="inline-flex h-[30px] items-center rounded-[7px] px-[13px] text-[12px] font-semibold" style={{ background: tint("var(--ink-lime)", 10), color: "var(--ink-lime)" }}>Rueda única</span>
                     ) : (
-                      <div className="flex gap-1 rounded-[8px] p-[3px]" style={{ border: "1px solid var(--bd-strong)", background: "var(--bg)" }}>
-                        <button onClick={() => setAxleType(i, "simple")} className="h-[30px] rounded-[6px] px-[11px] text-[12px] font-semibold" style={seg(!dual)}>Simple</button>
-                        <button onClick={() => setAxleType(i, "dual")} className="h-[30px] rounded-[6px] px-[11px] text-[12px] font-semibold" style={seg(dual)}>Dual</button>
+                      <div className="flex gap-1 rounded-lg p-[3px]" style={{ border: "1px solid var(--bd-strong)", background: "var(--bg)" }}>
+                        <button onClick={() => setAxleType(i, "simple")} className="h-[30px] rounded-md px-[11px] text-[12px] font-semibold" style={seg(!dual)}>Simple</button>
+                        <button onClick={() => setAxleType(i, "dual")} className="h-[30px] rounded-md px-[11px] text-[12px] font-semibold" style={seg(dual)}>Dual</button>
                       </div>
                     )}
-                    <button onClick={() => canRemove && removeAxle(i)} title="Quitar eje" className="inline-flex h-8 w-8 flex-none items-center justify-center rounded-[8px]" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: canRemove ? "var(--ink-red)" : "var(--bd-hover)", cursor: canRemove ? "pointer" : "not-allowed" }}>
+                    <button onClick={() => canRemove && removeAxle(i)} title="Quitar eje" className="inline-flex h-8 w-8 flex-none items-center justify-center rounded-lg" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: canRemove ? "var(--ink-red)" : "var(--bd-hover)", cursor: canRemove ? "pointer" : "not-allowed" }}>
                       <RemoveRoundedIcon sx={{ fontSize: 15 }} />
                     </button>
                   </div>
@@ -193,14 +193,14 @@ const NuevoVehiculo = ({ onClose, onCreated }) => {
 
           {/* FRENTE */}
           <div className="mb-2 flex flex-col items-center gap-1.5">
-            <span className="text-[10px] tracking-[.1em]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-6)" }}>FRENTE</span>
+            <span className="text-[10px] tracking-widest" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-6)" }}>FRENTE</span>
             <span style={{ color: "var(--tx-7)" }} className="inline-flex"><ArrowUpwardRoundedIcon sx={{ fontSize: 16 }} /></span>
           </div>
 
           {/* diagrama */}
           <div className="relative py-1.5">
             <div className="absolute left-1/2 top-3.5 bottom-3.5 w-11 -translate-x-1/2 rounded-[14px]" style={{ background: "var(--bd-2)", border: "1px solid var(--bd-strong)" }} />
-            <div className="relative z-[1] flex flex-col gap-5">
+            <div className="relative z-1 flex flex-col gap-5">
               {axles.map((t, i) => {
                 const dual = t === "dual"
                 const moto = t === "moto"
@@ -232,7 +232,7 @@ const NuevoVehiculo = ({ onClose, onCreated }) => {
 
           {/* stats */}
           <div className="mt-[22px] flex items-center gap-2.5 rounded-[11px] px-4 py-[11px]" style={{ border: "1px solid var(--bd)", background: "var(--elev)" }}>
-            <span className="flex h-[30px] w-[30px] flex-none items-center justify-center rounded-[8px]" style={{ background: tint("var(--ink-lime)", 13), color: "var(--ink-lime)" }}><TripOriginRoundedIcon sx={{ fontSize: 17 }} /></span>
+            <span className="flex h-[30px] w-[30px] flex-none items-center justify-center rounded-lg" style={{ background: tint("var(--ink-lime)", 13), color: "var(--ink-lime)" }}><TripOriginRoundedIcon sx={{ fontSize: 17 }} /></span>
             <div style={{ lineHeight: 1.2 }}>
               <div className="text-[18px] font-bold" style={{ fontFamily: "'Space Grotesk'", color: "var(--tx)" }}>{total}</div>
               <div className="text-[11.5px]" style={{ color: "var(--tx-4)" }}>posiciones de cubierta</div>

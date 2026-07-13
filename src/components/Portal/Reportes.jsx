@@ -124,7 +124,7 @@ const Reportes = () => {
               <h2 className="font-display text-[17px] font-bold" style={{ fontFamily: "'Space Grotesk'", color: "var(--tx)" }}>Ranking de marcas</h2>
               <p className="mt-1 text-[12.5px]" style={{ color: "var(--tx-5)" }}>Ordenado por vida útil promedio. La base para decidir qué marca conviene comprar.</p>
             </div>
-            <div className="grid gap-3 px-5 py-3 text-[10.5px] font-semibold uppercase tracking-[.05em]" style={{ gridTemplateColumns: RANK_COLS, background: "var(--elev)", borderTop: "1px solid var(--bd)", borderBottom: "1px solid var(--bd)", fontFamily: "'IBM Plex Mono'", color: "var(--tx-6)" }}>
+            <div className="grid gap-3 px-5 py-3 text-[10.5px] font-semibold uppercase tracking-wider" style={{ gridTemplateColumns: RANK_COLS, background: "var(--elev)", borderTop: "1px solid var(--bd)", borderBottom: "1px solid var(--bd)", fontFamily: "'IBM Plex Mono'", color: "var(--tx-6)" }}>
               <div>#</div><div>Marca</div><div>Cubiertas</div><div>Vida útil promedio</div><div>Recap. prom</div><div>Descarte</div>
             </div>
             {brandsWithDot.map((b, i) => (
@@ -185,7 +185,7 @@ const Reportes = () => {
           </div>
 
           {/* Nota: falta el costo de compra para calcular costo/km */}
-          <div className="mt-4 flex items-start gap-3 rounded-[12px] p-4" style={{ border: "1px dashed var(--bd-strong)", background: "var(--elev)" }}>
+          <div className="mt-4 flex items-start gap-3 rounded-xl p-4" style={{ border: "1px dashed var(--bd-strong)", background: "var(--elev)" }}>
             <InfoRoundedIcon sx={{ fontSize: 18 }} style={{ color: "var(--ink-blue)", flexShrink: 0, marginTop: 1 }} />
             <p className="text-[12.5px]" style={{ color: "var(--tx-5)" }}>Cuando registres el costo de compra de las cubiertas, acá vas a ver también el costo por kilómetro por marca — el indicador definitivo de qué conviene comprar.</p>
           </div>

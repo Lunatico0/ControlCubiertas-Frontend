@@ -110,7 +110,7 @@ const AdminLayout = () => {
           <div className="flex items-center gap-[13px] rounded-[9px] px-[13px] py-[11px] text-[14px]" style={{ color: "var(--tx-6)", cursor: "default" }}>
             <span className="inline-flex flex-none items-center justify-center" style={{ width: 20, height: 20 }}><CreditCardRoundedIcon sx={{ fontSize: 18 }} /></span>
             <span>Cuenta</span>
-            <span className="ml-auto rounded-full px-2 py-0.5 text-[9px] font-semibold tracking-[.05em]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--ink-purple)", background: "color-mix(in srgb, var(--ink-purple) 16%, transparent)" }}>PRÓXIMAMENTE</span>
+            <span className="ml-auto rounded-full px-2 py-0.5 text-[9px] font-semibold tracking-wider" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--ink-purple)", background: "color-mix(in srgb, var(--ink-purple) 16%, transparent)" }}>PRÓXIMAMENTE</span>
           </div>
         </nav>
 
@@ -140,18 +140,18 @@ const AdminLayout = () => {
 
           {helpMenu && (
             <>
-              <div className="fixed inset-0 z-[35]" onClick={() => setHelpMenu(false)} />
-              <div className="absolute z-[40] overflow-hidden rounded-[12px]" style={{ bottom: 58, left: 12, right: 12, background: "var(--card)", border: "1px solid var(--bd-strong)", boxShadow: "0 18px 44px rgba(0,0,0,.5)" }}>
+              <div className="fixed inset-0 z-35" onClick={() => setHelpMenu(false)} />
+              <div className="absolute z-40 overflow-hidden rounded-xl" style={{ bottom: 58, left: 12, right: 12, background: "var(--card)", border: "1px solid var(--bd-strong)", boxShadow: "0 18px 44px rgba(0,0,0,.5)" }}>
                 <div className="px-3.5 py-[11px] text-[10px] tracking-[.08em]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-6)", borderBottom: "1px solid var(--bd-soft)" }}>AYUDA · PANEL ADMIN</div>
                 <button onClick={() => { setHelpMenu(false); navigate("/admin"); setTourOpen(true) }} className="flex w-full items-center gap-[11px] px-3.5 py-3 text-left">
-                  <span className="flex h-[30px] w-[30px] flex-none items-center justify-center rounded-[8px]" style={{ background: "color-mix(in srgb, var(--ink-lime) 13%, transparent)", color: "var(--ink-lime)" }}><PlayArrowRoundedIcon sx={{ fontSize: 16 }} /></span>
+                  <span className="flex h-[30px] w-[30px] flex-none items-center justify-center rounded-lg" style={{ background: "color-mix(in srgb, var(--ink-lime) 13%, transparent)", color: "var(--ink-lime)" }}><PlayArrowRoundedIcon sx={{ fontSize: 16 }} /></span>
                   <span style={{ lineHeight: 1.25 }}>
                     <span className="block text-[13px] font-semibold" style={{ color: "var(--tx)" }}>Ver guía interactiva</span>
                     <span className="block text-[11px]" style={{ color: "var(--tx-5)" }}>Tour por el panel de administración</span>
                   </span>
                 </button>
                 <a {...externalPageProps("/admin/guia")} onClick={() => setHelpMenu(false)} className="flex items-center gap-[11px] px-3.5 py-3" style={{ textDecoration: "none", borderTop: "1px solid var(--bd-soft)" }}>
-                  <span className="flex h-[30px] w-[30px] flex-none items-center justify-center rounded-[8px]" style={{ background: "color-mix(in srgb, var(--ink-blue) 16%, transparent)", color: "var(--ink-blue)" }}><MenuBookRoundedIcon sx={{ fontSize: 16 }} /></span>
+                  <span className="flex h-[30px] w-[30px] flex-none items-center justify-center rounded-lg" style={{ background: "color-mix(in srgb, var(--ink-blue) 16%, transparent)", color: "var(--ink-blue)" }}><MenuBookRoundedIcon sx={{ fontSize: 16 }} /></span>
                   <span style={{ lineHeight: 1.25 }}>
                     <span className="block text-[13px] font-semibold" style={{ color: "var(--tx)" }}>Guía del administrador</span>
                     <span className="block text-[11px]" style={{ color: "var(--tx-5)" }}>Manual detallado · pestaña nueva</span>
@@ -166,7 +166,7 @@ const AdminLayout = () => {
       {/* Columna principal */}
       <main className="relative flex min-w-0 flex-1 flex-col overflow-hidden">
         {/* Top bar */}
-        <div className="z-[2] flex h-[74px] flex-none items-center gap-3.5 px-6" style={{ background: "var(--bg)", borderBottom: "1px solid var(--bd-faint)" }}>
+        <div className="z-2 flex h-[74px] flex-none items-center gap-3.5 px-6" style={{ background: "var(--bg)", borderBottom: "1px solid var(--bd-faint)" }}>
           <div className="ml-auto flex items-center gap-3">
             <div className="inline-flex items-center gap-2.5 rounded-[10px] px-3.5 py-2.5" style={{ background: "var(--elev)", border: "1px solid var(--bd)" }}>
               <ApartmentRoundedIcon sx={{ fontSize: 17 }} style={{ color: "var(--tx-5)" }} />
@@ -185,7 +185,7 @@ const AdminLayout = () => {
           </div>
         </div>
 
-        <div className="relative z-[1] flex-1 overflow-auto" style={{ padding: "28px 30px" }}>
+        <div className="relative z-1 flex-1 overflow-auto" style={{ padding: "28px 30px" }}>
           <Outlet />
         </div>
       </main>
