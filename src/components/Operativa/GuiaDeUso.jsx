@@ -1,6 +1,8 @@
 import { useTheme } from "@context/ThemeContext"
 import { Link } from "react-router-dom"
 import ChevronLeftRoundedIcon from "@mui/icons-material/ChevronLeftRounded"
+import DarkModeRoundedIcon from "@mui/icons-material/DarkModeRounded"
+import LightModeRoundedIcon from "@mui/icons-material/LightModeRounded"
 import BoltRoundedIcon from "@mui/icons-material/BoltRounded"
 import InfoRoundedIcon from "@mui/icons-material/InfoRounded"
 import WarningRoundedIcon from "@mui/icons-material/WarningRounded"
@@ -55,11 +57,11 @@ const Logo = ({ c = "var(--ink-lime)", s = 34 }) => (
 )
 
 const GuiaDeUso = () => {
-  const { isDarkMode } = useTheme()
+  const { isDarkMode, toggleTheme } = useTheme()
   return (
-    <div data-app-theme={isDarkMode ? "dark" : "light"} className="flex min-h-screen w-full text-left" style={{ background: "var(--bg)", color: "var(--tx)", fontFamily: "'IBM Plex Sans',system-ui,sans-serif" }}>
-      {/* TOC */}
-      <aside className="sticky top-0 hidden h-screen w-[270px] flex-none overflow-y-auto px-5 py-[26px] md:block" style={{ background: "var(--sidebar)", borderRight: "1px solid var(--bd-faint)" }}>
+    <div data-app-theme={isDarkMode ? "dark" : "light"} className="flex h-screen w-full overflow-hidden text-left" style={{ background: "var(--bg)", color: "var(--tx)", fontFamily: "'IBM Plex Sans',system-ui,sans-serif" }}>
+      {/* TOC — fijo (altura de viewport, no scrollea con el contenido) */}
+      <aside className="hidden h-screen w-[270px] flex-none flex-col overflow-y-auto px-5 py-[26px] md:flex" style={{ background: "var(--sidebar)", borderRight: "1px solid var(--bd-faint)" }}>
         <div className="mb-[22px] flex items-center gap-[11px]">
           <Logo />
           <div style={{ lineHeight: 1 }}>
@@ -74,15 +76,20 @@ const GuiaDeUso = () => {
             </a>
           ))}
         </nav>
-        <div className="mt-[22px] pt-[18px]" style={{ borderTop: "1px solid var(--bd-faint)" }}>
+        <div className="mt-auto pt-[18px]" style={{ borderTop: "1px solid var(--bd-faint)" }}>
+          <button onClick={toggleTheme} className="mb-2.5 flex w-full items-center gap-2.5 rounded-[9px] border px-3 py-2.5 text-[13px] font-medium" style={{ borderColor: "var(--bd)", background: "var(--elev)", color: "var(--tx-2)" }}>
+            <span className="inline-flex" style={{ color: "var(--ink-lime)" }}>{isDarkMode ? <DarkModeRoundedIcon sx={{ fontSize: 17 }} /> : <LightModeRoundedIcon sx={{ fontSize: 18 }} />}</span>
+            {isDarkMode ? "Tema oscuro" : "Tema claro"}
+          </button>
           <Link to="/" className="inline-flex items-center gap-2 text-[12.5px]" style={{ color: "var(--ink-lime)", textDecoration: "none" }}>
             <ChevronLeftRoundedIcon sx={{ fontSize: 16 }} /> Volver a la app
           </Link>
         </div>
       </aside>
 
-      {/* CONTENIDO */}
-      <main className="mx-auto min-w-0 flex-1" style={{ maxWidth: 820, padding: "52px 48px 90px" }}>
+      {/* CONTENIDO — el scroll vive acá (la página no scrollea, el TOC queda fijo) */}
+      <main className="min-w-0 flex-1 overflow-y-auto">
+        <div className="mx-auto" style={{ maxWidth: 820, padding: "52px 48px 90px" }}>
         <div className="mb-3 text-[11px]" style={{ fontFamily: "'IBM Plex Mono'", letterSpacing: ".14em", color: "var(--ink-lime)" }}>MANUAL DEL USUARIO OPERATIVO</div>
         <h1 className="text-[40px] font-bold" style={{ fontFamily: "'Space Grotesk'", letterSpacing: "-.02em", color: "var(--tx)", lineHeight: 1.05 }}>Cómo usar Control Cubiertas</h1>
         <p className="mt-4 text-[16px]" style={{ lineHeight: 1.65, color: "var(--tx-3)", maxWidth: 640 }}>
@@ -175,6 +182,7 @@ const GuiaDeUso = () => {
 
         <div className="mt-14 flex items-center gap-2.5 pt-[22px] text-[12.5px]" style={{ borderTop: "1px solid var(--bd)", color: "var(--tx-7)", fontFamily: "'IBM Plex Mono'" }}>
           <Logo c="var(--tx-7)" s={20} /> Control Cubiertas · Guía del usuario operativo
+        </div>
         </div>
       </main>
     </div>
