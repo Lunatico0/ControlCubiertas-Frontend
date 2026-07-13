@@ -53,10 +53,24 @@ export const StateBadge = ({ status, small }) => {
   )
 }
 
-export const Pips = ({ level }) => (
-  <div className="flex gap-[5px]">
-    {[0, 1, 2].map((i) => (
-      <span key={i} className="rounded-[3px]" style={{ width: 18, height: 6, background: i < level ? "var(--st-teal)" : "var(--bd-strong)" }} />
-    ))}
-  </div>
-)
+// Escalera de recapados del tenant: los estados de rol "stock" ordenados por nivel, con
+// su color. La cantidad = recapados posibles (configurables en el panel admin).
+export const recapScale = () =>
+  Object.values(_catalog)
+    .filter((m) => m.role === "stock")
+    .sort((a, b) => a.level - b.level)
+    .map((m) => m.color)
+
+// Pips de recapado: un chip por recapado posible; prendidos = nivel de recapado de la
+// cubierta (level), cada chip con el color de SU recapado. Apagados = gris.
+export const Pips = ({ level = 0 }) => {
+  const colors = recapScale()
+  if (!colors.length) return null
+  return (
+    <div className="flex gap-[5px]">
+      {colors.map((c, i) => (
+        <span key={i} className="rounded-[3px]" style={{ width: 18, height: 6, background: i < level ? c : "var(--bd-strong)" }} />
+      ))}
+    </div>
+  )
+}

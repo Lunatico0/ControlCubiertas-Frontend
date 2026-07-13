@@ -250,7 +250,7 @@ const Cubiertas = ({ intent }) => {
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="text-[10px] tracking-[.05em]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-6)" }}>RECAPADOS</span>
-                    <Pips level={m.level} />
+                    <Pips level={t.recapLevel ?? m.level} />
                   </div>
                   <div className="flex flex-col gap-[5px] text-[12.5px]">
                     <Row label="Marca" value={t.brand} />
