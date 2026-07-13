@@ -108,7 +108,7 @@ const GuiaDeUso = () => {
           <li><B>Botones grandes:</B> las acciones más frecuentes (dar de alta, buscar, montar, comprobantes) a un toque — cómodos también en tablet.</li>
           <li><B>Accesos por estado:</B> tarjetas con el conteo de cubiertas en stock, en circulación y a recapar. Tocá una para ir directo a ese grupo filtrado.</li>
         </UL>
-        <Callout Icon={BoltRoundedIcon} tone="var(--ink-lime)"><B>Atajo:</B> apretá la tecla <Kbd>/</Kbd> en cualquier pantalla para saltar directo al buscador de cubiertas.</Callout>
+        <Callout Icon={BoltRoundedIcon} tone="var(--ink-lime)"><B>Atajo:</B> apretá <Kbd>Ctrl</Kbd> + <Kbd>K</Kbd> en cualquier pantalla para saltar directo al buscador de cubiertas.</Callout>
 
         <H2 id="cubiertas">3 · Cubiertas (el inventario)</H2>
         <P>Es el corazón operativo. Podés verlo como <B>tarjetas</B> (más visual) o como <B>lista</B> (más densa) con el toggle de la esquina superior derecha.</P>
@@ -162,7 +162,7 @@ const GuiaDeUso = () => {
 
         <H2 id="atajos">7 · Atajos de teclado</H2>
         <div className="mt-3.5 flex flex-col gap-2">
-          {[["/", "Ir al buscador de cubiertas"], ["Esc", "Cerrar paneles y ventanas abiertas"]].map(([k, d]) => (
+          {[["Ctrl + K", "Ir al buscador de cubiertas"], ["Esc", "Cerrar paneles y ventanas abiertas"]].map(([k, d]) => (
             <div key={k} className="flex items-center gap-3.5 rounded-[9px] px-3.5 py-[11px]" style={{ border: "1px solid var(--bd)", background: "var(--card)" }}>
               <span style={{ fontFamily: "'IBM Plex Mono'", fontSize: 13, background: "var(--input)", border: "1px solid var(--bd-strong)", borderRadius: 6, padding: "3px 11px", color: "var(--ink-lime)" }}>{k}</span>
               <span className="text-[14px]" style={{ color: "var(--tx-2)" }}>{d}</span>
