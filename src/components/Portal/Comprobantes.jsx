@@ -17,7 +17,8 @@ const FILTERS = [
   { label: "Alta", value: "Alta" },
   { label: "Asignación", value: "Asignación" },
   { label: "Desasignación", value: "Desasignación" },
-  { label: "Estado", value: "Estado" },
+  // "Recapado" filtra los movimientos type "Estado" (un recapado es un cambio de estado).
+  { label: "Recapado", value: "Estado" },
 ]
 
 // Color por TIPO de movimiento (mismo criterio que el timeline del drawer: asignación y
