@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react"
-import { NavLink, useNavigate, Outlet } from "react-router-dom"
+import { NavLink, useNavigate, useLocation, Outlet } from "react-router-dom"
 import { useAuth } from "@context/AuthContext"
 import { useTheme } from "@context/ThemeContext"
 import { getCompany } from "@api/admin"
+import OpTour from "@components/Operativa/OpTour"
 
 import HomeRoundedIcon from "@mui/icons-material/HomeRounded"
 import GroupRoundedIcon from "@mui/icons-material/GroupRounded"
@@ -15,17 +16,38 @@ import HeadsetMicRoundedIcon from "@mui/icons-material/HeadsetMicRounded"
 import CreditCardRoundedIcon from "@mui/icons-material/CreditCardRounded"
 import DarkModeRoundedIcon from "@mui/icons-material/DarkModeRounded"
 import LightModeRoundedIcon from "@mui/icons-material/LightModeRounded"
+import PlayArrowRoundedIcon from "@mui/icons-material/PlayArrowRounded"
+import MenuBookRoundedIcon from "@mui/icons-material/MenuBookRounded"
 
 // Portal del tenant-admin: shell dark propio (design system operativo), separado de la
 // operación. Cada sección entra por <Outlet/>. "Comprobantes" (histórico) es un hito
 // aparte → queda como "próximamente" hasta que exista su vista.
 const NAV = [
   { to: "/admin", end: true, label: "Resumen", Icon: HomeRoundedIcon },
-  { to: "/admin/usuarios", label: "Usuarios", Icon: GroupRoundedIcon },
-  { to: "/admin/empresa", label: "Empresa", Icon: ApartmentRoundedIcon },
-  { to: "/admin/comprobantes", label: "Comprobantes", Icon: ReceiptLongRoundedIcon },
-  { to: "/admin/comprobante", label: "Editor de comprobante", Icon: EditRoundedIcon },
+  { to: "/admin/usuarios", label: "Usuarios", Icon: GroupRoundedIcon, tour: "a-usuarios" },
+  { to: "/admin/empresa", label: "Empresa", Icon: ApartmentRoundedIcon, tour: "a-empresa" },
+  { to: "/admin/comprobantes", label: "Comprobantes", Icon: ReceiptLongRoundedIcon, tour: "a-comprobantes" },
+  { to: "/admin/comprobante", label: "Editor de comprobante", Icon: EditRoundedIcon, tour: "a-editor" },
 ]
+
+// Pasos del tour del panel admin. screen = pantalla (ruta); sel = data-tour del elemento.
+const ADMIN_STEPS = [
+  { screen: "resumen", sel: null, place: "center", title: "Panel de administración", body: "Un recorrido corto por la administración de tu empresa. Podés salir cuando quieras y volver desde el botón de ayuda." },
+  { screen: "resumen", sel: "a-usuarios", place: "right", title: "Usuarios", body: "Das de alta a tu equipo, definís su rol (admin u operativo) y activás o desactivás accesos. El único admin no puede desactivarse a sí mismo." },
+  { screen: "empresa", sel: "a-empresa", place: "right", title: "Empresa", body: "Los datos de la organización y el ciclo de estados de las cubiertas: nombre y color de cada estado y cuántos recapados se permiten antes de descartar." },
+  { screen: "comprobantes", sel: "a-comprobantes", place: "right", title: "Comprobantes", body: "El histórico de todos los comprobantes emitidos por cada movimiento. Podés buscar, filtrar por tipo, reimprimir y exportar a CSV." },
+  { screen: "editor", sel: "a-editor", place: "right", title: "Editor de comprobante", body: "Diseñás cómo se ve el comprobante impreso (A4): logo, secciones, tipografía, color de acento y pie, con vista previa en vivo." },
+  { screen: "resumen", sel: "a-help", place: "top", title: "Ayuda siempre a mano", body: "Desde acá reproducís este tour cuando quieras y abrís la guía del administrador completa." },
+  { screen: "resumen", sel: null, place: "center", title: "¡Listo!", body: "Eso es la administración. Los cambios de configuración impactan en toda la operación de la empresa." },
+]
+
+// screen del tour ↔ ruta del portal (para navegar/derivar la pantalla activa).
+const SCREEN_ROUTE = { resumen: "/admin", empresa: "/admin/empresa", comprobantes: "/admin/comprobantes", editor: "/admin/comprobante" }
+const screenOf = (path) =>
+  path.startsWith("/admin/empresa") ? "empresa"
+    : path.startsWith("/admin/comprobantes") ? "comprobantes"
+      : path.startsWith("/admin/comprobante") ? "editor"
+        : "resumen"
 
 const Logo = () => (
   <svg width="34" height="34" viewBox="0 0 40 40" fill="none">
@@ -38,7 +60,10 @@ const AdminLayout = () => {
   const { user, logout } = useAuth()
   const { isDarkMode, toggleTheme } = useTheme()
   const navigate = useNavigate()
+  const location = useLocation()
   const [companyName, setCompanyName] = useState("")
+  const [tourOpen, setTourOpen] = useState(false) // guía interactiva del admin (tour)
+  const [helpMenu, setHelpMenu] = useState(false) // popover de ayuda
 
   useEffect(() => {
     getCompany().then((c) => setCompanyName(c?.name || "")).catch(() => {})
@@ -69,8 +94,8 @@ const AdminLayout = () => {
 
         <div className="px-5 pb-2 pt-3.5 text-[10px] font-semibold tracking-[.16em]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-6)" }}>PANEL</div>
         <nav className="flex flex-1 flex-col gap-1 px-3">
-          {NAV.map(({ to, end, label, Icon }) => (
-            <NavLink key={to} to={to} end={end} style={navStyle}>
+          {NAV.map(({ to, end, label, Icon, tour }) => (
+            <NavLink key={to} to={to} end={end} data-tour={tour} style={navStyle}>
               <span className="inline-flex flex-none items-center justify-center" style={{ width: 20, height: 20 }}><Icon sx={{ fontSize: 19 }} /></span>
               <span>{label}</span>
             </NavLink>
@@ -85,20 +110,43 @@ const AdminLayout = () => {
         </nav>
 
         {/* Tema claro/oscuro + Ayuda */}
-        <div className="space-y-3 p-3.5">
+        <div className="relative space-y-3 p-3.5">
           <button onClick={toggleTheme} className="flex w-full items-center gap-[11px] rounded-[11px] px-3.5 py-3" style={{ background: "var(--elev)", border: "1px solid var(--bd-soft)" }}>
             <span className="inline-flex h-5 w-5 flex-none items-center" style={{ color: "var(--ink-lime)" }}>
               {isDarkMode ? <DarkModeRoundedIcon sx={{ fontSize: 18 }} /> : <LightModeRoundedIcon sx={{ fontSize: 19 }} />}
             </span>
             <span className="text-[13px] font-medium" style={{ color: "var(--tx-2)" }}>{isDarkMode ? "Tema oscuro" : "Tema claro"}</span>
           </button>
-          <div className="flex items-center gap-3 rounded-[11px] p-3.5" style={{ background: "var(--elev)", border: "1px solid var(--bd-soft)" }}>
+          <button data-tour="a-help" onClick={() => setHelpMenu((v) => !v)} className="flex w-full items-center gap-3 rounded-[11px] p-3.5 text-left" style={{ background: helpMenu ? "color-mix(in srgb, var(--ink-lime) 8%, transparent)" : "var(--elev)", border: `1px solid ${helpMenu ? "color-mix(in srgb, var(--ink-lime) 40%, transparent)" : "var(--bd-soft)"}` }}>
             <span className="flex flex-none items-center justify-center rounded-lg" style={{ width: 32, height: 32, background: "color-mix(in srgb, var(--ink-lime) 12%, transparent)", color: "var(--ink-lime)" }}><HeadsetMicRoundedIcon sx={{ fontSize: 18 }} /></span>
             <div style={{ lineHeight: 1.3 }}>
               <div className="text-[12.5px] font-semibold" style={{ color: "var(--ink-lime)" }}>¿Necesitás ayuda?</div>
-              <div className="text-[11.5px]" style={{ color: "var(--tx-5)" }}>Centro de ayuda</div>
+              <div className="text-[11.5px]" style={{ color: "var(--tx-5)" }}>Guía y tour del panel</div>
             </div>
-          </div>
+          </button>
+
+          {helpMenu && (
+            <>
+              <div className="fixed inset-0 z-[35]" onClick={() => setHelpMenu(false)} />
+              <div className="absolute z-[40] overflow-hidden rounded-[12px]" style={{ bottom: 84, left: 14, right: 14, background: "var(--card)", border: "1px solid var(--bd-strong)", boxShadow: "0 18px 44px rgba(0,0,0,.5)" }}>
+                <div className="px-3.5 py-[11px] text-[10px] tracking-[.08em]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-6)", borderBottom: "1px solid var(--bd-soft)" }}>AYUDA · PANEL ADMIN</div>
+                <button onClick={() => { setHelpMenu(false); navigate("/admin"); setTourOpen(true) }} className="flex w-full items-center gap-[11px] px-3.5 py-3 text-left">
+                  <span className="flex h-[30px] w-[30px] flex-none items-center justify-center rounded-[8px]" style={{ background: "color-mix(in srgb, var(--ink-lime) 13%, transparent)", color: "var(--ink-lime)" }}><PlayArrowRoundedIcon sx={{ fontSize: 16 }} /></span>
+                  <span style={{ lineHeight: 1.25 }}>
+                    <span className="block text-[13px] font-semibold" style={{ color: "var(--tx)" }}>Ver guía interactiva</span>
+                    <span className="block text-[11px]" style={{ color: "var(--tx-5)" }}>Tour por el panel de administración</span>
+                  </span>
+                </button>
+                <a href="/admin/guia" target="_blank" rel="noopener noreferrer" onClick={() => setHelpMenu(false)} className="flex items-center gap-[11px] px-3.5 py-3" style={{ textDecoration: "none", borderTop: "1px solid var(--bd-soft)" }}>
+                  <span className="flex h-[30px] w-[30px] flex-none items-center justify-center rounded-[8px]" style={{ background: "color-mix(in srgb, var(--ink-blue) 16%, transparent)", color: "var(--ink-blue)" }}><MenuBookRoundedIcon sx={{ fontSize: 16 }} /></span>
+                  <span style={{ lineHeight: 1.25 }}>
+                    <span className="block text-[13px] font-semibold" style={{ color: "var(--tx)" }}>Guía del administrador</span>
+                    <span className="block text-[11px]" style={{ color: "var(--tx-5)" }}>Manual detallado · pestaña nueva</span>
+                  </span>
+                </a>
+              </div>
+            </>
+          )}
         </div>
 
         {/* Usuario + logout */}
@@ -140,6 +188,8 @@ const AdminLayout = () => {
           <Outlet />
         </div>
       </main>
+
+      {tourOpen && <OpTour steps={ADMIN_STEPS} active={screenOf(location.pathname)} onNavigate={(s) => navigate(SCREEN_ROUTE[s] || "/admin")} onClose={() => setTourOpen(false)} />}
     </div>
   )
 }

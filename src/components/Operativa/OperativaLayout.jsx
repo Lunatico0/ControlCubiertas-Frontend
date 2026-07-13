@@ -26,6 +26,18 @@ const NAV = [
   { key: "comprobantes", label: "Comprobantes", icon: <ReceiptLongRoundedIcon sx={{ fontSize: 20 }} /> },
 ]
 
+// Pasos del tour de la operativa (screen = key de sección; sel = data-tour del elemento).
+const OP_STEPS = [
+  { screen: "inicio", sel: null, place: "center", title: "Bienvenido a Control Cubiertas", body: "Un recorrido de 30 segundos por lo esencial. Podés salir cuando quieras y volver a verlo desde el botón de ayuda." },
+  { screen: "inicio", sel: "nav-cubiertas", place: "right", title: "Menú principal", body: "Todo se mueve desde acá: Inicio, Cubiertas (el inventario), Vehículos y Comprobantes." },
+  { screen: "inicio", sel: "inicio-search", place: "bottom", title: "Buscá al instante", body: "Desde el Inicio buscás cualquier cubierta por código, marca o serie. Tip: apretá Ctrl + K para saltar a la búsqueda." },
+  { screen: "cubiertas", sel: "cub-filters", place: "bottom", title: "Filtros rápidos", body: "Acotá el inventario por estado: en stock, en circulación o a recapar. El número te dice cuántas hay en cada grupo." },
+  { screen: "cubiertas", sel: "cub-viewtoggle", place: "left", title: "Tarjetas o lista", body: "Cambiá entre vista de tarjetas (más visual) y lista (más densa) según lo que necesites." },
+  { screen: "cubiertas", sel: "cub-alta", place: "bottom", title: "Dar de alta", body: "Registrás una cubierta nueva en el inventario. Cada movimiento genera su comprobante automáticamente." },
+  { screen: "vehiculos", sel: "nav-vehiculos", place: "right", title: "Vehículos y ejes", body: "Cada vehículo muestra su esquema de ejes y las cubiertas montadas. Desde el detalle podés reconfigurar los ejes si hubo un error." },
+  { screen: "vehiculos", sel: "help-btn", place: "top", title: "¿Perdido? Volvé acá", body: "Este botón de ayuda reproduce el tour cuando quieras y abre la guía de uso completa." },
+]
+
 const OperativaLayout = () => {
   const { isDarkMode, toggleTheme } = useTheme()
   const { user, logout } = useAuth()
@@ -184,7 +196,7 @@ const OperativaLayout = () => {
         </div>
       </main>
 
-      {tourOpen && <OpTour active={active} onNavigate={(s) => navigate(s)} onClose={() => setTourOpen(false)} />}
+      {tourOpen && <OpTour steps={OP_STEPS} active={active} onNavigate={(s) => navigate(s)} onClose={() => setTourOpen(false)} />}
     </div>
   )
 }

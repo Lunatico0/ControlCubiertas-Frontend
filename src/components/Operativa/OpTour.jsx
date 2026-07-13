@@ -1,26 +1,16 @@
 import { useState, useEffect, useCallback } from "react"
 
-// Tour interactivo (rediseño Claude Design "TOUR INTERACTIVO"). Recorre la app con un
-// spotlight sobre elementos marcados con data-tour="...". Cada paso puede pedir una
-// pantalla (screen) — el tour navega y luego mide el elemento para posicionar el foco.
-const STEPS = [
-  { screen: "inicio", sel: null, place: "center", title: "Bienvenido a Control Cubiertas", body: "Un recorrido de 30 segundos por lo esencial. Podés salir cuando quieras y volver a verlo desde el botón de ayuda." },
-  { screen: "inicio", sel: "nav-cubiertas", place: "right", title: "Menú principal", body: "Todo se mueve desde acá: Inicio, Cubiertas (el inventario), Vehículos y Comprobantes." },
-  { screen: "inicio", sel: "inicio-search", place: "bottom", title: "Buscá al instante", body: "Desde el Inicio buscás cualquier cubierta por código, marca o serie. Tip: apretá Ctrl + K para saltar a la búsqueda." },
-  { screen: "cubiertas", sel: "cub-filters", place: "bottom", title: "Filtros rápidos", body: "Acotá el inventario por estado: en stock, en circulación o a recapar. El número te dice cuántas hay en cada grupo." },
-  { screen: "cubiertas", sel: "cub-viewtoggle", place: "left", title: "Tarjetas o lista", body: "Cambiá entre vista de tarjetas (más visual) y lista (más densa) según lo que necesites." },
-  { screen: "cubiertas", sel: "cub-alta", place: "bottom", title: "Dar de alta", body: "Registrás una cubierta nueva en el inventario. Cada movimiento genera su comprobante automáticamente." },
-  { screen: "vehiculos", sel: "nav-vehiculos", place: "right", title: "Vehículos y ejes", body: "Cada vehículo muestra su esquema de ejes y las cubiertas montadas. Desde el detalle podés reconfigurar los ejes si hubo un error." },
-  { screen: "vehiculos", sel: "help-btn", place: "top", title: "¿Perdido? Volvé acá", body: "Este botón de ayuda reproduce el tour cuando quieras y abre la guía de uso completa." },
-]
-
+// Motor de tour interactivo (rediseño Claude Design "TOUR INTERACTIVO"). Genérico: recibe
+// los `steps` (cada layout define los suyos) y recorre la app con un spotlight sobre
+// elementos data-tour="...". Cada paso puede pedir una `screen` — el tour navega (onNavigate)
+// y luego mide el elemento para posicionar el foco. Lo usan la operativa y el panel admin.
 const PAD = 8, TIP_W = 320, TIP_H = 190, GAP = 16
 
-const OpTour = ({ active, onNavigate, onClose }) => {
+const OpTour = ({ steps, active, onNavigate, onClose }) => {
   const [i, setI] = useState(0)
   const [pos, setPos] = useState(null)
-  const step = STEPS[i]
-  const last = i === STEPS.length - 1
+  const step = steps[i]
+  const last = i === steps.length - 1
 
   const next = useCallback(() => (last ? onClose() : setI((n) => n + 1)), [last, onClose])
   const prev = useCallback(() => setI((n) => Math.max(0, n - 1)), [])
@@ -76,7 +66,7 @@ const OpTour = ({ active, onNavigate, onClose }) => {
 
       <div style={{ position: "absolute", top: pos.tipTop, left: pos.tipLeft, width: TIP_W, background: "var(--card)", border: "1px solid var(--bd-strong)", borderRadius: 14, boxShadow: "0 20px 56px rgba(0,0,0,.6)", padding: "19px 20px 16px", transition: "all .18s ease" }}>
         <div className="mb-[9px] flex items-center gap-2">
-          <span className="rounded-full px-[9px] py-[2px] text-[10.5px] font-semibold" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--ink-lime)", background: "color-mix(in srgb, var(--ink-lime) 13%, transparent)" }}>{i + 1} / {STEPS.length}</span>
+          <span className="rounded-full px-[9px] py-[2px] text-[10.5px] font-semibold" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--ink-lime)", background: "color-mix(in srgb, var(--ink-lime) 13%, transparent)" }}>{i + 1} / {steps.length}</span>
         </div>
         <div className="mb-1.5 text-[17px] font-bold" style={{ fontFamily: "'Space Grotesk'", color: "var(--tx)" }}>{step.title}</div>
         <div className="text-[13px]" style={{ color: "var(--tx-3)", lineHeight: 1.55 }}>{step.body}</div>

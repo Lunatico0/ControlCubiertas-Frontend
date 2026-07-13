@@ -13,6 +13,7 @@ import Users from '@components/Portal/Users.jsx'
 import CompanySettings from '@components/Portal/CompanySettings.jsx'
 import Comprobantes from '@components/Portal/Comprobantes.jsx'
 import EditorComprobante from '@components/Portal/EditorComprobante.jsx'
+import GuiaAdmin from '@components/Portal/GuiaAdmin.jsx'
 import OperativaLayout from '@components/Operativa/OperativaLayout.jsx'
 import GuiaDeUso from '@components/Operativa/GuiaDeUso.jsx'
 
@@ -32,6 +33,16 @@ function App() {
               </RequireAuth>
             }
           />
+          {/* Guía del administrador (manual): pantalla propia, se abre desde Ayuda (pestaña nueva). */}
+          <Route
+            path="/admin/guia"
+            element={
+              <RequireAuth requireAdmin>
+                <GuiaAdmin />
+              </RequireAuth>
+            }
+          />
+
           {/* Portal del tenant-admin: shell propio (dark), gateado por rol. */}
           <Route
             path="/admin"
