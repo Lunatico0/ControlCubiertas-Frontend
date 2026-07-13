@@ -11,6 +11,7 @@ import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded"
 import HelpOutlineRoundedIcon from "@mui/icons-material/HelpOutlineRounded"
 import PlayArrowRoundedIcon from "@mui/icons-material/PlayArrowRounded"
 import MenuBookRoundedIcon from "@mui/icons-material/MenuBookRounded"
+import { externalPageProps } from "@utils/isElectron"
 import Cubiertas from "./Cubiertas"
 import Inicio from "./Inicio"
 import Vehiculos from "./Vehiculos"
@@ -163,7 +164,7 @@ const OperativaLayout = () => {
                     <span className="block text-[11px]" style={{ color: "var(--tx-5)" }}>Tour rápido por la app</span>
                   </span>
                 </button>
-                <a href="/guia" target="_blank" rel="noopener noreferrer" onClick={() => setHelpMenu(false)} className="flex items-center gap-[11px] px-3.5 py-3" style={{ textDecoration: "none", borderTop: "1px solid var(--bd-soft)" }}>
+                <a {...externalPageProps("/guia")} onClick={() => setHelpMenu(false)} className="flex items-center gap-[11px] px-3.5 py-3" style={{ textDecoration: "none", borderTop: "1px solid var(--bd-soft)" }}>
                   <span className="flex h-[30px] w-[30px] flex-none items-center justify-center rounded-[8px]" style={{ background: "color-mix(in srgb, var(--ink-blue) 16%, transparent)", color: "var(--ink-blue)" }}><MenuBookRoundedIcon sx={{ fontSize: 16 }} /></span>
                   <span style={{ lineHeight: 1.25 }}>
                     <span className="block text-[13px] font-semibold" style={{ color: "var(--tx)" }}>Guía de uso completa</span>

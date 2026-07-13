@@ -1,5 +1,6 @@
 import './App.css'
-import { BrowserRouter, Routes, Route } from "react-router-dom"
+import { BrowserRouter, HashRouter, Routes, Route } from "react-router-dom"
+import isElectron from "@utils/isElectron"
 import { useUpdater } from "@hooks/useUpdater"
 import Layout from '@components/Layout/Layout.jsx'
 import ContextProvider from '@context/ContextProvider.jsx'
@@ -12,17 +13,23 @@ import Dashboard from '@components/Portal/Dashboard.jsx'
 import Users from '@components/Portal/Users.jsx'
 import CompanySettings from '@components/Portal/CompanySettings.jsx'
 import Comprobantes from '@components/Portal/Comprobantes.jsx'
+import Reportes from '@components/Portal/Reportes.jsx'
 import EditorComprobante from '@components/Portal/EditorComprobante.jsx'
 import GuiaAdmin from '@components/Portal/GuiaAdmin.jsx'
 import OperativaLayout from '@components/Operativa/OperativaLayout.jsx'
 import GuiaDeUso from '@components/Operativa/GuiaDeUso.jsx'
+
+// En la app instalable (Electron) el index.html se carga por file:// → BrowserRouter
+// (history API) rompe las rutas. HashRouter (#/ruta) funciona sobre file://. En web
+// seguimos con BrowserRouter (URLs limpias). Se resuelve una sola vez al arrancar.
+const Router = isElectron() ? HashRouter : BrowserRouter
 
 function App() {
   useUpdater()
 
   return (
     <ContextProvider>
-      <BrowserRouter>
+      <Router>
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route
@@ -56,6 +63,7 @@ function App() {
             <Route path="usuarios" element={<Users />} />
             <Route path="empresa" element={<CompanySettings />} />
             <Route path="comprobantes" element={<Comprobantes />} />
+            <Route path="reportes" element={<Reportes />} />
             {/* Editor de comprobante: vista del portal (dentro del shell, con sidebar visible). */}
             <Route path="comprobante" element={<EditorComprobante />} />
           </Route>
@@ -95,7 +103,7 @@ function App() {
             }
           />
         </Routes>
-      </BrowserRouter>
+      </Router>
     </ContextProvider>
   )
 }

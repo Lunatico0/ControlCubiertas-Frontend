@@ -3,12 +3,14 @@ import { NavLink, useNavigate, useLocation, Outlet } from "react-router-dom"
 import { useAuth } from "@context/AuthContext"
 import { useTheme } from "@context/ThemeContext"
 import { getCompany } from "@api/admin"
+import { externalPageProps } from "@utils/isElectron"
 import OpTour from "@components/Operativa/OpTour"
 
 import HomeRoundedIcon from "@mui/icons-material/HomeRounded"
 import GroupRoundedIcon from "@mui/icons-material/GroupRounded"
 import ApartmentRoundedIcon from "@mui/icons-material/ApartmentRounded"
 import ReceiptLongRoundedIcon from "@mui/icons-material/ReceiptLongRounded"
+import InsightsRoundedIcon from "@mui/icons-material/InsightsRounded"
 import EditRoundedIcon from "@mui/icons-material/EditRounded"
 import OpenInNewRoundedIcon from "@mui/icons-material/OpenInNewRounded"
 import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded"
@@ -24,6 +26,7 @@ import MenuBookRoundedIcon from "@mui/icons-material/MenuBookRounded"
 // aparte → queda como "próximamente" hasta que exista su vista.
 const NAV = [
   { to: "/admin", end: true, label: "Resumen", Icon: HomeRoundedIcon },
+  { to: "/admin/reportes", label: "Reportes", Icon: InsightsRoundedIcon, tour: "a-reportes" },
   { to: "/admin/usuarios", label: "Usuarios", Icon: GroupRoundedIcon, tour: "a-usuarios" },
   { to: "/admin/empresa", label: "Empresa", Icon: ApartmentRoundedIcon, tour: "a-empresa" },
   { to: "/admin/comprobantes", label: "Comprobantes", Icon: ReceiptLongRoundedIcon, tour: "a-comprobantes" },
@@ -34,6 +37,7 @@ const NAV = [
 const ADMIN_STEPS = [
   { screen: "resumen", sel: null, place: "center", title: "Panel de administración", body: "Un recorrido corto por la administración de tu empresa. Podés salir cuando quieras y volver desde el botón de ayuda." },
   { screen: "resumen", sel: "a-usuarios", place: "right", title: "Usuarios", body: "Das de alta a tu equipo, definís su rol (admin u operativo) y activás o desactivás accesos. El único admin no puede desactivarse a sí mismo." },
+  { screen: "reportes", sel: "a-reportes", place: "right", title: "Reportes", body: "Trazabilidad y rendimiento por kilometraje: ranking de marcas por vida útil, km por etapa del ciclo y tasa de descarte. La base para decidir qué comprar." },
   { screen: "empresa", sel: "a-empresa", place: "right", title: "Empresa", body: "Los datos de la organización y el ciclo de estados de las cubiertas: nombre y color de cada estado y cuántos recapados se permiten antes de descartar." },
   { screen: "comprobantes", sel: "a-comprobantes", place: "right", title: "Comprobantes", body: "El histórico de todos los comprobantes emitidos por cada movimiento. Podés buscar, filtrar por tipo, reimprimir y exportar a CSV." },
   { screen: "editor", sel: "a-editor", place: "right", title: "Editor de comprobante", body: "Diseñás cómo se ve el comprobante impreso (A4): logo, secciones, tipografía, color de acento y pie, con vista previa en vivo." },
@@ -42,12 +46,13 @@ const ADMIN_STEPS = [
 ]
 
 // screen del tour ↔ ruta del portal (para navegar/derivar la pantalla activa).
-const SCREEN_ROUTE = { resumen: "/admin", empresa: "/admin/empresa", comprobantes: "/admin/comprobantes", editor: "/admin/comprobante" }
+const SCREEN_ROUTE = { resumen: "/admin", empresa: "/admin/empresa", comprobantes: "/admin/comprobantes", editor: "/admin/comprobante", reportes: "/admin/reportes" }
 const screenOf = (path) =>
   path.startsWith("/admin/empresa") ? "empresa"
     : path.startsWith("/admin/comprobantes") ? "comprobantes"
       : path.startsWith("/admin/comprobante") ? "editor"
-        : "resumen"
+        : path.startsWith("/admin/reportes") ? "reportes"
+          : "resumen"
 
 const Logo = () => (
   <svg width="34" height="34" viewBox="0 0 40 40" fill="none">
@@ -137,7 +142,7 @@ const AdminLayout = () => {
                     <span className="block text-[11px]" style={{ color: "var(--tx-5)" }}>Tour por el panel de administración</span>
                   </span>
                 </button>
-                <a href="/admin/guia" target="_blank" rel="noopener noreferrer" onClick={() => setHelpMenu(false)} className="flex items-center gap-[11px] px-3.5 py-3" style={{ textDecoration: "none", borderTop: "1px solid var(--bd-soft)" }}>
+                <a {...externalPageProps("/admin/guia")} onClick={() => setHelpMenu(false)} className="flex items-center gap-[11px] px-3.5 py-3" style={{ textDecoration: "none", borderTop: "1px solid var(--bd-soft)" }}>
                   <span className="flex h-[30px] w-[30px] flex-none items-center justify-center rounded-[8px]" style={{ background: "color-mix(in srgb, var(--ink-blue) 16%, transparent)", color: "var(--ink-blue)" }}><MenuBookRoundedIcon sx={{ fontSize: 16 }} /></span>
                   <span style={{ lineHeight: 1.25 }}>
                     <span className="block text-[13px] font-semibold" style={{ color: "var(--tx)" }}>Guía del administrador</span>
