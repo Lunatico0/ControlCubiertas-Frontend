@@ -107,21 +107,26 @@ const OperativaLayout = () => {
               </div>
             )
           })}
+
+          {/* Acceso al panel admin: separado del resto por un divider (solo tenant-admin). */}
+          {isAdmin && (
+            <>
+              <div className="mx-1 my-2 h-px" style={{ background: "var(--bd-faint)" }} />
+              <div
+                onClick={() => goToRoute("/admin")}
+                title="Ir al panel administrativo"
+                className="flex cursor-pointer items-center gap-[13px] rounded-[9px] px-[13px] py-3 text-[14.5px] font-semibold transition-colors"
+                style={{ border: "1px solid color-mix(in srgb, var(--ink-lime) 45%, transparent)", background: "color-mix(in srgb, var(--ink-lime) 8%, transparent)", color: "var(--ink-lime)" }}
+              >
+                <span className="inline-flex h-[21px] w-[21px] flex-none items-center"><AdminPanelSettingsRoundedIcon sx={{ fontSize: 20 }} /></span>
+                <span>Panel administrativo</span>
+              </div>
+            </>
+          )}
         </nav>
 
-        {/* Panel administrativo (solo tenant-admin) + toggle de tema */}
-        <div className="mt-auto flex flex-col gap-2.5 px-3 pt-[10px]">
-          {isAdmin && (
-            <button
-              onClick={() => goToRoute("/admin")}
-              title="Ir al panel administrativo"
-              className="flex w-full items-center gap-[11px] rounded-[9px] px-3 py-[10px] text-[13px] font-semibold"
-              style={{ border: "1px solid color-mix(in srgb, var(--ink-lime) 45%, transparent)", background: "color-mix(in srgb, var(--ink-lime) 8%, transparent)", color: "var(--ink-lime)" }}
-            >
-              <span className="inline-flex h-5 w-5 flex-none items-center"><AdminPanelSettingsRoundedIcon sx={{ fontSize: 19 }} /></span>
-              Panel administrativo
-            </button>
-          )}
+        {/* Toggle de tema */}
+        <div className="mt-auto px-3 pt-[10px]">
           <button
             onClick={toggleTheme}
             className="flex w-full items-center gap-[11px] rounded-[9px] border px-3 py-[10px]"
