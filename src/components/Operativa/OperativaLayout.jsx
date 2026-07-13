@@ -1,6 +1,8 @@
 import { useState } from "react"
+import { useNavigate } from "react-router-dom"
 import { useTheme } from "@context/ThemeContext"
 import { useAuth } from "@context/AuthContext"
+import AdminPanelSettingsRoundedIcon from "@mui/icons-material/AdminPanelSettingsRounded"
 import HomeRoundedIcon from "@mui/icons-material/HomeRounded"
 import TripOriginRoundedIcon from "@mui/icons-material/TripOriginRounded"
 import LocalShippingOutlinedIcon from "@mui/icons-material/LocalShippingOutlined"
@@ -41,7 +43,8 @@ const OP_STEPS = [
 
 const OperativaLayout = () => {
   const { isDarkMode, toggleTheme } = useTheme()
-  const { user, logout } = useAuth()
+  const { user, logout, isAdmin } = useAuth()
+  const goToRoute = useNavigate() // navegación de ruta (react-router), distinta del navigate interno por sección
   const [active, setActive] = useState("cubiertas")
   const [intent, setIntent] = useState(null) // intención de navegación para Cubiertas (query/tab)
   const [tourOpen, setTourOpen] = useState(false) // guía interactiva (tour con spotlight)
@@ -106,8 +109,19 @@ const OperativaLayout = () => {
           })}
         </nav>
 
-        {/* Toggle de tema */}
-        <div className="mt-auto px-3 pt-[10px]">
+        {/* Panel administrativo (solo tenant-admin) + toggle de tema */}
+        <div className="mt-auto flex flex-col gap-2.5 px-3 pt-[10px]">
+          {isAdmin && (
+            <button
+              onClick={() => goToRoute("/admin")}
+              title="Ir al panel administrativo"
+              className="flex w-full items-center gap-[11px] rounded-[9px] px-3 py-[10px] text-[13px] font-semibold"
+              style={{ border: "1px solid color-mix(in srgb, var(--ink-lime) 45%, transparent)", background: "color-mix(in srgb, var(--ink-lime) 8%, transparent)", color: "var(--ink-lime)" }}
+            >
+              <span className="inline-flex h-5 w-5 flex-none items-center"><AdminPanelSettingsRoundedIcon sx={{ fontSize: 19 }} /></span>
+              Panel administrativo
+            </button>
+          )}
           <button
             onClick={toggleTheme}
             className="flex w-full items-center gap-[11px] rounded-[9px] border px-3 py-[10px]"
