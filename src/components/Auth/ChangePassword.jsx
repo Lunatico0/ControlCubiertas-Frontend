@@ -1,129 +1,107 @@
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { useNavigate } from "react-router-dom"
-import LockResetOutlinedIcon from "@mui/icons-material/LockResetOutlined"
 import { useAuth } from "@context/AuthContext"
+import { useTheme } from "@context/ThemeContext"
+import { showToast } from "@utils/toast"
 
-const inputClass =
-  "w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-slate-900 placeholder:text-slate-400 outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
+// Establecer/cambiar contraseña (rediseño Claude Design "primer ingreso"). Dos modos:
+//  - mustChangePassword (primer ingreso / tras un reset): solo pide la nueva; el backend
+//    no re-pide la actual porque ya se autenticó con la temporal.
+//  - voluntario: pide la contraseña actual + la nueva.
+const Logo = () => (
+  <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+    <circle cx="20" cy="20" r="18" stroke="var(--ink-lime)" strokeWidth="3.4" strokeDasharray="78 22" strokeLinecap="round" transform="rotate(-50 20 20)" />
+    <circle cx="20" cy="20" r="6.4" stroke="var(--ink-lime)" strokeWidth="3.4" />
+  </svg>
+)
+const KeyIcon = () => (
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><circle cx="7.5" cy="15.5" r="4.5" /><path d="m10.5 12.5 8-8M16 6l2 2M19 3l2 2" /></svg>
+)
+const labelStyle = { fontSize: 12, fontWeight: 600, color: "var(--tx-4)", display: "block", marginBottom: 7 }
+const inputCls = "w-full rounded-[9px] px-[13px] py-[11px] text-[14px] outline-none"
+const inputStyle = { border: "1px solid var(--bd-strong)", background: "var(--input)", color: "var(--tx)" }
 
 const ChangePassword = () => {
   const { changePassword, mustChangePassword, logout } = useAuth()
+  const { isDarkMode } = useTheme()
   const navigate = useNavigate()
   const [serverError, setServerError] = useState("")
-  const {
-    register,
-    handleSubmit,
-    watch,
-    formState: { errors, isSubmitting },
-  } = useForm()
-
+  const { register, handleSubmit, watch, formState: { errors, isSubmitting } } = useForm()
   const newPassword = watch("newPassword")
 
   const onSubmit = async ({ currentPassword, newPassword }) => {
     setServerError("")
     try {
-      await changePassword(currentPassword, newPassword)
-      navigate("/", { replace: true })
+      await changePassword(mustChangePassword ? undefined : currentPassword, newPassword)
+      if (mustChangePassword) {
+        navigate("/", { replace: true })
+      } else {
+        showToast("success", "Contraseña actualizada")
+        navigate(-1)
+      }
     } catch (err) {
       setServerError(err.message || "No pudimos cambiar la contraseña")
     }
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-100 p-6 dark:bg-slate-950">
-      <div className="w-full max-w-sm rounded-xl border border-slate-200 bg-white p-8 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-        <span className="grid h-11 w-11 place-items-center rounded-lg bg-brand-500 text-slate-900">
-          <LockResetOutlinedIcon />
-        </span>
+    <div data-app-theme={isDarkMode ? "dark" : "light"} className="flex min-h-screen items-center justify-center p-6" style={{ background: "var(--sidebar)", color: "var(--tx)", fontFamily: "'IBM Plex Sans',system-ui,sans-serif" }}>
+      <div className="w-full" style={{ maxWidth: 408 }}>
+        <div className="mb-6 flex items-center justify-center gap-3">
+          <Logo />
+          <div style={{ lineHeight: 0.98, textAlign: "left", fontFamily: "'Space Grotesk'", fontWeight: 700, fontSize: 17, letterSpacing: ".02em" }}>
+            <div style={{ color: "var(--tx)" }}>CONTROL</div>
+            <div style={{ color: "var(--ink-lime)" }}>CUBIERTAS</div>
+          </div>
+        </div>
 
-        <h1 className="mt-5 font-display text-2xl font-bold text-slate-900 dark:text-white">
-          {mustChangePassword ? "Creá tu contraseña" : "Cambiar contraseña"}
-        </h1>
-        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-          {mustChangePassword
-            ? "Es tu primer ingreso. Definí una contraseña nueva para continuar."
-            : "Actualizá tu contraseña actual."}
-        </p>
+        <div className="rounded-[14px] p-8" style={{ background: "var(--card)", border: "1px solid var(--bd)", boxShadow: "0 24px 64px rgba(0,0,0,.45)" }}>
+          <div className="mb-[15px] inline-flex items-center gap-[7px] rounded-[7px] px-2.5 py-1 text-[10.5px] font-semibold" style={{ fontFamily: "'IBM Plex Mono'", letterSpacing: ".05em", color: "var(--ink-lime)", background: "color-mix(in srgb, var(--ink-lime) 12%, transparent)" }}>
+            <KeyIcon /> {mustChangePassword ? "PRIMER INGRESO" : "SEGURIDAD"}
+          </div>
+          <h1 className="text-[21px] font-semibold" style={{ fontFamily: "'Space Grotesk'", letterSpacing: "-.01em", color: "var(--tx)" }}>
+            {mustChangePassword ? "Cambiá tu contraseña temporal" : "Cambiar contraseña"}
+          </h1>
+          <p className="mb-[22px] mt-[7px] text-[13.5px]" style={{ color: "var(--tx-4)" }}>
+            {mustChangePassword ? "Te dieron una contraseña provisoria. Elegí una propia para continuar." : "Ingresá tu contraseña actual y elegí una nueva."}
+          </p>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="mt-7 space-y-5" noValidate>
-          {serverError && (
-            <div
-              role="alert"
-              className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900/50 dark:bg-red-950/40 dark:text-red-300"
-            >
-              {serverError}
-            </div>
-          )}
-
-          <div>
-            <label htmlFor="currentPassword" className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
-              {mustChangePassword ? "Contraseña temporal" : "Contraseña actual"}
-            </label>
-            <input
-              id="currentPassword"
-              type="password"
-              autoComplete="current-password"
-              className={inputClass}
-              {...register("currentPassword", { required: "Ingresá tu contraseña actual" })}
-            />
-            {errors.currentPassword && (
-              <p className="mt-1 text-xs text-red-600">{errors.currentPassword.message}</p>
+          <form onSubmit={handleSubmit(onSubmit)} noValidate>
+            {serverError && (
+              <div role="alert" className="mb-4 rounded-[9px] px-4 py-3 text-[13px]" style={{ border: "1px solid color-mix(in srgb, var(--ink-red) 40%, transparent)", background: "color-mix(in srgb, var(--ink-red) 10%, transparent)", color: "var(--ink-red)" }}>
+                {serverError}
+              </div>
             )}
-          </div>
 
-          <div>
-            <label htmlFor="newPassword" className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
-              Contraseña nueva
-            </label>
-            <input
-              id="newPassword"
-              type="password"
-              autoComplete="new-password"
-              className={inputClass}
-              {...register("newPassword", {
-                required: "Ingresá una contraseña nueva",
-                minLength: { value: 6, message: "Mínimo 6 caracteres" },
-              })}
-            />
-            {errors.newPassword && <p className="mt-1 text-xs text-red-600">{errors.newPassword.message}</p>}
-          </div>
-
-          <div>
-            <label htmlFor="confirmPassword" className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
-              Repetí la contraseña
-            </label>
-            <input
-              id="confirmPassword"
-              type="password"
-              autoComplete="new-password"
-              className={inputClass}
-              {...register("confirmPassword", {
-                required: "Repetí la contraseña",
-                validate: (v) => v === newPassword || "Las contraseñas no coinciden",
-              })}
-            />
-            {errors.confirmPassword && (
-              <p className="mt-1 text-xs text-red-600">{errors.confirmPassword.message}</p>
+            {!mustChangePassword && (
+              <label className="mb-[14px] block">
+                <span style={labelStyle}>Contraseña actual</span>
+                <input type="password" autoComplete="current-password" placeholder="••••••••" className={inputCls} style={inputStyle} {...register("currentPassword", { required: "Ingresá tu contraseña actual" })} />
+                {errors.currentPassword && <p className="mt-1 text-[12px]" style={{ color: "var(--ink-red)" }}>{errors.currentPassword.message}</p>}
+              </label>
             )}
-          </div>
 
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="w-full rounded-lg bg-brand-500 px-4 py-2.5 font-medium text-slate-900 transition hover:bg-brand-600 focus:ring-2 focus:ring-brand-500/40 disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            {isSubmitting ? "Guardando…" : "Guardar y continuar"}
-          </button>
+            <label className="mb-[14px] block">
+              <span style={labelStyle}>Nueva contraseña</span>
+              <input type="password" autoComplete="new-password" placeholder="••••••••" className={inputCls} style={inputStyle} {...register("newPassword", { required: "Ingresá una contraseña nueva", minLength: { value: 6, message: "Mínimo 6 caracteres" } })} />
+              {errors.newPassword && <p className="mt-1 text-[12px]" style={{ color: "var(--ink-red)" }}>{errors.newPassword.message}</p>}
+            </label>
 
-          <button
-            type="button"
-            onClick={logout}
-            className="w-full text-center text-sm text-slate-500 transition hover:text-slate-700 dark:text-slate-400"
-          >
-            Salir
-          </button>
-        </form>
+            <label className="mb-[22px] block">
+              <span style={labelStyle}>Repetir contraseña</span>
+              <input type="password" autoComplete="new-password" placeholder="••••••••" className={inputCls} style={inputStyle} {...register("confirmPassword", { required: "Repetí la contraseña", validate: (v) => v === newPassword || "Las contraseñas no coinciden" })} />
+              {errors.confirmPassword && <p className="mt-1 text-[12px]" style={{ color: "var(--ink-red)" }}>{errors.confirmPassword.message}</p>}
+            </label>
+
+            <button type="submit" disabled={isSubmitting} className="w-full rounded-[10px] py-[13px] text-[15px] font-bold" style={{ border: "none", background: "var(--ink-lime)", color: "var(--bg)", opacity: isSubmitting ? 0.6 : 1 }}>
+              {isSubmitting ? "Guardando…" : mustChangePassword ? "Guardar y entrar" : "Guardar"}
+            </button>
+            <button type="button" onClick={mustChangePassword ? logout : () => navigate(-1)} className="mt-3 w-full text-center text-[13px]" style={{ color: "var(--tx-5)", background: "none", border: "none", cursor: "pointer" }}>
+              {mustChangePassword ? "Salir" : "Cancelar"}
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   )

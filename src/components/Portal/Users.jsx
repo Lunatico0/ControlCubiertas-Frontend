@@ -1,10 +1,12 @@
 import { useState, useEffect, useCallback } from "react"
 import PersonAddAltRoundedIcon from "@mui/icons-material/PersonAddAltRounded"
 import ContentCopyRoundedIcon from "@mui/icons-material/ContentCopyRounded"
+import LockResetRoundedIcon from "@mui/icons-material/LockResetRounded"
+import RefreshRoundedIcon from "@mui/icons-material/RefreshRounded"
 import { showToast, showConfirm } from "@utils/toast"
 import { useAuth } from "@context/AuthContext"
 import Modal from "@components/UI/Modal"
-import { listUsers, setUserStatus } from "../../api/admin"
+import { listUsers, setUserStatus, resetPassword } from "../../api/admin"
 import UserForm from "./UserForm"
 
 const roleLabel = { "tenant-admin": "Administrador", operator: "Operario" }
@@ -17,6 +19,8 @@ const Users = () => {
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [tempCred, setTempCred] = useState(null)
+  const [resetTarget, setResetTarget] = useState(null) // { user, tempPassword } tras un reset
+  const [resetting, setResetting] = useState(false)
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -56,6 +60,33 @@ const Users = () => {
 
   const copyPassword = async () => {
     try { await navigator.clipboard.writeText(tempCred.tempPassword); showToast("success", "Contraseña copiada") }
+    catch { showToast("error", "No se pudo copiar") }
+  }
+
+  // Reset por admin: genera una temporal y la muestra (una vez). Al ingresar con ella, el
+  // usuario cae en el flujo de primer ingreso (mustChangePassword) y define una nueva.
+  const doReset = async (u) => {
+    setResetting(true)
+    try {
+      const { tempPassword } = await resetPassword(u._id)
+      setResetTarget({ user: u, tempPassword })
+    } catch (err) {
+      showToast("error", err.message || "No se pudo restablecer la contraseña")
+    } finally {
+      setResetting(false)
+    }
+  }
+  const regenReset = async () => {
+    try {
+      const { tempPassword } = await resetPassword(resetTarget.user._id)
+      setResetTarget((p) => ({ ...p, tempPassword }))
+      showToast("info", "Se generó otra contraseña temporal")
+    } catch (err) {
+      showToast("error", err.message || "No se pudo regenerar")
+    }
+  }
+  const copyReset = async () => {
+    try { await navigator.clipboard.writeText(resetTarget.tempPassword); showToast("success", "Contraseña copiada") }
     catch { showToast("error", "No se pudo copiar") }
   }
 
@@ -106,7 +137,11 @@ const Users = () => {
                     {active ? "Activo" : "Inactivo"}
                   </span>
                 </div>
-                <div className="flex items-center justify-end">
+                <div className="flex items-center justify-end gap-2">
+                  <button onClick={() => doReset(u)} disabled={isYou || resetting} title={isYou ? "Usá “Cambiar contraseña” para la tuya" : "Restablecer contraseña"}
+                    className="inline-flex h-[32px] w-[32px] flex-none items-center justify-center rounded-[8px]" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--tx-3)", opacity: isYou ? 0.4 : 1, cursor: isYou ? "not-allowed" : "pointer" }}>
+                    <LockResetRoundedIcon sx={{ fontSize: 16 }} />
+                  </button>
                   <button onClick={() => toggleStatus(u)} disabled={isYou} title={isYou ? "No podés cambiar tu propio estado" : ""}
                     className="rounded-[8px] px-3 py-[7px] text-[12px] font-semibold" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: active ? "var(--ink-red)" : "var(--ink-teal)", opacity: isYou ? 0.4 : 1, cursor: isYou ? "not-allowed" : "pointer" }}>
                     {active ? "Desactivar" : "Activar"}
@@ -136,6 +171,32 @@ const Users = () => {
           </div>
           <div className="mt-5 flex justify-end">
             <button onClick={() => setTempCred(null)} className="rounded-lg px-4 py-2.5 text-sm font-medium" style={{ background: "var(--ink-lime)", color: "var(--bg)" }}>Listo</button>
+          </div>
+        </Modal>
+      )}
+
+      {resetTarget && (
+        <Modal title="Restablecer contraseña" onClose={() => setResetTarget(null)} maxWidth="md">
+          <p className="text-sm" style={{ color: "var(--tx-3)" }}>
+            Contraseña temporal para <span className="font-medium" style={{ color: "var(--tx)" }}>{resetTarget.user.name || resetTarget.user.email}</span>. Pasásela al usuario: al ingresar, el sistema le pedirá definir una nueva y segura.
+          </p>
+          <div className="mt-4 rounded-lg p-4" style={{ border: "1px solid color-mix(in srgb, var(--ink-orange) 35%, transparent)", background: "color-mix(in srgb, var(--ink-orange) 10%, transparent)" }}>
+            <p className="text-xs font-medium uppercase tracking-wide" style={{ color: "var(--ink-orange)" }}>Contraseña temporal — se muestra una sola vez</p>
+            <div className="mt-2 flex items-center justify-between gap-3">
+              <code className="font-mono text-lg font-semibold" style={{ color: "var(--tx)" }}>{resetTarget.tempPassword}</code>
+              <div className="flex flex-none gap-2">
+                <button onClick={regenReset} title="Generar otra" className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium" style={{ border: "1px solid var(--bd-strong)", color: "var(--tx-3)" }}>
+                  <RefreshRoundedIcon fontSize="inherit" /> Otra
+                </button>
+                <button onClick={copyReset} className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium" style={{ border: "1px solid color-mix(in srgb, var(--ink-orange) 40%, transparent)", color: "var(--ink-orange)" }}>
+                  <ContentCopyRoundedIcon fontSize="inherit" /> Copiar
+                </button>
+              </div>
+            </div>
+          </div>
+          <div className="mt-5 flex justify-end gap-3">
+            <button onClick={() => setResetTarget(null)} className="rounded-lg px-4 py-2.5 text-sm font-medium" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--tx-2)" }}>Cancelar</button>
+            <button onClick={async () => { await copyReset(); setResetTarget(null) }} className="rounded-lg px-4 py-2.5 text-sm font-medium" style={{ background: "var(--ink-lime)", color: "var(--bg)" }}>Copiar y listo</button>
           </div>
         </Modal>
       )}

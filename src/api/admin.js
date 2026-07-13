@@ -8,6 +8,9 @@ export const listUsers = () => adminClient.get("/users").then((r) => r.data)
 export const createUser = (data) => adminClient.post("/users", data).then((r) => r.data) // → { user, tempPassword }
 export const setUserStatus = (id, status) =>
   adminClient.patch(`/users/${id}/status`, { status }).then((r) => r.data)
+// Restablece la contraseña de un usuario a una temporal (admin). → { user, tempPassword }
+export const resetPassword = (id) =>
+  adminClient.post(`/users/${id}/reset-password`).then((r) => r.data)
 
 // Configuración de la empresa
 export const getCompany = () => adminClient.get("/company").then((r) => r.data)
