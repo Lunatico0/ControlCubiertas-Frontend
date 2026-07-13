@@ -23,6 +23,7 @@ const NAV = [
   { to: "/admin", end: true, label: "Resumen", Icon: HomeRoundedIcon },
   { to: "/admin/usuarios", label: "Usuarios", Icon: GroupRoundedIcon },
   { to: "/admin/empresa", label: "Empresa", Icon: ApartmentRoundedIcon },
+  { to: "/admin/comprobantes", label: "Comprobantes", Icon: ReceiptLongRoundedIcon },
   { to: "/admin/comprobante", label: "Editor de comprobante", Icon: EditRoundedIcon },
 ]
 
@@ -74,13 +75,6 @@ const AdminLayout = () => {
               <span>{label}</span>
             </NavLink>
           ))}
-
-          {/* Comprobantes (histórico): hito aparte, aún no disponible */}
-          <div className="flex items-center gap-[13px] rounded-[9px] px-[13px] py-[11px] text-[14px]" style={{ color: "var(--tx-6)", cursor: "default" }}>
-            <span className="inline-flex flex-none items-center justify-center" style={{ width: 20, height: 20 }}><ReceiptLongRoundedIcon sx={{ fontSize: 19 }} /></span>
-            <span>Comprobantes</span>
-            <span className="ml-auto rounded-full px-2 py-0.5 text-[9px] font-semibold tracking-[.05em]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--ink-purple)", background: "color-mix(in srgb, var(--ink-purple) 16%, transparent)" }}>PRÓXIMAMENTE</span>
-          </div>
 
           <div className="my-3.5 h-px" style={{ background: "var(--bd-faint)" }} />
           <div className="flex items-center gap-[13px] rounded-[9px] px-[13px] py-[11px] text-[14px]" style={{ color: "var(--tx-6)", cursor: "default" }}>

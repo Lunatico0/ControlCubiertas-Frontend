@@ -15,3 +15,7 @@ export const updateCompany = (data) => adminClient.patch("/company", data).then(
 
 // Resumen operativo del tenant
 export const getSummary = () => adminClient.get("/summary").then((r) => r.data)
+
+// Histórico de comprobantes emitidos (con búsqueda, filtro por tipo y paginación)
+export const getReceipts = (params = {}) =>
+  adminClient.get("/receipts", { params }).then((r) => r.data) // → { items, total, page, limit }

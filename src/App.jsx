@@ -11,6 +11,7 @@ import AdminLayout from '@components/Portal/AdminLayout.jsx'
 import Dashboard from '@components/Portal/Dashboard.jsx'
 import Users from '@components/Portal/Users.jsx'
 import CompanySettings from '@components/Portal/CompanySettings.jsx'
+import Comprobantes from '@components/Portal/Comprobantes.jsx'
 import EditorComprobante from '@components/Portal/EditorComprobante.jsx'
 import OperativaLayout from '@components/Operativa/OperativaLayout.jsx'
 
@@ -42,6 +43,7 @@ function App() {
             <Route index element={<Dashboard />} />
             <Route path="usuarios" element={<Users />} />
             <Route path="empresa" element={<CompanySettings />} />
+            <Route path="comprobantes" element={<Comprobantes />} />
             {/* Editor de comprobante: vista del portal (dentro del shell, con sidebar visible). */}
             <Route path="comprobante" element={<EditorComprobante />} />
           </Route>
