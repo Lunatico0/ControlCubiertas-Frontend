@@ -51,7 +51,7 @@ const Inicio = ({ onNavigate }) => {
       <p className="mt-[7px] text-[15px]" style={{ color: "var(--tx-4)" }}>¿Qué cubierta vas a operar hoy?</p>
 
       {/* Buscador grande */}
-      <div className="relative mt-[26px]">
+      <div data-tour="inicio-search" className="relative mt-[26px]">
         <span className="absolute left-5 top-1/2 -translate-y-1/2" style={{ color: "var(--tx-7)" }}>
           <SearchRoundedIcon sx={{ fontSize: 22 }} />
         </span>

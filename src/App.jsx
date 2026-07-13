@@ -14,6 +14,7 @@ import CompanySettings from '@components/Portal/CompanySettings.jsx'
 import Comprobantes from '@components/Portal/Comprobantes.jsx'
 import EditorComprobante from '@components/Portal/EditorComprobante.jsx'
 import OperativaLayout from '@components/Operativa/OperativaLayout.jsx'
+import GuiaDeUso from '@components/Operativa/GuiaDeUso.jsx'
 
 function App() {
   useUpdater()
@@ -47,6 +48,16 @@ function App() {
             {/* Editor de comprobante: vista del portal (dentro del shell, con sidebar visible). */}
             <Route path="comprobante" element={<EditorComprobante />} />
           </Route>
+
+          {/* Guía de uso completa (manual): pantalla propia, se abre desde Ayuda (pestaña nueva). */}
+          <Route
+            path="/guia"
+            element={
+              <RequireAuth>
+                <GuiaDeUso />
+              </RequireAuth>
+            }
+          />
 
           {/* UI vieja preservada en /legacy un tiempo, por adaptación (se retira más adelante). */}
           <Route

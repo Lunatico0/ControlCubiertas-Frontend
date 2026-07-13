@@ -8,9 +8,13 @@ import ReceiptLongRoundedIcon from "@mui/icons-material/ReceiptLongRounded"
 import DarkModeRoundedIcon from "@mui/icons-material/DarkModeRounded"
 import LightModeRoundedIcon from "@mui/icons-material/LightModeRounded"
 import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded"
+import HelpOutlineRoundedIcon from "@mui/icons-material/HelpOutlineRounded"
+import PlayArrowRoundedIcon from "@mui/icons-material/PlayArrowRounded"
+import MenuBookRoundedIcon from "@mui/icons-material/MenuBookRounded"
 import Cubiertas from "./Cubiertas"
 import Inicio from "./Inicio"
 import Vehiculos from "./Vehiculos"
+import OpTour from "./OpTour"
 
 // Shell de la app operativa (rediseño Claude Design). Usa el design system de
 // tokens (var(--x)) + data-app-theme para tema claro/oscuro. Las pantallas internas
@@ -27,6 +31,8 @@ const OperativaLayout = () => {
   const { user, logout } = useAuth()
   const [active, setActive] = useState("cubiertas")
   const [intent, setIntent] = useState(null) // intención de navegación para Cubiertas (query/tab)
+  const [tourOpen, setTourOpen] = useState(false) // guía interactiva (tour con spotlight)
+  const [helpMenu, setHelpMenu] = useState(false) // popover de ayuda en el perfil
 
   const navigate = (section, intentData = null) => {
     setIntent(intentData)
@@ -68,6 +74,7 @@ const OperativaLayout = () => {
             return (
               <div
                 key={item.key}
+                data-tour={item.key === "cubiertas" ? "nav-cubiertas" : item.key === "vehiculos" ? "nav-vehiculos" : undefined}
                 onClick={() => navigate(item.key)}
                 className="flex cursor-pointer items-center gap-[13px] rounded-[9px] px-[13px] py-3 text-[14.5px] transition-colors"
                 style={{
@@ -102,8 +109,8 @@ const OperativaLayout = () => {
           </button>
         </div>
 
-        {/* Perfil */}
-        <div className="flex items-center gap-[11px] p-3">
+        {/* Perfil + ayuda */}
+        <div className="relative flex items-center gap-[11px] p-3">
           <div
             className="flex h-9 w-9 flex-none items-center justify-center rounded-full text-[12px] font-bold"
             style={{ background: "#18B89E", color: "#04201B", fontFamily: "'Space Grotesk'" }}
@@ -115,6 +122,15 @@ const OperativaLayout = () => {
             <div className="text-[11px]" style={{ color: "var(--tx-5)" }}>Operativo</div>
           </div>
           <div
+            data-tour="help-btn"
+            title="Ayuda"
+            onClick={() => setHelpMenu((v) => !v)}
+            className="inline-flex cursor-pointer rounded-[7px] p-[7px]"
+            style={{ color: helpMenu ? "var(--ink-lime)" : "var(--tx-6)", background: helpMenu ? "color-mix(in srgb, var(--ink-lime) 12%, transparent)" : "transparent" }}
+          >
+            <HelpOutlineRoundedIcon sx={{ fontSize: 17 }} />
+          </div>
+          <div
             title="Cerrar sesión"
             onClick={logout}
             className="inline-flex cursor-pointer rounded-[7px] p-[7px]"
@@ -122,6 +138,29 @@ const OperativaLayout = () => {
           >
             <LogoutRoundedIcon sx={{ fontSize: 17 }} />
           </div>
+
+          {helpMenu && (
+            <>
+              <div className="fixed inset-0 z-[35]" onClick={() => setHelpMenu(false)} />
+              <div className="absolute z-[40] overflow-hidden rounded-[12px]" style={{ bottom: 58, right: 12, left: 12, background: "var(--card)", border: "1px solid var(--bd-strong)", boxShadow: "0 18px 44px rgba(0,0,0,.5)" }}>
+                <div className="px-3.5 py-[11px] text-[10px] tracking-[.08em]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-6)", borderBottom: "1px solid var(--bd-soft)" }}>AYUDA</div>
+                <button onClick={() => { setHelpMenu(false); setActive("inicio"); setTourOpen(true) }} className="flex w-full items-center gap-[11px] px-3.5 py-3 text-left">
+                  <span className="flex h-[30px] w-[30px] flex-none items-center justify-center rounded-[8px]" style={{ background: "color-mix(in srgb, var(--ink-lime) 13%, transparent)", color: "var(--ink-lime)" }}><PlayArrowRoundedIcon sx={{ fontSize: 16 }} /></span>
+                  <span style={{ lineHeight: 1.25 }}>
+                    <span className="block text-[13px] font-semibold" style={{ color: "var(--tx)" }}>Ver guía interactiva</span>
+                    <span className="block text-[11px]" style={{ color: "var(--tx-5)" }}>Tour rápido por la app</span>
+                  </span>
+                </button>
+                <a href="/guia" target="_blank" rel="noopener noreferrer" onClick={() => setHelpMenu(false)} className="flex items-center gap-[11px] px-3.5 py-3" style={{ textDecoration: "none", borderTop: "1px solid var(--bd-soft)" }}>
+                  <span className="flex h-[30px] w-[30px] flex-none items-center justify-center rounded-[8px]" style={{ background: "color-mix(in srgb, var(--ink-blue) 16%, transparent)", color: "var(--ink-blue)" }}><MenuBookRoundedIcon sx={{ fontSize: 16 }} /></span>
+                  <span style={{ lineHeight: 1.25 }}>
+                    <span className="block text-[13px] font-semibold" style={{ color: "var(--tx)" }}>Guía de uso completa</span>
+                    <span className="block text-[11px]" style={{ color: "var(--tx-5)" }}>Manual detallado · pestaña nueva</span>
+                  </span>
+                </a>
+              </div>
+            </>
+          )}
         </div>
       </aside>
 
@@ -144,6 +183,8 @@ const OperativaLayout = () => {
           )}
         </div>
       </main>
+
+      {tourOpen && <OpTour active={active} onNavigate={(s) => navigate(s)} onClose={() => setTourOpen(false)} />}
     </div>
   )
 }

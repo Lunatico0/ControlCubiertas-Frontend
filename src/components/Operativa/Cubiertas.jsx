@@ -159,13 +159,13 @@ const Cubiertas = ({ intent }) => {
               {SHORTCUT_LABEL}
             </span>
           </div>
-          <button onClick={() => setShowAlta(true)} className="ml-auto inline-flex h-[46px] items-center gap-2 rounded-[11px] px-[18px] text-[14.5px] font-bold" style={{ background: "var(--ink-lime)", color: "#0A0C0D" }}>
+          <button data-tour="cub-alta" onClick={() => setShowAlta(true)} className="ml-auto inline-flex h-[46px] items-center gap-2 rounded-[11px] px-[18px] text-[14.5px] font-bold" style={{ background: "var(--ink-lime)", color: "#0A0C0D" }}>
             <AddRoundedIcon sx={{ fontSize: 18 }} /> Alta de cubierta
           </button>
         </div>
 
         <div className="flex items-center gap-[14px]">
-          <div className="flex flex-wrap gap-2">
+          <div data-tour="cub-filters" className="flex flex-wrap gap-2">
             {TABS.map((f) => {
               const on = tab === f.key
               return (
@@ -182,7 +182,7 @@ const Cubiertas = ({ intent }) => {
             <TuneRoundedIcon sx={{ fontSize: 16 }} /> Filtros
             {activeFilters > 0 && <span className="rounded-full px-[7px] py-px text-[11px]" style={{ fontFamily: "'IBM Plex Mono'", background: "var(--ink-lime)", color: "var(--bg)" }}>{activeFilters}</span>}
           </button>
-          <div className="flex gap-[3px] rounded-[9px] p-[3px]" style={{ border: "1px solid var(--bd)", background: "var(--card)" }}>
+          <div data-tour="cub-viewtoggle" className="flex gap-[3px] rounded-[9px] p-[3px]" style={{ border: "1px solid var(--bd)", background: "var(--card)" }}>
             {[{ key: "grid", icon: <GridViewRoundedIcon sx={{ fontSize: 17 }} /> }, { key: "table", icon: <ViewListRoundedIcon sx={{ fontSize: 17 }} /> }].map((v) => {
               const on = view === v.key
               return (
