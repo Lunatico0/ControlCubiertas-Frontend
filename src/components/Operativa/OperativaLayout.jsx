@@ -10,7 +10,6 @@ import ReceiptLongRoundedIcon from "@mui/icons-material/ReceiptLongRounded"
 import DarkModeRoundedIcon from "@mui/icons-material/DarkModeRounded"
 import LightModeRoundedIcon from "@mui/icons-material/LightModeRounded"
 import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded"
-import LockResetRoundedIcon from "@mui/icons-material/LockResetRounded"
 import HelpOutlineRoundedIcon from "@mui/icons-material/HelpOutlineRounded"
 import PlayArrowRoundedIcon from "@mui/icons-material/PlayArrowRounded"
 import MenuBookRoundedIcon from "@mui/icons-material/MenuBookRounded"
@@ -148,14 +147,6 @@ const OperativaLayout = () => {
           <div className="min-w-0 flex-1" style={{ lineHeight: 1.3 }}>
             <div className="truncate text-[13px] font-semibold" style={{ color: "var(--tx)" }}>{displayName}</div>
             <div className="text-[11px]" style={{ color: "var(--tx-5)" }}>Operativo</div>
-          </div>
-          <div
-            title="Cambiar contraseña"
-            onClick={() => goToRoute("/cambiar-password")}
-            className="inline-flex cursor-pointer rounded-[7px] p-[7px]"
-            style={{ color: "var(--tx-6)" }}
-          >
-            <LockResetRoundedIcon sx={{ fontSize: 17 }} />
           </div>
           <div
             data-tour="help-btn"

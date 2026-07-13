@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react"
+import { useNavigate } from "react-router-dom"
 import PersonAddAltRoundedIcon from "@mui/icons-material/PersonAddAltRounded"
 import ContentCopyRoundedIcon from "@mui/icons-material/ContentCopyRounded"
 import LockResetRoundedIcon from "@mui/icons-material/LockResetRounded"
@@ -15,6 +16,7 @@ const COLS = "2.2fr 1fr 0.9fr 1.3fr"
 
 const Users = () => {
   const { user: me } = useAuth()
+  const navigate = useNavigate()
   const [users, setUsers] = useState([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
@@ -138,8 +140,9 @@ const Users = () => {
                   </span>
                 </div>
                 <div className="flex items-center justify-end gap-2">
-                  <button onClick={() => doReset(u)} disabled={isYou || resetting} title={isYou ? "Usá “Cambiar contraseña” para la tuya" : "Restablecer contraseña"}
-                    className="inline-flex h-[32px] w-[32px] flex-none items-center justify-center rounded-[8px]" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--tx-3)", opacity: isYou ? 0.4 : 1, cursor: isYou ? "not-allowed" : "pointer" }}>
+                  <button onClick={() => (isYou ? navigate("/cambiar-password") : doReset(u))} disabled={!isYou && resetting}
+                    title={isYou ? "Cambiar mi contraseña" : "Restablecer contraseña"}
+                    className="inline-flex h-[32px] w-[32px] flex-none items-center justify-center rounded-[8px]" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--tx-3)", cursor: "pointer" }}>
                     <LockResetRoundedIcon sx={{ fontSize: 16 }} />
                   </button>
                   <button onClick={() => toggleStatus(u)} disabled={isYou} title={isYou ? "No podés cambiar tu propio estado" : ""}

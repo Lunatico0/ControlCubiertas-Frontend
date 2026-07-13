@@ -14,7 +14,6 @@ import InsightsRoundedIcon from "@mui/icons-material/InsightsRounded"
 import EditRoundedIcon from "@mui/icons-material/EditRounded"
 import OpenInNewRoundedIcon from "@mui/icons-material/OpenInNewRounded"
 import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded"
-import LockResetRoundedIcon from "@mui/icons-material/LockResetRounded"
 import HeadsetMicRoundedIcon from "@mui/icons-material/HeadsetMicRounded"
 import CreditCardRoundedIcon from "@mui/icons-material/CreditCardRounded"
 import DarkModeRoundedIcon from "@mui/icons-material/DarkModeRounded"
@@ -162,9 +161,6 @@ const AdminLayout = () => {
             <span className="block truncate text-[12.5px] font-semibold" style={{ color: "var(--tx)" }}>{displayName}</span>
             <span className="block text-[11px]" style={{ color: "var(--tx-5)" }}>Tenant Admin</span>
           </span>
-          <button onClick={() => navigate("/cambiar-password")} title="Cambiar contraseña" className="inline-flex p-1" style={{ color: "var(--tx-6)" }}>
-            <LockResetRoundedIcon sx={{ fontSize: 17 }} />
-          </button>
           <button onClick={logout} title="Cerrar sesión" className="inline-flex p-1" style={{ color: "var(--tx-6)" }}>
             <LogoutRoundedIcon sx={{ fontSize: 17 }} />
           </button>
