@@ -9,7 +9,7 @@
     "start": "vite",
     "vercel-build": "vite build",
     "build:web": "vite build",
-    "build:electron": "cross-env BUILD_TARGET=electron vite build",
+    "build:electron": "cross-env BUILD_TARGET=electron VITE_API_URL=https://controlcubiertas-backend.vercel.app vite build",
     "preview": "vite preview",
     "electron:start": "electron ."
   },
