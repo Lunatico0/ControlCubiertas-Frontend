@@ -9,6 +9,7 @@ import { generateReceiptHTML } from "@utils/receipt-html"
 import { buildReprintData } from "@utils/print-data"
 import { useReprint } from "@hooks/useReprint"
 import { showToast } from "@utils/toast"
+import Pager from "./Pager"
 
 const COLS = "1.15fr 0.85fr 0.75fr 1.35fr 0.9fr 0.75fr"
 const LIMIT = 15
@@ -200,12 +201,7 @@ const Comprobantes = () => {
         {!loading && total > 0 && (
           <div className="flex items-center justify-between px-5 py-[13px]" style={{ background: "var(--elev)" }}>
             <span className="text-[12px]" style={{ color: "var(--tx-6)" }}>Mostrando {desde}–{hasta} de {total}</span>
-            <div className="flex gap-1.5">
-              <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page <= 1}
-                className="h-8 rounded-lg px-3 text-[12.5px] font-semibold" style={{ border: "1px solid var(--bd)", background: "var(--card)", color: "var(--tx-4)", opacity: page <= 1 ? 0.5 : 1, cursor: page <= 1 ? "not-allowed" : "pointer" }}>Anterior</button>
-              <button onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={page >= totalPages}
-                className="h-8 rounded-lg px-3 text-[12.5px] font-semibold" style={{ border: "1px solid var(--bd-strong)", background: "var(--card)", color: "var(--tx)", opacity: page >= totalPages ? 0.5 : 1, cursor: page >= totalPages ? "not-allowed" : "pointer" }}>Siguiente</button>
-            </div>
+            <Pager page={page} totalPages={totalPages} onChange={setPage} />
           </div>
         )}
       </div>
