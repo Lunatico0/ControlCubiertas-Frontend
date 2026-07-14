@@ -6,7 +6,7 @@ import StyleRoundedIcon from "@mui/icons-material/StyleRounded"
 import FileDownloadRoundedIcon from "@mui/icons-material/FileDownloadRounded"
 import LocalShippingRoundedIcon from "@mui/icons-material/LocalShippingRounded"
 import BoltRoundedIcon from "@mui/icons-material/BoltRounded"
-import { getReports, getVehicleReports } from "@api/admin"
+import { getReports, getVehicleReports, getVehicleWear } from "@api/admin"
 import { showToast } from "@utils/toast"
 import {
   ResponsiveContainer, BarChart, Bar, LineChart, Line, AreaChart, Area,
@@ -25,8 +25,8 @@ const RANK_COLS = "24px 1.4fr 0.8fr 2fr 0.9fr 0.9fr"
 // fill/stroke → los charts siguen el tema (claro/oscuro) sin JS.
 const PALETTE = ["var(--st-lime)", "var(--st-teal)", "var(--st-blue)", "var(--st-purple)", "var(--st-orange)", "var(--st-red)"]
 const STAGE_ROTATION = ["var(--st-lime)", "var(--st-teal)", "var(--st-blue)", "var(--st-purple)"]
-// Color de un punto por su recapado: recap→naranja; initial/stock por nivel (Nueva=lima, 1er=teal…).
-const roleColor = (t) => (t.role === "recap" ? "var(--st-orange)" : STAGE_ROTATION[(t.level ?? 0) % STAGE_ROTATION.length])
+// Escala de calor (semáforo) por % de desgaste relativo: verde bajo → naranja medio → rojo alto.
+const heatColor = (pct) => (pct >= 70 ? "var(--st-red)" : pct >= 40 ? "var(--st-orange)" : "var(--st-lime)")
 
 const tint = (c, pct = 14) => `color-mix(in srgb, ${c} ${pct}%, transparent)`
 const fmtKm = (n) => `${Number(n || 0).toLocaleString("es-AR")} km`
@@ -123,6 +123,84 @@ const PosScatter = ({ data }) => {
   )
 }
 
+// Vista superior del camión como mapa de calor: cada posición pintada por su % de desgaste
+// (km acumulado ahí, relativo al máximo del camión). Ejes de adelante hacia atrás, lado izq/der
+// separados por el chasis. Deja ver de un vistazo si una posición o un eje entero se gasta más.
+const TruckHeatmap = ({ wear }) => {
+  const max = Math.max(1, wear.maxPosKm)
+  const HeatBox = ({ p }) => {
+    const pct = Math.round((p.km / max) * 100)
+    const c = heatColor(pct)
+    return (
+      <div title={`${p.code} · ${fmtKm(p.km)}${p.current ? ` · #${p.current.code} ${p.current.status}` : " · libre"}`}
+        style={{ width: 62, height: 50, borderRadius: 9, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 1, background: tint(c, 16), border: `1px solid ${tint(c, 38)}` }}>
+        <span style={{ fontFamily: "'Space Grotesk'", fontWeight: 700, fontSize: 15, lineHeight: 1, color: c }}>{pct}%</span>
+        <span style={{ fontSize: 8.5, fontFamily: "'IBM Plex Mono'", color: "var(--tx-6)" }}>{p.current ? `R${p.current.level ?? 0}·` : ""}{p.code.split("-")[1]}</span>
+      </div>
+    )
+  }
+  return (
+    <div>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 5, marginBottom: 10, fontSize: 10, letterSpacing: ".14em", color: "var(--tx-6)", fontFamily: "'IBM Plex Mono'" }}>
+        FRENTE <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M6 13l6 6 6-6" /></svg>
+      </div>
+      <div style={{ position: "relative", display: "flex", flexDirection: "column", gap: 12, alignItems: "center" }}>
+        <div style={{ position: "absolute", top: 6, bottom: 6, left: "50%", width: 3, transform: "translateX(-50%)", background: "var(--bd-strong)", borderRadius: 3 }} />
+        {wear.axles.map((a) => {
+          const ps = wear.positions.filter((p) => p.axle === a.axle)
+          const left = ps.filter((p) => p.side === "L")
+          const right = ps.filter((p) => p.side !== "L")
+          return (
+            <div key={a.axle} style={{ position: "relative", display: "flex", alignItems: "center", gap: 8 }}>
+              <div style={{ display: "flex", gap: 6 }}>{left.map((p) => <HeatBox key={p.code} p={p} />)}</div>
+              <div style={{ width: 30 }} />
+              <div style={{ display: "flex", gap: 6 }}>{right.map((p) => <HeatBox key={p.code} p={p} />)}</div>
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
+// Resumen accionable: banderas derivadas del desgaste (eje más exigido, posición más caliente,
+// desbalance izq/der → alineación, y la recomendación de rotar).
+const WearResumen = ({ wear }) => {
+  const axles = wear.axles
+  const avg = axles.length ? axles.reduce((s, a) => s + a.km, 0) / axles.length : 0
+  const hotAxle = axles.reduce((a, b) => (b.km > a.km ? b : a), axles[0] || { km: 0, axle: 0 })
+  const hotDev = avg ? Math.round(((hotAxle.km - avg) / avg) * 100) : 0
+  const withKm = wear.positions.filter((p) => p.km > 0)
+  const hotPos = withKm.length ? withKm.reduce((a, b) => (b.km > a.km ? b : a)) : null
+  const leftKm = wear.positions.filter((p) => p.side === "L").reduce((s, p) => s + p.km, 0)
+  const rightKm = wear.positions.filter((p) => p.side === "R").reduce((s, p) => s + p.km, 0)
+  const base = (leftKm + rightKm) / 2
+  const imbalance = base ? Math.round((Math.abs(leftKm - rightKm) / base) * 100) : 0
+
+  const flags = []
+  if (axles.length > 1 && hotDev > 15) flags.push({ warn: true, text: `El Eje ${hotAxle.axle} concentra ${hotDev}% más desgaste que el promedio del camión.` })
+  if (hotPos) flags.push({ warn: true, text: `La posición ${hotPos.code} es la más exigida (${fmtKm(hotPos.km)}).` })
+  if (imbalance > 15) flags.push({ warn: true, text: `Desbalance izquierda/derecha del ${imbalance}% — conviene revisar la alineación.` })
+  if (!flags.length) flags.push({ warn: false, text: "El desgaste está parejo entre ejes y posiciones. Buen indicio mecánico." })
+  flags.push({ warn: false, text: "Rotá las cubiertas entre posiciones para emparejar el desgaste y estirar su vida útil." })
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+      <div style={{ fontSize: 12, fontWeight: 600, color: "var(--tx-4)" }}>Resumen</div>
+      {flags.map((f, i) => (
+        <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 9, padding: "10px 12px", borderRadius: 10, background: f.warn ? "color-mix(in srgb, var(--st-orange) 8%, var(--elev))" : "var(--elev)", border: `1px solid ${f.warn ? "color-mix(in srgb, var(--st-orange) 30%, transparent)" : "var(--bd)"}` }}>
+          <span style={{ display: "inline-flex", flex: "none", marginTop: 1, color: f.warn ? "var(--ink-orange)" : "var(--ink-lime)" }}>
+            {f.warn
+              ? <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z" /><path d="M12 9v4M12 17h.01" /></svg>
+              : <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5" /></svg>}
+          </span>
+          <span style={{ fontSize: 12, color: "var(--tx-3)", lineHeight: 1.45 }}>{f.text}</span>
+        </div>
+      ))}
+    </div>
+  )
+}
+
 // Selector de tipo/opciones estilo diseño (native select con chevron custom).
 const Selector = ({ value, onChange, options, icon }) => (
   <div style={{ position: "relative", flex: "none", minWidth: icon ? 180 : undefined }}>
@@ -174,7 +252,9 @@ const Reportes = () => {
   const [loading, setLoading] = useState(true)
   const [types, setTypes] = useState({ brandLife: "bar", stages: "line", brandShare: "pie", vehicle: "bar" })
   const [vehMetric, setVehMetric] = useState("kmTotal")
-  const [posVeh, setPosVeh] = useState(null) // camión elegido para el gráfico de desgaste por posición
+  const [posVeh, setPosVeh] = useState(null) // camión elegido para el desgaste por posición
+  const [wear, setWear] = useState(null) // getVehicleWear del camión elegido
+  const [wearLoading, setWearLoading] = useState(false)
   const setType = (key, v) => setTypes((t) => ({ ...t, [key]: v }))
 
   const load = useCallback(async () => {
@@ -232,22 +312,30 @@ const Reportes = () => {
   }, [vehicles, vehMetric, fleetAvgStint])
   const vehUnit = vehMetric === "kmTotal" || vehMetric === "avgKmPerStint" ? "km" : "count"
 
-  // Desgaste por posición: elegí un camión → puntos (posición, km) coloreados por recapado.
+  // Desgaste por posición: elegí un camión → mapa de calor de sus posiciones/ejes.
   const posOptions = useMemo(() => vehicles.map((v) => ({ value: v.id, label: v.mobile })), [vehicles])
   const posVehObj = vehicles.find((v) => v.id === posVeh) || null
-  const posWearData = useMemo(
-    () => (posVehObj?.positions || []).filter((p) => p.tire).map((p) => ({ pos: p.code, axle: p.axle, km: p.tire.km || 0, color: roleColor(p.tire), code: p.tire.code })),
-    [posVehObj],
-  )
-  // Al cargar (o cambiar la flota), elegir por defecto el primer camión con cubiertas montadas.
+  // Por defecto, el camión con más km registrado en posiciones (el que más data tiene para mostrar).
   useEffect(() => {
     if (!vehicles.length) return
-    const stillValid = posVeh && vehicles.some((v) => v.id === posVeh)
-    if (stillValid) return
-    const occ = (v) => (v.positions || []).filter((p) => p.tire).length
-    const best = [...vehicles].sort((a, b) => occ(b) - occ(a))[0]
+    if (posVeh && vehicles.some((v) => v.id === posVeh)) return
+    const best = [...vehicles].sort((a, b) => (b.kmTotal || 0) - (a.kmTotal || 0))[0]
     setPosVeh(best?.id || null)
   }, [vehicles, posVeh])
+  // Traer el desgaste por posición del camión elegido.
+  useEffect(() => {
+    if (!posVeh) { setWear(null); return }
+    let cancelled = false
+    setWearLoading(true)
+    getVehicleWear(posVeh)
+      .then((w) => { if (!cancelled) setWear(w) })
+      .catch(() => { if (!cancelled) setWear(null) })
+      .finally(() => { if (!cancelled) setWearLoading(false) })
+    return () => { cancelled = true }
+  }, [posVeh])
+  const maxAxleKm = wear ? Math.max(1, ...wear.axles.map((a) => a.km)) : 1
+  const axleBars = wear ? wear.axles.map((a) => ({ name: `Eje ${a.axle}`, value: a.km, color: heatColor(Math.round((a.km / maxAxleKm) * 100)) })) : []
+  const posDots = wear ? wear.positions.filter((p) => p.km > 0).map((p) => ({ pos: p.code, km: p.km, color: heatColor(Math.round((p.km / Math.max(1, wear.maxPosKm)) * 100)) })) : []
 
   // Insights dinámicos.
   const brandInsight = useMemo(() => {
@@ -363,15 +451,36 @@ const Reportes = () => {
             </ChartCard>
           </div>
 
-          {/* Desgaste por posición (por camión) */}
+          {/* Desgaste por posición: mapa de calor (vista superior) + resumen + barras por eje + dot plot */}
           <div className="mt-4">
             <ChartCard
               title="Desgaste por posición"
-              sub={posVehObj ? `${posVehObj.mobile} — km de la cubierta en cada posición del eje. Compará entre posiciones y ejes.` : "Elegí un camión para ver el desgaste por posición."}
-              insight="Cada punto es una cubierta montada; el color indica el recapado. Si un eje entero queda más alto (más km), puede señalar un desgaste desparejo o un problema en ese eje."
+              sub={posVehObj ? `${posVehObj.mobile} · vista superior — km acumulado en cada posición del eje` : "Elegí un camión para ver el mapa de desgaste."}
+              insight="El % de cada posición es su km acumulado relativo a la más exigida del camión (verde = poco, rojo = mucho). Deja ver si una posición o un eje entero desgasta más — señal de alineación o rotación."
               extraSelector={<Selector value={posVeh || ""} onChange={setPosVeh} options={posOptions}
                 icon={<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M14 18V6a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h1" /><path d="M14 9h4l4 4v4a1 1 0 0 1-1 1h-1" /><circle cx="7" cy="18" r="2" /><circle cx="17" cy="18" r="2" /><path d="M9 18h6" /></svg>} />}>
-              <PosScatter data={posWearData} />
+              {wearLoading ? (
+                <p style={{ padding: "48px 0", textAlign: "center", color: "var(--tx-6)", fontSize: 13 }}>Cargando…</p>
+              ) : !wear || !wear.positions.length ? (
+                <p style={{ padding: "48px 0", textAlign: "center", color: "var(--tx-6)", fontSize: 13, lineHeight: 1.5 }}>Este camión no tiene ejes configurados. Definí su esquema en Vehículos para ver el desgaste por posición.</p>
+              ) : (
+                <>
+                  <div style={{ display: "grid", gridTemplateColumns: "1.25fr 1fr", gap: 24, alignItems: "start" }}>
+                    <TruckHeatmap wear={wear} />
+                    <WearResumen wear={wear} />
+                  </div>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginTop: 18, paddingTop: 18, borderTop: "1px solid var(--bd-soft)" }}>
+                    <div>
+                      <div style={{ fontSize: 12.5, fontWeight: 600, color: "var(--tx-3)", marginBottom: 6 }}>Desgaste promedio por eje</div>
+                      <CatChart type="bar" data={axleBars} unit="km" />
+                    </div>
+                    <div>
+                      <div style={{ fontSize: 12.5, fontWeight: 600, color: "var(--tx-3)", marginBottom: 6 }}>Kilometraje por posición</div>
+                      <PosScatter data={posDots} />
+                    </div>
+                  </div>
+                </>
+              )}
             </ChartCard>
           </div>
 

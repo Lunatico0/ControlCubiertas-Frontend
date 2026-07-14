@@ -30,3 +30,7 @@ export const getReports = (params = {}) =>
 // Desgaste de cubiertas por vehículo (km recorrido, períodos, promedio por período, montadas).
 export const getVehicleReports = () =>
   adminClient.get("/reports/vehicles").then((r) => r.data) // → { vehicles: [{ mobile, licensePlate, tires, stints, kmTotal, avgKmPerStint, mounted }] }
+
+// Desgaste POR POSICIÓN de un camión: km acumulado en cada posición del eje + agregado por eje.
+export const getVehicleWear = (id) =>
+  adminClient.get(`/reports/vehicles/${id}/wear`).then((r) => r.data) // → { vehicle, positions:[{code,axle,side,km,current}], axles:[{axle,km,count}], maxPosKm }
