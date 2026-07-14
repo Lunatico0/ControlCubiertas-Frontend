@@ -10,7 +10,7 @@ import { getReports, getVehicleReports } from "@api/admin"
 import { showToast } from "@utils/toast"
 import {
   ResponsiveContainer, BarChart, Bar, LineChart, Line, AreaChart, Area,
-  PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
+  PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ScatterChart, Scatter,
 } from "recharts"
 
 const RANGES = [
@@ -25,6 +25,8 @@ const RANK_COLS = "24px 1.4fr 0.8fr 2fr 0.9fr 0.9fr"
 // fill/stroke → los charts siguen el tema (claro/oscuro) sin JS.
 const PALETTE = ["var(--st-lime)", "var(--st-teal)", "var(--st-blue)", "var(--st-purple)", "var(--st-orange)", "var(--st-red)"]
 const STAGE_ROTATION = ["var(--st-lime)", "var(--st-teal)", "var(--st-blue)", "var(--st-purple)"]
+// Color de un punto por su recapado: recap→naranja; initial/stock por nivel (Nueva=lima, 1er=teal…).
+const roleColor = (t) => (t.role === "recap" ? "var(--st-orange)" : STAGE_ROTATION[(t.level ?? 0) % STAGE_ROTATION.length])
 
 const tint = (c, pct = 14) => `color-mix(in srgb, ${c} ${pct}%, transparent)`
 const fmtKm = (n) => `${Number(n || 0).toLocaleString("es-AR")} km`
@@ -99,36 +101,25 @@ const CatChart = ({ type, data, unit, xShort }) => {
   )
 }
 
-// Esquema de ejes de un camión: cada posición con su cubierta montada (dot coloreado por
-// recapado) y su km. Las posiciones se agrupan por eje (delantero → trasero).
-const roleColor = (t) => (t.role === "recap" ? "var(--st-orange)" : STAGE_ROTATION[(t.level ?? 0) % STAGE_ROTATION.length])
-const AxleDiagram = ({ positions }) => {
-  if (!positions?.length) return <div style={{ height: CHART_H, display: "flex", alignItems: "center", justifyContent: "center", textAlign: "center", padding: "0 24px", color: "var(--tx-6)", fontSize: 13, lineHeight: 1.5 }}>Este camión no tiene ejes configurados. Definí su esquema en Vehículos para ver el desgaste por posición.</div>
-  const axles = [...new Set(positions.map((p) => p.axle))].sort((a, b) => a - b)
+// Dispersión posición → km de un camión: cada punto es la cubierta montada en una posición
+// (X ordenado por eje), a la altura de su km y coloreado por recapado. Deja ver si una posición
+// o un eje entero desgasta distinto al resto.
+const PosScatter = ({ data }) => {
+  if (!data.length) return <div style={{ height: CHART_H, display: "flex", alignItems: "center", justifyContent: "center", textAlign: "center", padding: "0 24px", color: "var(--tx-6)", fontSize: 13, lineHeight: 1.5 }}>Este camión no tiene cubiertas montadas con posición asignada.</div>
   return (
-    <div style={{ minHeight: CHART_H, display: "flex", flexDirection: "column", gap: 12, paddingTop: 2 }}>
-      {axles.map((n) => (
-        <div key={n} style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <span style={{ width: 40, flex: "none", fontSize: 10.5, fontWeight: 600, color: "var(--tx-6)", fontFamily: "'IBM Plex Mono'" }}>Eje {n}</span>
-          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-            {positions.filter((p) => p.axle === n).map((p) => {
-              const t = p.tire
-              const c = t ? roleColor(t) : null
-              return (
-                <div key={p.code} title={t ? `${p.code} · #${t.code} ${t.brand} · ${t.status} · ${fmtKm(t.km)}` : `${p.code} · libre`} style={{ width: 66 }}>
-                  <div style={{ height: 34, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, background: t ? tint(c, 16) : "var(--input)", border: t ? "1.5px solid transparent" : "1.5px dashed var(--bd-strong)" }}>
-                    <span style={{ width: 9, height: 9, borderRadius: "50%", flex: "none", background: t ? c : "transparent", border: t ? "none" : "1.5px solid var(--bd-strong)" }} />
-                    {t && <span style={{ fontSize: 11, fontFamily: "'IBM Plex Mono'", color: "var(--tx-2)" }}>#{t.code}</span>}
-                  </div>
-                  <div style={{ fontSize: 9, fontFamily: "'IBM Plex Mono'", color: "var(--tx-6)", textAlign: "center", marginTop: 3 }}>{p.code}</div>
-                  <div style={{ fontSize: 9.5, fontFamily: "'IBM Plex Mono'", color: "var(--tx-4)", textAlign: "center", minHeight: 12 }}>{t ? fmtKm(t.km) : "libre"}</div>
-                </div>
-              )
-            })}
-          </div>
-        </div>
-      ))}
-    </div>
+    <ResponsiveContainer width="100%" height={272}>
+      <ScatterChart margin={{ top: 10, right: 18, left: -4, bottom: 30 }}>
+        <CartesianGrid stroke="var(--bd-faint)" />
+        <XAxis type="category" dataKey="pos" name="Posición" interval={0} tickLine={false} axisLine={{ stroke: "var(--bd)" }}
+          tick={{ fill: "var(--tx-6)", fontSize: 10.5, fontFamily: "'IBM Plex Mono'" }} angle={-25} textAnchor="end" height={54} />
+        <YAxis type="number" dataKey="km" name="Km" {...AXIS} tickFormatter={fmtKmShort} width={48} />
+        <Tooltip {...TOOLTIP} cursor={{ strokeDasharray: "3 3", stroke: "var(--bd-strong)" }}
+          formatter={(v, n) => (n === "Km" ? [fmtKm(v), "Km"] : [v, "Posición"])} />
+        <Scatter data={data}>
+          {data.map((p, i) => <Cell key={i} fill={p.color} />)}
+        </Scatter>
+      </ScatterChart>
+    </ResponsiveContainer>
   )
 }
 
@@ -169,14 +160,21 @@ const ChartCard = ({ title, sub, type, onType, typeOpts, extraSelector, insight,
 const TYPE_BAR_LINE = [{ value: "bar", label: "Barras" }, { value: "line", label: "Línea" }]
 const TYPE_SEQ = [{ value: "line", label: "Línea" }, { value: "area", label: "Área" }, { value: "bar", label: "Barras" }]
 const TYPE_SHARE = [{ value: "pie", label: "Dona" }, { value: "bar", label: "Barras" }]
+const VEH_METRICS = [
+  { value: "kmTotal", label: "Km total" },
+  { value: "avgKmPerStint", label: "Prom. por período" },
+  { value: "stints", label: "Períodos" },
+  { value: "tires", label: "Cubiertas usadas" },
+]
 
 const Reportes = () => {
   const [range, setRange] = useState("12m")
   const [data, setData] = useState(null)
   const [vehicles, setVehicles] = useState([])
   const [loading, setLoading] = useState(true)
-  const [types, setTypes] = useState({ brandLife: "bar", stages: "line", brandShare: "pie" })
-  const [vehSel, setVehSel] = useState("all")
+  const [types, setTypes] = useState({ brandLife: "bar", stages: "line", brandShare: "pie", vehicle: "bar" })
+  const [vehMetric, setVehMetric] = useState("kmTotal")
+  const [posVeh, setPosVeh] = useState(null) // camión elegido para el gráfico de desgaste por posición
   const setType = (key, v) => setTypes((t) => ({ ...t, [key]: v }))
 
   const load = useCallback(async () => {
@@ -223,17 +221,33 @@ const Reportes = () => {
     return stages.map((s) => ({ name: s.label, value: s.km, color: s.role === "recap" ? "var(--st-orange)" : STAGE_ROTATION[idx++ % STAGE_ROTATION.length] }))
   }, [stages])
 
-  // "Toda la flota" → barras de km total por móvil. Un móvil elegido → esquema de ejes.
-  const vehicleData = useMemo(
-    () => [...vehicles].sort((a, b) => (b.kmTotal || 0) - (a.kmTotal || 0)).slice(0, 12)
-      .map((v) => ({ name: v.mobile, value: v.kmTotal || 0, color: "var(--st-blue)" })),
-    [vehicles],
+  const vehWithStints = vehicles.filter((v) => v.stints > 0)
+  const fleetAvgStint = vehWithStints.length ? Math.round(vehWithStints.reduce((a, v) => a + v.avgKmPerStint, 0) / vehWithStints.length) : 0
+  const vehicleData = useMemo(() => {
+    const rows = [...vehicles].sort((a, b) => (b[vehMetric] || 0) - (a[vehMetric] || 0)).slice(0, 12)
+    return rows.map((v) => {
+      const slow = vehMetric === "avgKmPerStint" && v.stints > 0 && fleetAvgStint > 0 && v.avgKmPerStint < fleetAvgStint * 0.6
+      return { name: v.mobile, value: v[vehMetric] || 0, color: slow ? "var(--st-orange)" : "var(--st-blue)" }
+    })
+  }, [vehicles, vehMetric, fleetAvgStint])
+  const vehUnit = vehMetric === "kmTotal" || vehMetric === "avgKmPerStint" ? "km" : "count"
+
+  // Desgaste por posición: elegí un camión → puntos (posición, km) coloreados por recapado.
+  const posOptions = useMemo(() => vehicles.map((v) => ({ value: v.id, label: v.mobile })), [vehicles])
+  const posVehObj = vehicles.find((v) => v.id === posVeh) || null
+  const posWearData = useMemo(
+    () => (posVehObj?.positions || []).filter((p) => p.tire).map((p) => ({ pos: p.code, axle: p.axle, km: p.tire.km || 0, color: roleColor(p.tire), code: p.tire.code })),
+    [posVehObj],
   )
-  const vehOptions = useMemo(
-    () => [{ value: "all", label: "Toda la flota" }, ...vehicles.map((v) => ({ value: v.id, label: v.mobile }))],
-    [vehicles],
-  )
-  const selectedVehicle = vehSel === "all" ? null : vehicles.find((v) => v.id === vehSel)
+  // Al cargar (o cambiar la flota), elegir por defecto el primer camión con cubiertas montadas.
+  useEffect(() => {
+    if (!vehicles.length) return
+    const stillValid = posVeh && vehicles.some((v) => v.id === posVeh)
+    if (stillValid) return
+    const occ = (v) => (v.positions || []).filter((p) => p.tire).length
+    const best = [...vehicles].sort((a, b) => occ(b) - occ(a))[0]
+    setPosVeh(best?.id || null)
+  }, [vehicles, posVeh])
 
   // Insights dinámicos.
   const brandInsight = useMemo(() => {
@@ -248,11 +262,9 @@ const Reportes = () => {
     const best = withKm.reduce((a, b) => (b.km > a.km ? b : a))
     return `El mayor rendimiento promedio se da en “${best.label}” (${fmtKm(best.km)}). Usá la curva para fijar el punto de recambio antes de que caiga el rinde.`
   }, [stages])
-  const vehicleInsight = !selectedVehicle
-    ? "Elegí un camión para ver su esquema de ejes y el desgaste de cada posición."
-    : selectedVehicle.hasAxles
-      ? `${selectedVehicle.mounted} de ${selectedVehicle.positions.length} posiciones ocupadas. Cada casillero muestra la cubierta montada y sus km.`
-      : `${selectedVehicle.mobile} todavía no tiene ejes configurados.`
+  const vehicleInsight = fleetAvgStint
+    ? `El promedio de la flota es ${fmtKm(fleetAvgStint)} por período. Un móvil muy por debajo puede indicar un problema de tren delantero o alineación.`
+    : "Se llena a medida que asignás y desasignás cubiertas de los vehículos."
 
   const empty = !loading && (!data || data.total === 0)
 
@@ -342,14 +354,24 @@ const Reportes = () => {
               <CatChart type={types.brandShare} data={brandShareData} unit="count" />
             </ChartCard>
 
-            <ChartCard title="Desgaste por vehículo"
-              sub={selectedVehicle ? `Ejes de ${selectedVehicle.mobile} — cubierta y km por posición.` : "Km total que rindió cada móvil en cubiertas. Elegí un camión para ver sus ejes."}
+            <ChartCard title="Desgaste por vehículo" sub="Cuánto rinden las cubiertas en cada móvil y cada cuánto las rota."
+              type={types.vehicle} onType={(v) => setType("vehicle", v)} typeOpts={TYPE_BAR_LINE}
               insight={vehicleInsight}
-              extraSelector={<Selector value={vehSel} onChange={setVehSel} options={vehOptions}
+              extraSelector={<Selector value={vehMetric} onChange={setVehMetric} options={VEH_METRICS}
                 icon={<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M14 18V6a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h1" /><path d="M14 9h4l4 4v4a1 1 0 0 1-1 1h-1" /><circle cx="7" cy="18" r="2" /><circle cx="17" cy="18" r="2" /><path d="M9 18h6" /></svg>} />}>
-              {selectedVehicle
-                ? <AxleDiagram positions={selectedVehicle.positions} />
-                : <CatChart type="bar" data={vehicleData} unit="km" xShort={(v) => String(v).replace("Móvil ", "")} />}
+              <CatChart type={types.vehicle} data={vehicleData} unit={vehUnit} xShort={(v) => String(v).replace("Móvil ", "")} />
+            </ChartCard>
+          </div>
+
+          {/* Desgaste por posición (por camión) */}
+          <div className="mt-4">
+            <ChartCard
+              title="Desgaste por posición"
+              sub={posVehObj ? `${posVehObj.mobile} — km de la cubierta en cada posición del eje. Compará entre posiciones y ejes.` : "Elegí un camión para ver el desgaste por posición."}
+              insight="Cada punto es una cubierta montada; el color indica el recapado. Si un eje entero queda más alto (más km), puede señalar un desgaste desparejo o un problema en ese eje."
+              extraSelector={<Selector value={posVeh || ""} onChange={setPosVeh} options={posOptions}
+                icon={<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M14 18V6a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h1" /><path d="M14 9h4l4 4v4a1 1 0 0 1-1 1h-1" /><circle cx="7" cy="18" r="2" /><circle cx="17" cy="18" r="2" /><path d="M9 18h6" /></svg>} />}>
+              <PosScatter data={posWearData} />
             </ChartCard>
           </div>
 
