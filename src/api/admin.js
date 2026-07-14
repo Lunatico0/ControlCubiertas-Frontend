@@ -26,3 +26,7 @@ export const getReceipts = (params = {}) =>
 // Reportes de trazabilidad/rendimiento por kilometraje. params: { range: '12m'|'6m'|'all' }
 export const getReports = (params = {}) =>
   adminClient.get("/reports", { params }).then((r) => r.data) // → { total, fleetLife, discardRate, leader, brands, stages }
+
+// Desgaste de cubiertas por vehículo (km recorrido, períodos, promedio por período, montadas).
+export const getVehicleReports = () =>
+  adminClient.get("/reports/vehicles").then((r) => r.data) // → { vehicles: [{ mobile, licensePlate, tires, stints, kmTotal, avgKmPerStint, mounted }] }

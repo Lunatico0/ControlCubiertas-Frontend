@@ -5,7 +5,8 @@ import DeleteOutlineRoundedIcon from "@mui/icons-material/DeleteOutlineRounded"
 import StyleRoundedIcon from "@mui/icons-material/StyleRounded"
 import FileDownloadRoundedIcon from "@mui/icons-material/FileDownloadRounded"
 import InfoRoundedIcon from "@mui/icons-material/InfoRounded"
-import { getReports } from "@api/admin"
+import LocalShippingRoundedIcon from "@mui/icons-material/LocalShippingRounded"
+import { getReports, getVehicleReports } from "@api/admin"
 import { showToast } from "@utils/toast"
 
 const RANGES = [
@@ -16,6 +17,8 @@ const RANGES = [
 
 // Columnas de la tabla de ranking (mismo criterio de grid que Comprobantes.jsx).
 const RANK_COLS = "24px 1.4fr 0.8fr 2fr 0.9fr 0.9fr"
+// Columnas de la tabla de desgaste por vehículo.
+const VEH_COLS = "1.6fr 0.9fr 0.9fr 0.9fr 1fr 1fr"
 
 // Paleta de dots para el ranking de marcas (se asigna por índice, no por marca fija).
 const DOT_PALETTE = ["var(--ink-lime)", "var(--ink-teal)", "var(--ink-blue)", "var(--ink-purple)", "var(--ink-orange)", "var(--ink-red)"]
@@ -26,13 +29,16 @@ const fmtKm = (n) => `${Number(n || 0).toLocaleString("es-AR")} km`
 const Reportes = () => {
   const [range, setRange] = useState("12m")
   const [data, setData] = useState(null)
+  const [vehicles, setVehicles] = useState([])
   const [loading, setLoading] = useState(true)
 
   const load = useCallback(async () => {
     setLoading(true)
     try {
-      const d = await getReports({ range })
+      // El desgaste por vehículo no depende del rango; se piden juntos para una sola espera.
+      const [d, v] = await Promise.all([getReports({ range }), getVehicleReports().catch(() => ({ vehicles: [] }))])
       setData(d)
+      setVehicles(v?.vehicles || [])
     } catch (err) {
       showToast("error", err.message || "No se pudieron cargar los reportes")
     } finally {
@@ -62,6 +68,13 @@ const Reportes = () => {
   const stages = data?.stages || []
   const maxLife = Math.max(1, ...brands.map((b) => b.life || 0))
   const maxStageKm = Math.max(1, ...stages.map((s) => s.km || 0))
+  const maxVehKm = Math.max(1, ...vehicles.map((v) => v.kmTotal || 0))
+  // Promedio de km por período de la flota: sirve de referencia para marcar los móviles que
+  // rotan cubiertas más rápido que el resto (posible problema de tren delantero/alineación).
+  const vehWithStints = vehicles.filter((v) => v.stints > 0)
+  const fleetAvgStint = vehWithStints.length
+    ? Math.round(vehWithStints.reduce((a, v) => a + v.avgKmPerStint, 0) / vehWithStints.length)
+    : 0
   const brandsWithDot = brands.map((b, i) => ({ ...b, dot: DOT_PALETTE[i % DOT_PALETTE.length] }))
 
   // Color por rol: initial/stock rotan lime→teal→blue→purple según orden de aparición;
@@ -182,6 +195,55 @@ const Reportes = () => {
                 ))}
               </div>
             </div>
+          </div>
+
+          {/* Desgaste por vehículo */}
+          <div className="mt-4 overflow-hidden rounded-[13px]" style={{ background: "var(--card)", border: "1px solid var(--bd)" }}>
+            <div className="flex items-start gap-3 px-5 pb-4 pt-[18px]">
+              <span className="flex flex-none items-center justify-center rounded-[9px]" style={{ width: 32, height: 32, background: tint("var(--ink-blue)", 14), color: "var(--ink-blue)" }}>
+                <LocalShippingRoundedIcon sx={{ fontSize: 17 }} />
+              </span>
+              <div>
+                <h2 className="font-display text-[17px] font-bold" style={{ fontFamily: "'Space Grotesk'", color: "var(--tx)" }}>Desgaste por vehículo</h2>
+                <p className="mt-1 text-[12.5px]" style={{ color: "var(--tx-5)" }}>
+                  Km que cada móvil recorrió en cubiertas y cada cuánto las rota. Un promedio por período muy por
+                  debajo de la flota{fleetAvgStint ? ` (${fmtKm(fleetAvgStint)})` : ""} puede indicar un problema de tren delantero o alineación.
+                </p>
+              </div>
+            </div>
+
+            {vehicles.length === 0 ? (
+              <p className="px-5 pb-5 text-[12.5px]" style={{ color: "var(--tx-5)" }}>Todavía no hay montajes registrados. Se llena a medida que asignás y desasignás cubiertas de los vehículos.</p>
+            ) : (
+              <>
+                <div className="grid gap-3 px-5 py-3 text-[10.5px] font-semibold uppercase tracking-wider" style={{ gridTemplateColumns: VEH_COLS, background: "var(--elev)", borderTop: "1px solid var(--bd)", borderBottom: "1px solid var(--bd)", fontFamily: "'IBM Plex Mono'", color: "var(--tx-6)" }}>
+                  <div>Móvil</div><div>Cubiertas</div><div>Montadas</div><div>Períodos</div><div>Km total</div><div>Prom / período</div>
+                </div>
+                {vehicles.map((v) => {
+                  const slow = v.stints > 0 && fleetAvgStint > 0 && v.avgKmPerStint < fleetAvgStint * 0.6
+                  return (
+                    <div key={v.id} className="grid items-center gap-3 px-5 py-3" style={{ gridTemplateColumns: VEH_COLS, borderBottom: "1px solid var(--bd-faint)" }}>
+                      <div className="min-w-0">
+                        <div className="truncate text-[13.5px] font-medium" style={{ color: "var(--tx)" }}>{v.mobile}</div>
+                        <div className="truncate text-[11px]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-6)" }}>{v.licensePlate || "—"}</div>
+                      </div>
+                      <div className="text-[12.5px]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-3)" }}>{v.tires}</div>
+                      <div className="text-[12.5px]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-3)" }}>{v.mounted}</div>
+                      <div className="text-[12.5px]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-3)" }}>{v.stints}</div>
+                      <div className="flex items-center gap-2">
+                        <div className="h-2 flex-1 rounded-full" style={{ background: "var(--bd-strong)" }}>
+                          <div className="h-full rounded-full" style={{ width: `${(v.kmTotal / maxVehKm) * 100}%`, background: "var(--ink-blue)" }} />
+                        </div>
+                        <span className="text-[12px]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-2)" }}>{fmtKm(v.kmTotal)}</span>
+                      </div>
+                      <div className="text-[12.5px]" style={{ fontFamily: "'IBM Plex Mono'", color: slow ? "var(--ink-orange)" : "var(--tx-3)" }} title={slow ? "Rota cubiertas más rápido que el resto de la flota" : ""}>
+                        {v.stints > 0 ? fmtKm(v.avgKmPerStint) : "—"}
+                      </div>
+                    </div>
+                  )
+                })}
+              </>
+            )}
           </div>
 
           {/* Nota: falta el costo de compra para calcular costo/km */}
