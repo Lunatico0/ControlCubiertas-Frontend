@@ -4,7 +4,6 @@ import TimelineRoundedIcon from "@mui/icons-material/TimelineRounded"
 import DeleteOutlineRoundedIcon from "@mui/icons-material/DeleteOutlineRounded"
 import StyleRoundedIcon from "@mui/icons-material/StyleRounded"
 import FileDownloadRoundedIcon from "@mui/icons-material/FileDownloadRounded"
-import InfoRoundedIcon from "@mui/icons-material/InfoRounded"
 import LocalShippingRoundedIcon from "@mui/icons-material/LocalShippingRounded"
 import { getReports, getVehicleReports } from "@api/admin"
 import { showToast } from "@utils/toast"
@@ -244,12 +243,6 @@ const Reportes = () => {
                 })}
               </>
             )}
-          </div>
-
-          {/* Nota: falta el costo de compra para calcular costo/km */}
-          <div className="mt-4 flex items-start gap-3 rounded-xl p-4" style={{ border: "1px dashed var(--bd-strong)", background: "var(--elev)" }}>
-            <InfoRoundedIcon sx={{ fontSize: 18 }} style={{ color: "var(--ink-blue)", flexShrink: 0, marginTop: 1 }} />
-            <p className="text-[12.5px]" style={{ color: "var(--tx-5)" }}>Cuando registres el costo de compra de las cubiertas, acá vas a ver también el costo por kilómetro por marca — el indicador definitivo de qué conviene comprar.</p>
           </div>
         </>
       )}
