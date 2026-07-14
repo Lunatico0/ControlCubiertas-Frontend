@@ -397,14 +397,27 @@ export const ApiProvider = ({ children }) => {
   }, [])
 
   // Cargar los estados configurables del tenant y setear el catálogo (colores/roles) para /op.
+  // Reintenta si llega vacío: sin catálogo, /op resuelve todos los roles al fallback y los
+  // conteos por rol (ej. "A recapar") quedan en 0. Combinado con getCompanyCached, que ya no
+  // cachea fallos, un miss transitorio en el arranque frío se autocorrige.
   useEffect(() => {
-    getCompanyCached()
-      .then((c) => {
-        const st = Array.isArray(c?.stockStatuses) ? c.stockStatuses : []
-        setStatuses(st)
-        setStatusCatalog(buildStatusMeta(st))
-      })
-      .catch(() => {})
+    let cancelled = false
+    const loadStatuses = (attempt = 0) => {
+      getCompanyCached()
+        .then((c) => {
+          if (cancelled) return
+          const st = Array.isArray(c?.stockStatuses) ? c.stockStatuses : []
+          if (!st.length && attempt < 3) {
+            setTimeout(() => loadStatuses(attempt + 1), 400 * (attempt + 1))
+            return
+          }
+          setStatuses(st)
+          setStatusCatalog(buildStatusMeta(st))
+        })
+        .catch(() => {})
+    }
+    loadStatuses()
+    return () => { cancelled = true }
   }, [])
 
   // Efecto para recargar cuando cambia refreshTrigger

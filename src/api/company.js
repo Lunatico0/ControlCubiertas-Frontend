@@ -11,7 +11,13 @@ export const fetchCompany = async () => (await companyAPI.get("/")).data
 // Si el fetch falla → null → generateReceiptHTML usa defaults (TMBC), nunca rompe.
 let companyPromise = null
 export const getCompanyCached = () => {
-  if (!companyPromise) companyPromise = fetchCompany().catch(() => null)
+  // Cachear SOLO éxitos. Si el fetch falla (token aún no listo, 401 transitorio, red),
+  // se limpia la promesa para que el próximo llamador reintente, en vez de quedar pegado
+  // en null toda la sesión — eso rompía el catálogo de estados en /op (todos los roles
+  // caían al fallback y los conteos por rol, ej. "A recapar", quedaban en 0).
+  if (!companyPromise) {
+    companyPromise = fetchCompany().catch(() => { companyPromise = null; return null })
+  }
   return companyPromise
 }
 
