@@ -4,6 +4,7 @@ import { useAuth } from "@context/AuthContext"
 import { useTheme } from "@context/ThemeContext"
 import { getCompany } from "@api/admin"
 import { externalPageProps } from "@utils/isElectron"
+import { useCacheTenantLogo } from "@hooks/useCacheTenantLogo"
 import OpTour from "@components/Operativa/OpTour"
 
 import HomeRoundedIcon from "@mui/icons-material/HomeRounded"
@@ -63,6 +64,7 @@ const Logo = () => (
 
 const AdminLayout = () => {
   const { user, logout } = useAuth()
+  useCacheTenantLogo() // cachea el logo del tenant para el splash del desktop (no-op en web)
   const { isDarkMode, toggleTheme } = useTheme()
   const navigate = useNavigate()
   const location = useLocation()

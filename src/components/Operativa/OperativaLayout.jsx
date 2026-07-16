@@ -14,6 +14,7 @@ import HelpOutlineRoundedIcon from "@mui/icons-material/HelpOutlineRounded"
 import PlayArrowRoundedIcon from "@mui/icons-material/PlayArrowRounded"
 import MenuBookRoundedIcon from "@mui/icons-material/MenuBookRounded"
 import { externalPageProps } from "@utils/isElectron"
+import { useCacheTenantLogo } from "@hooks/useCacheTenantLogo"
 import Cubiertas from "./Cubiertas"
 import Inicio from "./Inicio"
 import Vehiculos from "./Vehiculos"
@@ -44,6 +45,7 @@ const OP_STEPS = [
 const OperativaLayout = () => {
   const { isDarkMode, toggleTheme } = useTheme()
   const { user, logout, isAdmin } = useAuth()
+  useCacheTenantLogo() // cachea el logo del tenant para el splash del desktop (no-op en web)
   const goToRoute = useNavigate() // navegación de ruta (react-router), distinta del navigate interno por sección
   const [active, setActive] = useState("cubiertas")
   const [intent, setIntent] = useState(null) // intención de navegación para Cubiertas (query/tab)
