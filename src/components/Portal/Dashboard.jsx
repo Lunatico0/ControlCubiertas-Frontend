@@ -12,6 +12,7 @@ import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded"
 import GroupRoundedIcon from "@mui/icons-material/GroupRounded"
 import ApartmentRoundedIcon from "@mui/icons-material/ApartmentRounded"
 import OpenInNewRoundedIcon from "@mui/icons-material/OpenInNewRounded"
+import DesktopDownload from "./DesktopDownload"
 
 // Paleta de estados del design system (coherente entre donut y barras).
 const STATUS_COLORS = {
@@ -177,6 +178,9 @@ const Dashboard = () => {
           <QuickAction icon={<ApartmentRoundedIcon />} tint="var(--ink-purple)" title="Configuración de empresa" subtitle="Editar datos y preferencias" onClick={() => navigate("/admin/empresa")} />
         </div>
       </section>
+
+      {/* Descarga de la app de escritorio (solo visible en web) */}
+      <DesktopDownload />
     </div>
   )
 }
