@@ -80,7 +80,7 @@ const Sidebar = ({ active, setActive }) => {
         {/* Top */}
         <div>
           <div className={`flex items-center justify-between px-4 py-3 border-b ${colors.borderSider}`}>
-            {expanded && <span className={`${text.value} font-bold text-sm`}>Control Cubiertas</span>}
+            {expanded && <span className={`${text.value} font-bold text-sm`}>TireOps</span>}
             {!isMobile && (
               <button onClick={() => setExpanded(!expanded)} className={`ml-auto ${text.value}`}>
                 <MenuRoundedIcon />

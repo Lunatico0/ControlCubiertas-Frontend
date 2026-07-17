@@ -4,17 +4,12 @@ import { useNavigate } from "react-router-dom"
 import { useAuth } from "@context/AuthContext"
 import { useTheme } from "@context/ThemeContext"
 import { showToast } from "@utils/toast"
+import BrandLogo from "@components/BrandLogo"
 
 // Establecer/cambiar contraseña (rediseño Claude Design "primer ingreso"). Dos modos:
 //  - mustChangePassword (primer ingreso / tras un reset): solo pide la nueva; el backend
 //    no re-pide la actual porque ya se autenticó con la temporal.
 //  - voluntario: pide la contraseña actual + la nueva.
-const Logo = () => (
-  <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
-    <circle cx="20" cy="20" r="18" stroke="var(--ink-lime)" strokeWidth="3.4" strokeDasharray="78 22" strokeLinecap="round" transform="rotate(-50 20 20)" />
-    <circle cx="20" cy="20" r="6.4" stroke="var(--ink-lime)" strokeWidth="3.4" />
-  </svg>
-)
 const KeyIcon = () => (
   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><circle cx="7.5" cy="15.5" r="4.5" /><path d="m10.5 12.5 8-8M16 6l2 2M19 3l2 2" /></svg>
 )
@@ -48,12 +43,8 @@ const ChangePassword = () => {
   return (
     <div data-app-theme={isDarkMode ? "dark" : "light"} className="flex min-h-screen items-center justify-center p-6" style={{ background: "var(--sidebar)", color: "var(--tx)", fontFamily: "'IBM Plex Sans',system-ui,sans-serif" }}>
       <div className="w-full" style={{ maxWidth: 408 }}>
-        <div className="mb-6 flex items-center justify-center gap-3">
-          <Logo />
-          <div style={{ lineHeight: 0.98, textAlign: "left", fontFamily: "'Space Grotesk'", fontWeight: 700, fontSize: 17, letterSpacing: ".02em" }}>
-            <div style={{ color: "var(--tx)" }}>CONTROL</div>
-            <div style={{ color: "var(--ink-lime)" }}>CUBIERTAS</div>
-          </div>
+        <div className="mb-6 flex items-center justify-center">
+          <BrandLogo height={38} />
         </div>
 
         <div className="rounded-[14px] p-8" style={{ background: "var(--card)", border: "1px solid var(--bd)", boxShadow: "0 24px 64px rgba(0,0,0,.45)" }}>

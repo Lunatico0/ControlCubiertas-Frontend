@@ -3,6 +3,7 @@ import { Link } from "react-router-dom"
 import ChevronLeftRoundedIcon from "@mui/icons-material/ChevronLeftRounded"
 import DarkModeRoundedIcon from "@mui/icons-material/DarkModeRounded"
 import LightModeRoundedIcon from "@mui/icons-material/LightModeRounded"
+import BrandLogo from "@components/BrandLogo"
 
 // Shell común de las guías (manual operativo y manual del admin). Layout: TOC lateral FIJO
 // (altura de viewport, no scrollea con el contenido) + main scrolleable + toggle de tema.
@@ -43,12 +44,9 @@ const GuiaShell = ({ sidebarTitle, badge, eyebrow, title, intro, toc, backTo = "
     <div data-app-theme={isDarkMode ? "dark" : "light"} className="flex h-screen w-full overflow-hidden text-left" style={{ background: "var(--bg)", color: "var(--tx)", fontFamily: "'IBM Plex Sans',system-ui,sans-serif" }}>
       {/* TOC — fijo (altura de viewport, no scrollea con el contenido) */}
       <aside className="hidden h-screen w-[270px] flex-none flex-col overflow-y-auto px-5 py-[26px] md:flex" style={{ background: "var(--sidebar)", borderRight: "1px solid var(--bd-faint)" }}>
-        <div className="mb-2 flex items-center gap-[11px]">
-          <Logo />
-          <div style={{ lineHeight: 1 }}>
-            <div className="text-[13px] font-bold" style={{ fontFamily: "'Space Grotesk'", color: "var(--tx)" }}>{sidebarTitle}</div>
-            <div className="mt-0.5 text-[10px]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-6)" }}>Control Cubiertas</div>
-          </div>
+        <div className="mb-3 flex flex-col gap-2">
+          <BrandLogo height={26} />
+          <div className="text-[13px] font-bold" style={{ fontFamily: "'Space Grotesk'", color: "var(--tx)" }}>{sidebarTitle}</div>
         </div>
         {badge && <div className="mb-[18px] ml-[45px] inline-block self-start rounded-full px-[9px] py-[3px] text-[9.5px]" style={{ fontFamily: "'IBM Plex Mono'", letterSpacing: ".1em", color: "var(--ink-purple)", background: "color-mix(in srgb, var(--ink-purple) 14%, transparent)" }}>{badge}</div>}
         <nav className="flex flex-col gap-px">

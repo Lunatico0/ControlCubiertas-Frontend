@@ -36,17 +36,17 @@ const GuiaDeUso = () => (
   <GuiaShell
     sidebarTitle="GUÍA DE USO"
     eyebrow="MANUAL DEL USUARIO OPERATIVO"
-    title="Cómo usar Control Cubiertas"
+    title="Cómo usar TireOps"
     intro="Esta guía cubre todo el día a día de la app: buscar y dar de alta cubiertas, seguir su ciclo de recapado, montarlas y desmontarlas de los vehículos, reconfigurar ejes e imprimir comprobantes. Está pensada para leerse de corrido o consultarse por sección."
     toc={TOC}
     backTo="/"
     backLabel="Volver a la app"
-    footer="Control Cubiertas · Guía del usuario operativo"
+    footer="TireOps · Guía del usuario operativo"
   >
     <Callout Icon={PlayArrowRoundedIcon} tone="var(--ink-lime)">¿Preferís un recorrido guiado? Usá <B>Ayuda → Ver guía interactiva</B> en la app.</Callout>
 
-    <H2 id="intro">1 · Qué es Control Cubiertas</H2>
-    <P>Control Cubiertas es el sistema para administrar el ciclo de vida completo de cada cubierta de la flota: desde que ingresa nueva al depósito hasta que se descarta. Cada cubierta tiene un <B>código único</B>, un <B>estado</B> dentro del ciclo de recapado, una <B>ubicación</B> (depósito o montada en un vehículo) y un <B>historial</B> de todos sus movimientos.</P>
+    <H2 id="intro">1 · Qué es TireOps</H2>
+    <P>TireOps es el sistema para administrar el ciclo de vida completo de cada cubierta de la flota: desde que ingresa nueva al depósito hasta que se descarta. Cada cubierta tiene un <B>código único</B>, un <B>estado</B> dentro del ciclo de recapado, una <B>ubicación</B> (depósito o montada en un vehículo) y un <B>historial</B> de todos sus movimientos.</P>
     <P>Cada movimiento (alta, montaje, desmontaje, recapado, descarte) genera automáticamente un <B>comprobante</B> con su número correlativo, que podés imprimir o reimprimir cuando quieras.</P>
 
     <H2 id="inicio">2 · La pantalla de Inicio</H2>

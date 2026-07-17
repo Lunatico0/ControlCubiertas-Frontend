@@ -8,7 +8,7 @@ export const fetchCompany = async () => (await companyAPI.get("/")).data
 
 // Cache a nivel módulo (por sesión): el diseño del comprobante y los datos de empresa
 // cambian rara vez. Compartido por usePrint (acciones) y useReprint (reimpresión).
-// Si el fetch falla → null → generateReceiptHTML usa defaults (TMBC), nunca rompe.
+// Si el fetch falla → null → generateReceiptHTML usa defaults, nunca rompe.
 let companyPromise = null
 export const getCompanyCached = () => {
   // Cachear SOLO éxitos. Si el fetch falla (token aún no listo, 401 transitorio, red),

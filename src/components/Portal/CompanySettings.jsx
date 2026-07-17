@@ -235,7 +235,7 @@ const CompanySettings = () => {
               <div><p className="text-(--tx-5)">Estado</p><p className="mt-0.5 font-medium capitalize text-(--tx-2)">{meta.status || "—"}</p></div>
               <div><p className="text-(--tx-5)">Base de datos</p><p className="mt-0.5 font-mono text-xs text-(--tx-4)">{meta.dbName}</p></div>
             </div>
-            <p className="mt-3 text-xs text-(--tx-5)">El plan y el estado los administra el equipo de ControlCubiertas.</p>
+            <p className="mt-3 text-xs text-(--tx-5)">El plan y el estado los administra el equipo de TireOps.</p>
           </section>
         )}
 

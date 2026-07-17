@@ -26,15 +26,15 @@ const GuiaAdmin = () => (
     sidebarTitle="GUÍA DEL ADMIN"
     badge="SOLO TENANT-ADMIN"
     eyebrow="MANUAL DEL ADMINISTRADOR"
-    title="Administrar tu empresa en Control Cubiertas"
+    title="Administrar tu empresa en TireOps"
     intro="El panel de administración es donde configurás tu organización: el equipo que accede, el ciclo de estados de las cubiertas, el diseño del comprobante impreso y el histórico de comprobantes. Solo lo ven los usuarios con rol tenant-admin."
     toc={TOC}
     backTo="/admin"
     backLabel="Volver al panel"
-    footer="Control Cubiertas · Guía del administrador"
+    footer="TireOps · Guía del administrador"
   >
     <H2 id="acceso">1 · Acceso y roles</H2>
-    <P>Hay dos roles en Control Cubiertas:</P>
+    <P>Hay dos roles en TireOps:</P>
     <UL>
       <li><B>Tenant-admin:</B> además de operar, accede a este panel para gestionar equipo y configuración.</li>
       <li><B>Operativo:</B> usa la app del día a día (cubiertas, vehículos, comprobantes). No ve el panel de administración.</li>
@@ -45,7 +45,7 @@ const GuiaAdmin = () => (
     <P>La pantalla de inicio del panel muestra el estado general de la flota: totales de cubiertas por ubicación (en circulación, en depósito), cantidad de vehículos, la distribución por estado del ciclo y señales de atención (por ejemplo, cubiertas a recapar o vehículos sin cubiertas). Es solo lectura: un vistazo rápido para decidir dónde actuar.</P>
 
     <H2 id="usuarios">3 · Usuarios</H2>
-    <P>Gestionás quién accede a Control Cubiertas dentro de tu empresa.</P>
+    <P>Gestionás quién accede a TireOps dentro de tu empresa.</P>
     <UL>
       <li><B>Crear usuario:</B> nombre, email y rol. Se le envía una contraseña temporal para su primer ingreso.</li>
       <li><B>Editar / cambiar rol:</B> ajustás datos o pasás a alguien de operativo a admin y viceversa.</li>

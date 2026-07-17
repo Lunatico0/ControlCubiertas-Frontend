@@ -68,7 +68,7 @@ const LayoutPreview = ({ type, selected, onSelect }) => {
 
         {/* Marca de agua */}
         <div className="absolute top-[45%] left-1/2 -translate-x-1/2 opacity-40 pointer-events-none">
-          <img src="TMBC.png" alt="marca agua" className="w-36 mx-auto" />
+          <img src="/TireOpsLight.svg" alt="marca agua" className="w-36 mx-auto" />
         </div>
 
         {/* Footer */}

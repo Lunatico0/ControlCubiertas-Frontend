@@ -5,6 +5,7 @@ import { useTheme } from "@context/ThemeContext"
 import { getCompany } from "@api/admin"
 import { externalPageProps } from "@utils/isElectron"
 import { useCacheTenantLogo } from "@hooks/useCacheTenantLogo"
+import BrandLogo from "@components/BrandLogo"
 import OpTour from "@components/Operativa/OpTour"
 
 import HomeRoundedIcon from "@mui/icons-material/HomeRounded"
@@ -55,13 +56,6 @@ const screenOf = (path) =>
         : path.startsWith("/admin/reportes") ? "reportes"
           : "resumen"
 
-const Logo = () => (
-  <svg width="34" height="34" viewBox="0 0 40 40" fill="none">
-    <circle cx="20" cy="20" r="18" stroke="var(--ink-lime)" strokeWidth="3.4" strokeDasharray="78 22" strokeLinecap="round" transform="rotate(-50 20 20)" />
-    <circle cx="20" cy="20" r="6.4" stroke="var(--ink-lime)" strokeWidth="3.4" />
-  </svg>
-)
-
 const AdminLayout = () => {
   const { user, logout } = useAuth()
   useCacheTenantLogo() // cachea el logo del tenant para el splash del desktop (no-op en web)
@@ -91,12 +85,8 @@ const AdminLayout = () => {
     <div data-app-theme={isDarkMode ? "dark" : "light"} className="flex h-screen overflow-hidden text-left" style={{ background: "var(--bg)", color: "var(--tx)", fontFamily: "'IBM Plex Sans',system-ui,sans-serif" }}>
       {/* Sidebar */}
       <aside className="hidden w-64 flex-none flex-col md:flex" style={{ background: "var(--sidebar)", borderRight: "1px solid var(--bd-faint)" }}>
-        <div className="flex items-center gap-3 px-5 py-5">
-          <Logo />
-          <div style={{ lineHeight: 0.98, fontFamily: "'Space Grotesk'", fontWeight: 700, fontSize: 16, letterSpacing: ".02em" }}>
-            <div style={{ color: "var(--tx)" }}>CONTROL</div>
-            <div style={{ color: "var(--ink-lime)" }}>CUBIERTAS</div>
-          </div>
+        <div className="flex items-center px-5 py-5">
+          <BrandLogo height={30} />
         </div>
 
         <div className="px-5 pb-2 pt-3.5 text-[10px] font-semibold tracking-[.16em]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-6)" }}>PANEL</div>

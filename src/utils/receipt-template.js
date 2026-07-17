@@ -1,7 +1,7 @@
 // Generador ÚNICO del HTML del comprobante. Fuente de verdad compartida por el editor
 // (preview en vivo) y la impresión real → lo que se previsualiza es exactamente lo que
 // se imprime. Parametrizado por el receiptDesign del tenant + sus datos de empresa.
-// NO hay marca hardcodeada: sin logo configurado se muestra un placeholder, nunca TMBC.
+// NO hay marca hardcodeada: sin logo configurado se muestra un placeholder, nunca una marca fija.
 
 const FS = {
   S: { base: "10px", h1: "15px", h2: "14px", label: "8.5px", small: "8.5px" },

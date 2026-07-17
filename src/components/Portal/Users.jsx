@@ -97,7 +97,7 @@ const Users = () => {
       <div className="mb-[22px] flex items-start gap-5">
         <div>
           <h1 className="font-display text-[28px] font-bold tracking-[-.02em]" style={{ color: "var(--tx)", fontFamily: "'Space Grotesk'" }}>Usuarios</h1>
-          <p className="mt-1 text-sm" style={{ color: "var(--tx-4)" }}>Quién accede a ControlCubiertas</p>
+          <p className="mt-1 text-sm" style={{ color: "var(--tx-4)" }}>Quién accede a TireOps</p>
         </div>
         <button onClick={() => setShowForm(true)} className="ml-auto inline-flex items-center gap-2 rounded-[10px] px-[17px] py-[11px] text-sm font-bold"
           style={{ background: "var(--ink-lime)", color: "var(--bg)" }}>

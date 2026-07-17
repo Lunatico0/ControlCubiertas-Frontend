@@ -4,7 +4,7 @@ import { getCompanyCached } from "@api/company"
 
 // En la app instalable (Electron), cachea el logo del tenant (receiptDesign.logo, un dataURL)
 // para que el splash del PRÓXIMO arranque lo muestre. El splash corre antes del login, así que
-// depende de este cache: primer inicio o tenant sin logo → splash con la marca Control Cubiertas.
+// depende de este cache: primer inicio o tenant sin logo → splash con la marca TireOps.
 // En web es no-op (no existe window.electronAPI).
 export const useCacheTenantLogo = () => {
   useEffect(() => {

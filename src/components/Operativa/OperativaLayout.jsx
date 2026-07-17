@@ -15,6 +15,7 @@ import PlayArrowRoundedIcon from "@mui/icons-material/PlayArrowRounded"
 import MenuBookRoundedIcon from "@mui/icons-material/MenuBookRounded"
 import { externalPageProps } from "@utils/isElectron"
 import { useCacheTenantLogo } from "@hooks/useCacheTenantLogo"
+import BrandLogo from "@components/BrandLogo"
 import Cubiertas from "./Cubiertas"
 import Inicio from "./Inicio"
 import Vehiculos from "./Vehiculos"
@@ -32,7 +33,7 @@ const NAV = [
 
 // Pasos del tour de la operativa (screen = key de sección; sel = data-tour del elemento).
 const OP_STEPS = [
-  { screen: "inicio", sel: null, place: "center", title: "Bienvenido a Control Cubiertas", body: "Un recorrido de 30 segundos por lo esencial. Podés salir cuando quieras y volver a verlo desde el botón de ayuda." },
+  { screen: "inicio", sel: null, place: "center", title: "Bienvenido a TireOps", body: "Un recorrido de 30 segundos por lo esencial. Podés salir cuando quieras y volver a verlo desde el botón de ayuda." },
   { screen: "inicio", sel: "nav-cubiertas", place: "right", title: "Menú principal", body: "Todo se mueve desde acá: Inicio, Cubiertas (el inventario), Vehículos y Comprobantes." },
   { screen: "inicio", sel: "inicio-search", place: "bottom", title: "Buscá al instante", body: "Desde el Inicio buscás cualquier cubierta por código, marca o serie. Tip: apretá Ctrl + K para saltar a la búsqueda." },
   { screen: "cubiertas", sel: "cub-filters", place: "bottom", title: "Filtros rápidos", body: "Acotá el inventario por estado: en stock, en circulación o a recapar. El número te dice cuántas hay en cada grupo." },
@@ -72,17 +73,8 @@ const OperativaLayout = () => {
         style={{ background: "var(--sidebar)", borderColor: "var(--bd-faint)" }}
       >
         {/* Logo */}
-        <div className="flex items-center gap-3 px-5 pb-5 pt-[22px]">
-          <span className="flex h-9 w-9 flex-none items-center justify-center">
-            <svg width="36" height="36" viewBox="0 0 40 40" fill="none">
-              <circle cx="20" cy="20" r="18" stroke="#C4ED2B" strokeWidth="3.4" strokeDasharray="78 22" strokeLinecap="round" transform="rotate(-50 20 20)" />
-              <circle cx="20" cy="20" r="6.4" stroke="#C4ED2B" strokeWidth="3.4" />
-            </svg>
-          </span>
-          <div style={{ fontFamily: "'Space Grotesk'", lineHeight: ".98" }}>
-            <div className="text-[15px] font-bold tracking-[.02em]" style={{ color: "var(--tx)" }}>CONTROL</div>
-            <div className="text-[15px] font-bold tracking-[.02em]" style={{ color: "var(--ink-lime)" }}>CUBIERTAS</div>
-          </div>
+        <div className="flex items-center px-5 pb-5 pt-[22px]">
+          <BrandLogo height={34} />
         </div>
 
         {/* Navegación */}

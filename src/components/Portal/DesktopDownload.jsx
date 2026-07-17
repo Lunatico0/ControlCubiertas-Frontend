@@ -63,7 +63,7 @@ const DesktopDownload = () => {
           <DesktopWindowsRoundedIcon />
         </span>
         <div className="flex-1">
-          <p className="font-medium" style={{ color: "var(--tx)" }}>Control Cubiertas para Windows</p>
+          <p className="font-medium" style={{ color: "var(--tx)" }}>TireOps para Windows</p>
           <p className="mt-0.5 text-sm" style={{ color: "var(--tx-5)" }}>{meta}</p>
         </div>
         {asset ? (
