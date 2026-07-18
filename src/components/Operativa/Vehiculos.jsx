@@ -178,7 +178,7 @@ const Vehiculos = ({ onNavigate }) => {
 
                 {/* esquema de posiciones */}
                 {hasAxles ? (
-                  <div className="flex flex-wrap gap-[7px]">
+                  <div className="flex flex-1 flex-wrap content-start gap-[7px]">
                     {positions.map((p, i) => (
                       <div key={i} title={`${p.label} · ${p.empty ? "Vacía" : `#${p.tireCode} ${p.status}`}`} className="flex w-[42px] flex-col items-center gap-1">
                         <div className="flex h-[30px] w-full items-center justify-center rounded-[7px]" style={{ background: p.empty ? "var(--input)" : p.bg, border: p.empty ? "1.5px dashed var(--bd-strong)" : "1.5px solid transparent" }}>
@@ -194,8 +194,8 @@ const Vehiculos = ({ onNavigate }) => {
                   </div>
                 )}
 
-                {/* footer */}
-                <div className="flex items-center gap-[14px] border-t pt-[13px] text-[12.5px]" style={{ borderColor: "var(--bd-soft)" }}>
+                {/* footer — pineado al fondo (mt-auto): el espacio sobrante queda entre las cubiertas y el divider */}
+                <div className="mt-auto flex items-center gap-[14px] border-t pt-[13px] text-[12.5px]" style={{ borderColor: "var(--bd-soft)" }}>
                   <span className="inline-flex items-center gap-[7px] font-semibold" style={{ color: countColor }}><TripOriginRoundedIcon sx={{ fontSize: 15 }} />{countLabel}</span>
                   <span className="ml-auto" style={{ color: "var(--tx-5)", fontFamily: "'IBM Plex Mono'" }}>{kmLabel}</span>
                 </div>
