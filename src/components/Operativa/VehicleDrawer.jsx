@@ -18,10 +18,12 @@ const VehicleDrawer = ({ item, onClose, onNavigate }) => {
   const { v, positions, hasAxles, countLabel, countColor, tipoColor, tipoBg, kmLabel } = item
 
   useEffect(() => {
-    const onKey = (e) => { if (e.key === "Escape") onClose() }
+    // Mientras está abierto el editor de ejes, Esc no cierra el detalle (el editor tiene su
+    // propio Cancelar/volver); evita cerrar todo de un tecla.
+    const onKey = (e) => { if (e.key === "Escape" && !showReconfig) onClose() }
     window.addEventListener("keydown", onKey)
     return () => window.removeEventListener("keydown", onKey)
-  }, [onClose])
+  }, [onClose, showReconfig])
 
   const mounted = positions.filter((p) => !p.empty).length
   const total = positions.length
@@ -31,6 +33,10 @@ const VehicleDrawer = ({ item, onClose, onNavigate }) => {
   // vacía → inventario para asignar. Ambos navegan (Vehiculos se desmonta con el drawer).
   const verCubierta = (p) => onNavigate?.("cubiertas", { query: String(p.tireCode) })
   const montar = () => onNavigate?.("cubiertas", { query: v.mobile || "" })
+
+  // Editor de ejes: toma el área de contenido (respeta el sidebar). El drawer y su backdrop
+  // se retiran para no atenuar el sidebar ni capturar sus clics (antes cerraba todo).
+  if (showReconfig) return <ConfigurarEjes vehicle={v} onClose={() => setShowReconfig(false)} />
 
   return (
     <div className="fixed inset-0 z-40 flex justify-end" style={{ background: "rgba(4,5,6,.55)" }} onClick={onClose}>
@@ -121,9 +127,8 @@ const VehicleDrawer = ({ item, onClose, onNavigate }) => {
         </div>
       </aside>
 
-      {/* Overlays sobre el drawer: al guardar, cierran todo → la lista muestra la data fresca */}
+      {/* Editar datos: modal sobre el drawer. Al guardar cierra todo → la lista se refresca. */}
       {showEdit && <EditarVehiculo vehicle={v} onClose={() => setShowEdit(false)} onSaved={onClose} />}
-      {showReconfig && <ConfigurarEjes vehicle={v} onClose={() => setShowReconfig(false)} />}
     </div>
   )
 }

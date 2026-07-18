@@ -156,7 +156,7 @@ const ConfigurarEjes = ({ onClose, vehicle }) => {
   }
 
   return (
-    <div data-app-theme={isDarkMode ? "dark" : "light"} className="fixed inset-0 z-60 flex flex-col" style={{ background: "var(--bg)", color: "var(--tx)", fontFamily: "'IBM Plex Sans',system-ui,sans-serif" }}>
+    <div data-app-theme={isDarkMode ? "dark" : "light"} className="fixed inset-y-0 right-0 left-[248px] z-60 flex flex-col" style={{ background: "var(--bg)", color: "var(--tx)", fontFamily: "'IBM Plex Sans',system-ui,sans-serif", borderLeft: "1px solid var(--bd-faint)" }}>
       {view === "list" ? (
         /* ===================== LISTA DE PENDIENTES ===================== */
         <>
