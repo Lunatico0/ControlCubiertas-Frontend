@@ -197,9 +197,9 @@ const OperativaLayout = () => {
           {active === "inicio" ? (
             <Inicio onNavigate={navigate} />
           ) : active === "cubiertas" ? (
-            <Cubiertas intent={intent} />
+            <Cubiertas intent={intent} onNavigate={navigate} />
           ) : active === "vehiculos" ? (
-            <Vehiculos onNavigate={navigate} />
+            <Vehiculos onNavigate={navigate} intent={intent} />
           ) : (
             <div className="mx-auto flex h-full max-w-[900px] flex-col items-center justify-center gap-3 p-8 text-center">
               <div className="text-[22px] font-bold" style={{ fontFamily: "'Space Grotesk'", color: "var(--tx)" }}>

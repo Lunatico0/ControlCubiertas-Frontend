@@ -45,7 +45,7 @@ const GRID_COLS = "0.8fr 1fr 1.2fr 0.9fr 0.6fr 0.8fr 1.1fr"
 const IS_MAC = typeof navigator !== "undefined" && /Mac|iPhone|iPad|iPod/i.test(navigator.platform || navigator.userAgent || "")
 const SHORTCUT_LABEL = IS_MAC ? "⌘K" : "Ctrl K"
 
-const Cubiertas = ({ intent }) => {
+const Cubiertas = ({ intent, onNavigate }) => {
   const { data, ui } = useContext(ApiContext)
   const tires = data?.tires || []
   const loading = ui?.loading
@@ -100,7 +100,7 @@ const Cubiertas = ({ intent }) => {
     () => ({
       todas: tires.length,
       stock: tires.filter((t) => !t.vehicle).length,
-      disponibles: tires.filter((t) => !t.vehicle && metaOf(t.status).role !== "discard").length,
+      disponibles: tires.filter((t) => !t.vehicle && !["discard", "recap"].includes(metaOf(t.status).role)).length,
       circulacion: tires.filter((t) => t.vehicle).length,
       recapar: tires.filter((t) => metaOf(t.status).role === "recap").length,
     }),
@@ -113,7 +113,7 @@ const Cubiertas = ({ intent }) => {
     const kmMax = fKmMax !== "" ? Number(fKmMax) : null
     const base = tires.filter((t) => {
       if (tab === "stock" && t.vehicle) return false
-      if (tab === "disponibles" && (t.vehicle || metaOf(t.status).role === "discard")) return false
+      if (tab === "disponibles" && (t.vehicle || ["discard", "recap"].includes(metaOf(t.status).role))) return false
       if (tab === "circulacion" && !t.vehicle) return false
       if (tab === "recapar" && metaOf(t.status).role !== "recap") return false
       if (fBrand && t.brand !== fBrand) return false
@@ -280,7 +280,7 @@ const Cubiertas = ({ intent }) => {
                     <Row label="Actualizada" value={fmtDate(t.updatedAt)} mono />
                   </div>
                   <div className="flex border-t pt-[11px]" style={{ borderColor: "var(--bd-soft)", gap: "clamp(5px, 2.5cqi, 8px)", containerType: "inline-size" }} onClick={(e) => e.stopPropagation()}>
-                    {!t.vehicle && metaOf(t.status).role !== "discard" && <OpActionBtn type="assign" full onClick={openDrawer(t._id, "assign")} />}
+                    {!t.vehicle && !["discard", "recap"].includes(metaOf(t.status).role) && <OpActionBtn type="assign" full onClick={openDrawer(t._id, "assign")} />}
                     {t.vehicle && <OpActionBtn type="unassign" full onClick={openDrawer(t._id, "unassign")} />}
                     {metaOf(t.status).role === "recap" && <OpActionBtn type="recap" full onClick={openDrawer(t._id, "recap")} />}
                     <OpActionBtn type="view" square onClick={openDrawer(t._id)} />
@@ -327,7 +327,7 @@ const Cubiertas = ({ intent }) => {
                   <div className="text-right text-[13px] font-semibold" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx)" }}>{fmtKm(t.kilometers)}</div>
                   <div className="text-right text-[12px]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-5)" }}>{fmtDate(t.updatedAt)}</div>
                   <div className="flex items-center justify-end gap-1.5">
-                    {!t.vehicle && metaOf(t.status).role !== "discard" && <OpActionBtn type="assign" square size={36} onClick={openDrawer(t._id, "assign")} />}
+                    {!t.vehicle && !["discard", "recap"].includes(metaOf(t.status).role) && <OpActionBtn type="assign" square size={36} onClick={openDrawer(t._id, "assign")} />}
                     {t.vehicle && <OpActionBtn type="unassign" square size={36} onClick={openDrawer(t._id, "unassign")} />}
                     {metaOf(t.status).role === "recap" && <OpActionBtn type="recap" square size={36} onClick={openDrawer(t._id, "recap")} />}
                     {!t.vehicle && metaOf(t.status).role !== "discard" && <OpActionBtn type="discard" square size={36} onClick={openDrawer(t._id, "discard")} />}
@@ -340,7 +340,20 @@ const Cubiertas = ({ intent }) => {
         )}
       </div>
 
-      {selectedId && <TireDrawer tireId={selectedId} initialAction={pendingAction} initialAssign={pendingAction === "assign" ? assignTo : null} onClose={closeDrawer} />}
+      {selectedId && (
+        <TireDrawer
+          tireId={selectedId}
+          initialAction={pendingAction}
+          initialAssign={pendingAction === "assign" ? assignTo : null}
+          onAssigned={() => {
+            const target = assignTo
+            setAssignTo(null) // el montaje terminó → se va el banner
+            closeDrawer()
+            if (target) onNavigate?.("vehiculos", { openVehicle: target.vehicleId }) // volver al vehículo que inició el flujo
+          }}
+          onClose={closeDrawer}
+        />
+      )}
       {showAlta && <AltaDrawer onClose={() => setShowAlta(false)} />}
     </div>
   )

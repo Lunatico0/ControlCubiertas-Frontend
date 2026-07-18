@@ -98,7 +98,7 @@ const histBits = (h) => {
   return bits
 }
 
-const TireDrawer = ({ tireId, initialAction, initialAssign, onClose }) => {
+const TireDrawer = ({ tireId, initialAction, initialAssign, onAssigned, onClose }) => {
   const { tires, orders, data } = useContext(ApiContext)
   const vehicles = data?.vehicles || []
   const { statuses = [], stockScale = [], discardStatus } = data || {}
@@ -182,12 +182,15 @@ const TireDrawer = ({ tireId, initialAction, initialAssign, onClose }) => {
     if (!form.vehicle || !form.kmAlta || !form.orderNumber) return showToast("warning", "Completá vehículo, km y N° de orden")
     // Si el vehículo tiene ejes configurados, la posición es obligatoria; si no, se asigna sin posición.
     if (positions && positions.length > 0 && !form.position) return showToast("warning", "Elegí la posición en el vehículo")
+    // Montaje dirigido: al éxito no cerramos el panel acá; avisamos (onAssigned) para que el
+    // padre limpie el banner de montaje, cierre el drawer y vuelva al vehículo. Flujo normal:
+    // se cierra el panel de acción como siempre.
     assignAct.execute({
       tire,
       formData: { vehicle: form.vehicle, kmAlta: Number(form.kmAlta), orderNumber: form.orderNumber, position: form.position || null, getReceiptNumber: orders.getNextReceipt },
       refresh: reload,
-      close: closeAction,
-    })
+      close: initialAssign ? undefined : closeAction,
+    }).then((updated) => { if (updated && initialAssign) onAssigned?.() }).catch(() => { /* error ya notificado */ })
   }
   const doUnassign = () => {
     if (!form.kmBaja || !form.orderNumber) return showToast("warning", "Completá km y N° de orden")
@@ -475,7 +478,7 @@ const TireDrawer = ({ tireId, initialAction, initialAssign, onClose }) => {
 
                 {/* Acciones (estilo Claude Design) */}
                 <div className="mb-7 flex flex-wrap gap-2">
-                  {!tire.vehicle && metaOf(tire.status).role !== "discard" && <OpActionBtn type="assign" size={44} onClick={() => openAction("assign")} />}
+                  {!tire.vehicle && !["discard", "recap"].includes(metaOf(tire.status).role) && <OpActionBtn type="assign" size={44} onClick={() => openAction("assign")} />}
                   {tire.vehicle && <OpActionBtn type="unassign" size={44} onClick={() => openAction("unassign")} />}
                   {metaOf(tire.status).role === "recap" && <OpActionBtn type="recap" size={44} onClick={() => openAction("recap")} />}
                   {lastReceiptEntry && <OpActionBtn type="print" size={44} onClick={() => reprintAct.execute({ entry: lastReceiptEntry, tire })} disabled={reprintAct.isPrinting} />}

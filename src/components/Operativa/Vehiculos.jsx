@@ -1,4 +1,4 @@
-import { useState, useMemo, useContext } from "react"
+import { useState, useMemo, useContext, useEffect, useRef } from "react"
 import ApiContext from "@context/apiContext"
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded"
 import AddRoundedIcon from "@mui/icons-material/AddRounded"
@@ -22,7 +22,7 @@ const TABLE_COLS = "1.4fr 1fr 1fr 1.4fr 0.7fr"
 
 const VehTypeIcon = ({ size = 22 }) => <LocalShippingOutlinedIcon sx={{ fontSize: size }} />
 
-const Vehiculos = ({ onNavigate }) => {
+const Vehiculos = ({ onNavigate, intent }) => {
   const { data, ui } = useContext(ApiContext)
   const vehicles = data?.vehicles || []
   const tires = data?.tires || []
@@ -89,6 +89,16 @@ const Vehiculos = ({ onNavigate }) => {
   const toggleBtn = (active) => ({ background: active ? "var(--ink-lime)" : "transparent", color: active ? "var(--bg)" : "var(--tx-5)" })
   // Click en un vehículo → abre su drawer de detalle (no navega directo al inventario).
   const open = (v) => setDetailVeh(fleet.find((it) => String(it.v._id) === String(v._id)) || null)
+
+  // Auto-abrir un vehículo cuando llega por intent (ej. tras montar una cubierta, se vuelve a
+  // su detalle). Una vez por intent (ref) para no re-abrir en cada refresh de datos.
+  const handledIntentRef = useRef(null)
+  useEffect(() => {
+    if (intent && intent !== handledIntentRef.current && intent.openVehicle) {
+      const it = fleet.find((x) => String(x.v._id) === String(intent.openVehicle))
+      if (it) { setDetailVeh(it); handledIntentRef.current = intent }
+    }
+  }, [intent, fleet])
 
   return (
     <div>
