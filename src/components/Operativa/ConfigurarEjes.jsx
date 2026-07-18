@@ -1,6 +1,9 @@
-import { useState, useContext, useMemo } from "react"
+import { useState, useContext, useMemo, useEffect } from "react"
 import ApiContext from "@context/apiContext"
+import { useTheme } from "@context/ThemeContext"
 import { showToast } from "@utils/toast"
+import { dialog } from "@utils/dialog"
+import { getVehicleTypes, createVehicleType } from "@api/vehicles"
 import { tint, fmtKm } from "./status"
 import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded"
 import ArrowForwardRoundedIcon from "@mui/icons-material/ArrowForwardRounded"
@@ -11,72 +14,149 @@ import TripOriginRoundedIcon from "@mui/icons-material/TripOriginRounded"
 import LocalShippingOutlinedIcon from "@mui/icons-material/LocalShippingOutlined"
 import ReportProblemRoundedIcon from "@mui/icons-material/ReportProblemRounded"
 import CheckRoundedIcon from "@mui/icons-material/CheckRounded"
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined"
 
-// Configurar ejes de vehículos preexistentes (migración A4: adaptar los que se migraron
-// sin esquema al modelo de ejes). Pantalla con 2 vistas: lista de pendientes (vehículos
-// con axles vacío) + editor de ejes (presets + simple/dual/moto + preview). Guarda con
-// vehicles.updateAxles → PATCH /api/vehicles/:id/axles.
+// Configurar/reconfigurar ejes de un vehículo. Dos vistas: lista de pendientes (vehículos
+// con axles vacío, migración) + editor. El "tipo de vehículo" se DERIVA del layout de ejes
+// (se compara contra el catálogo = presets del front + tipos custom del tenant). Si no
+// coincide con ninguno → se puede nombrar y guardar como tipo custom (persistido por tenant,
+// GET/POST /api/vehicles/types). Guard duro: los ejes con cubierta montada quedan bloqueados
+// (hay que desasignar primero); el backend además rechaza (409) lo que orfanaría una cubierta.
 const PRESETS = {
-  auto: { label: "Auto", sub: "4 ruedas", axles: ["simple", "simple"] },
-  camion42: { label: "Camión 4×2", sub: "6 ruedas", axles: ["simple", "dual"] },
-  camion64: { label: "Camión 6×4", sub: "10 ruedas", axles: ["simple", "dual", "dual"] },
-  semi3: { label: "Semi 3 ejes", sub: "12 ruedas", axles: ["dual", "dual", "dual"] },
-  bus: { label: "Bus", sub: "6 ruedas", axles: ["simple", "dual"] },
-  moto: { label: "Moto", sub: "2 ruedas", axles: ["moto", "moto"] },
+  moto: { label: "Moto", axles: ["moto", "moto"] },
+  auto: { label: "Auto / Utilitario", axles: ["simple", "simple"] },
+  camion42: { label: "Camión 4×2", axles: ["simple", "dual"] },
+  camion64: { label: "Camión 6×4", axles: ["simple", "dual", "dual"] },
+  tractor64: { label: "Tractor 6×4", axles: ["simple", "dual", "dual"] },
+  semi2: { label: "Semi 2 ejes", axles: ["dual", "dual"] },
+  semi3: { label: "Semi 3 ejes", axles: ["dual", "dual", "dual"] },
+  acoplado4: { label: "Acoplado 4 ejes", axles: ["dual", "dual", "dual", "dual"] },
+  bus: { label: "Bus", axles: ["simple", "dual"] },
 }
 const wheelsOf = (t) => (t === "dual" ? 4 : t === "moto" ? 1 : 2)
 const tiresOf = (axles) => axles.reduce((n, t) => n + wheelsOf(t), 0)
+const eqLayout = (a, b) => a.length === b.length && a.every((x, i) => x === b[i])
 const sectionLabelStyle = { fontFamily: "'IBM Plex Mono'", color: "var(--tx-6)" }
 
 const ConfigurarEjes = ({ onClose, vehicle }) => {
   const { data, vehicles } = useContext(ApiContext)
+  const { isDarkMode } = useTheme()
   const tires = data?.tires || []
-  // Modo puntual: si viene `vehicle`, arranca directo en el editor de ESE vehículo
-  // (reconfigurar ejes desde el detalle). Sin `vehicle`, es el flujo batch de migración.
+  // Modo puntual: si viene `vehicle`, arranca en el editor de ESE vehículo. Sin `vehicle`, es
+  // el flujo batch de migración (lista de pendientes).
   const [view, setView] = useState(vehicle ? "editor" : "list")
   const [sel, setSel] = useState(vehicle || null)
-  const [preset, setPreset] = useState(vehicle?.axles?.length ? "custom" : "camion42")
   const [axles, setAxles] = useState(vehicle?.axles?.length ? vehicle.axles.map((a) => a.type || "simple") : ["simple", "dual"])
+  const [customTypes, setCustomTypes] = useState([])
+  const [customName, setCustomName] = useState("")
   const [saving, setSaving] = useState(false)
+  const [savingType, setSavingType] = useState(false)
 
-  // Pendientes: vehículos sin esquema de ejes (axles vacío). Conteo de cubiertas montadas
-  // desde data.tires (modelo viejo: montadas sin posición).
+  useEffect(() => {
+    getVehicleTypes().then((r) => setCustomTypes(Array.isArray(r) ? r : [])).catch(() => {})
+  }, [])
+
+  // Catálogo de tipos = presets del front + custom del tenant.
+  const catalog = useMemo(() => {
+    const cat = { ...PRESETS }
+    customTypes.forEach((c, i) => { cat[`c${i}`] = { label: c.name, axles: c.axles || [], custom: true } })
+    return cat
+  }, [customTypes])
+
+  // Tipo derivado del layout actual: primer tipo del catálogo cuyo array de ejes coincide.
+  // El nombre previo del vehículo (sel.type) desempata entre presets con el mismo layout.
+  const matchedKey = useMemo(() => {
+    const keys = Object.keys(catalog)
+    if (sel?.type) {
+      const byName = keys.find((k) => catalog[k].label === sel.type && eqLayout(catalog[k].axles, axles))
+      if (byName) return byName
+    }
+    return keys.find((k) => eqLayout(catalog[k].axles, axles)) || "custom"
+  }, [catalog, axles, sel])
+  const isCustom = matchedKey === "custom"
+  const typeName = isCustom ? "" : catalog[matchedKey].label
+
+  // Ocupación por eje. Solo en RECONFIGURACIÓN (el vehículo ya tiene ejes): una cubierta
+  // montada en E{n}-… ocupa el eje n. Montada SIN posición (legacy) → no se puede verificar
+  // → se bloquea todo. En primera config (axles vacío) no hay nada ocupado.
+  const isReconfig = !!(sel?.axles?.length)
+  const { occupiedAxles, hasPositionless, mountedCount } = useMemo(() => {
+    const occ = new Set()
+    let posless = false
+    let count = 0
+    if (isReconfig && sel) {
+      tires
+        .filter((t) => String(t.vehicle?._id || t.vehicle || "") === String(sel._id))
+        .forEach((t) => {
+          count += 1
+          const m = t.position && String(t.position).match(/^E(\d+)-/)
+          if (m) occ.add(Number(m[1]))
+          else posless = true
+        })
+    }
+    return { occupiedAxles: occ, hasPositionless: posless, mountedCount: count }
+  }, [tires, sel, isReconfig])
+
+  const axleLocked = (i) => isReconfig && (hasPositionless || occupiedAxles.has(i + 1))
+  const total = useMemo(() => tiresOf(axles), [axles])
+
+  // Pendientes de migración: vehículos sin esquema de ejes.
   const pending = useMemo(() => {
     return (data?.vehicles || [])
       .filter((v) => !(v.axles && v.axles.length))
-      .map((v) => ({
-        ...v,
-        cubiertas: tires.filter((t) => String(t.vehicle?._id || t.vehicle || "") === String(v._id)).length,
-      }))
+      .map((v) => ({ ...v, cubiertas: tires.filter((t) => String(t.vehicle?._id || t.vehicle || "") === String(v._id)).length }))
       .sort((a, b) => (a.mobile || "").localeCompare(b.mobile || "", "es", { numeric: true }))
   }, [data?.vehicles, tires])
 
-  const total = useMemo(() => tiresOf(axles), [axles])
-
-  const openEditor = (v) => { setSel(v); setPreset("camion42"); setAxles(["simple", "dual"]); setView("editor") }
-  // En modo puntual no hay lista a la que volver: "cancelar"/"volver" cierra el overlay.
+  const openEditor = (v) => { setSel(v); setAxles(v?.axles?.length ? v.axles.map((a) => a.type || "simple") : ["simple", "dual"]); setCustomName(""); setView("editor") }
   const backToList = () => { if (vehicle) return onClose(); setView("list"); setSel(null) }
-  const applyPreset = (key) => () => { setPreset(key); setAxles(PRESETS[key].axles.slice()) }
-  const addAxle = () => { setAxles((a) => [...a, "dual"]); setPreset("custom") }
-  const removeAxle = (i) => setAxles((a) => (a.length <= 1 ? a : a.filter((_, idx) => idx !== i)))
-  const setAxleType = (i, type) => { setAxles((a) => a.map((t, idx) => (idx === i ? type : t))); setPreset("custom") }
+  const applyPreset = (key) => () => setAxles(catalog[key].axles.slice())
+  const addAxle = () => setAxles((a) => [...a, "dual"])
+  const removeAxle = (i) => { if (axleLocked(i)) return; setAxles((a) => (a.length <= 1 ? a : a.filter((_, idx) => idx !== i))) }
+  const setAxleType = (i, type) => { if (axleLocked(i)) return; setAxles((a) => a.map((t, idx) => (idx === i ? type : t))) }
+
+  const saveCustomType = async () => {
+    const name = customName.trim()
+    if (!name) return showToast("warning", "Poné un nombre para el tipo")
+    setSavingType(true)
+    try {
+      await createVehicleType({ name, axles: axles.slice() })
+      const list = await getVehicleTypes()
+      setCustomTypes(Array.isArray(list) ? list : [])
+      setCustomName("")
+      showToast("success", `Tipo "${name}" guardado`)
+    } catch (e) {
+      showToast("error", e?.response?.data?.message || e.message || "No se pudo guardar el tipo")
+    } finally {
+      setSavingType(false)
+    }
+  }
 
   const save = async () => {
     if (!sel) return
     setSaving(true)
     try {
-      await vehicles.updateAxles(sel._id, { axles: axles.map((t) => ({ type: t })) })
+      await vehicles.updateAxles(sel._id, {
+        axles: axles.map((t) => ({ type: t })),
+        type: isCustom ? (customName.trim() || sel.type || "Personalizado") : typeName,
+      })
       showToast("success", `Esquema guardado · ${sel.mobile} · ${total} posiciones`)
       backToList()
     } catch (e) {
-      showToast("error", e.message || "No se pudo guardar el esquema")
+      const status = e?.response?.status
+      const msg = e?.response?.data?.message || e.message
+      if (status === 409) {
+        await dialog.notice("error", { title: "No se puede reconfigurar", text: msg || "Hay cubiertas montadas. Desasignalas antes de reconfigurar los ejes." })
+      } else {
+        showToast("error", msg || "No se pudo guardar el esquema")
+      }
     } finally {
       setSaving(false)
     }
   }
 
   return (
-    <div data-app-theme="dark" className="fixed inset-0 z-60 flex flex-col" style={{ background: "var(--bg)", color: "var(--tx)", fontFamily: "'IBM Plex Sans',system-ui,sans-serif" }}>
+    <div data-app-theme={isDarkMode ? "dark" : "light"} className="fixed inset-0 z-60 flex flex-col" style={{ background: "var(--bg)", color: "var(--tx)", fontFamily: "'IBM Plex Sans',system-ui,sans-serif" }}>
       {view === "list" ? (
         /* ===================== LISTA DE PENDIENTES ===================== */
         <>
@@ -87,7 +167,7 @@ const ConfigurarEjes = ({ onClose, vehicle }) => {
               </button>
               <div>
                 <h1 className="m-0 text-[21px] font-bold" style={{ fontFamily: "'Space Grotesk'", color: "var(--tx)" }}>Configurar ejes</h1>
-                <p className="mt-1 text-[13px]" style={{ color: "var(--tx-4)" }}>Vehículos que migraste sin esquema de ejes. Definí su configuración para habilitar el montaje de cubiertas.</p>
+                <p className="mt-1 text-[13px]" style={{ color: "var(--tx-4)" }}>Vehículos sin esquema de ejes. Definí su configuración para habilitar el montaje de cubiertas.</p>
               </div>
               {pending.length > 0 && (
                 <div className="ml-auto inline-flex items-center gap-2 rounded-[9px] px-[13px] py-[7px] text-[12.5px] font-semibold" style={{ color: "var(--ink-orange)", background: tint("var(--ink-orange)", 10), border: `1px solid ${tint("var(--ink-orange)", 30)}` }}>
@@ -149,28 +229,56 @@ const ConfigurarEjes = ({ onClose, vehicle }) => {
             </div>
             <div className="ml-auto flex items-center gap-2.5">
               <button onClick={backToList} className="h-10 rounded-[9px] px-[15px] text-[13.5px] font-semibold" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--tx)" }}>Cancelar</button>
-              <button onClick={save} disabled={saving} className="h-10 rounded-[9px] px-[18px] text-[13.5px] font-bold" style={{ background: "var(--ink-lime)", color: "var(--bg)", opacity: saving ? 0.6 : 1 }}>{saving ? "Guardando…" : "Guardar esquema"}</button>
+              <button onClick={save} disabled={saving || hasPositionless} className="h-10 rounded-[9px] px-[18px] text-[13.5px] font-bold" style={{ background: "var(--ink-lime)", color: "var(--bg)", opacity: saving || hasPositionless ? 0.5 : 1, cursor: hasPositionless ? "not-allowed" : "pointer" }}>{saving ? "Guardando…" : "Guardar esquema"}</button>
             </div>
           </div>
 
           <div className="flex min-h-0 flex-1">
             {/* controles */}
             <div className="w-[430px] flex-none overflow-y-auto" style={{ background: "var(--elev)", borderRight: "1px solid var(--bd)" }}>
+              {/* Aviso de cubiertas montadas (guard) */}
+              {mountedCount > 0 && (
+                <div className="mx-6 mt-5 flex items-start gap-2.5 rounded-[10px] px-[13px] py-[11px]" style={{ border: `1px solid ${tint("var(--ink-orange)", 35)}`, background: tint("var(--ink-orange)", 10) }}>
+                  <span className="mt-0.5 inline-flex flex-none" style={{ color: "var(--ink-orange)" }}><ReportProblemRoundedIcon sx={{ fontSize: 16 }} /></span>
+                  <span className="text-[12px] leading-relaxed" style={{ color: "var(--tx-3)" }}>
+                    {hasPositionless
+                      ? `Este vehículo tiene ${mountedCount} cubierta${mountedCount === 1 ? "" : "s"} montada${mountedCount === 1 ? "" : "s"} sin posición. Desasignalas para poder reconfigurar los ejes.`
+                      : `Los ejes con cubierta montada están bloqueados. Desasigná esas cubiertas para reconfigurarlos.`}
+                  </span>
+                </div>
+              )}
+
+              {/* Tipo de vehículo (presets + custom del tenant) */}
               <div className="px-6 py-[22px]" style={{ borderBottom: "1px solid var(--bd-faint)" }}>
-                <div className="mb-1.5 text-[10px] tracking-[.12em]" style={sectionLabelStyle}>PRESET</div>
-                <div className="mb-3.5 text-[11.5px]" style={{ color: "var(--tx-6)" }}>Arrancá con un preset y ajustá los ejes abajo.</div>
+                <div className="mb-1.5 text-[10px] tracking-[.12em]" style={sectionLabelStyle}>TIPO DE VEHÍCULO</div>
+                <div className="mb-3.5 text-[11.5px]" style={{ color: "var(--tx-6)" }}>El tipo se deriva de los ejes. Elegí uno y ajustá abajo, o armá el tuyo.</div>
                 <div className="flex flex-wrap gap-2">
-                  {Object.keys(PRESETS).map((k) => {
-                    const p = PRESETS[k]
-                    const on = preset === k
+                  {Object.keys(catalog).map((k) => {
+                    const p = catalog[k]
+                    const on = matchedKey === k
                     return (
-                      <button key={k} onClick={applyPreset(k)} className="flex min-w-[100px] flex-col items-start gap-0.5 rounded-[10px] px-[13px] py-2.5" style={{ border: `1px solid ${on ? "var(--ink-lime)" : "var(--bd)"}`, background: on ? tint("var(--ink-lime)", 8) : "var(--input)" }}>
-                        <span className="text-[13px] font-bold" style={{ fontFamily: "'Space Grotesk'", color: on ? "var(--ink-lime)" : "var(--tx)" }}>{p.label}</span>
-                        <span className="text-[10.5px]" style={{ fontFamily: "'IBM Plex Mono'", color: on ? "var(--ink-lime)" : "var(--tx-5)" }}>{p.sub}</span>
+                      <button key={k} onClick={applyPreset(k)} className="flex min-w-[104px] flex-col items-start gap-0.5 rounded-[10px] px-[13px] py-2.5" style={{ border: `1px solid ${on ? "var(--ink-lime)" : "var(--bd)"}`, background: on ? tint("var(--ink-lime)", 8) : "var(--input)" }}>
+                        <span className="flex items-center gap-1.5 text-[13px] font-bold" style={{ fontFamily: "'Space Grotesk'", color: on ? "var(--ink-lime)" : "var(--tx)" }}>
+                          {p.label}
+                          {p.custom && <span className="rounded-full px-1.5 py-px text-[8.5px] font-semibold" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--ink-purple)", background: tint("var(--ink-purple)", 16) }}>CUSTOM</span>}
+                        </span>
+                        <span className="text-[10.5px]" style={{ fontFamily: "'IBM Plex Mono'", color: on ? "var(--ink-lime)" : "var(--tx-5)" }}>{tiresOf(p.axles)} cubiertas</span>
                       </button>
                     )
                   })}
                 </div>
+
+                {/* Esquema personalizado → guardar tipo */}
+                {isCustom && (
+                  <div className="mt-3.5 rounded-[10px] p-[13px]" style={{ border: "1.5px dashed var(--ink-lime)", background: tint("var(--ink-lime)", 6) }}>
+                    <div className="text-[12.5px] font-semibold" style={{ color: "var(--tx)" }}>Esquema personalizado</div>
+                    <div className="mt-1 text-[11.5px]" style={{ color: "var(--tx-5)" }}>No coincide con ningún tipo conocido. Dale un nombre para guardarlo y reusarlo.</div>
+                    <div className="mt-2.5 flex gap-2">
+                      <input value={customName} onChange={(e) => setCustomName(e.target.value)} placeholder="Ej. Bitrén 7 ejes" className="h-10 flex-1 rounded-[9px] px-3 text-[13px] outline-none" style={{ background: "var(--input)", border: "1.5px solid var(--bd)", color: "var(--tx)" }} />
+                      <button onClick={saveCustomType} disabled={savingType} className="h-10 rounded-[9px] px-3.5 text-[12.5px] font-bold" style={{ background: "var(--ink-lime)", color: "var(--bg)", opacity: savingType ? 0.6 : 1 }}>{savingType ? "Guardando…" : "Guardar tipo"}</button>
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div className="px-6 pb-7 pt-[22px]">
@@ -182,25 +290,26 @@ const ConfigurarEjes = ({ onClose, vehicle }) => {
                   {axles.map((t, i) => {
                     const dual = t === "dual"
                     const moto = t === "moto"
-                    const canRemove = axles.length > 1
-                    const seg = (on) => ({ background: on ? "var(--ink-lime)" : "transparent", color: on ? "var(--bg)" : "var(--tx-3)" })
+                    const locked = axleLocked(i)
+                    const canRemove = axles.length > 1 && !locked
+                    const seg = (on) => ({ background: on ? "var(--ink-lime)" : "transparent", color: on ? "var(--bg)" : "var(--tx-3)", cursor: locked ? "not-allowed" : "pointer" })
                     const sub = (i === 0 ? "Dirección · " : "") + (moto ? "Rueda única (1 cubierta)" : dual ? "Dual (4 cubiertas)" : "Simple (2 cubiertas)")
                     return (
-                      <div key={i} className="flex items-center gap-[11px] rounded-[10px] px-[13px] py-[11px]" style={{ border: "1px solid var(--bd)", background: "var(--input)" }}>
+                      <div key={i} className="flex items-center gap-[11px] rounded-[10px] px-[13px] py-[11px]" style={{ border: `1px solid ${locked ? tint("var(--ink-orange)", 35) : "var(--bd)"}`, background: locked ? tint("var(--ink-orange)", 7) : "var(--input)" }}>
                         <span className="flex h-[30px] w-[30px] flex-none items-center justify-center rounded-[7px] text-[12px] font-semibold" style={{ background: "var(--bd-2)", fontFamily: "'IBM Plex Mono'", color: "var(--tx-2)" }}>{i + 1}</span>
                         <div className="min-w-0 flex-1">
-                          <div className="text-[13px] font-semibold" style={{ color: "var(--tx)" }}>Eje {i + 1}</div>
-                          <div className="text-[11px]" style={{ color: "var(--tx-5)" }}>{sub}</div>
+                          <div className="flex items-center gap-1.5 text-[13px] font-semibold" style={{ color: "var(--tx)" }}>Eje {i + 1}{locked && <LockOutlinedIcon sx={{ fontSize: 13, color: "var(--ink-orange)" }} />}</div>
+                          <div className="text-[11px]" style={{ color: locked ? "var(--ink-orange)" : "var(--tx-5)" }}>{locked ? "Cubierta montada — desasigná para reconfigurar" : sub}</div>
                         </div>
                         {moto ? (
                           <span className="inline-flex h-[30px] items-center rounded-[7px] px-[13px] text-[12px] font-semibold" style={{ background: tint("var(--ink-lime)", 10), color: "var(--ink-lime)" }}>Rueda única</span>
                         ) : (
-                          <div className="flex gap-1 rounded-lg p-[3px]" style={{ border: "1px solid var(--bd-strong)", background: "var(--bg)" }}>
-                            <button onClick={() => setAxleType(i, "simple")} className="h-[30px] rounded-md px-[11px] text-[12px] font-semibold" style={seg(!dual)}>Simple</button>
-                            <button onClick={() => setAxleType(i, "dual")} className="h-[30px] rounded-md px-[11px] text-[12px] font-semibold" style={seg(dual)}>Dual</button>
+                          <div className="flex gap-1 rounded-lg p-[3px]" style={{ border: "1px solid var(--bd-strong)", background: "var(--bg)", opacity: locked ? 0.5 : 1 }}>
+                            <button onClick={() => setAxleType(i, "simple")} disabled={locked} className="h-[30px] rounded-md px-[11px] text-[12px] font-semibold" style={seg(!dual)}>Simple</button>
+                            <button onClick={() => setAxleType(i, "dual")} disabled={locked} className="h-[30px] rounded-md px-[11px] text-[12px] font-semibold" style={seg(dual)}>Dual</button>
                           </div>
                         )}
-                        <button onClick={() => canRemove && removeAxle(i)} title="Quitar eje" className="inline-flex h-8 w-8 flex-none items-center justify-center rounded-lg" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: canRemove ? "var(--ink-red)" : "var(--bd-hover)", cursor: canRemove ? "pointer" : "not-allowed" }}>
+                        <button onClick={() => removeAxle(i)} disabled={!canRemove} title={locked ? "Eje con cubierta — desasigná primero" : "Quitar eje"} className="inline-flex h-8 w-8 flex-none items-center justify-center rounded-lg" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: canRemove ? "var(--ink-red)" : "var(--bd-hover)", cursor: canRemove ? "pointer" : "not-allowed" }}>
                           <RemoveRoundedIcon sx={{ fontSize: 15 }} />
                         </button>
                       </div>
@@ -216,9 +325,9 @@ const ConfigurarEjes = ({ onClose, vehicle }) => {
             {/* preview */}
             <div className="flex flex-1 flex-col items-center overflow-y-auto px-6 py-[30px]" style={{ background: "var(--hover)" }}>
               <div className="mb-1.5 flex items-center gap-2 self-start text-[11px]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-5)" }}>
-                <span className="h-[7px] w-[7px] rounded-full" style={{ background: "var(--ink-lime)" }} />ESQUEMA DEL VEHÍCULO
+                <span className="h-[7px] w-[7px] rounded-full" style={{ background: "var(--ink-lime)" }} />ESQUEMA · {isCustom ? "Personalizado" : typeName}
               </div>
-              <div className="mb-[22px] self-start text-[12.5px]" style={{ color: "var(--tx-6)" }}>Vista superior · {total} cubiertas (todas vacías al configurar)</div>
+              <div className="mb-[22px] self-start text-[12.5px]" style={{ color: "var(--tx-6)" }}>Vista superior · {total} cubiertas</div>
 
               <div className="mb-2 flex flex-col items-center gap-1.5">
                 <span className="text-[10px] tracking-widest" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-6)" }}>FRENTE</span>

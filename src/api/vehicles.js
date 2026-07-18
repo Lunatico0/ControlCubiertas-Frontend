@@ -11,4 +11,9 @@ export const updateVehicleAxles = async (id, data) => (await vehiclesAPI.patch(`
 // Esquema de posiciones del vehículo + qué cubierta ocupa cada una. Para el selector al montar.
 export const fetchVehiclePositions = async (id) => (await vehiclesAPI.get(`/${id}/positions`)).data
 
+// Tipos de vehículo custom del tenant. El "tipo" se deriva del layout de ejes; los presets
+// viven en el front (constante), estos son los que el usuario guardó. data: { name, axles: [String] }
+export const getVehicleTypes = async () => (await vehiclesAPI.get("/types")).data
+export const createVehicleType = async (data) => (await vehiclesAPI.post("/types", data)).data
+
 export default vehiclesAPI

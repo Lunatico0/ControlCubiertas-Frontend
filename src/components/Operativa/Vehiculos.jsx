@@ -8,12 +8,10 @@ import TripOriginRoundedIcon from "@mui/icons-material/TripOriginRounded"
 import GridViewRoundedIcon from "@mui/icons-material/GridViewRounded"
 import ViewListRoundedIcon from "@mui/icons-material/ViewListRounded"
 import ReportProblemRoundedIcon from "@mui/icons-material/ReportProblemRounded"
-import EditOutlinedIcon from "@mui/icons-material/EditOutlined"
 import { metaOf, tint, fmtKm } from "./status"
 import { generatePositions } from "./axles"
 import NuevoVehiculo from "./NuevoVehiculo"
 import ConfigurarEjes from "./ConfigurarEjes"
-import EditarVehiculo from "./EditarVehiculo"
 import VehicleDrawer from "./VehicleDrawer"
 
 // Lista de vehículos (rediseño Claude Design). Dos vistas con toggle (persistido por
@@ -32,10 +30,8 @@ const Vehiculos = ({ onNavigate }) => {
   const [query, setQuery] = useState("")
   const [showAlta, setShowAlta] = useState(false)
   const [showConfigEjes, setShowConfigEjes] = useState(false)
-  const [editVeh, setEditVeh] = useState(null)
   const [detailVeh, setDetailVeh] = useState(null)
   const [fType, setFType] = useState("")
-  const editar = (e, v) => { e.stopPropagation(); setEditVeh(v) }
   const types = useMemo(() => [...new Set(vehicles.map((v) => v.type).filter(Boolean))].sort((a, b) => a.localeCompare(b, "es")), [vehicles])
   const pendingAxles = vehicles.filter((v) => !(v.axles && v.axles.length)).length
   const [vview, setVview] = useState(() => localStorage.getItem("op_vehview") || "grid")
@@ -156,11 +152,8 @@ const Vehiculos = ({ onNavigate }) => {
                 <div className="text-[13px]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-2)" }}>{v.licensePlate || "—"}</div>
                 <div>{v.type && <span className="inline-flex rounded-full px-2.5 py-[3px] text-[11px] font-semibold" style={{ color: tipoColor, background: tipoBg }}>{v.type}</span>}</div>
                 <div className="flex items-center gap-[7px] text-[13px] font-semibold" style={{ color: countColor }}><TripOriginRoundedIcon sx={{ fontSize: 14 }} />{countLabel}</div>
-                <div className="flex items-center justify-end gap-2.5">
+                <div className="flex items-center justify-end">
                   <span className="text-[13px] font-semibold" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx)" }}>{kmLabel}</span>
-                  <button onClick={(e) => editar(e, v)} title="Editar datos" className="inline-flex h-7 w-7 flex-none items-center justify-center rounded-[7px]" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--tx-4)" }}>
-                    <EditOutlinedIcon sx={{ fontSize: 14 }} />
-                  </button>
                 </div>
               </div>
             ))}
@@ -180,9 +173,6 @@ const Vehiculos = ({ onNavigate }) => {
                     </div>
                     <div className="mt-0.5 text-[12px]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-5)" }}>{v.licensePlate || "—"} · {v.brand || "—"}</div>
                   </div>
-                  <button onClick={(e) => editar(e, v)} title="Editar datos" className="inline-flex h-7 w-7 flex-none items-center justify-center rounded-[7px]" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--tx-4)" }}>
-                    <EditOutlinedIcon sx={{ fontSize: 15 }} />
-                  </button>
                   <span className="inline-flex flex-none" style={{ color: "var(--tx-6)" }}><ChevronRightRoundedIcon sx={{ fontSize: 18 }} /></span>
                 </div>
 
@@ -200,7 +190,7 @@ const Vehiculos = ({ onNavigate }) => {
                   </div>
                 ) : (
                   <div className="rounded-[9px] px-3 py-2.5 text-[12px]" style={{ background: "var(--input)", border: "1px dashed var(--bd-strong)", color: "var(--tx-5)" }}>
-                    Ejes sin configurar — editá el vehículo para definir su esquema.
+                    Ejes sin configurar — abrí el detalle para configurarlos.
                   </div>
                 )}
 
@@ -217,7 +207,6 @@ const Vehiculos = ({ onNavigate }) => {
 
       {showAlta && <NuevoVehiculo onClose={() => setShowAlta(false)} />}
       {showConfigEjes && <ConfigurarEjes onClose={() => setShowConfigEjes(false)} />}
-      {editVeh && <EditarVehiculo vehicle={editVeh} onClose={() => setEditVeh(null)} />}
       {detailVeh && <VehicleDrawer item={detailVeh} onClose={() => setDetailVeh(null)} onNavigate={onNavigate} />}
     </div>
   )
