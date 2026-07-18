@@ -98,7 +98,7 @@ const NuevoVehiculo = ({ onClose, onCreated }) => {
   const sectionLabelStyle = { fontFamily: "'IBM Plex Mono'", color: "var(--tx-6)" }
 
   return (
-    <div className="fixed inset-0 z-60 flex flex-col" style={{ background: "var(--bg)" }}>
+    <div className="fixed inset-y-0 right-0 left-[248px] z-60 flex flex-col" style={{ background: "var(--bg)", borderLeft: "1px solid var(--bd-faint)" }}>
       {/* ===== TOP BAR ===== */}
       <div className="flex h-16 flex-none items-center gap-3.5 px-6" style={{ background: "var(--sidebar)", borderBottom: "1px solid var(--bd-faint)" }}>
         <button onClick={onClose} title="Volver" className="inline-flex h-[38px] w-[38px] items-center justify-center rounded-[9px]" style={{ border: "1px solid var(--bd)", background: "var(--elev)", color: "var(--tx-3)" }}>
