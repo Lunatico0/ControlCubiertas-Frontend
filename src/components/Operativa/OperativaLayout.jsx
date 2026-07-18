@@ -74,7 +74,7 @@ const OperativaLayout = () => {
       >
         {/* Logo */}
         <div className="flex items-center px-5 pb-5 pt-[22px]">
-          <BrandLogo height={34} />
+          <BrandLogo height={65} />
         </div>
 
         {/* Navegación */}

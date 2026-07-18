@@ -86,7 +86,7 @@ const AdminLayout = () => {
       {/* Sidebar */}
       <aside className="hidden w-64 flex-none flex-col md:flex" style={{ background: "var(--sidebar)", borderRight: "1px solid var(--bd-faint)" }}>
         <div className="flex items-center px-5 py-5">
-          <BrandLogo height={30} />
+          <BrandLogo height={65} />
         </div>
 
         <div className="px-5 pb-2 pt-3.5 text-[10px] font-semibold tracking-[.16em]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-6)" }}>PANEL</div>
