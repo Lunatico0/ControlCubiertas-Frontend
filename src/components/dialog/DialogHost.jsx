@@ -188,8 +188,8 @@ const DialogHost = () => {
       {toast && (() => {
         const tv = TOAST[toast.kind] || TOAST.ok
         return (
-          <div style={{ position: "fixed", bottom: 24, left: "50%", transform: "translateX(-50%)", zIndex: 60, animation: "dlgToastIn .2s ease" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 12, background: "var(--toast)", border: "1px solid var(--bd-strong)", borderRadius: 12, padding: "12px 16px", boxShadow: "0 16px 40px rgba(0,0,0,.45)", minWidth: 280 }}>
+          <div style={{ position: "fixed", bottom: 24, left: "50%", transform: "translateX(-50%)", zIndex: 60 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 12, background: "var(--toast)", border: "1px solid var(--bd-strong)", borderRadius: 12, padding: "12px 16px", boxShadow: "0 16px 40px rgba(0,0,0,.45)", minWidth: 280, animation: "dlgToastIn .22s ease" }}>
               <span style={{ width: 30, height: 30, borderRadius: 8, background: tv.bg, color: tv.color, display: "flex", alignItems: "center", justifyContent: "center", flex: "none" }}><DlgIcon kind={tv.icon} size={17} /></span>
               <div style={{ lineHeight: 1.3 }}>
                 <div style={{ fontSize: 13, fontWeight: 600, color: "var(--tx)" }}>{toast.title}</div>
