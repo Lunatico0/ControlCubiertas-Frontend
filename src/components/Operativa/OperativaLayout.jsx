@@ -1,12 +1,11 @@
 import { useState } from "react"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useLocation } from "react-router-dom"
 import { useTheme } from "@context/ThemeContext"
 import { useAuth } from "@context/AuthContext"
 import AdminPanelSettingsRoundedIcon from "@mui/icons-material/AdminPanelSettingsRounded"
 import HomeRoundedIcon from "@mui/icons-material/HomeRounded"
 import TripOriginRoundedIcon from "@mui/icons-material/TripOriginRounded"
 import LocalShippingOutlinedIcon from "@mui/icons-material/LocalShippingOutlined"
-import ReceiptLongRoundedIcon from "@mui/icons-material/ReceiptLongRounded"
 import DarkModeRoundedIcon from "@mui/icons-material/DarkModeRounded"
 import LightModeRoundedIcon from "@mui/icons-material/LightModeRounded"
 import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded"
@@ -28,13 +27,12 @@ const NAV = [
   { key: "inicio", label: "Inicio", icon: <HomeRoundedIcon sx={{ fontSize: 20 }} /> },
   { key: "cubiertas", label: "Cubiertas", icon: <TripOriginRoundedIcon sx={{ fontSize: 20 }} /> },
   { key: "vehiculos", label: "Vehículos", icon: <LocalShippingOutlinedIcon sx={{ fontSize: 20 }} /> },
-  { key: "comprobantes", label: "Comprobantes", icon: <ReceiptLongRoundedIcon sx={{ fontSize: 20 }} /> },
 ]
 
 // Pasos del tour de la operativa (screen = key de sección; sel = data-tour del elemento).
 const OP_STEPS = [
   { screen: "inicio", sel: null, place: "center", title: "Bienvenido a TireOps", body: "Un recorrido de 30 segundos por lo esencial. Podés salir cuando quieras y volver a verlo desde el botón de ayuda." },
-  { screen: "inicio", sel: "nav-cubiertas", place: "right", title: "Menú principal", body: "Todo se mueve desde acá: Inicio, Cubiertas (el inventario), Vehículos y Comprobantes." },
+  { screen: "inicio", sel: "nav-cubiertas", place: "right", title: "Menú principal", body: "Todo se mueve desde acá: Inicio, Cubiertas (el inventario) y Vehículos." },
   { screen: "inicio", sel: "inicio-search", place: "bottom", title: "Buscá al instante", body: "Desde el Inicio buscás cualquier cubierta por código, marca o serie. Tip: apretá Ctrl + K para saltar a la búsqueda." },
   { screen: "cubiertas", sel: "cub-filters", place: "bottom", title: "Filtros rápidos", body: "Acotá el inventario por estado: en stock, en circulación o a recapar. El número te dice cuántas hay en cada grupo." },
   { screen: "cubiertas", sel: "cub-viewtoggle", place: "left", title: "Tarjetas o lista", body: "Cambiá entre vista de tarjetas (más visual) y lista (más densa) según lo que necesites." },
@@ -48,8 +46,11 @@ const OperativaLayout = () => {
   const { user, logout, isAdmin } = useAuth()
   useCacheTenantLogo() // cachea el logo del tenant para el splash del desktop (no-op en web)
   const goToRoute = useNavigate() // navegación de ruta (react-router), distinta del navigate interno por sección
-  const [active, setActive] = useState("cubiertas")
-  const [intent, setIntent] = useState(null) // intención de navegación para Cubiertas (query/tab)
+  // Deep-link desde el panel admin: navigate("/", { state:{ op:{ section, tab } } }) abre la
+  // sección + filtro pedidos (ej. "Requiere acción" → Cubiertas filtradas por A recapar).
+  const initialOp = useLocation().state?.op
+  const [active, setActive] = useState(initialOp?.section || "cubiertas")
+  const [intent, setIntent] = useState(initialOp?.tab ? { tab: initialOp.tab } : null) // intención de navegación para Cubiertas (query/tab/assignTo)
   const [tourOpen, setTourOpen] = useState(false) // guía interactiva (tour con spotlight)
   const [helpMenu, setHelpMenu] = useState(false) // popover de ayuda en el perfil
 

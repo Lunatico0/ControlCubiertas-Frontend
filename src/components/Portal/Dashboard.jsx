@@ -12,6 +12,7 @@ import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded"
 import GroupRoundedIcon from "@mui/icons-material/GroupRounded"
 import ApartmentRoundedIcon from "@mui/icons-material/ApartmentRounded"
 import OpenInNewRoundedIcon from "@mui/icons-material/OpenInNewRounded"
+import TaskAltRoundedIcon from "@mui/icons-material/TaskAltRounded"
 import DesktopDownload from "./DesktopDownload"
 
 // Paleta de estados del design system (coherente entre donut y barras).
@@ -147,24 +148,39 @@ const Dashboard = () => {
         <section className="rounded-xl p-6" style={card}>
           <h2 className="font-display text-lg font-semibold" style={{ color: "var(--tx)", fontFamily: "'Space Grotesk'" }}>Atención requerida</h2>
           <div className="mt-4 space-y-3">
-            <button onClick={() => navigate("/")} className="flex w-full items-center gap-4 rounded-lg p-4 text-left"
-              style={{ background: tintBg("var(--ink-orange)", 10), border: "1px solid " + tintBg("var(--ink-orange)", 30) }}>
-              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-lg" style={{ background: tintBg("var(--ink-orange)", 20), color: "var(--ink-orange)" }}><WarningAmberRoundedIcon /></span>
-              <span className="flex-1">
-                <span className="block font-semibold" style={{ color: "var(--tx)" }}>{senales.aRecapar} cubiertas</span>
-                <span className="block text-sm" style={{ color: "var(--tx-4)" }}>Pendientes de recapado</span>
-              </span>
-              <ChevronRightRoundedIcon style={{ color: "var(--tx-6)" }} />
-            </button>
-            <button onClick={() => navigate("/")} className="flex w-full items-center gap-4 rounded-lg p-4 text-left"
-              style={{ background: "var(--elev)", border: "1px solid var(--bd)" }}>
-              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-lg" style={{ background: "var(--bd-strong)", color: "var(--tx-3)" }}><DirectionsBusRoundedIcon /></span>
-              <span className="flex-1">
-                <span className="block font-semibold" style={{ color: "var(--tx)" }}>{senales.vehiculosSinCubiertas} vehículos</span>
-                <span className="block text-sm" style={{ color: "var(--tx-4)" }}>Sin cubiertas asignadas</span>
-              </span>
-              <ChevronRightRoundedIcon style={{ color: "var(--tx-6)" }} />
-            </button>
+            {senales.aRecapar === 0 && senales.vehiculosSinCubiertas === 0 ? (
+              /* Sin acciones pendientes → estado positivo */
+              <div className="flex flex-col items-center gap-2 py-8 text-center">
+                <span className="grid h-12 w-12 place-items-center rounded-xl" style={{ background: tintBg("var(--ink-teal)", 14), color: "var(--ink-teal)" }}><TaskAltRoundedIcon /></span>
+                <div className="font-semibold" style={{ color: "var(--tx)" }}>Todo en orden</div>
+                <div className="text-sm" style={{ color: "var(--tx-5)" }}>No hay cubiertas pendientes de recapado ni vehículos sin cubiertas asignadas.</div>
+              </div>
+            ) : (
+              <>
+                {senales.aRecapar > 0 && (
+                  <button onClick={() => navigate("/", { state: { op: { section: "cubiertas", tab: "recapar" } } })} className="flex w-full items-center gap-4 rounded-lg p-4 text-left"
+                    style={{ background: tintBg("var(--ink-orange)", 10), border: "1px solid " + tintBg("var(--ink-orange)", 30) }}>
+                    <span className="grid h-11 w-11 shrink-0 place-items-center rounded-lg" style={{ background: tintBg("var(--ink-orange)", 20), color: "var(--ink-orange)" }}><WarningAmberRoundedIcon /></span>
+                    <span className="flex-1">
+                      <span className="block font-semibold" style={{ color: "var(--tx)" }}>{senales.aRecapar} cubiertas</span>
+                      <span className="block text-sm" style={{ color: "var(--tx-4)" }}>Pendientes de recapado</span>
+                    </span>
+                    <ChevronRightRoundedIcon style={{ color: "var(--tx-6)" }} />
+                  </button>
+                )}
+                {senales.vehiculosSinCubiertas > 0 && (
+                  <button onClick={() => navigate("/", { state: { op: { section: "vehiculos" } } })} className="flex w-full items-center gap-4 rounded-lg p-4 text-left"
+                    style={{ background: "var(--elev)", border: "1px solid var(--bd)" }}>
+                    <span className="grid h-11 w-11 shrink-0 place-items-center rounded-lg" style={{ background: "var(--bd-strong)", color: "var(--tx-3)" }}><DirectionsBusRoundedIcon /></span>
+                    <span className="flex-1">
+                      <span className="block font-semibold" style={{ color: "var(--tx)" }}>{senales.vehiculosSinCubiertas} vehículos</span>
+                      <span className="block text-sm" style={{ color: "var(--tx-4)" }}>Sin cubiertas asignadas</span>
+                    </span>
+                    <ChevronRightRoundedIcon style={{ color: "var(--tx-6)" }} />
+                  </button>
+                )}
+              </>
+            )}
           </div>
         </section>
       </div>

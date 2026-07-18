@@ -16,6 +16,7 @@ import AltaDrawer from "./AltaDrawer"
 const TABS = [
   { key: "todas", label: "Todas" },
   { key: "stock", label: "En stock" },
+  { key: "disponibles", label: "Disponibles" },
   { key: "circulacion", label: "En circulación" },
   { key: "recapar", label: "A recapar" },
 ]
@@ -59,6 +60,7 @@ const Cubiertas = ({ intent }) => {
   const [selectedId, setSelectedId] = useState(null)
   const [pendingAction, setPendingAction] = useState(null)
   const [showAlta, setShowAlta] = useState(false)
+  const [assignTo, setAssignTo] = useState(null) // montaje dirigido desde una posición de vehículo: { vehicleId, mobile, position }
   const [sortBy, setSortBy] = useState("code")
   const [sortDir, setSortDir] = useState("asc")
   // Filtros avanzados (panel desplegable)
@@ -91,12 +93,14 @@ const Cubiertas = ({ intent }) => {
     if (intent.query != null) setQuery(intent.query)
     if (intent.tab) setTab(intent.tab)
     if (intent.alta) setShowAlta(true)
+    if (intent.assignTo) setAssignTo(intent.assignTo)
   }, [intent])
 
   const counts = useMemo(
     () => ({
       todas: tires.length,
       stock: tires.filter((t) => !t.vehicle).length,
+      disponibles: tires.filter((t) => !t.vehicle && metaOf(t.status).role !== "discard").length,
       circulacion: tires.filter((t) => t.vehicle).length,
       recapar: tires.filter((t) => metaOf(t.status).role === "recap").length,
     }),
@@ -109,6 +113,7 @@ const Cubiertas = ({ intent }) => {
     const kmMax = fKmMax !== "" ? Number(fKmMax) : null
     const base = tires.filter((t) => {
       if (tab === "stock" && t.vehicle) return false
+      if (tab === "disponibles" && (t.vehicle || metaOf(t.status).role === "discard")) return false
       if (tab === "circulacion" && !t.vehicle) return false
       if (tab === "recapar" && metaOf(t.status).role !== "recap") return false
       if (fBrand && t.brand !== fBrand) return false
@@ -231,6 +236,17 @@ const Cubiertas = ({ intent }) => {
       </div>
 
       <div className="px-7 pb-8 pt-5">
+        {assignTo && (
+          <div className="mb-4 flex items-center gap-3 rounded-[11px] px-4 py-3" style={{ border: `1px solid ${tint("var(--ink-lime)", 40)}`, background: tint("var(--ink-lime)", 8) }}>
+            <span className="inline-flex flex-none" style={{ color: "var(--ink-lime)" }}><AddRoundedIcon sx={{ fontSize: 18 }} /></span>
+            <span className="flex-1 text-[13px]" style={{ color: "var(--tx-2)" }}>
+              Montando en <b style={{ color: "var(--tx)" }}>{assignTo.mobile}</b> · posición <b style={{ color: "var(--tx)", fontFamily: "'IBM Plex Mono'" }}>{assignTo.position}</b> — elegí una cubierta disponible y tocá <b>Asignar</b>.
+            </span>
+            <button onClick={() => setAssignTo(null)} className="inline-flex flex-none items-center gap-1 rounded-lg px-2.5 py-1.5 text-[12px] font-semibold" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--tx-3)" }}>
+              <CloseRoundedIcon sx={{ fontSize: 14 }} /> Cancelar montaje
+            </button>
+          </div>
+        )}
         {loading ? (
           <p className="text-[13px]" style={{ color: "var(--tx-5)" }}>Cargando cubiertas…</p>
         ) : filtered.length === 0 ? (
@@ -324,7 +340,7 @@ const Cubiertas = ({ intent }) => {
         )}
       </div>
 
-      {selectedId && <TireDrawer tireId={selectedId} initialAction={pendingAction} onClose={closeDrawer} />}
+      {selectedId && <TireDrawer tireId={selectedId} initialAction={pendingAction} initialAssign={pendingAction === "assign" ? assignTo : null} onClose={closeDrawer} />}
       {showAlta && <AltaDrawer onClose={() => setShowAlta(false)} />}
     </div>
   )

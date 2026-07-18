@@ -32,7 +32,9 @@ const VehicleDrawer = ({ item, onClose, onNavigate }) => {
   // Ver la cubierta montada → inventario filtrado por su código. Montar en una posición
   // vacía → inventario para asignar. Ambos navegan (Vehiculos se desmonta con el drawer).
   const verCubierta = (p) => onNavigate?.("cubiertas", { query: String(p.tireCode) })
-  const montar = () => onNavigate?.("cubiertas", { query: v.mobile || "" })
+  // Montar en ESTA posición: va a Cubiertas (tab Disponibles) con el montaje dirigido; al
+  // tocar "Asignar" en una cubierta, el drawer abre con vehículo + posición ya cargados.
+  const montar = (p) => onNavigate?.("cubiertas", { tab: "disponibles", assignTo: { vehicleId: v._id, mobile: v.mobile, position: p.label } })
 
   // Editor de ejes: toma el área de contenido (respeta el sidebar). El drawer y su backdrop
   // se retiran para no atenuar el sidebar ni capturar sus clics (antes cerraba todo).
@@ -97,7 +99,7 @@ const VehicleDrawer = ({ item, onClose, onNavigate }) => {
                       )}
                     </div>
                     {p.empty ? (
-                      <button onClick={montar} className="inline-flex h-[34px] flex-none items-center gap-1.5 rounded-lg px-3 text-[12px] font-semibold" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--ink-lime)" }}>
+                      <button onClick={() => montar(p)} className="inline-flex h-[34px] flex-none items-center gap-1.5 rounded-lg px-3 text-[12px] font-semibold" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--ink-lime)" }}>
                         <AddRoundedIcon sx={{ fontSize: 15 }} /> Montar
                       </button>
                     ) : (

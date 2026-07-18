@@ -98,7 +98,7 @@ const histBits = (h) => {
   return bits
 }
 
-const TireDrawer = ({ tireId, initialAction, onClose }) => {
+const TireDrawer = ({ tireId, initialAction, initialAssign, onClose }) => {
   const { tires, orders, data } = useContext(ApiContext)
   const vehicles = data?.vehicles || []
   const { statuses = [], stockScale = [], discardStatus } = data || {}
@@ -138,6 +138,14 @@ const TireDrawer = ({ tireId, initialAction, onClose }) => {
       .finally(() => alive && setLoading(false))
     return () => { alive = false }
   }, [tireId])
+
+  // Montaje dirigido desde una posición de vehículo: pre-carga vehículo + posición para que
+  // el operario solo ingrese km + N° de orden y confirme (el resto ya viene fijado).
+  useEffect(() => {
+    if (initialAction === "assign" && initialAssign?.vehicleId) {
+      setForm((f) => ({ ...f, vehicle: initialAssign.vehicleId, position: initialAssign.position || "" }))
+    }
+  }, [initialAssign, initialAction])
 
   useEffect(() => {
     const onKey = (e) => { if (e.key === "Escape") (action ? closeAction() : onClose()) }
