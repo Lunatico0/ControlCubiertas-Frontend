@@ -4,6 +4,7 @@ import { useTheme } from "@context/ThemeContext"
 import { showToast } from "@utils/toast"
 import { dialog } from "@utils/dialog"
 import { getVehicleTypes, createVehicleType } from "@api/vehicles"
+import { tiresOf, buildCatalog, matchType } from "./vehicleTypes"
 import { tint, fmtKm } from "./status"
 import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded"
 import ArrowForwardRoundedIcon from "@mui/icons-material/ArrowForwardRounded"
@@ -22,20 +23,6 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined"
 // coincide con ninguno → se puede nombrar y guardar como tipo custom (persistido por tenant,
 // GET/POST /api/vehicles/types). Guard duro: los ejes con cubierta montada quedan bloqueados
 // (hay que desasignar primero); el backend además rechaza (409) lo que orfanaría una cubierta.
-const PRESETS = {
-  moto: { label: "Moto", axles: ["moto", "moto"] },
-  auto: { label: "Auto / Utilitario", axles: ["simple", "simple"] },
-  camion42: { label: "Camión 4×2", axles: ["simple", "dual"] },
-  camion64: { label: "Camión 6×4", axles: ["simple", "dual", "dual"] },
-  tractor64: { label: "Tractor 6×4", axles: ["simple", "dual", "dual"] },
-  semi2: { label: "Semi 2 ejes", axles: ["dual", "dual"] },
-  semi3: { label: "Semi 3 ejes", axles: ["dual", "dual", "dual"] },
-  acoplado4: { label: "Acoplado 4 ejes", axles: ["dual", "dual", "dual", "dual"] },
-  bus: { label: "Bus", axles: ["simple", "dual"] },
-}
-const wheelsOf = (t) => (t === "dual" ? 4 : t === "moto" ? 1 : 2)
-const tiresOf = (axles) => axles.reduce((n, t) => n + wheelsOf(t), 0)
-const eqLayout = (a, b) => a.length === b.length && a.every((x, i) => x === b[i])
 const sectionLabelStyle = { fontFamily: "'IBM Plex Mono'", color: "var(--tx-6)" }
 
 const ConfigurarEjes = ({ onClose, vehicle }) => {
@@ -56,23 +43,10 @@ const ConfigurarEjes = ({ onClose, vehicle }) => {
     getVehicleTypes().then((r) => setCustomTypes(Array.isArray(r) ? r : [])).catch(() => {})
   }, [])
 
-  // Catálogo de tipos = presets del front + custom del tenant.
-  const catalog = useMemo(() => {
-    const cat = { ...PRESETS }
-    customTypes.forEach((c, i) => { cat[`c${i}`] = { label: c.name, axles: c.axles || [], custom: true } })
-    return cat
-  }, [customTypes])
-
-  // Tipo derivado del layout actual: primer tipo del catálogo cuyo array de ejes coincide.
-  // El nombre previo del vehículo (sel.type) desempata entre presets con el mismo layout.
-  const matchedKey = useMemo(() => {
-    const keys = Object.keys(catalog)
-    if (sel?.type) {
-      const byName = keys.find((k) => catalog[k].label === sel.type && eqLayout(catalog[k].axles, axles))
-      if (byName) return byName
-    }
-    return keys.find((k) => eqLayout(catalog[k].axles, axles)) || "custom"
-  }, [catalog, axles, sel])
+  // Catálogo (presets + custom del tenant) y tipo derivado del layout (matchType desempata
+  // con el nombre previo del vehículo entre presets con el mismo layout).
+  const catalog = useMemo(() => buildCatalog(customTypes), [customTypes])
+  const matchedKey = useMemo(() => matchType(catalog, axles, sel?.type), [catalog, axles, sel])
   const isCustom = matchedKey === "custom"
   const typeName = isCustom ? "" : catalog[matchedKey].label
 

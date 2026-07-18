@@ -1,6 +1,8 @@
 import { useState, useEffect, useContext, useMemo } from "react"
 import ApiContext from "@context/apiContext"
 import { showToast } from "@utils/toast"
+import { getVehicleTypes, createVehicleType } from "@api/vehicles"
+import { buildCatalog, matchType, tiresOf } from "./vehicleTypes"
 import { tint } from "./status"
 import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded"
 import AddRoundedIcon from "@mui/icons-material/AddRounded"
@@ -8,30 +10,25 @@ import RemoveRoundedIcon from "@mui/icons-material/RemoveRounded"
 import ArrowUpwardRoundedIcon from "@mui/icons-material/ArrowUpwardRounded"
 import TripOriginRoundedIcon from "@mui/icons-material/TripOriginRounded"
 
-// Alta de vehículo (rediseño Claude Design). Pantalla dedicada: datos + configuración
-// de ejes (presets + edición eje a eje) con preview en vivo del esquema. De los ejes
-// se derivan las posiciones de cubierta (backend: generatePositions). Crea con
-// vehicles.create → POST /api/vehicles { mobile, licensePlate, brand, type, kilometers, axles }.
-const PRESETS = {
-  auto: { label: "Auto", sub: "4 ruedas", tipo: "Auto", axles: ["simple", "simple"] },
-  camion42: { label: "Camión 4×2", sub: "6 ruedas", tipo: "Camión", axles: ["simple", "dual"] },
-  camion64: { label: "Camión 6×4", sub: "10 ruedas", tipo: "Camión", axles: ["simple", "dual", "dual"] },
-  semi3: { label: "Semi 3 ejes", sub: "12 ruedas", tipo: "Semi", axles: ["dual", "dual", "dual"] },
-  bus: { label: "Bus", sub: "6 ruedas", tipo: "Bus", axles: ["simple", "dual"] },
-  moto: { label: "Moto", sub: "2 ruedas", tipo: "Moto", axles: ["moto", "moto"] },
-}
-const TIPOS = ["Camión", "Semi", "Acoplado", "Bus", "Auto", "Moto"]
-const wheelsOfAxle = (t) => (t === "dual" ? 4 : t === "moto" ? 1 : 2)
-const tiresOf = (axles) => axles.reduce((n, t) => n + wheelsOfAxle(t), 0)
-
+// Alta de vehículo (rediseño Claude Design). Pantalla dedicada: datos + configuración de
+// ejes con preview en vivo. El TIPO ya NO se elige a mano: se DERIVA del layout de ejes
+// (catálogo compartido en vehicleTypes.js = presets + custom del tenant); si no coincide con
+// ninguno, se puede nombrar y guardar como tipo custom. Crea con vehicles.create → POST
+// /api/vehicles { mobile, licensePlate, brand, type (derivado), kilometers, axles }.
 const NuevoVehiculo = ({ onClose, onCreated }) => {
   const { vehicles } = useContext(ApiContext)
-  const [form, setForm] = useState({ movil: "", patente: "", marca: "", tipo: "Camión", km: "" })
+  const [form, setForm] = useState({ movil: "", patente: "", marca: "", km: "" })
   const [axles, setAxles] = useState(["simple", "dual"])
-  const [preset, setPreset] = useState("camion42")
+  const [customTypes, setCustomTypes] = useState([])
+  const [customName, setCustomName] = useState("")
   const [submitting, setSubmitting] = useState(false)
+  const [savingType, setSavingType] = useState(false)
 
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }))
+
+  useEffect(() => {
+    getVehicleTypes().then((r) => setCustomTypes(Array.isArray(r) ? r : [])).catch(() => {})
+  }, [])
 
   useEffect(() => {
     const onKey = (e) => { if (e.key === "Escape") onClose() }
@@ -39,18 +36,35 @@ const NuevoVehiculo = ({ onClose, onCreated }) => {
     return () => window.removeEventListener("keydown", onKey)
   }, [onClose])
 
-  const applyPreset = (key) => () => {
-    const p = PRESETS[key]
-    setPreset(key)
-    setAxles(p.axles.slice())
-    setForm((f) => ({ ...f, tipo: p.tipo }))
-  }
-  const addAxle = () => { setAxles((a) => [...a, "dual"]); setPreset("custom") }
-  const removeAxle = (i) => setAxles((a) => (a.length <= 1 ? a : a.filter((_, idx) => idx !== i)))
-  const setAxleType = (i, type) => { setAxles((a) => a.map((t, idx) => (idx === i ? type : t))); setPreset("custom") }
-
+  const catalog = useMemo(() => buildCatalog(customTypes), [customTypes])
+  const matchedKey = useMemo(() => matchType(catalog, axles, null), [catalog, axles])
+  const isCustom = matchedKey === "custom"
+  const typeName = isCustom ? "" : catalog[matchedKey].label
   const total = useMemo(() => tiresOf(axles), [axles])
+
+  const applyPreset = (key) => () => setAxles(catalog[key].axles.slice())
+  const addAxle = () => setAxles((a) => [...a, "dual"])
+  const removeAxle = (i) => setAxles((a) => (a.length <= 1 ? a : a.filter((_, idx) => idx !== i)))
+  const setAxleType = (i, type) => setAxles((a) => a.map((t, idx) => (idx === i ? type : t)))
+
   const valid = form.movil.trim() && form.patente.trim()
+
+  const saveCustomType = async () => {
+    const name = customName.trim()
+    if (!name) return showToast("warning", "Poné un nombre para el tipo")
+    setSavingType(true)
+    try {
+      await createVehicleType({ name, axles: axles.slice() })
+      const list = await getVehicleTypes()
+      setCustomTypes(Array.isArray(list) ? list : [])
+      setCustomName("")
+      showToast("success", `Tipo "${name}" guardado`)
+    } catch (e) {
+      showToast("error", e?.response?.data?.message || e.message || "No se pudo guardar el tipo")
+    } finally {
+      setSavingType(false)
+    }
+  }
 
   const submit = async () => {
     if (!valid) return showToast("warning", "Completá móvil y patente")
@@ -60,7 +74,7 @@ const NuevoVehiculo = ({ onClose, onCreated }) => {
         mobile: form.movil.trim(),
         licensePlate: form.patente.trim().toUpperCase(),
         brand: form.marca.trim() || "—",
-        type: form.tipo,
+        type: isCustom ? (customName.trim() || "Personalizado") : typeName,
         kilometers: Number(form.km) || 0,
         axles: axles.map((t) => ({ type: t })),
         tires: [],
@@ -69,7 +83,7 @@ const NuevoVehiculo = ({ onClose, onCreated }) => {
       onCreated?.()
       onClose()
     } catch (e) {
-      showToast("error", e.message || "No se pudo crear el vehículo")
+      showToast("error", e?.response?.data?.message || e.message || "No se pudo crear el vehículo")
     } finally {
       setSubmitting(false)
     }
@@ -114,33 +128,38 @@ const NuevoVehiculo = ({ onClose, onCreated }) => {
               <label className="block"><span className={labelCls} style={{ color: "var(--tx-4)" }}>Marca</span><input value={form.marca} onChange={set("marca")} placeholder="Scania" className={inputBase} style={inputStyle} onFocus={onFocusLime} onBlur={onBlurBd} /></label>
               <label className="block"><span className={labelCls} style={{ color: "var(--tx-4)" }}>Kilometraje actual</span><input value={form.km} onChange={set("km")} placeholder="0" inputMode="numeric" className={inputBase} style={{ ...inputStyle, fontFamily: "'IBM Plex Mono'" }} onFocus={onFocusLime} onBlur={onBlurBd} /></label>
             </div>
-            <span className="mb-2 mt-[15px] block text-[11.5px] font-semibold" style={{ color: "var(--tx-4)" }}>Tipo</span>
-            <div className="flex flex-wrap gap-[7px]">
-              {TIPOS.map((t) => {
-                const on = form.tipo === t
-                return (
-                  <button key={t} onClick={() => setForm((f) => ({ ...f, tipo: t }))} className="h-9 rounded-lg px-3.5 text-[13px] font-semibold" style={{ border: `1px solid ${on ? "var(--ink-lime)" : "var(--bd-strong)"}`, background: on ? tint("var(--ink-lime)", 10) : "var(--input)", color: on ? "var(--ink-lime)" : "var(--tx-3)" }}>{t}</button>
-                )
-              })}
-            </div>
           </div>
 
-          {/* PRESETS */}
+          {/* TIPO DE VEHÍCULO (derivado de los ejes) */}
           <div className="px-6 py-[22px]" style={{ borderBottom: "1px solid var(--bd-faint)" }}>
-            <div className="mb-1.5 text-[10px] tracking-[.12em]" style={sectionLabelStyle}>CONFIGURACIÓN DE EJES</div>
-            <div className="mb-3.5 text-[11.5px]" style={{ color: "var(--tx-6)" }}>Elegí un preset para arrancar y ajustá los ejes abajo.</div>
+            <div className="mb-1.5 text-[10px] tracking-[.12em]" style={sectionLabelStyle}>TIPO DE VEHÍCULO</div>
+            <div className="mb-3.5 text-[11.5px]" style={{ color: "var(--tx-6)" }}>El tipo se deriva de los ejes. Elegí uno y ajustá abajo, o armá el tuyo.</div>
             <div className="flex flex-wrap gap-2">
-              {Object.keys(PRESETS).map((k) => {
-                const p = PRESETS[k]
-                const on = preset === k
+              {Object.keys(catalog).map((k) => {
+                const p = catalog[k]
+                const on = matchedKey === k
                 return (
                   <button key={k} onClick={applyPreset(k)} className="flex min-w-[104px] flex-col items-start gap-0.5 rounded-[10px] px-[13px] py-2.5" style={{ border: `1px solid ${on ? "var(--ink-lime)" : "var(--bd)"}`, background: on ? tint("var(--ink-lime)", 8) : "var(--input)" }}>
-                    <span className="text-[13px] font-bold" style={{ fontFamily: "'Space Grotesk'", color: on ? "var(--ink-lime)" : "var(--tx)" }}>{p.label}</span>
-                    <span className="text-[10.5px]" style={{ fontFamily: "'IBM Plex Mono'", color: on ? "var(--ink-lime)" : "var(--tx-5)" }}>{p.sub}</span>
+                    <span className="flex items-center gap-1.5 text-[13px] font-bold" style={{ fontFamily: "'Space Grotesk'", color: on ? "var(--ink-lime)" : "var(--tx)" }}>
+                      {p.label}
+                      {p.custom && <span className="rounded-full px-1.5 py-px text-[8.5px] font-semibold" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--ink-purple)", background: tint("var(--ink-purple)", 16) }}>CUSTOM</span>}
+                    </span>
+                    <span className="text-[10.5px]" style={{ fontFamily: "'IBM Plex Mono'", color: on ? "var(--ink-lime)" : "var(--tx-5)" }}>{tiresOf(p.axles)} cubiertas</span>
                   </button>
                 )
               })}
             </div>
+
+            {isCustom && (
+              <div className="mt-3.5 rounded-[10px] p-[13px]" style={{ border: "1.5px dashed var(--ink-lime)", background: tint("var(--ink-lime)", 6) }}>
+                <div className="text-[12.5px] font-semibold" style={{ color: "var(--tx)" }}>Esquema personalizado</div>
+                <div className="mt-1 text-[11.5px]" style={{ color: "var(--tx-5)" }}>No coincide con ningún tipo conocido. Dale un nombre para guardarlo y reusarlo.</div>
+                <div className="mt-2.5 flex gap-2">
+                  <input value={customName} onChange={(e) => setCustomName(e.target.value)} placeholder="Ej. Bitrén 7 ejes" className="h-10 flex-1 rounded-[9px] px-3 text-[13px] outline-none" style={{ background: "var(--input)", border: "1.5px solid var(--bd)", color: "var(--tx)" }} />
+                  <button onClick={saveCustomType} disabled={savingType} className="h-10 rounded-[9px] px-3.5 text-[12.5px] font-bold" style={{ background: "var(--ink-lime)", color: "var(--bg)", opacity: savingType ? 0.6 : 1 }}>{savingType ? "Guardando…" : "Guardar tipo"}</button>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* EJES */}
@@ -187,7 +206,7 @@ const NuevoVehiculo = ({ onClose, onCreated }) => {
         {/* ===== PREVIEW ===== */}
         <div className="flex flex-1 flex-col items-center overflow-y-auto px-6 py-[30px]" style={{ background: "var(--hover)" }}>
           <div className="mb-1.5 flex items-center gap-2 self-start text-[11px]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-5)" }}>
-            <span className="h-[7px] w-[7px] rounded-full" style={{ background: "var(--ink-lime)" }} />ESQUEMA DEL VEHÍCULO
+            <span className="h-[7px] w-[7px] rounded-full" style={{ background: "var(--ink-lime)" }} />ESQUEMA · {isCustom ? "Personalizado" : typeName}
           </div>
           <div className="mb-[22px] self-start text-[12.5px]" style={{ color: "var(--tx-6)" }}>Vista superior · {total} cubiertas (todas vacías al crear)</div>
 
