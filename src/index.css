@@ -82,3 +82,17 @@
 /* Animaciones del rediseño (drawer/toast) — se usan en hitos posteriores. */
 @keyframes opDrawerIn { from { transform: translateX(24px); opacity:.4 } to { transform: translateX(0); opacity:1 } }
 @keyframes opToastIn  { from { transform: translateY(14px); opacity:0 } to { transform: translateY(0); opacity:1 } }
+
+/* ============================================================================
+   SISTEMA DE DIÁLOGOS (reemplazo de SweetAlert2) — animaciones + hover.
+   Ver src/components/dialog/. API imperativa en src/utils/dialog.js.
+   ============================================================================ */
+@keyframes dlgBackdropIn { from { opacity:0 } to { opacity:1 } }
+@keyframes dlgPopIn   { from { transform: translateY(14px) scale(.97); opacity:0 } to { transform: translateY(0) scale(1); opacity:1 } }
+@keyframes dlgSlideIn { from { transform: translateY(34px); opacity:0 } to { transform: translateY(0); opacity:1 } }
+@keyframes dlgFadeIn  { from { opacity:0 } to { opacity:1 } }
+@keyframes dlgToastIn { from { transform: translateY(14px); opacity:0 } to { transform: translateY(0); opacity:1 } }
+
+.dlg-btn-neutral:not(:disabled):hover { border-color: var(--bd-hover) }
+.dlg-btn-primary:hover { filter: brightness(.94) }
+.dlg-x:hover { background: var(--hover); color: var(--tx) }
