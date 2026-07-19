@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react"
 import { useNavigate } from "react-router-dom"
 import PersonAddAltRoundedIcon from "@mui/icons-material/PersonAddAltRounded"
 import ContentCopyRoundedIcon from "@mui/icons-material/ContentCopyRounded"
+import EditRoundedIcon from "@mui/icons-material/EditRounded"
 import LockResetRoundedIcon from "@mui/icons-material/LockResetRounded"
 import RefreshRoundedIcon from "@mui/icons-material/RefreshRounded"
 import { showToast, showConfirm } from "@utils/toast"
@@ -20,6 +21,7 @@ const Users = () => {
   const [users, setUsers] = useState([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
+  const [editTarget, setEditTarget] = useState(null) // usuario en edición (name + role)
   const [tempCred, setTempCred] = useState(null)
   const [resetTarget, setResetTarget] = useState(null) // { user, tempPassword } tras un reset
   const [resetting, setResetting] = useState(false)
@@ -58,6 +60,11 @@ const Users = () => {
     setUsers((prev) => [...prev, user])
     setTempCred({ user, tempPassword })
     showToast("success", "Usuario creado")
+  }
+
+  const onSaved = (updated) => {
+    setUsers((prev) => prev.map((x) => (x._id === updated._id ? updated : x)))
+    showToast("success", "Usuario actualizado")
   }
 
   const copyPassword = async () => {
@@ -100,7 +107,7 @@ const Users = () => {
           <p className="mt-1 text-sm" style={{ color: "var(--tx-4)" }}>Quién accede a TireOps</p>
         </div>
         <button onClick={() => setShowForm(true)} className="ml-auto inline-flex items-center gap-2 rounded-[10px] px-[17px] py-[11px] text-sm font-bold"
-          style={{ background: "var(--ink-lime)", color: "var(--bg)" }}>
+          style={{ background: "#C4ED2B", color: "#0A0C0D" }}>
           <PersonAddAltRoundedIcon sx={{ fontSize: 17 }} /> Crear usuario
         </button>
       </div>
@@ -140,6 +147,10 @@ const Users = () => {
                   </span>
                 </div>
                 <div className="flex items-center justify-end gap-2">
+                  <button onClick={() => setEditTarget(u)} title="Editar usuario"
+                    className="inline-flex h-[32px] w-[32px] flex-none items-center justify-center rounded-lg" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--tx-3)", cursor: "pointer" }}>
+                    <EditRoundedIcon sx={{ fontSize: 16 }} />
+                  </button>
                   <button onClick={() => (isYou ? navigate("/cambiar-password") : doReset(u))} disabled={!isYou && resetting}
                     title={isYou ? "Cambiar mi contraseña" : "Restablecer contraseña"}
                     className="inline-flex h-[32px] w-[32px] flex-none items-center justify-center rounded-lg" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--tx-3)", cursor: "pointer" }}>
@@ -158,6 +169,8 @@ const Users = () => {
 
       {showForm && <UserForm onClose={() => setShowForm(false)} onCreated={onCreated} />}
 
+      {editTarget && <UserForm user={editTarget} onClose={() => setEditTarget(null)} onSaved={onSaved} />}
+
       {tempCred && (
         <Modal title="Usuario creado" onClose={() => setTempCred(null)} maxWidth="md">
           <p className="text-sm" style={{ color: "var(--tx-3)" }}>
@@ -173,7 +186,7 @@ const Users = () => {
             </div>
           </div>
           <div className="mt-5 flex justify-end">
-            <button onClick={() => setTempCred(null)} className="rounded-lg px-4 py-2.5 text-sm font-medium" style={{ background: "var(--ink-lime)", color: "var(--bg)" }}>Listo</button>
+            <button onClick={() => setTempCred(null)} className="rounded-lg px-4 py-2.5 text-sm font-medium" style={{ background: "#C4ED2B", color: "#0A0C0D" }}>Listo</button>
           </div>
         </Modal>
       )}
@@ -199,7 +212,7 @@ const Users = () => {
           </div>
           <div className="mt-5 flex justify-end gap-3">
             <button onClick={() => setResetTarget(null)} className="rounded-lg px-4 py-2.5 text-sm font-medium" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--tx-2)" }}>Cancelar</button>
-            <button onClick={async () => { await copyReset(); setResetTarget(null) }} className="rounded-lg px-4 py-2.5 text-sm font-medium" style={{ background: "var(--ink-lime)", color: "var(--bg)" }}>Copiar y listo</button>
+            <button onClick={async () => { await copyReset(); setResetTarget(null) }} className="rounded-lg px-4 py-2.5 text-sm font-medium" style={{ background: "#C4ED2B", color: "#0A0C0D" }}>Copiar y listo</button>
           </div>
         </Modal>
       )}
