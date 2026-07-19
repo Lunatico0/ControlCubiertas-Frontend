@@ -15,6 +15,10 @@ import MenuBookRoundedIcon from "@mui/icons-material/MenuBookRounded"
 import { externalPageProps } from "@utils/isElectron"
 import { useCacheTenantLogo } from "@hooks/useCacheTenantLogo"
 import BrandLogo from "@components/BrandLogo"
+import tireOpsDark from "@/assets/TireOpsDark.svg"
+import tireOpsLight from "@/assets/TireOpsLight.svg"
+import tireOpsIconDark from "@/assets/TireOpsIconDark.svg"
+import tireOpsIconLight from "@/assets/TireOpsIconLight.svg"
 import Cubiertas from "./Cubiertas"
 import Inicio from "./Inicio"
 import Vehiculos from "./Vehiculos"
@@ -193,7 +197,20 @@ const OperativaLayout = () => {
 
       {/* ============ MAIN ============ */}
       <main className="relative flex min-w-0 flex-1 flex-col overflow-hidden">
-        <div className="flex-1 overflow-auto">
+        {/* Deco de marca: dos logos TireOps muy tenues, solo en Inicio (detrás del contenido). */}
+        {active === "inicio" && (
+          <>
+            {/* top-right: solo el ÍCONO (sin wordmark) */}
+            <div style={{ position: "absolute", top: -110, right: -80, width: 460, height: 460, overflow: "hidden", pointerEvents: "none", zIndex: 0 }}>
+              <img src={isDarkMode ? tireOpsIconDark : tireOpsIconLight} alt="" style={{ display: "block", height: 460, width: "auto", opacity: 0.05 }} />
+            </div>
+            {/* bottom-left: logo COMPLETO (ícono + wordmark) */}
+            <div style={{ position: "absolute", bottom: 70, left: -120, pointerEvents: "none", zIndex: 0 }}>
+              <img src={isDarkMode ? tireOpsDark : tireOpsLight} alt="" style={{ display: "block", width: 560, height: "auto", opacity: 0.035 }} />
+            </div>
+          </>
+        )}
+        <div className="relative z-[1] flex-1 overflow-auto">
           {active === "inicio" ? (
             <Inicio onNavigate={navigate} />
           ) : active === "cubiertas" ? (

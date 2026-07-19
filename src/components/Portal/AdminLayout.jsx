@@ -6,6 +6,8 @@ import { getCompany } from "@api/admin"
 import { externalPageProps } from "@utils/isElectron"
 import { useCacheTenantLogo } from "@hooks/useCacheTenantLogo"
 import BrandLogo from "@components/BrandLogo"
+import tireOpsIconDark from "@/assets/TireOpsIconDark.svg"
+import tireOpsIconLight from "@/assets/TireOpsIconLight.svg"
 import OpTour from "@components/Operativa/OpTour"
 
 import HomeRoundedIcon from "@mui/icons-material/HomeRounded"
@@ -157,6 +159,12 @@ const AdminLayout = () => {
 
       {/* Columna principal */}
       <main className="relative flex min-w-0 flex-1 flex-col overflow-hidden">
+        {/* Deco de marca: solo el ÍCONO TireOps (sin wordmark), muy tenue arriba a la derecha, solo en el Resumen. */}
+        {location.pathname === "/admin" && (
+          <div style={{ position: "absolute", top: -110, right: -80, width: 460, height: 460, overflow: "hidden", pointerEvents: "none", zIndex: 0 }}>
+            <img src={isDarkMode ? tireOpsIconDark : tireOpsIconLight} alt="" style={{ display: "block", height: 460, width: "auto", opacity: 0.05 }} />
+          </div>
+        )}
         {/* Top bar */}
         <div className="z-2 flex h-[74px] flex-none items-center gap-3.5 px-6" style={{ background: "var(--bg)", borderBottom: "1px solid var(--bd-faint)" }}>
           <div className="ml-auto flex items-center gap-3">
