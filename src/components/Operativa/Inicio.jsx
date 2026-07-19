@@ -6,7 +6,6 @@ import SearchRoundedIcon from "@mui/icons-material/SearchRounded"
 import AddRoundedIcon from "@mui/icons-material/AddRounded"
 import TripOriginRoundedIcon from "@mui/icons-material/TripOriginRounded"
 import LocalShippingOutlinedIcon from "@mui/icons-material/LocalShippingOutlined"
-import ReceiptLongRoundedIcon from "@mui/icons-material/ReceiptLongRounded"
 import Inventory2OutlinedIcon from "@mui/icons-material/Inventory2Outlined"
 import WarningAmberRoundedIcon from "@mui/icons-material/WarningAmberRounded"
 import { tint, metaOf } from "./status"
@@ -34,7 +33,6 @@ const Inicio = ({ onNavigate }) => {
     { key: "alta", title: "Alta de cubierta", sub: "Registrar una nueva", icon: <AddRoundedIcon />, primary: true, onClick: () => onNavigate("cubiertas", { alta: true }) },
     { key: "buscar", title: "Buscar cubierta", sub: "Ver el inventario", icon: <TripOriginRoundedIcon />, accent: "var(--ink-lime)", onClick: () => onNavigate("cubiertas") },
     { key: "asignar", title: "Asignar a vehículo", sub: "Montar una cubierta", icon: <LocalShippingOutlinedIcon />, accent: "var(--ink-blue)", onClick: () => onNavigate("cubiertas", { tab: "stock" }) },
-    { key: "comp", title: "Comprobantes", sub: "Imprimir / reimprimir", icon: <ReceiptLongRoundedIcon />, accent: "var(--ink-purple)", onClick: () => onNavigate("comprobantes") },
   ]
 
   const ACCESS = [
@@ -68,7 +66,7 @@ const Inicio = ({ onNavigate }) => {
       </div>
 
       {/* Tiles de acción */}
-      <div className="mt-[26px] grid grid-cols-1 gap-[14px] sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mt-[26px] grid grid-cols-1 gap-[14px] sm:grid-cols-2 lg:grid-cols-3">
         {TILES.map((t) => (
           <button
             key={t.key}

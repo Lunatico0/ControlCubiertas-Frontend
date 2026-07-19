@@ -49,7 +49,7 @@ const OperativaLayout = () => {
   // Deep-link desde el panel admin: navigate("/", { state:{ op:{ section, tab } } }) abre la
   // sección + filtro pedidos (ej. "Requiere acción" → Cubiertas filtradas por A recapar).
   const initialOp = useLocation().state?.op
-  const [active, setActive] = useState(initialOp?.section || "cubiertas")
+  const [active, setActive] = useState(initialOp?.section || "inicio")
   const [intent, setIntent] = useState(initialOp?.tab ? { tab: initialOp.tab } : null) // intención de navegación para Cubiertas (query/tab/assignTo)
   const [tourOpen, setTourOpen] = useState(false) // guía interactiva (tour con spotlight)
   const [helpMenu, setHelpMenu] = useState(false) // popover de ayuda en el perfil

@@ -18,6 +18,7 @@ import EditorComprobante from '@components/Portal/EditorComprobante.jsx'
 import GuiaAdmin from '@components/Portal/GuiaAdmin.jsx'
 import OperativaLayout from '@components/Operativa/OperativaLayout.jsx'
 import GuiaDeUso from '@components/Operativa/GuiaDeUso.jsx'
+import NotFound from '@components/NotFound.jsx'
 
 // En la app instalable (Electron) el index.html se carga por file:// → BrowserRouter
 // (history API) rompe las rutas. HashRouter (#/ruta) funciona sobre file://. En web
@@ -90,10 +91,10 @@ function App() {
             }
           />
 
-          {/* Operación (rediseño): ahora la interfaz PRINCIPAL, en / y el resto de rutas.
-              React Router v6 rankea /legacy/* y /admin por encima de este catch-all. */}
+          {/* Operación (rediseño): la interfaz PRINCIPAL, en /. La navegación interna es por
+              sección (estado), no por URL, así que vive solo en la raíz. */}
           <Route
-            path="/*"
+            path="/"
             element={
               <RequireAuth>
                 <ApiProvider>
@@ -102,6 +103,9 @@ function App() {
               </RequireAuth>
             }
           />
+
+          {/* Catch-all: cualquier ruta inexistente cae en el 404 (no en la operativa). */}
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </Router>
     </ContextProvider>
