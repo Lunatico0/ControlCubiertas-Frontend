@@ -61,8 +61,14 @@ export const createAPI = (path) => {
       if (status === 401 && !/\/login$/.test(url)) forceLogout()
 
       console.error(`❌ Error en ${path} API:`, error)
-      const message = error.response?.data?.message || error.message || "Error desconocido"
-      return Promise.reject(new Error(message))
+      const data = error.response?.data
+      const message = data?.message || error.message || "Error desconocido"
+      // Re-lanzamos un Error plano (la UI consume .message), pero preservamos datos útiles:
+      // `field` (qué campo marcar en rojo) y `status` (código HTTP) para el manejo en el componente.
+      const err = new Error(message)
+      if (data?.field) err.field = data.field
+      if (status) err.status = status
+      return Promise.reject(err)
     },
   )
 

@@ -23,8 +23,16 @@ const NuevoVehiculo = ({ onClose, onCreated }) => {
   const [customName, setCustomName] = useState("")
   const [submitting, setSubmitting] = useState(false)
   const [savingType, setSavingType] = useState(false)
+  const [errField, setErrField] = useState(null) // "movil" | "patente" — campo en conflicto
+  const [errMsg, setErrMsg] = useState("")
 
-  const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }))
+  // La patente solo admite letras y números (se pasa a MAYÚSCULAS y se sacan símbolos al tipear).
+  // Al editar el campo en conflicto se limpia el error.
+  const set = (k) => (e) => {
+    const v = k === "patente" ? e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, "") : e.target.value
+    setForm((f) => ({ ...f, [k]: v }))
+    if (errField === k) { setErrField(null); setErrMsg("") }
+  }
 
   useEffect(() => {
     getVehicleTypes().then((r) => setCustomTypes(Array.isArray(r) ? r : [])).catch(() => {})
@@ -83,7 +91,12 @@ const NuevoVehiculo = ({ onClose, onCreated }) => {
       onCreated?.()
       onClose()
     } catch (e) {
-      showToast("error", e?.response?.data?.message || e.message || "No se pudo crear el vehículo")
+      const field = e?.field || e?.response?.data?.field
+      const msg = e?.message || "No se pudo crear el vehículo"
+      const mapped = field === "mobile" ? "movil" : field === "licensePlate" ? "patente" : null
+      setErrField(mapped)
+      setErrMsg(mapped ? msg : "")
+      showToast("error", msg)
     } finally {
       setSubmitting(false)
     }
@@ -93,6 +106,8 @@ const NuevoVehiculo = ({ onClose, onCreated }) => {
   const inputStyle = { height: 42, background: "var(--input)", border: "1px solid var(--bd-strong)", color: "var(--tx)" }
   const onFocusLime = (e) => (e.target.style.borderColor = "var(--ink-lime)")
   const onBlurBd = (e) => (e.target.style.borderColor = "var(--bd-strong)")
+  const errBorder = (name) => (errField === name ? "var(--ink-red)" : "var(--bd-strong)")
+  const onBlurField = (name) => (e) => (e.target.style.borderColor = errBorder(name))
   const labelCls = "mb-1.5 block text-[11.5px] font-semibold"
   const sectionLabel = "mb-4 text-[10px] tracking-[.12em]"
   const sectionLabelStyle = { fontFamily: "'IBM Plex Mono'", color: "var(--tx-6)" }
@@ -110,7 +125,7 @@ const NuevoVehiculo = ({ onClose, onCreated }) => {
         </div>
         <div className="ml-auto flex items-center gap-2.5">
           <button onClick={onClose} className="h-10 rounded-[9px] px-[15px] text-[13.5px] font-semibold" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--tx)" }}>Cancelar</button>
-          <button onClick={submit} disabled={!valid || submitting} className="h-10 rounded-[9px] px-[18px] text-[13.5px] font-bold" style={{ background: valid ? "var(--ink-lime)" : "var(--bd-2)", color: valid ? "var(--bg)" : "var(--tx-7)", cursor: valid ? "pointer" : "not-allowed", opacity: submitting ? 0.6 : 1 }}>
+          <button onClick={submit} disabled={!valid || submitting} className="h-10 rounded-[9px] px-[18px] text-[13.5px] font-bold" style={{ background: valid ? "#C4ED2B" : "var(--bd-2)", color: valid ? "#0A0C0D" : "var(--tx-7)", cursor: valid ? "pointer" : "not-allowed", opacity: submitting ? 0.6 : 1 }}>
             {submitting ? "Creando…" : "Crear vehículo"}
           </button>
         </div>
@@ -123,8 +138,8 @@ const NuevoVehiculo = ({ onClose, onCreated }) => {
           <div className="px-6 py-[22px]" style={{ borderBottom: "1px solid var(--bd-faint)" }}>
             <div className={sectionLabel} style={sectionLabelStyle}>DATOS DEL VEHÍCULO</div>
             <div className="grid grid-cols-2 gap-[13px]">
-              <label className="block"><span className={labelCls} style={{ color: "var(--tx-4)" }}>Móvil / Identificador</span><input value={form.movil} onChange={set("movil")} placeholder="Móvil 07" className={inputBase} style={inputStyle} onFocus={onFocusLime} onBlur={onBlurBd} /></label>
-              <label className="block"><span className={labelCls} style={{ color: "var(--tx-4)" }}>Patente</span><input value={form.patente} onChange={set("patente")} placeholder="AB123CD" className={inputBase} style={{ ...inputStyle, fontFamily: "'IBM Plex Mono'", textTransform: "uppercase" }} onFocus={onFocusLime} onBlur={onBlurBd} /></label>
+              <label className="block"><span className={labelCls} style={{ color: "var(--tx-4)" }}>Móvil / Identificador</span><input value={form.movil} onChange={set("movil")} placeholder="Móvil 07" className={inputBase} style={{ ...inputStyle, borderColor: errBorder("movil") }} onFocus={onFocusLime} onBlur={onBlurField("movil")} />{errField === "movil" && <span className="mt-1 block text-[11px]" style={{ color: "var(--ink-red)" }}>{errMsg}</span>}</label>
+              <label className="block"><span className={labelCls} style={{ color: "var(--tx-4)" }}>Patente</span><input value={form.patente} onChange={set("patente")} placeholder="AB123CD" className={inputBase} style={{ ...inputStyle, borderColor: errBorder("patente"), fontFamily: "'IBM Plex Mono'", textTransform: "uppercase" }} onFocus={onFocusLime} onBlur={onBlurField("patente")} />{errField === "patente" && <span className="mt-1 block text-[11px]" style={{ color: "var(--ink-red)" }}>{errMsg}</span>}</label>
               <label className="block"><span className={labelCls} style={{ color: "var(--tx-4)" }}>Marca</span><input value={form.marca} onChange={set("marca")} placeholder="Scania" className={inputBase} style={inputStyle} onFocus={onFocusLime} onBlur={onBlurBd} /></label>
               <label className="block"><span className={labelCls} style={{ color: "var(--tx-4)" }}>Kilometraje actual</span><input value={form.km} onChange={set("km")} placeholder="0" inputMode="numeric" className={inputBase} style={{ ...inputStyle, fontFamily: "'IBM Plex Mono'" }} onFocus={onFocusLime} onBlur={onBlurBd} /></label>
             </div>
@@ -156,7 +171,7 @@ const NuevoVehiculo = ({ onClose, onCreated }) => {
                 <div className="mt-1 text-[11.5px]" style={{ color: "var(--tx-5)" }}>No coincide con ningún tipo conocido. Dale un nombre para guardarlo y reusarlo.</div>
                 <div className="mt-2.5 flex gap-2">
                   <input value={customName} onChange={(e) => setCustomName(e.target.value)} placeholder="Ej. Bitrén 7 ejes" className="h-10 flex-1 rounded-[9px] px-3 text-[13px] outline-none" style={{ background: "var(--input)", border: "1.5px solid var(--bd)", color: "var(--tx)" }} />
-                  <button onClick={saveCustomType} disabled={savingType} className="h-10 rounded-[9px] px-3.5 text-[12.5px] font-bold" style={{ background: "var(--ink-lime)", color: "var(--bg)", opacity: savingType ? 0.6 : 1 }}>{savingType ? "Guardando…" : "Guardar tipo"}</button>
+                  <button onClick={saveCustomType} disabled={savingType} className="h-10 rounded-[9px] px-3.5 text-[12.5px] font-bold" style={{ background: "#C4ED2B", color: "#0A0C0D", opacity: savingType ? 0.6 : 1 }}>{savingType ? "Guardando…" : "Guardar tipo"}</button>
                 </div>
               </div>
             )}

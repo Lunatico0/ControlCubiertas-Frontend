@@ -2,16 +2,21 @@
 // comparándolo contra estos presets del front + los tipos custom del tenant (backend,
 // VehicleType[]). Compartido por el alta (NuevoVehiculo) y el editor (ConfigurarEjes) para
 // que ambos usen el mismo catálogo, la misma derivación y el mismo flujo de guardar custom.
+// El tipo se DERIVA del layout de ejes (simple=2 cubiertas, dual=4, moto=1). Como el modelo
+// solo distingue cubiertas-por-eje (no cuál tracciona/dirige), varias categorías del diseño
+// comparten el MISMO layout (ej. Camión 6×4 = Camión balancín 6×2 = Tractor 6×4). Por eso el
+// catálogo tiene UN preset por layout único (si dos coinciden, quedaría uno "inaccesible" en
+// el selector porque matchType elige el primero) — cada entrada acá es un layout distinto.
 export const AXLE_PRESETS = {
-  moto: { label: "Moto", axles: ["moto", "moto"] },
-  auto: { label: "Auto / Utilitario", axles: ["simple", "simple"] },
-  camion42: { label: "Camión 4×2", axles: ["simple", "dual"] },
-  camion64: { label: "Camión 6×4", axles: ["simple", "dual", "dual"] },
-  tractor64: { label: "Tractor 6×4", axles: ["simple", "dual", "dual"] },
-  semi2: { label: "Semi 2 ejes", axles: ["dual", "dual"] },
-  semi3: { label: "Semi 3 ejes", axles: ["dual", "dual", "dual"] },
-  acoplado4: { label: "Acoplado 4 ejes", axles: ["dual", "dual", "dual", "dual"] },
-  bus: { label: "Bus", axles: ["simple", "dual"] },
+  moto:      { label: "Moto",                 axles: ["moto", "moto"] },              // 2
+  auto:      { label: "Auto / Utilitario",    axles: ["simple", "simple"] },          // 4
+  camion42:  { label: "Camión 4×2",           axles: ["simple", "dual"] },            // 6
+  camion64:  { label: "Camión 6×4",           axles: ["simple", "dual", "dual"] },    // 10
+  semi2:     { label: "Semirremolque 2 ejes", axles: ["dual", "dual"] },              // 8
+  bus62:     { label: "Bus larga dist. 6×2",  axles: ["simple", "dual", "simple"] },  // 8
+  semi3:     { label: "Semirremolque 3 ejes", axles: ["dual", "dual", "dual"] },      // 12
+  bitren4:   { label: "Bitrén 4 ejes",        axles: ["simple", "dual", "dual", "dual"] }, // 14
+  acoplado4: { label: "Acoplado 4 ejes",      axles: ["dual", "dual", "dual", "dual"] },   // 16
 }
 
 export const wheelsOfAxle = (t) => (t === "dual" ? 4 : t === "moto" ? 1 : 2)
