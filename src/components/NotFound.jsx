@@ -35,7 +35,7 @@ const NotFound = () => {
       <button
         onClick={() => navigate("/")}
         className="inline-flex items-center gap-2 rounded-[10px] px-5 py-2.5 text-[14px] font-semibold transition-colors"
-        style={{ background: "var(--ink-lime)", color: "#0A0C0D" }}
+        style={{ background: "#C4ED2B", color: "#0A0C0D" }}
       >
         <HomeRoundedIcon sx={{ fontSize: 18 }} />
         Volver al inicio

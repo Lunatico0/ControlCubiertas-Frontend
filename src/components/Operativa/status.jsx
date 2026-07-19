@@ -40,15 +40,17 @@ export const tint = (color, pct) => `color-mix(in srgb, ${color} ${pct}%, transp
 export const fmtKm = (n) => `${(n ?? 0).toLocaleString("es-AR")} km`
 export const fmtDate = (d) => (d ? new Date(d).toLocaleDateString("es-AR") : "—")
 
-export const StateBadge = ({ status, small }) => {
+export const StateBadge = ({ status, small, truncate }) => {
   const m = metaOf(status)
   return (
     <span
-      className="inline-flex items-center gap-1.5 rounded-full font-semibold"
+      className="inline-flex max-w-full items-center gap-1.5 rounded-full font-semibold"
       style={{ color: m.color, background: tint(m.color, 14), padding: small ? "3px 10px" : "4px 10px", fontSize: "11.5px" }}
+      title={truncate ? status : undefined}
     >
-      <span className="rounded-full" style={{ width: 6, height: 6, background: m.color }} />
-      {status}
+      <span className="rounded-full" style={{ width: 6, height: 6, background: m.color, flex: "none" }} />
+      {/* En vistas angostas (lista) el texto se trunca con "…" en vez de desbordar/wrappear. */}
+      <span style={truncate ? { minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } : undefined}>{status}</span>
     </span>
   )
 }

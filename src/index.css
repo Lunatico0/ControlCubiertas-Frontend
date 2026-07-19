@@ -96,3 +96,7 @@
 .dlg-btn-neutral:not(:disabled):hover { border-color: var(--bd-hover) }
 .dlg-btn-primary:hover { filter: brightness(.94) }
 .dlg-x:hover { background: var(--hover); color: var(--tx) }
+
+/* Barrido global: todo <button> habilitado muestra cursor de mano (evita depender de que
+   cada botón lo declare inline — ej. help/logout del panel admin no lo tenían). */
+button:not(:disabled) { cursor: pointer; }

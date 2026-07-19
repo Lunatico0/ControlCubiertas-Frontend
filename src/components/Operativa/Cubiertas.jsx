@@ -168,7 +168,7 @@ const Cubiertas = ({ intent, onNavigate }) => {
               {SHORTCUT_LABEL}
             </span>
           </div>
-          <button data-tour="cub-alta" onClick={() => setShowAlta(true)} className="ml-auto inline-flex h-[46px] items-center gap-2 rounded-[11px] px-[18px] text-[14.5px] font-bold" style={{ background: "var(--ink-lime)", color: "#0A0C0D" }}>
+          <button data-tour="cub-alta" onClick={() => setShowAlta(true)} className="ml-auto inline-flex h-[46px] items-center gap-2 rounded-[11px] px-[18px] text-[14.5px] font-bold" style={{ background: "#C4ED2B", color: "#0A0C0D" }}>
             <AddRoundedIcon sx={{ fontSize: 18 }} /> Alta de cubierta
           </button>
         </div>
@@ -318,7 +318,7 @@ const Cubiertas = ({ intent, onNavigate }) => {
                     <div className="text-[15px] font-bold" style={{ fontFamily: "'Space Grotesk'", color: "var(--tx)" }}>#{t.code}</div>
                     <div className="text-[10.5px]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-6)" }}>{t.serialNumber || "—"}</div>
                   </div>
-                  <div><StateBadge status={t.status} small /></div>
+                  <div className="min-w-0"><StateBadge status={t.status} small truncate /></div>
                   <div className="min-w-0">
                     <div className="text-[13px] font-medium" style={{ color: "var(--tx-2)" }}>{t.brand}</div>
                     <div className="text-[11.5px]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-5)" }}>{t.size}{t.pattern ? ` · ${t.pattern}` : ""}</div>

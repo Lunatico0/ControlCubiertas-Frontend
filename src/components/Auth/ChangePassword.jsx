@@ -85,7 +85,7 @@ const ChangePassword = () => {
               {errors.confirmPassword && <p className="mt-1 text-[12px]" style={{ color: "var(--ink-red)" }}>{errors.confirmPassword.message}</p>}
             </label>
 
-            <button type="submit" disabled={isSubmitting} className="w-full rounded-[10px] py-[13px] text-[15px] font-bold" style={{ border: "none", background: "var(--ink-lime)", color: "var(--bg)", opacity: isSubmitting ? 0.6 : 1 }}>
+            <button type="submit" disabled={isSubmitting} className="w-full rounded-[10px] py-[13px] text-[15px] font-bold" style={{ border: "none", background: "#C4ED2B", color: "#0A0C0D", opacity: isSubmitting ? 0.6 : 1 }}>
               {isSubmitting ? "Guardando…" : mustChangePassword ? "Guardar y entrar" : "Guardar"}
             </button>
             <button type="button" onClick={mustChangePassword ? logout : () => navigate(-1)} className="mt-3 w-full text-center text-[13px]" style={{ color: "var(--tx-5)", background: "none", border: "none", cursor: "pointer" }}>

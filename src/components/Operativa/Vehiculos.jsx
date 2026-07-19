@@ -115,7 +115,7 @@ const Vehiculos = ({ onNavigate, intent }) => {
               <ReportProblemRoundedIcon sx={{ fontSize: 17 }} /> Configurar ejes ({pendingAxles})
             </button>
           )}
-          <button onClick={() => setShowAlta(true)} className={`${pendingAxles > 0 ? "" : "ml-auto "}inline-flex h-[46px] items-center gap-2 rounded-[11px] px-[18px] text-[14.5px] font-bold`} style={{ background: "var(--ink-lime)", color: "var(--bg)" }}>
+          <button onClick={() => setShowAlta(true)} className={`${pendingAxles > 0 ? "" : "ml-auto "}inline-flex h-[46px] items-center gap-2 rounded-[11px] px-[18px] text-[14.5px] font-bold`} style={{ background: "#C4ED2B", color: "#0A0C0D" }}>
             <AddRoundedIcon sx={{ fontSize: 18 }} /> Nuevo vehículo
           </button>
           {/* toggle cards/tabla */}

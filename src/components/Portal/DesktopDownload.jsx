@@ -69,7 +69,7 @@ const DesktopDownload = () => {
         {asset ? (
           <a href={asset.browser_download_url} download
             className="inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold transition hover:opacity-90"
-            style={{ background: "var(--ink-lime)", color: "#0f1216" }}>
+            style={{ background: "#C4ED2B", color: "#0f1216" }}>
             <DownloadRoundedIcon sx={{ fontSize: 18 }} /> Descargar
           </a>
         ) : (

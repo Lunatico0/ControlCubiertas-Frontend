@@ -180,7 +180,7 @@ const ConfigurarEjes = ({ onClose, vehicle }) => {
                         <TripOriginRoundedIcon sx={{ fontSize: 15 }} />{v.cubiertas} {v.cubiertas === 1 ? "cubierta" : "cubiertas"}
                       </span>
                       <span className="text-[12.5px]" style={{ color: "var(--tx-5)", fontFamily: "'IBM Plex Mono'" }}>{fmtKm(v.kilometers)}</span>
-                      <button onClick={() => openEditor(v)} className="ml-auto inline-flex h-10 items-center gap-2 rounded-[9px] px-4 text-[13.5px] font-bold" style={{ background: "var(--ink-lime)", color: "var(--bg)" }}>
+                      <button onClick={() => openEditor(v)} className="ml-auto inline-flex h-10 items-center gap-2 rounded-[9px] px-4 text-[13.5px] font-bold" style={{ background: "#C4ED2B", color: "#0A0C0D" }}>
                         Configurar ejes <ArrowForwardRoundedIcon sx={{ fontSize: 15 }} />
                       </button>
                     </div>
@@ -203,7 +203,7 @@ const ConfigurarEjes = ({ onClose, vehicle }) => {
             </div>
             <div className="ml-auto flex items-center gap-2.5">
               <button onClick={backToList} className="h-10 rounded-[9px] px-[15px] text-[13.5px] font-semibold" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--tx)" }}>Cancelar</button>
-              <button onClick={save} disabled={saving || hasPositionless} className="h-10 rounded-[9px] px-[18px] text-[13.5px] font-bold" style={{ background: "var(--ink-lime)", color: "var(--bg)", opacity: saving || hasPositionless ? 0.5 : 1, cursor: hasPositionless ? "not-allowed" : "pointer" }}>{saving ? "Guardando…" : "Guardar esquema"}</button>
+              <button onClick={save} disabled={saving || hasPositionless} className="h-10 rounded-[9px] px-[18px] text-[13.5px] font-bold" style={{ background: "#C4ED2B", color: "#0A0C0D", opacity: saving || hasPositionless ? 0.5 : 1, cursor: hasPositionless ? "not-allowed" : "pointer" }}>{saving ? "Guardando…" : "Guardar esquema"}</button>
             </div>
           </div>
 
@@ -249,7 +249,7 @@ const ConfigurarEjes = ({ onClose, vehicle }) => {
                     <div className="mt-1 text-[11.5px]" style={{ color: "var(--tx-5)" }}>No coincide con ningún tipo conocido. Dale un nombre para guardarlo y reusarlo.</div>
                     <div className="mt-2.5 flex gap-2">
                       <input value={customName} onChange={(e) => setCustomName(e.target.value)} placeholder="Ej. Bitrén 7 ejes" className="h-10 flex-1 rounded-[9px] px-3 text-[13px] outline-none" style={{ background: "var(--input)", border: "1.5px solid var(--bd)", color: "var(--tx)" }} />
-                      <button onClick={saveCustomType} disabled={savingType} className="h-10 rounded-[9px] px-3.5 text-[12.5px] font-bold" style={{ background: "var(--ink-lime)", color: "var(--bg)", opacity: savingType ? 0.6 : 1 }}>{savingType ? "Guardando…" : "Guardar tipo"}</button>
+                      <button onClick={saveCustomType} disabled={savingType} className="h-10 rounded-[9px] px-3.5 text-[12.5px] font-bold" style={{ background: "#C4ED2B", color: "#0A0C0D", opacity: savingType ? 0.6 : 1 }}>{savingType ? "Guardando…" : "Guardar tipo"}</button>
                     </div>
                   </div>
                 )}
