@@ -1,104 +1,126 @@
-import { useEffect, useRef } from "react";
-import Swal from "sweetalert2";
-import { showToast } from "@utils/toast";
-import { getUpdateRules } from '@constants/settingsRules';
-import { formatReleaseNotes } from '@utils/formatReleaseNotes'
-import {
-  showInteractiveDownloadProgress,
-  updateProgressBar,
-} from "@utils/updateProgress";
+import { useState, useEffect, useRef, useCallback } from "react"
+import { showToast } from "@utils/toast"
 
-export const useUpdater = (setHasUpdate) => {
-  const updateInfoRef = useRef(null);
-  const initializedRef = useRef(false);
-  const checkingRef = useRef(false);
+// Hook del auto-updater (solo desktop). Maneja estado + IPC con la capa Electron.
+// La API vive en window.electronAPI (inyectada por preload). En dev/web no existe;
+// para poder ver el modal en el browser se puede inyectar window.__updaterMock y se
+// usa como si fuese electronAPI (mismo shape). NADA de SweetAlert.
+//
+// Decisión: electron-updater SIEMPRE instala la ÚLTIMA versión (no una intermedia).
+// Por eso listReleases() es informativo (changelog) y la descarga/instalación es una
+// sola (la de la última versión). El modal muestra el botón solo en esa fila.
+const getApi = () => (typeof window !== "undefined" ? window.electronAPI || window.__updaterMock : null)
 
+export const useUpdater = () => {
+  const api = getApi()
+  const isDesktop = !!api
+
+  const [current, setCurrent] = useState("") // versión instalada (getVersion)
+  const [bip, setBip] = useState(false) // hay update disponible → punto rojo en el botón
+  const [open, setOpen] = useState(false) // modal abierto
+  const [phase, setPhase] = useState("checking") // 'checking' | 'uptodate' | 'list' | 'installing'
+  const [list, setList] = useState([]) // releases más nuevos que el instalado (asc)
+  const [dl, setDl] = useState({ st: "idle", pct: 0 }) // 'idle'|'downloading'|'downloaded'|'scheduled'
+  const [installingV, setInstallingV] = useState("") // versión que se está instalando
+
+  // Espejo del estado de descarga para leerlo dentro de los listeners sin re-suscribir.
+  const dlStRef = useRef(dl.st)
+  dlStRef.current = dl.st
+
+  // Mount: versión instalada + listeners + chequeo en background (para prender el bip).
   useEffect(() => {
-    if (!window.electronAPI || initializedRef.current) return;
-    initializedRef.current = true;
+    if (!isDesktop) return
 
-    const rules = getUpdateRules();
-    const skip = localStorage.getItem("skipUpdateCheck") === "true";
+    api.getVersion?.().then(setCurrent).catch(() => {})
 
-    const onAvailable = (_, info) => {
-      checkingRef.current = false;
-      setHasUpdate(true);
-      updateInfoRef.current = info;
-    };
-
-    const onProgress = (_, progress) => {
-      showInteractiveDownloadProgress();
-      updateProgressBar(progress.percent);
-    };
-
-    const onDownloaded = () => {
-      // barra muestra botón "Instalar"
-    };
-
-    const onError = (_, err) => {
-      checkingRef.current = false;
-      const msg = typeof err === "string" ? err : err?.message || "Error desconocido";
-      showToast("error", `Error de actualización: ${msg}`);
-    };
-
-    window.electronAPI.onUpdateAvailable(onAvailable);
-    window.electronAPI.onUpdateProgress(onProgress);
-    window.electronAPI.onUpdateDownloaded(onDownloaded);
-    window.electronAPI.onUpdateError(onError);
-
-    if (rules.autoCheckForUpdates && !skip) {
-      checkingRef.current = true;
-      window.electronAPI.checkForUpdates();
+    const onAvailable = () => setBip(true)
+    const onNotAvailable = () => setBip(false)
+    const onProgress = (_e, payload) => setDl({ st: "downloading", pct: payload?.percent ?? 0 })
+    const onDownloaded = () => setDl({ st: "downloaded", pct: 100 })
+    const onError = (_e, payload) => {
+      const msg = typeof payload === "string" ? payload : payload?.message || "Error desconocido"
+      showToast("error", `Error de actualización: ${msg}`)
+      if (dlStRef.current === "downloading") setDl({ st: "idle", pct: 0 })
     }
+
+    api.onUpdateAvailable?.(onAvailable)
+    api.onUpdateNotAvailable?.(onNotAvailable)
+    api.onUpdateProgress?.(onProgress)
+    api.onUpdateDownloaded?.(onDownloaded)
+    api.onUpdateError?.(onError)
+
+    api.checkForUpdates?.() // background: prende el bip si hay update
 
     return () => {
-      window.electronAPI.removeListener("update:available", onAvailable);
-      window.electronAPI.removeListener("update:progress", onProgress);
-      window.electronAPI.removeListener("update:downloaded", onDownloaded);
-      window.electronAPI.removeListener("update:error", onError);
-    };
-  }, [setHasUpdate]);
-
-  // Función que se ejecuta manualmente
-  return () => {
-    if (!updateInfoRef.current) {
-      if (checkingRef.current) return;
-      checkingRef.current = true;
-
-      window.electronAPI.checkForUpdates();
-      showToast("info", "Buscando actualizaciones...");
-      return;
+      api.removeListener?.("update:available", onAvailable)
+      api.removeListener?.("update:not-available", onNotAvailable)
+      api.removeListener?.("update:progress", onProgress)
+      api.removeListener?.("update:downloaded", onDownloaded)
+      api.removeListener?.("update:error", onError)
     }
+    // api es estable (misma ref de window.*); solo depende de si hay desktop.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isDesktop])
 
-    const info = updateInfoRef.current;
+  // checking → listReleases → list (si hay) / uptodate (si no o falla).
+  const loadList = useCallback(() => {
+    setPhase("checking")
+    Promise.resolve(api?.listReleases?.())
+      .then((rel) => {
+        const arr = Array.isArray(rel) ? rel : []
+        setList(arr)
+        setPhase(arr.length ? "list" : "uptodate")
+      })
+      .catch(() => setPhase("uptodate"))
+  }, [api])
 
-    Swal.fire({
-      title: `Actualización lista: v${info.version}`,
-      html: `
-        <div style="overflow-y:auto; overflow-x:hidden; white-space:pre-line; font-size:13px; padding:5px; background:#f9f9f9; border:1px solid #ccc; border-radius:4px; text-align:left; max-height:120px;">
-          ${formatReleaseNotes(info.releaseNotes)}
-        </div>
-        <hr/>
-        <label style="display:block; margin-top:10px;">
-          <input type="checkbox" id="noShowAgain" />
-          No notificar actualizaciones automáticamente
-        </label>
-      `,
-      icon: "info",
-      showCancelButton: true,
-      confirmButtonText: "Actualizar",
-      cancelButtonText: "Más tarde",
-    }).then(res => {
-      const checkbox = Swal.getPopup()?.querySelector("#noShowAgain");
-      if (checkbox?.checked) {
-        localStorage.setItem("skipUpdateCheck", "true");
-      }
+  const openModal = useCallback(() => {
+    setOpen(true)
+    loadList()
+  }, [loadList])
 
-      if (res.isConfirmed) {
-        window.electronAPI.downloadUpdate();
-      } else {
-        showToast("info", "Actualización pospuesta");
-      }
-    });
-  };
-};
+  const closeModal = useCallback(() => setOpen(false), [])
+
+  const recheck = useCallback(() => {
+    api?.checkForUpdates?.() // re-dispara el chequeo (refresca el bip)
+    loadList()
+  }, [api, loadList])
+
+  const download = useCallback(() => {
+    setDl({ st: "downloading", pct: 0 })
+    api?.downloadUpdate?.()
+  }, [api])
+
+  const installNow = useCallback((v) => {
+    setInstallingV(v)
+    setPhase("installing")
+    api?.installUpdate?.()
+  }, [api])
+
+  const installLater = useCallback(
+    () => {
+      api?.installOnNextLaunch?.()
+      setDl((d) => ({ ...d, st: "scheduled" }))
+      showToast("info", "Se instalará al reiniciar la app")
+      closeModal()
+    },
+    [api, closeModal]
+  )
+
+  return {
+    isDesktop,
+    current,
+    bip,
+    open,
+    phase,
+    list,
+    dl,
+    installingV,
+    openModal,
+    closeModal,
+    recheck,
+    download,
+    installNow,
+    installLater,
+  }
+}

@@ -1,7 +1,6 @@
 import './App.css'
 import { BrowserRouter, HashRouter, Routes, Route } from "react-router-dom"
 import isElectron from "@utils/isElectron"
-import { useUpdater } from "@hooks/useUpdater"
 import Layout from '@components/Layout/Layout.jsx'
 import ContextProvider from '@context/ContextProvider.jsx'
 import { ApiProvider } from '@context/apiContext'
@@ -26,8 +25,6 @@ import NotFound from '@components/NotFound.jsx'
 const Router = isElectron() ? HashRouter : BrowserRouter
 
 function App() {
-  useUpdater()
-
   return (
     <ContextProvider>
       <Router>

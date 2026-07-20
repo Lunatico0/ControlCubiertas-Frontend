@@ -4,10 +4,10 @@ import TimelineRoundedIcon from "@mui/icons-material/TimelineRounded"
 import DeleteOutlineRoundedIcon from "@mui/icons-material/DeleteOutlineRounded"
 import StyleRoundedIcon from "@mui/icons-material/StyleRounded"
 import FileDownloadRoundedIcon from "@mui/icons-material/FileDownloadRounded"
-import LocalShippingRoundedIcon from "@mui/icons-material/LocalShippingRounded"
 import BoltRoundedIcon from "@mui/icons-material/BoltRounded"
 import { getReports, getVehicleReports, getVehicleWear } from "@api/admin"
 import { showToast } from "@utils/toast"
+import { downloadCSV } from "@utils/csv"
 import {
   ResponsiveContainer, BarChart, Bar, LineChart, Line, AreaChart, Area,
   PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ScatterChart, Scatter,
@@ -277,12 +277,7 @@ const Reportes = () => {
     try {
       const head = ["#", "Marca", "Cubiertas", "Vida útil promedio (km)", "Recapados promedio", "Descarte (%)"]
       const body = data.brands.map((b, i) => [i + 1, b.name, b.count, Math.round(b.life || 0), b.recaps, b.discardRate])
-      const csv = [head, ...body].map((r) => r.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(",")).join("\n")
-      const blob = new Blob(["﻿" + csv], { type: "text/csv;charset=utf-8" })
-      const url = URL.createObjectURL(blob)
-      const a = document.createElement("a")
-      a.href = url; a.download = "reportes-marcas.csv"; a.click()
-      URL.revokeObjectURL(url)
+      downloadCSV("reportes-marcas.csv", head, body)
     } catch {
       showToast("error", "No se pudo exportar")
     }

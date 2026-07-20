@@ -1,5 +1,6 @@
 import { useState, useMemo, useContext, useEffect, useRef } from "react"
 import ApiContext from "@context/apiContext"
+import { usePersistedState } from "@hooks/usePersistedState"
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded"
 import AddRoundedIcon from "@mui/icons-material/AddRounded"
 import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded"
@@ -34,11 +35,7 @@ const Vehiculos = ({ onNavigate, intent }) => {
   const [fType, setFType] = useState("")
   const types = useMemo(() => [...new Set(vehicles.map((v) => v.type).filter(Boolean))].sort((a, b) => a.localeCompare(b, "es")), [vehicles])
   const pendingAxles = vehicles.filter((v) => !(v.axles && v.axles.length)).length
-  const [vview, setVview] = useState(() => localStorage.getItem("op_vehview") || "grid")
-  const setView = (v) => {
-    setVview(v)
-    try { localStorage.setItem("op_vehview", v) } catch { /* device sin storage */ }
-  }
+  const [vview, setView] = usePersistedState("op_vehview", "grid")
 
   // Cubiertas montadas indexadas por vehículo → { byPos: {E1-I: tire}, count }
   const mountedByVeh = useMemo(() => {

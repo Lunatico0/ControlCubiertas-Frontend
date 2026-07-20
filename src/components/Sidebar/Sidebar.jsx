@@ -5,6 +5,7 @@ import { useTheme } from "@context/ThemeContext";
 import { useAuth } from "@context/AuthContext";
 import isElectron from "@utils/isElectron";
 import { useUpdater } from "@hooks/useUpdater";
+import UpdaterModal from "@components/Updater/UpdaterModal";
 
 import MenuRoundedIcon from "@mui/icons-material/MenuRounded";
 import DirectionsBusRoundedIcon from "@mui/icons-material/DirectionsBusRounded";
@@ -29,10 +30,9 @@ const Sidebar = ({ active, setActive }) => {
   const [expanded, setExpanded] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-  const [hasUpdate, setHasUpdate] = useState(false);
   const [version, setVersion] = useState("");
   const electron = isElectron();
-  const triggerUpdateCheck = useUpdater(setHasUpdate);
+  const upd = useUpdater(); // nuevo hook del auto-updater (estado + modal)
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -126,13 +126,10 @@ const Sidebar = ({ active, setActive }) => {
           {electron && (
             <div
               className={`relative flex items-center gap-2 px-2 py-2 rounded-lg cursor-pointer transition-colors ${colors.shadow} ${utility.hoverBg} ${text.value}`}
-              onClick={() => {
-                setHasUpdate(false);
-                triggerUpdateCheck();
-              }}
+              onClick={upd.openModal}
             >
               <CloudDownloadRoundedIcon fontSize="small" />
-              {hasUpdate && (
+              {upd.bip && (
                 <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 rounded-full animate-ping" />
               )}
               {(expanded || isMobile) && <span className={text.value}>Actualizar</span>}
@@ -177,6 +174,17 @@ const Sidebar = ({ active, setActive }) => {
           )}
         </div>
       </div>
+
+      {upd.open && (
+        <UpdaterModal
+          {...upd}
+          onClose={upd.closeModal}
+          onRecheck={upd.recheck}
+          onDownload={upd.download}
+          onInstallNow={upd.installNow}
+          onInstallLater={upd.installLater}
+        />
+      )}
     </>
   );
 };

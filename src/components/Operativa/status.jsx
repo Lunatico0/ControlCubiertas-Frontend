@@ -33,7 +33,6 @@ export const buildStatusMeta = (statuses = []) => {
 // Catálogo activo del tenant (seteado por ApiProvider al cargar la empresa).
 let _catalog = {}
 export const setStatusCatalog = (catalog) => { _catalog = catalog || {} }
-export const getStatusCatalog = () => _catalog
 
 export const metaOf = (status) => _catalog[status] || FALLBACK
 export const tint = (color, pct) => `color-mix(in srgb, ${color} ${pct}%, transparent)`

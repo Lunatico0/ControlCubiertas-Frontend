@@ -1,13 +1,12 @@
 import { useState, useEffect } from "react"
-import { NavLink, useNavigate, useLocation, Outlet } from "react-router-dom"
+import { useNavigate, useLocation, Outlet } from "react-router-dom"
 import { useAuth } from "@context/AuthContext"
 import { useTheme } from "@context/ThemeContext"
 import { getCompany } from "@api/admin"
-import { externalPageProps } from "@utils/isElectron"
 import { useCacheTenantLogo } from "@hooks/useCacheTenantLogo"
-import BrandLogo from "@components/BrandLogo"
-import tireOpsIconDark from "@/assets/TireOpsIconDark.svg"
-import tireOpsIconLight from "@/assets/TireOpsIconLight.svg"
+import { useUpdater } from "@hooks/useUpdater"
+import AppSidebar from "@components/Layout/AppSidebar"
+import BrandDeco from "@components/common/BrandDeco"
 import OpTour from "@components/Operativa/OpTour"
 
 import HomeRoundedIcon from "@mui/icons-material/HomeRounded"
@@ -17,13 +16,7 @@ import ReceiptLongRoundedIcon from "@mui/icons-material/ReceiptLongRounded"
 import InsightsRoundedIcon from "@mui/icons-material/InsightsRounded"
 import EditRoundedIcon from "@mui/icons-material/EditRounded"
 import OpenInNewRoundedIcon from "@mui/icons-material/OpenInNewRounded"
-import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded"
-import HelpOutlineRoundedIcon from "@mui/icons-material/HelpOutlineRounded"
 import CreditCardRoundedIcon from "@mui/icons-material/CreditCardRounded"
-import DarkModeRoundedIcon from "@mui/icons-material/DarkModeRounded"
-import LightModeRoundedIcon from "@mui/icons-material/LightModeRounded"
-import PlayArrowRoundedIcon from "@mui/icons-material/PlayArrowRounded"
-import MenuBookRoundedIcon from "@mui/icons-material/MenuBookRounded"
 
 // Portal del tenant-admin: shell dark propio (design system operativo), separado de la
 // operación. Cada sección entra por <Outlet/>. "Comprobantes" (histórico) es un hito
@@ -61,12 +54,12 @@ const screenOf = (path) =>
 const AdminLayout = () => {
   const { user, logout } = useAuth()
   useCacheTenantLogo() // cachea el logo del tenant para el splash del desktop (no-op en web)
-  const { isDarkMode, toggleTheme } = useTheme()
+  const { isDarkMode } = useTheme()
+  const upd = useUpdater() // auto-updater (solo desktop): botón sidebar + modal
   const navigate = useNavigate()
   const location = useLocation()
   const [companyName, setCompanyName] = useState("")
   const [tourOpen, setTourOpen] = useState(false) // guía interactiva del admin (tour)
-  const [helpMenu, setHelpMenu] = useState(false) // popover de ayuda
 
   useEffect(() => {
     getCompany().then((c) => setCompanyName(c?.name || "")).catch(() => {})
@@ -75,96 +68,38 @@ const AdminLayout = () => {
   const displayName = user?.name || user?.email?.split("@")[0] || "admin"
   const initials = displayName.slice(0, 2).toUpperCase()
 
-  const navStyle = ({ isActive }) => ({
-    display: "flex", alignItems: "center", gap: 13, padding: "11px 13px", borderRadius: 9,
-    fontSize: 14, fontWeight: isActive ? 600 : 500, cursor: "pointer",
-    color: isActive ? "var(--ink-lime)" : "var(--tx-4)",
-    background: isActive ? "color-mix(in srgb, var(--ink-lime) 12%, transparent)" : "transparent",
-    boxShadow: isActive ? "inset 3px 0 0 var(--ink-lime)" : "none",
-  })
-
   return (
     <div data-app-theme={isDarkMode ? "dark" : "light"} className="flex h-screen overflow-hidden text-left" style={{ background: "var(--bg)", color: "var(--tx)", fontFamily: "'IBM Plex Sans',system-ui,sans-serif" }}>
       {/* Sidebar */}
-      <aside className="hidden w-64 flex-none flex-col md:flex" style={{ background: "var(--sidebar)", borderRight: "1px solid var(--bd-faint)" }}>
-        <div className="flex items-center px-5 py-5">
-          <BrandLogo height={65} />
-        </div>
-
-        <div className="px-5 pb-2 pt-3.5 text-[10px] font-semibold tracking-[.16em]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-6)" }}>PANEL</div>
-        <nav className="flex flex-1 flex-col gap-1 px-3">
-          {NAV.map(({ to, end, label, Icon, tour }) => (
-            <NavLink key={to} to={to} end={end} data-tour={tour} style={navStyle}>
-              <span className="inline-flex flex-none items-center justify-center" style={{ width: 20, height: 20 }}><Icon sx={{ fontSize: 19 }} /></span>
-              <span>{label}</span>
-            </NavLink>
-          ))}
-
-          <div className="my-3.5 h-px" style={{ background: "var(--bd-faint)" }} />
-          <div className="flex items-center gap-[13px] rounded-[9px] px-[13px] py-[11px] text-[14px]" style={{ color: "var(--tx-6)", cursor: "default" }}>
-            <span className="inline-flex flex-none items-center justify-center" style={{ width: 20, height: 20 }}><CreditCardRoundedIcon sx={{ fontSize: 18 }} /></span>
-            <span>Cuenta</span>
-            <span className="ml-auto rounded-full px-2 py-0.5 text-[9px] font-semibold tracking-wider" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--ink-purple)", background: "color-mix(in srgb, var(--ink-purple) 16%, transparent)" }}>PRÓXIMAMENTE</span>
-          </div>
-        </nav>
-
-        {/* Tema claro/oscuro */}
-        <div className="p-3.5">
-          <button onClick={toggleTheme} className="flex w-full items-center gap-[11px] rounded-[11px] px-3.5 py-3" style={{ background: "var(--elev)", border: "1px solid var(--bd-soft)" }}>
-            <span className="inline-flex h-5 w-5 flex-none items-center" style={{ color: "var(--ink-lime)" }}>
-              {isDarkMode ? <DarkModeRoundedIcon sx={{ fontSize: 18 }} /> : <LightModeRoundedIcon sx={{ fontSize: 19 }} />}
-            </span>
-            <span className="text-[13px] font-medium" style={{ color: "var(--tx-2)" }}>{isDarkMode ? "Tema oscuro" : "Tema claro"}</span>
-          </button>
-        </div>
-
-        {/* Usuario + ayuda + logout (mismo patrón que la operativa) */}
-        <div className="relative flex items-center gap-[11px] p-3" style={{ borderTop: "1px solid var(--bd-faint)" }}>
-          <span className="flex flex-none items-center justify-center rounded-full text-xs font-bold" style={{ width: 34, height: 34, background: "var(--ink-lime)", color: "var(--bg)", fontFamily: "'Space Grotesk'" }}>{initials}</span>
-          <span className="min-w-0 flex-1" style={{ lineHeight: 1.3 }}>
-            <span className="block truncate text-[12.5px] font-semibold" style={{ color: "var(--tx)" }}>{displayName}</span>
-            <span className="block text-[11px]" style={{ color: "var(--tx-5)" }}>Tenant Admin</span>
-          </span>
-          <button data-tour="a-help" onClick={() => setHelpMenu((v) => !v)} title="Ayuda" className="inline-flex rounded-[7px] p-[7px]" style={{ color: helpMenu ? "var(--ink-lime)" : "var(--tx-6)", background: helpMenu ? "color-mix(in srgb, var(--ink-lime) 12%, transparent)" : "transparent" }}>
-            <HelpOutlineRoundedIcon sx={{ fontSize: 17 }} />
-          </button>
-          <button onClick={logout} title="Cerrar sesión" className="inline-flex p-1" style={{ color: "var(--tx-6)" }}>
-            <LogoutRoundedIcon sx={{ fontSize: 17 }} />
-          </button>
-
-          {helpMenu && (
-            <>
-              <div className="fixed inset-0 z-35" onClick={() => setHelpMenu(false)} />
-              <div className="absolute z-40 overflow-hidden rounded-xl" style={{ bottom: 58, left: 12, right: 12, background: "var(--card)", border: "1px solid var(--bd-strong)", boxShadow: "0 18px 44px rgba(0,0,0,.5)" }}>
-                <div className="px-3.5 py-[11px] text-[10px] tracking-[.08em]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-6)", borderBottom: "1px solid var(--bd-soft)" }}>AYUDA · PANEL ADMIN</div>
-                <button onClick={() => { setHelpMenu(false); navigate("/admin"); setTourOpen(true) }} className="flex w-full items-center gap-[11px] px-3.5 py-3 text-left">
-                  <span className="flex h-[30px] w-[30px] flex-none items-center justify-center rounded-lg" style={{ background: "color-mix(in srgb, var(--ink-lime) 13%, transparent)", color: "var(--ink-lime)" }}><PlayArrowRoundedIcon sx={{ fontSize: 16 }} /></span>
-                  <span style={{ lineHeight: 1.25 }}>
-                    <span className="block text-[13px] font-semibold" style={{ color: "var(--tx)" }}>Ver guía interactiva</span>
-                    <span className="block text-[11px]" style={{ color: "var(--tx-5)" }}>Tour por el panel de administración</span>
-                  </span>
-                </button>
-                <a {...externalPageProps("/admin/guia")} onClick={() => setHelpMenu(false)} className="flex items-center gap-[11px] px-3.5 py-3" style={{ textDecoration: "none", borderTop: "1px solid var(--bd-soft)" }}>
-                  <span className="flex h-[30px] w-[30px] flex-none items-center justify-center rounded-lg" style={{ background: "color-mix(in srgb, var(--ink-blue) 16%, transparent)", color: "var(--ink-blue)" }}><MenuBookRoundedIcon sx={{ fontSize: 16 }} /></span>
-                  <span style={{ lineHeight: 1.25 }}>
-                    <span className="block text-[13px] font-semibold" style={{ color: "var(--tx)" }}>Guía del administrador</span>
-                    <span className="block text-[11px]" style={{ color: "var(--tx-5)" }}>Manual detallado · pestaña nueva</span>
-                  </span>
-                </a>
-              </div>
-            </>
-          )}
-        </div>
-      </aside>
+      <AppSidebar
+        nav={NAV.map(({ to, label, Icon, tour }) => ({
+          key: to,
+          label,
+          icon: <Icon sx={{ fontSize: 19 }} />,
+          active: location.pathname === to,
+          onClick: () => navigate(to),
+          dataTour: tour,
+        }))}
+        belowNav={
+          <>
+            <div className="my-3.5 h-px" style={{ background: "var(--bd-faint)" }} />
+            <div className="flex items-center gap-[13px] rounded-[9px] px-[13px] py-[11px] text-[14px]" style={{ color: "var(--tx-6)", cursor: "default" }}>
+              <span className="inline-flex flex-none items-center justify-center" style={{ width: 20, height: 20 }}><CreditCardRoundedIcon sx={{ fontSize: 18 }} /></span>
+              <span>Cuenta</span>
+              <span className="ml-auto rounded-full px-2 py-0.5 text-[9px] font-semibold tracking-wider" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--ink-purple)", background: "color-mix(in srgb, var(--ink-purple) 16%, transparent)" }}>PRÓXIMAMENTE</span>
+            </div>
+          </>
+        }
+        upd={upd}
+        user={{ name: displayName, roleLabel: "Tenant Admin", initials, avatarBg: "var(--ink-lime)", avatarColor: "var(--bg)" }}
+        help={{ dataTour: "a-help", onStartTour: () => { navigate("/admin"); setTourOpen(true) }, guideHref: "/admin/guia", guideLabel: "Guía del administrador", guideSubtitle: "Manual detallado · pestaña nueva" }}
+        onLogout={logout}
+      />
 
       {/* Columna principal */}
       <main className="relative flex min-w-0 flex-1 flex-col overflow-hidden">
         {/* Deco de marca: solo el ÍCONO TireOps (sin wordmark), muy tenue arriba a la derecha, solo en el Resumen. */}
-        {location.pathname === "/admin" && (
-          <div style={{ position: "absolute", top: -110, right: -80, width: 460, height: 460, overflow: "hidden", pointerEvents: "none", zIndex: 0 }}>
-            <img src={isDarkMode ? tireOpsIconDark : tireOpsIconLight} alt="" style={{ display: "block", height: 460, width: "auto", opacity: 0.05 }} />
-          </div>
-        )}
+        {location.pathname === "/admin" && <BrandDeco variant="icon" />}
         {/* Top bar */}
         <div className="z-2 flex h-[74px] flex-none items-center gap-3.5 px-6" style={{ background: "var(--bg)", borderBottom: "1px solid var(--bd-faint)" }}>
           <div className="ml-auto flex items-center gap-3">

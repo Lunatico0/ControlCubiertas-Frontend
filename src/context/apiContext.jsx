@@ -165,11 +165,9 @@ export const ApiProvider = ({ children }) => {
 
   const handleCreateTire = useCallback(
     async (data) => {
-      console.log("🔧 Contexto: Creando cubierta con datos:", data)
       try {
         setError(null)
         const result = await createTire(data)
-        console.log("✅ Contexto: Cubierta creada exitosamente:", result)
         triggerGlobalRefresh()
         return result
       } catch (err) {
@@ -183,11 +181,9 @@ export const ApiProvider = ({ children }) => {
 
   const handleUpdateTireStatus = useCallback(
     async (tireId, data) => {
-      console.log("🔧 Contexto: Actualizando estado - ID:", tireId, "Data:", data)
       try {
         setError(null)
         const result = await updateTireStatus(tireId, data)
-        console.log("✅ Contexto: Estado actualizado:", result)
 
         if (result?.tire) {
           replaceTireInList(result.tire)
@@ -205,11 +201,9 @@ export const ApiProvider = ({ children }) => {
 
   const handleAssignTire = useCallback(
     async (tireId, data) => {
-      console.log("🔧 Contexto: Asignando cubierta - ID:", tireId, "Data:", data)
       try {
         setError(null)
         const result = await assignTireToVehicle(tireId, data)
-        console.log("✅ Contexto: Cubierta asignada:", result)
 
         if (result?.tire) {
           replaceTireInList(result.tire)
@@ -390,7 +384,6 @@ export const ApiProvider = ({ children }) => {
   // Efecto para carga inicial
   useEffect(() => {
     const initializeData = async () => {
-      console.log("🚀 Inicializando datos del contexto...")
       await Promise.all([loadTires(), loadVehicles()])
     }
     initializeData()

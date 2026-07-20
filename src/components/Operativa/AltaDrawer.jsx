@@ -3,20 +3,13 @@ import ApiContext from "@context/apiContext"
 import { showToast } from "@utils/toast"
 import { buildCreateTirePrintData } from "@utils/print-data"
 import usePrint from "@hooks/usePrint"
+import Field from "@components/common/Field"
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded"
 
 // Drawer de alta de cubierta nueva. Crea en depósito (status "Nueva"); la asignación
 // a vehículo es una acción aparte. Reutiliza tires.create (refresca la lista sola).
 const fieldStyle = { background: "var(--input)", border: "1.5px solid var(--bd)", color: "var(--tx)" }
-const labelCls = "mb-1.5 block text-[12.5px] font-medium"
 const inputCls = "w-full rounded-[9px] px-3 py-2.5 text-[14px] outline-none"
-
-const Field = ({ label, children }) => (
-  <div className="mb-3">
-    <label className={labelCls} style={{ color: "var(--tx-3)" }}>{label}</label>
-    {children}
-  </div>
-)
 
 const todayLocal = () => {
   const d = new Date()

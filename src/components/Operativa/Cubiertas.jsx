@@ -1,6 +1,7 @@
-import { useState, useRef, useEffect, useMemo, useContext } from "react"
+import { useState, useEffect, useMemo, useContext } from "react"
 import ApiContext from "@context/apiContext"
-import { showToast } from "@utils/toast"
+import { useHotkeyFocus } from "@hooks/useHotkeyFocus"
+import { usePersistedState } from "@hooks/usePersistedState"
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded"
 import AddRoundedIcon from "@mui/icons-material/AddRounded"
 import GridViewRoundedIcon from "@mui/icons-material/GridViewRounded"
@@ -52,11 +53,7 @@ const Cubiertas = ({ intent, onNavigate }) => {
 
   const [query, setQuery] = useState("")
   const [tab, setTab] = useState("todas")
-  const [view, setViewState] = useState(() => localStorage.getItem("op_tireview") || "grid")
-  const setView = (v) => {
-    setViewState(v)
-    try { localStorage.setItem("op_tireview", v) } catch { /* device sin storage */ }
-  }
+  const [view, setView] = usePersistedState("op_tireview", "grid")
   const [selectedId, setSelectedId] = useState(null)
   const [pendingAction, setPendingAction] = useState(null)
   const [showAlta, setShowAlta] = useState(false)
@@ -69,23 +66,11 @@ const Cubiertas = ({ intent, onNavigate }) => {
   const [fStatus, setFStatus] = useState("")
   const [fKmMin, setFKmMin] = useState("")
   const [fKmMax, setFKmMax] = useState("")
-  const searchRef = useRef(null)
+  const searchRef = useHotkeyFocus()
 
   const brands = useMemo(() => [...new Set(tires.map((t) => t.brand).filter(Boolean))].sort((a, b) => a.localeCompare(b, "es")), [tires])
   const activeFilters = (fBrand ? 1 : 0) + (fStatus ? 1 : 0) + (fKmMin || fKmMax ? 1 : 0)
   const clearFilters = () => { setFBrand(""); setFStatus(""); setFKmMin(""); setFKmMax("") }
-
-  // Atajo Ctrl/Cmd + K para enfocar la búsqueda.
-  useEffect(() => {
-    const onKey = (e) => {
-      if (e.key.toLowerCase() === "k" && (e.metaKey || e.ctrlKey)) {
-        e.preventDefault()
-        searchRef.current?.focus()
-      }
-    }
-    window.addEventListener("keydown", onKey)
-    return () => window.removeEventListener("keydown", onKey)
-  }, [])
 
   // Aplica la intención de navegación que llega desde Inicio (búsqueda o filtro).
   useEffect(() => {

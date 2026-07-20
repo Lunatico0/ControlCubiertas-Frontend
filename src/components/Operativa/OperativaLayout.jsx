@@ -6,19 +6,10 @@ import AdminPanelSettingsRoundedIcon from "@mui/icons-material/AdminPanelSetting
 import HomeRoundedIcon from "@mui/icons-material/HomeRounded"
 import TripOriginRoundedIcon from "@mui/icons-material/TripOriginRounded"
 import LocalShippingOutlinedIcon from "@mui/icons-material/LocalShippingOutlined"
-import DarkModeRoundedIcon from "@mui/icons-material/DarkModeRounded"
-import LightModeRoundedIcon from "@mui/icons-material/LightModeRounded"
-import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded"
-import HelpOutlineRoundedIcon from "@mui/icons-material/HelpOutlineRounded"
-import PlayArrowRoundedIcon from "@mui/icons-material/PlayArrowRounded"
-import MenuBookRoundedIcon from "@mui/icons-material/MenuBookRounded"
-import { externalPageProps } from "@utils/isElectron"
 import { useCacheTenantLogo } from "@hooks/useCacheTenantLogo"
-import BrandLogo from "@components/BrandLogo"
-import tireOpsDark from "@/assets/TireOpsDark.svg"
-import tireOpsLight from "@/assets/TireOpsLight.svg"
-import tireOpsIconDark from "@/assets/TireOpsIconDark.svg"
-import tireOpsIconLight from "@/assets/TireOpsIconLight.svg"
+import { useUpdater } from "@hooks/useUpdater"
+import AppSidebar from "@components/Layout/AppSidebar"
+import BrandDeco from "@components/common/BrandDeco"
 import Cubiertas from "./Cubiertas"
 import Inicio from "./Inicio"
 import Vehiculos from "./Vehiculos"
@@ -46,8 +37,9 @@ const OP_STEPS = [
 ]
 
 const OperativaLayout = () => {
-  const { isDarkMode, toggleTheme } = useTheme()
+  const { isDarkMode } = useTheme()
   const { user, logout, isAdmin } = useAuth()
+  const upd = useUpdater() // auto-updater (solo desktop): botón sidebar + modal
   useCacheTenantLogo() // cachea el logo del tenant para el splash del desktop (no-op en web)
   const goToRoute = useNavigate() // navegación de ruta (react-router), distinta del navigate interno por sección
   // Deep-link desde el panel admin: navigate("/", { state:{ op:{ section, tab } } }) abre la
@@ -56,7 +48,6 @@ const OperativaLayout = () => {
   const [active, setActive] = useState(initialOp?.section || "inicio")
   const [intent, setIntent] = useState(initialOp?.tab ? { tab: initialOp.tab } : null) // intención de navegación para Cubiertas (query/tab/assignTo)
   const [tourOpen, setTourOpen] = useState(false) // guía interactiva (tour con spotlight)
-  const [helpMenu, setHelpMenu] = useState(false) // popover de ayuda en el perfil
 
   const navigate = (section, intentData = null) => {
     setIntent(intentData)
@@ -73,42 +64,17 @@ const OperativaLayout = () => {
       style={{ background: "var(--bg)", color: "var(--tx)", fontFamily: "'IBM Plex Sans',system-ui,sans-serif" }}
     >
       {/* ============ SIDEBAR ============ */}
-      <aside
-        className="flex w-[248px] flex-none flex-col border-r"
-        style={{ background: "var(--sidebar)", borderColor: "var(--bd-faint)" }}
-      >
-        {/* Logo */}
-        <div className="flex items-center px-5 pb-5 pt-[22px]">
-          <BrandLogo height={65} />
-        </div>
-
-        {/* Navegación */}
-        <nav className="flex flex-col gap-1 px-3 py-2">
-          {NAV.map((item) => {
-            const on = active === item.key
-            return (
-              <div
-                key={item.key}
-                data-tour={item.key === "cubiertas" ? "nav-cubiertas" : item.key === "vehiculos" ? "nav-vehiculos" : undefined}
-                onClick={() => navigate(item.key)}
-                className="flex cursor-pointer items-center gap-[13px] rounded-[9px] px-[13px] py-3 text-[14.5px] transition-colors"
-                style={{
-                  fontWeight: on ? 600 : 500,
-                  color: on ? "var(--tx)" : "var(--tx-4)",
-                  background: on ? "var(--hover)" : "transparent",
-                  boxShadow: on ? "inset 3px 0 0 var(--ink-lime)" : "none",
-                }}
-              >
-                <span className="inline-flex h-[21px] w-[21px] flex-none items-center" style={{ color: on ? "var(--ink-lime)" : "var(--tx-5)" }}>
-                  {item.icon}
-                </span>
-                <span>{item.label}</span>
-              </div>
-            )
-          })}
-
-          {/* Acceso al panel admin: separado del resto por un divider (solo tenant-admin). */}
-          {isAdmin && (
+      <AppSidebar
+        nav={NAV.map((item) => ({
+          key: item.key,
+          label: item.label,
+          icon: item.icon,
+          active: active === item.key,
+          onClick: () => navigate(item.key),
+          dataTour: item.key === "cubiertas" ? "nav-cubiertas" : item.key === "vehiculos" ? "nav-vehiculos" : undefined,
+        }))}
+        belowNav={
+          isAdmin ? (
             <>
               <div className="mx-1 my-2 h-px" style={{ background: "var(--bd-faint)" }} />
               <div
@@ -121,93 +87,21 @@ const OperativaLayout = () => {
                 <span>Panel administrativo</span>
               </div>
             </>
-          )}
-        </nav>
-
-        {/* Toggle de tema */}
-        <div className="mt-auto px-3 pt-[10px]">
-          <button
-            onClick={toggleTheme}
-            className="flex w-full items-center gap-[11px] rounded-[9px] border px-3 py-[10px]"
-            style={{ borderColor: "var(--bd)", background: "var(--elev)" }}
-          >
-            <span className="inline-flex h-5 w-5 flex-none items-center" style={{ color: "var(--ink-lime)" }}>
-              {isDarkMode ? <DarkModeRoundedIcon sx={{ fontSize: 18 }} /> : <LightModeRoundedIcon sx={{ fontSize: 19 }} />}
-            </span>
-            <span className="text-[13px] font-medium" style={{ color: "var(--tx-2)" }}>
-              {isDarkMode ? "Tema oscuro" : "Tema claro"}
-            </span>
-          </button>
-        </div>
-
-        {/* Perfil + ayuda */}
-        <div className="relative flex items-center gap-[11px] p-3">
-          <div
-            className="flex h-9 w-9 flex-none items-center justify-center rounded-full text-[12px] font-bold"
-            style={{ background: "#18B89E", color: "#04201B", fontFamily: "'Space Grotesk'" }}
-          >
-            {initials}
-          </div>
-          <div className="min-w-0 flex-1" style={{ lineHeight: 1.3 }}>
-            <div className="truncate text-[13px] font-semibold" style={{ color: "var(--tx)" }}>{displayName}</div>
-            <div className="text-[11px]" style={{ color: "var(--tx-5)" }}>Operativo</div>
-          </div>
-          <div
-            data-tour="help-btn"
-            title="Ayuda"
-            onClick={() => setHelpMenu((v) => !v)}
-            className="inline-flex cursor-pointer rounded-[7px] p-[7px]"
-            style={{ color: helpMenu ? "var(--ink-lime)" : "var(--tx-6)", background: helpMenu ? "color-mix(in srgb, var(--ink-lime) 12%, transparent)" : "transparent" }}
-          >
-            <HelpOutlineRoundedIcon sx={{ fontSize: 17 }} />
-          </div>
-          <div
-            title="Cerrar sesión"
-            onClick={logout}
-            className="inline-flex cursor-pointer rounded-[7px] p-[7px]"
-            style={{ color: "var(--tx-6)" }}
-          >
-            <LogoutRoundedIcon sx={{ fontSize: 17 }} />
-          </div>
-
-          {helpMenu && (
-            <>
-              <div className="fixed inset-0 z-35" onClick={() => setHelpMenu(false)} />
-              <div className="absolute z-40 overflow-hidden rounded-xl" style={{ bottom: 58, right: 12, left: 12, background: "var(--card)", border: "1px solid var(--bd-strong)", boxShadow: "0 18px 44px rgba(0,0,0,.5)" }}>
-                <div className="px-3.5 py-[11px] text-[10px] tracking-[.08em]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-6)", borderBottom: "1px solid var(--bd-soft)" }}>AYUDA</div>
-                <button onClick={() => { setHelpMenu(false); setActive("inicio"); setTourOpen(true) }} className="flex w-full items-center gap-[11px] px-3.5 py-3 text-left">
-                  <span className="flex h-[30px] w-[30px] flex-none items-center justify-center rounded-lg" style={{ background: "color-mix(in srgb, var(--ink-lime) 13%, transparent)", color: "var(--ink-lime)" }}><PlayArrowRoundedIcon sx={{ fontSize: 16 }} /></span>
-                  <span style={{ lineHeight: 1.25 }}>
-                    <span className="block text-[13px] font-semibold" style={{ color: "var(--tx)" }}>Ver guía interactiva</span>
-                    <span className="block text-[11px]" style={{ color: "var(--tx-5)" }}>Tour rápido por la app</span>
-                  </span>
-                </button>
-                <a {...externalPageProps("/guia")} onClick={() => setHelpMenu(false)} className="flex items-center gap-[11px] px-3.5 py-3" style={{ textDecoration: "none", borderTop: "1px solid var(--bd-soft)" }}>
-                  <span className="flex h-[30px] w-[30px] flex-none items-center justify-center rounded-lg" style={{ background: "color-mix(in srgb, var(--ink-blue) 16%, transparent)", color: "var(--ink-blue)" }}><MenuBookRoundedIcon sx={{ fontSize: 16 }} /></span>
-                  <span style={{ lineHeight: 1.25 }}>
-                    <span className="block text-[13px] font-semibold" style={{ color: "var(--tx)" }}>Guía de uso completa</span>
-                    <span className="block text-[11px]" style={{ color: "var(--tx-5)" }}>Manual detallado · pestaña nueva</span>
-                  </span>
-                </a>
-              </div>
-            </>
-          )}
-        </div>
-      </aside>
+          ) : null
+        }
+        upd={upd}
+        user={{ name: displayName, roleLabel: "Operativo", initials, avatarBg: "#18B89E", avatarColor: "#04201B" }}
+        help={{ dataTour: "help-btn", onStartTour: () => { setActive("inicio"); setTourOpen(true) }, guideHref: "/guia", guideLabel: "Guía de uso completa", guideSubtitle: "Manual detallado · pestaña nueva" }}
+        onLogout={logout}
+      />
 
       {/* ============ MAIN ============ */}
       <main className="relative flex min-w-0 flex-1 flex-col overflow-hidden">
         {/* Deco de marca: dos logos TireOps muy tenues, solo en Inicio (detrás del contenido). */}
         {active === "inicio" && (
           <>
-            {/* top-right: solo el ÍCONO (sin wordmark) */}
-            <div style={{ position: "absolute", top: -110, right: -80, width: 460, height: 460, overflow: "hidden", pointerEvents: "none", zIndex: 0 }}>
-              <img src={isDarkMode ? tireOpsIconDark : tireOpsIconLight} alt="" style={{ display: "block", height: 460, width: "auto", opacity: 0.05 }} />
-            </div>
-            {/* bottom-left: logo COMPLETO (ícono + wordmark) */}
-            <div style={{ position: "absolute", bottom: 70, left: -120, pointerEvents: "none", zIndex: 0 }}>
-              <img src={isDarkMode ? tireOpsDark : tireOpsLight} alt="" style={{ display: "block", width: 560, height: "auto", opacity: 0.035 }} />
-            </div>
+            <BrandDeco variant="icon" />
+            <BrandDeco variant="full" />
           </>
         )}
         <div className="relative z-[1] flex-1 overflow-auto">

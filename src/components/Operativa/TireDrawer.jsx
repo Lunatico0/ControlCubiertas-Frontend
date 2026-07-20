@@ -14,16 +14,9 @@ import LocalPrintshopOutlinedIcon from "@mui/icons-material/LocalPrintshopOutlin
 import { buildAssignPrintData, buildUnassignPrintData, buildFinishRecapPrintData, buildDiscardPrintData, buildUndoPrintData, buildCorrectionPrintData } from "@utils/print-data"
 import { metaOf, tint, fmtKm, fmtDate, StateBadge } from "./status"
 import { OpActionBtn } from "./opActions"
+import Field from "@components/common/Field"
 
 const fieldStyle = { background: "var(--input)", border: "1.5px solid var(--bd)", color: "var(--tx)" }
-const labelCls = "mb-1.5 block text-[12.5px] font-medium"
-
-const Field = ({ label, children }) => (
-  <div className="mb-3">
-    <label className={labelCls} style={{ color: "var(--tx-3)" }}>{label}</label>
-    {children}
-  </div>
-)
 
 // Botón chico de una entrada del timeline (Reimprimir / Corregir / Deshacer), con hover coloreable.
 const TimelineBtn = ({ onClick, disabled, icon, label, hover }) => (

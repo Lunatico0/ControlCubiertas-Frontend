@@ -1,7 +1,7 @@
-import { useState, useContext, useEffect, useMemo, useRef } from "react"
+import { useState, useContext, useEffect, useMemo } from "react"
 import ApiContext from "@context/apiContext"
 import { useAuth } from "@context/AuthContext"
-import { showToast } from "@utils/toast"
+import { useHotkeyFocus } from "@hooks/useHotkeyFocus"
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded"
 import AddRoundedIcon from "@mui/icons-material/AddRounded"
 import TripOriginRoundedIcon from "@mui/icons-material/TripOriginRounded"
@@ -37,17 +37,7 @@ const Inicio = ({ onNavigate }) => {
   }, [])
 
   // Atajo Ctrl/Cmd + K → enfoca el buscador del inicio.
-  const searchRef = useRef(null)
-  useEffect(() => {
-    const onKey = (e) => {
-      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
-        e.preventDefault()
-        searchRef.current?.focus()
-      }
-    }
-    window.addEventListener("keydown", onKey)
-    return () => window.removeEventListener("keydown", onKey)
-  }, [])
+  const searchRef = useHotkeyFocus()
 
   const displayName = user?.name || user?.email?.split("@")[0] || "Operario"
   const counts = {
@@ -81,7 +71,6 @@ const Inicio = ({ onNavigate }) => {
   const resumenColor = pending > 0 ? "var(--ink-orange)" : "var(--ink-teal)"
 
   const goSearch = () => onNavigate("cubiertas", { query: q.trim() })
-  const soon = (m) => showToast("info", m)
 
   const TILES = [
     { key: "alta", title: "Alta de cubierta", sub: "Registrar una nueva", icon: <AddRoundedIcon />, primary: true, onClick: () => onNavigate("cubiertas", { alta: true }) },

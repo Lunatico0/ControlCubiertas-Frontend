@@ -9,6 +9,7 @@ import { generateReceiptHTML } from "@utils/receipt-html"
 import { buildReprintData } from "@utils/print-data"
 import { useReprint } from "@hooks/useReprint"
 import { showToast } from "@utils/toast"
+import { downloadCSV } from "@utils/csv"
 import Pager from "./Pager"
 
 const COLS = "1.15fr 0.85fr 0.75fr 1.35fr 0.9fr 0.75fr"
@@ -101,12 +102,7 @@ const Comprobantes = () => {
       const { items } = await getReceipts({ q, type, limit: 100000 })
       const head = ["N°", "Fecha", "Tipo", "Cubierta", "Detalle", "Usuario"]
       const body = items.map((c) => [c.numero, fmtDate(c.fecha), c.tipo, c.cubierta ? `#${c.cubierta.code}` : "", detalle(c), c.usuario || ""])
-      const csv = [head, ...body].map((r) => r.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(",")).join("\n")
-      const blob = new Blob(["﻿" + csv], { type: "text/csv;charset=utf-8" })
-      const url = URL.createObjectURL(blob)
-      const a = document.createElement("a")
-      a.href = url; a.download = "comprobantes.csv"; a.click()
-      URL.revokeObjectURL(url)
+      downloadCSV("comprobantes.csv", head, body)
     } catch {
       showToast("error", "No se pudo exportar")
     }

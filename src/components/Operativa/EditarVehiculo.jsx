@@ -1,6 +1,7 @@
 import { useState, useEffect, useContext } from "react"
 import ApiContext from "@context/apiContext"
 import { showToast } from "@utils/toast"
+import Field from "@components/common/Field"
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded"
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined"
 
@@ -9,15 +10,7 @@ import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined"
 // El TIPO ya NO se edita acá: se define junto con los ejes (ConfigurarEjes → deriva el
 // tipo del layout). El kilometraje surge de los movimientos.
 const fieldStyle = { background: "var(--input)", border: "1.5px solid var(--bd)", color: "var(--tx)" }
-const labelCls = "mb-1.5 block text-[12.5px] font-medium"
 const inputCls = "w-full rounded-[9px] px-3 py-2.5 text-[14px] outline-none"
-
-const Field = ({ label, children }) => (
-  <div className="mb-3">
-    <label className={labelCls} style={{ color: "var(--tx-3)" }}>{label}</label>
-    {children}
-  </div>
-)
 
 const EditarVehiculo = ({ vehicle, onClose, onSaved }) => {
   const { vehicles } = useContext(ApiContext)

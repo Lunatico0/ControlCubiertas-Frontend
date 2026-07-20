@@ -5,7 +5,6 @@ import AddRoundedIcon from "@mui/icons-material/AddRounded"
 import EditRoundedIcon from "@mui/icons-material/EditRounded"
 import SettingsInputComponentRoundedIcon from "@mui/icons-material/SettingsInputComponentRounded"
 import LocalShippingOutlinedIcon from "@mui/icons-material/LocalShippingOutlined"
-import { tint } from "./status"
 import EditarVehiculo from "./EditarVehiculo"
 import ConfigurarEjes from "./ConfigurarEjes"
 
