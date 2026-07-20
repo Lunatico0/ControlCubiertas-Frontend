@@ -92,6 +92,26 @@ export const buildFinishRecapPrintData = (tire, updated, formData, receiptNumber
     actionType: "Recapado Completado",
   }, receiptNumber)
 
+// Nombres legibles (es) de los campos corregidos, para no mostrar la clave cruda (ej. "status" -> "Estado").
+const FIELD_LABELS = {
+  status: "Estado",
+  kilometers: "Kilómetros",
+  brand: "Marca",
+  size: "Rodado",
+  pattern: "Dibujo",
+  serialNumber: "N° de serie",
+  code: "Código interno",
+  orderNumber: "N° de orden",
+  vehicle: "Vehículo",
+  position: "Posición",
+  createdAt: "Fecha de alta",
+  date: "Fecha",
+}
+const labelEditedFields = (f) => {
+  const keys = Array.isArray(f) ? f : f == null || f === "" ? [] : String(f).split(/,\s*/)
+  return keys.map((k) => FIELD_LABELS[k] || k).join(", ")
+}
+
 export const buildCorrectionPrintData = (tire, updated, formData, receiptNumber) => {
   const fields = formData.form || {}
   return withReceipt({
@@ -104,9 +124,7 @@ export const buildCorrectionPrintData = (tire, updated, formData, receiptNumber)
       kmBaja: fields.kmBaja ?? "-",
       status: fields.status ?? tire.status,
       vehicle: updated.tire.vehicle || defaultVehicle,
-      editedFields: Array.isArray(updated.editedFields)
-        ? updated.editedFields.join(", ")
-        : updated.editedFields,
+      editedFields: labelEditedFields(updated.editedFields),
     },
     actionType: "Corrección de historial",
   }, receiptNumber)
@@ -144,9 +162,7 @@ export const buildReprintData = (entry, tire) =>
     correction: entry.flag
       ? {
         reason: entry.reason || "",
-        editedFields: Array.isArray(entry.editedFields)
-          ? entry.editedFields.join(", ")
-          : entry.editedFields || "",
+        editedFields: labelEditedFields(entry.editedFields),
       }
       : null,
   }, entry.receiptNumber)

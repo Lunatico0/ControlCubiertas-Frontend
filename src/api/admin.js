@@ -36,3 +36,13 @@ export const getVehicleReports = () =>
 // Desgaste POR POSICIÓN de un camión: km acumulado en cada posición del eje + agregado por eje.
 export const getVehicleWear = (id) =>
   adminClient.get(`/reports/vehicles/${id}/wear`).then((r) => r.data) // → { vehicle, positions:[{code,axle,side,km,current}], axles:[{axle,km,count}], maxPosKm }
+
+// Cache por sesion del desgaste por posicion (es analitica: cambia rara vez). Al alternar entre
+// vehiculos no vuelve a fetchear uno ya visto. Cachea SOLO exitos (si falla, borra y reintenta).
+const wearCache = new Map()
+export const getVehicleWearCached = (id) => {
+  if (!wearCache.has(id)) {
+    wearCache.set(id, getVehicleWear(id).catch((e) => { wearCache.delete(id); throw e }))
+  }
+  return wearCache.get(id)
+}

@@ -5,7 +5,7 @@ import DeleteOutlineRoundedIcon from "@mui/icons-material/DeleteOutlineRounded"
 import StyleRoundedIcon from "@mui/icons-material/StyleRounded"
 import FileDownloadRoundedIcon from "@mui/icons-material/FileDownloadRounded"
 import BoltRoundedIcon from "@mui/icons-material/BoltRounded"
-import { getReports, getVehicleReports, getVehicleWear } from "@api/admin"
+import { getReports, getVehicleReports, getVehicleWearCached } from "@api/admin"
 import { showToast } from "@utils/toast"
 import { downloadCSV } from "@utils/csv"
 import {
@@ -322,7 +322,7 @@ const Reportes = () => {
     if (!posVeh) { setWear(null); return }
     let cancelled = false
     setWearLoading(true)
-    getVehicleWear(posVeh)
+    getVehicleWearCached(posVeh)
       .then((w) => { if (!cancelled) setWear(w) })
       .catch(() => { if (!cancelled) setWear(null) })
       .finally(() => { if (!cancelled) setWearLoading(false) })
