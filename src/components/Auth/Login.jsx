@@ -129,6 +129,17 @@ const Login = () => {
                   {loggingIn ? "Ingresando…" : "Ingresar"}
                 </button>
               </div>
+
+              <div style={{ marginTop: 24, padding: "13px 15px", border: "1px dashed #2A3033", borderRadius: 11, fontSize: 12, color: "#7B8186", lineHeight: 1.6 }}>
+                <div>
+                  <span style={{ fontFamily: "'IBM Plex Mono'", fontSize: "9.5px", fontWeight: 600, letterSpacing: ".08em", color: "#9D90F5", background: "rgba(157,144,245,.16)", padding: "2px 8px", borderRadius: 20, marginRight: 8 }}>DEMO · ANDES CARGO</span>
+                  admin@andescargo.com / operario@andescargo.com · contraseña: <span style={{ fontFamily: "'IBM Plex Mono'", color: "#9AA0A4" }}>tireops</span>
+                </div>
+                <div style={{ marginTop: 9, display: "flex", gap: 7 }}>
+                  <span style={{ flex: "none" }}>⏱</span>
+                  <span>Entorno de prueba: los datos de Andes Cargo se restauran cada 48 hs. Lo que cargues no se guarda en la base: queda solo en este equipo y se borra a las 48 hs de creado.</span>
+                </div>
+              </div>
             </>
           ) : (
             <>
