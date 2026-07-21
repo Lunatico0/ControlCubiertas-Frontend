@@ -4,6 +4,7 @@ import { showToast } from "@utils/toast"
 import { getVehicleTypes, createVehicleType } from "@api/vehicles"
 import { buildCatalog, matchType, tiresOf } from "./vehicleTypes"
 import { tint } from "./status"
+import { formatPlate, normalizePlate } from "@utils/plateFormat"
 import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded"
 import AddRoundedIcon from "@mui/icons-material/AddRounded"
 import RemoveRoundedIcon from "@mui/icons-material/RemoveRounded"
@@ -16,7 +17,7 @@ import TripOriginRoundedIcon from "@mui/icons-material/TripOriginRounded"
 // ninguno, se puede nombrar y guardar como tipo custom. Crea con vehicles.create → POST
 // /api/vehicles { mobile, licensePlate, brand, type (derivado), kilometers, axles }.
 const NuevoVehiculo = ({ onClose, onCreated }) => {
-  const { vehicles } = useContext(ApiContext)
+  const { vehicles, data } = useContext(ApiContext)
   const [form, setForm] = useState({ movil: "", patente: "", marca: "", km: "" })
   const [axles, setAxles] = useState(["simple", "dual"])
   const [customTypes, setCustomTypes] = useState([])
@@ -26,10 +27,11 @@ const NuevoVehiculo = ({ onClose, onCreated }) => {
   const [errField, setErrField] = useState(null) // "movil" | "patente" — campo en conflicto
   const [errMsg, setErrMsg] = useState("")
 
-  // La patente solo admite letras y números (se pasa a MAYÚSCULAS y se sacan símbolos al tipear).
-  // Al editar el campo en conflicto se limpia el error.
+  // La patente se guarda normalizada (alfanumérica MAYÚS, sin separadores); el separador
+  // configurado por el tenant se muestra en el input vía formatPlate. Al editar el campo en
+  // conflicto se limpia el error.
   const set = (k) => (e) => {
-    const v = k === "patente" ? e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, "") : e.target.value
+    const v = k === "patente" ? normalizePlate(e.target.value) : e.target.value
     setForm((f) => ({ ...f, [k]: v }))
     if (errField === k) { setErrField(null); setErrMsg("") }
   }
@@ -139,7 +141,7 @@ const NuevoVehiculo = ({ onClose, onCreated }) => {
             <div className={sectionLabel} style={sectionLabelStyle}>DATOS DEL VEHÍCULO</div>
             <div className="grid grid-cols-2 gap-[13px]">
               <label className="block"><span className={labelCls} style={{ color: "var(--tx-4)" }}>Móvil / Identificador</span><input value={form.movil} onChange={set("movil")} placeholder="Móvil 07" className={inputBase} style={{ ...inputStyle, borderColor: errBorder("movil") }} onFocus={onFocusLime} onBlur={onBlurField("movil")} />{errField === "movil" && <span className="mt-1 block text-[11px]" style={{ color: "var(--ink-red)" }}>{errMsg}</span>}</label>
-              <label className="block"><span className={labelCls} style={{ color: "var(--tx-4)" }}>Patente</span><input value={form.patente} onChange={set("patente")} placeholder="AB123CD" className={inputBase} style={{ ...inputStyle, borderColor: errBorder("patente"), fontFamily: "'IBM Plex Mono'", textTransform: "uppercase" }} onFocus={onFocusLime} onBlur={onBlurField("patente")} />{errField === "patente" && <span className="mt-1 block text-[11px]" style={{ color: "var(--ink-red)" }}>{errMsg}</span>}</label>
+              <label className="block"><span className={labelCls} style={{ color: "var(--tx-4)" }}>Patente</span><input value={formatPlate(form.patente, data.plateSep)} onChange={set("patente")} placeholder={formatPlate("AB123CD", data.plateSep)} className={inputBase} style={{ ...inputStyle, borderColor: errBorder("patente"), fontFamily: "'IBM Plex Mono'", textTransform: "uppercase" }} onFocus={onFocusLime} onBlur={onBlurField("patente")} />{errField === "patente" && <span className="mt-1 block text-[11px]" style={{ color: "var(--ink-red)" }}>{errMsg}</span>}</label>
               <label className="block"><span className={labelCls} style={{ color: "var(--tx-4)" }}>Marca</span><input value={form.marca} onChange={set("marca")} placeholder="Scania" className={inputBase} style={inputStyle} onFocus={onFocusLime} onBlur={onBlurBd} /></label>
               <label className="block"><span className={labelCls} style={{ color: "var(--tx-4)" }}>Kilometraje actual</span><input value={form.km} onChange={set("km")} placeholder="0" inputMode="numeric" className={inputBase} style={{ ...inputStyle, fontFamily: "'IBM Plex Mono'" }} onFocus={onFocusLime} onBlur={onBlurBd} /></label>
             </div>

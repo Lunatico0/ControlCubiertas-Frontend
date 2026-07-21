@@ -1,6 +1,5 @@
 import { createContext, useState, useEffect, useCallback, useMemo } from "react"
 import { getSuggestedCode } from "@utils/suggestedCode"
-import { setPlateSeparator } from "@utils/plateFormat"
 
 // Importar todas las funciones API
 import {
@@ -62,6 +61,7 @@ export const ApiProvider = ({ children }) => {
   const [suggestedCode, setSuggestedCode] = useState("")
   // Estados de cubierta configurables del tenant [{name,role}] — fuente para /op.
   const [statuses, setStatuses] = useState([])
+  const [plateSep, setPlateSep] = useState("") // separador de patente configurable (solo display)
 
   // Estados de control
   const [refreshTrigger, setRefreshTrigger] = useState(0)
@@ -400,7 +400,7 @@ export const ApiProvider = ({ children }) => {
       getCompanyCached()
         .then((c) => {
           if (cancelled) return
-          setPlateSeparator(c?.plateSeparator || "") // separador de patente configurable (solo display)
+          setPlateSep(c?.plateSeparator || "") // separador de patente configurable (solo display)
           const st = Array.isArray(c?.stockStatuses) ? c.stockStatuses : []
           if (!st.length && attempt < 3) {
             setTimeout(() => loadStatuses(attempt + 1), 400 * (attempt + 1))
@@ -509,6 +509,7 @@ export const ApiProvider = ({ children }) => {
     const byRole = (role) => statuses.find((s) => s.role === role)?.name
     return {
       statuses,
+      plateSep,
       statusMeta: buildStatusMeta(statuses),
       initialStatus: byRole("initial"),
       discardStatus: byRole("discard"),
@@ -516,7 +517,7 @@ export const ApiProvider = ({ children }) => {
       stockScale: statuses.filter((s) => s.role === "initial" || s.role === "stock").map((s) => s.name),
       stateOrder: statuses.map((s) => s.name),
     }
-  }, [statuses])
+  }, [statuses, plateSep])
 
   // Valor del contexto memoizado
   const contextValue = useMemo(() => ({

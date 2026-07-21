@@ -2,6 +2,7 @@ import { useState, useEffect, useContext } from "react"
 import ApiContext from "@context/apiContext"
 import { showToast } from "@utils/toast"
 import Field from "@components/common/Field"
+import { formatPlate, normalizePlate } from "@utils/plateFormat"
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded"
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined"
 
@@ -13,14 +14,15 @@ const fieldStyle = { background: "var(--input)", border: "1.5px solid var(--bd)"
 const inputCls = "w-full rounded-[9px] px-3 py-2.5 text-[14px] outline-none"
 
 const EditarVehiculo = ({ vehicle, onClose, onSaved }) => {
-  const { vehicles } = useContext(ApiContext)
+  const { vehicles, data } = useContext(ApiContext)
   const [form, setForm] = useState({
     mobile: vehicle?.mobile || "",
     licensePlate: vehicle?.licensePlate || "",
     brand: vehicle?.brand || "",
   })
   const [submitting, setSubmitting] = useState(false)
-  const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }))
+  // La patente se guarda normalizada; el separador del tenant se muestra vía formatPlate.
+  const set = (k) => (e) => setForm((f) => ({ ...f, [k]: k === "licensePlate" ? normalizePlate(e.target.value) : e.target.value }))
 
   useEffect(() => {
     const onKey = (e) => { if (e.key === "Escape") onClose() }
@@ -66,7 +68,7 @@ const EditarVehiculo = ({ vehicle, onClose, onSaved }) => {
 
         <div className="flex-1 overflow-auto p-5">
           <Field label="Móvil / Identificador"><input className={inputCls} style={fieldStyle} value={form.mobile} onChange={set("mobile")} placeholder="Móvil 07" /></Field>
-          <Field label="Patente"><input className={inputCls} style={{ ...fieldStyle, fontFamily: "'IBM Plex Mono'", textTransform: "uppercase" }} value={form.licensePlate} onChange={set("licensePlate")} placeholder="AB123CD" /></Field>
+          <Field label="Patente"><input className={inputCls} style={{ ...fieldStyle, fontFamily: "'IBM Plex Mono'", textTransform: "uppercase" }} value={formatPlate(form.licensePlate, data.plateSep)} onChange={set("licensePlate")} placeholder={formatPlate("AB123CD", data.plateSep)} /></Field>
           <Field label="Marca"><input className={inputCls} style={fieldStyle} value={form.brand} onChange={set("brand")} placeholder="Scania" /></Field>
           <div className="mb-3 flex items-start gap-2.5 rounded-[10px] px-3 py-2.5" style={{ border: "1px solid var(--bd-soft)", background: "var(--input)" }}>
             <span className="mt-0.5 inline-flex flex-none" style={{ color: "var(--ink-blue)" }}><InfoOutlinedIcon sx={{ fontSize: 16 }} /></span>
