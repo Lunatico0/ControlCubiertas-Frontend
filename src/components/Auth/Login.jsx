@@ -3,6 +3,7 @@ import { useNavigate, useLocation, Navigate } from "react-router-dom"
 import { useAuth } from "@context/AuthContext"
 import BrandLogo from "@components/BrandLogo"
 import tireOpsDark from "@/assets/TireOpsDark.svg"
+import isElectron from "@utils/isElectron"
 
 // Login del rediseño (Claude Design). Es una pantalla DARK FIJA (no sigue el toggle de tema),
 // por eso usa los hex de la paleta TireOps directo y no los tokens var(--x). Auth real via
@@ -60,14 +61,14 @@ const Login = () => {
   const onKey = (ev) => { if (ev.key === "Enter") doLogin() }
 
   return (
-    <div style={{ width: "100%", height: "100vh", display: "flex", background: "#0A0C0D", color: "#fff", overflow: "hidden", fontFamily: "'IBM Plex Sans',system-ui,sans-serif" }}>
+    <div style={{ width: "100%", height: "100vh", display: "flex", background: "#0A0C0D", color: "#fff", overflow: "hidden", textAlign: "left", fontFamily: "'IBM Plex Sans',system-ui,sans-serif" }}>
       {/* Panel de marca — oculto en pantallas chicas */}
-      <div className="hidden lg:flex" style={{ flex: 1.1, position: "relative", overflow: "hidden", background: "#070809", borderRight: "1px solid #181C1E", flexDirection: "column", justifyContent: "space-between", padding: "44px 48px" }}>
+      <div className="hidden lg:flex" style={{ flex: 1.1, position: "relative", overflow: "hidden", background: "#070809", borderRight: "1px solid #181C1E", flexDirection: "column", padding: "44px 48px" }}>
         <div style={{ position: "relative", zIndex: 1 }}><BrandLogo variant="dark" height={50} /></div>
         <img src={tireOpsDark} alt="" style={{ position: "absolute", right: -180, top: "50%", transform: "translateY(-50%)", width: 640, height: "auto", opacity: 0.05, pointerEvents: "none" }} />
-        <div style={{ position: "relative", zIndex: 1, maxWidth: 420 }}>
+        <div style={{ position: "relative", zIndex: 1, flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", maxWidth: 420 }}>
           <div style={{ fontFamily: "'Space Grotesk'", fontSize: 30, fontWeight: 700, lineHeight: 1.2, letterSpacing: "-.01em" }}>Cada cubierta,<br />bajo control.</div>
-          <div style={{ fontSize: "14.5px", color: "#8B9197", lineHeight: 1.6, marginTop: 12 }}>Trazabilidad completa del ciclo de vida: alta, montaje, recapados y descarte — con comprobante de cada movimiento.</div>
+          <div style={{ fontSize: "14.5px", color: "#8B9197", lineHeight: 1.6, marginTop: 12 }}>Trazabilidad completa del ciclo de vida: alta, montaje, recapados y descarte, con comprobante de cada movimiento.</div>
           <div style={{ display: "flex", gap: 18, marginTop: 26 }}>
             {[["Inventario vivo", "#C4ED2B"], ["Recapados", "#1FD0B4"], ["Flota completa", "#6E97F5"]].map(([label, dot]) => (
               <div key={label} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: "12.5px", color: "#7B8186" }}>
@@ -76,7 +77,7 @@ const Login = () => {
             ))}
           </div>
         </div>
-        <div style={{ position: "relative", zIndex: 1, fontFamily: "'IBM Plex Mono'", fontSize: 11, color: "#5E646A" }}>{ver ? `v${ver} · ` : ""}TireOps</div>
+        {isElectron() && <div style={{ position: "relative", zIndex: 1, fontFamily: "'IBM Plex Mono'", fontSize: 11, color: "#5E646A" }}>{ver ? `v${ver} · ` : ""}TireOps</div>}
       </div>
 
       {/* Panel de formulario */}
