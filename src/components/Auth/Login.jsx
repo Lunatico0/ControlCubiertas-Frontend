@@ -1,144 +1,151 @@
-import { useState } from "react"
-import { useForm } from "react-hook-form"
+import { useState, useEffect } from "react"
 import { useNavigate, useLocation, Navigate } from "react-router-dom"
-import MailOutlineIcon from "@mui/icons-material/MailOutline"
-import LockOutlinedIcon from "@mui/icons-material/LockOutlined"
-import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined"
-import VisibilityOffOutlinedIcon from "@mui/icons-material/VisibilityOffOutlined"
 import { useAuth } from "@context/AuthContext"
 import BrandLogo from "@components/BrandLogo"
+import tireOpsDark from "@/assets/TireOpsDark.svg"
 
-const inputClass =
-  "w-full rounded-lg border border-slate-300 bg-white py-2.5 text-slate-900 placeholder:text-slate-400 outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
+// Login del rediseño (Claude Design). Es una pantalla DARK FIJA (no sigue el toggle de tema),
+// por eso usa los hex de la paleta TireOps directo y no los tokens var(--x). Auth real via
+// useAuth().login. El reset por email no existe en el backend → "¿La olvidaste?" deriva a
+// pedirla al administrador. El "mantener sesión" y el demo llegan en updates siguientes.
+const LIME = "#C4ED2B"
+const BORDER = "#2A3033"
+const BAD = "#F0716A"
+
+const inputStyle = (bad) => ({
+  width: "100%", height: 48, padding: "0 15px",
+  border: `1.5px solid ${bad ? BAD : BORDER}`, borderRadius: 12,
+  background: "#0C0E0F", color: "#fff", fontSize: "14.5px",
+  fontFamily: "'IBM Plex Sans'", outline: "none",
+})
 
 const Login = () => {
   const { login, isAuthenticated, mustChangePassword } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
-  const [showPassword, setShowPassword] = useState(false)
-  const [serverError, setServerError] = useState("")
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm()
-
   const from = location.state?.from?.pathname || "/"
 
-  // Ya logueado: no mostrar el login de nuevo.
-  if (isAuthenticated) {
-    return <Navigate to={mustChangePassword ? "/cambiar-password" : from} replace />
-  }
+  const [step, setStep] = useState("login") // "login" | "forgot"
+  const [email, setEmail] = useState("")
+  const [pwd, setPwd] = useState("")
+  const [showPwd, setShowPwd] = useState(false)
+  const [err, setErr] = useState({})
+  const [credErr, setCredErr] = useState("")
+  const [loggingIn, setLoggingIn] = useState(false)
+  const [ver, setVer] = useState("")
 
-  const onSubmit = async ({ email, password }) => {
-    setServerError("")
+  useEffect(() => { window.electronAPI?.getVersion?.().then((v) => setVer(v || "")).catch(() => {}) }, [])
+
+  if (isAuthenticated) return <Navigate to={mustChangePassword ? "/cambiar-password" : from} replace />
+
+  const focus = (e) => (e.target.style.borderColor = LIME)
+  const blur = (bad) => (e) => (e.target.style.borderColor = bad ? BAD : BORDER)
+
+  const doLogin = async () => {
+    const e = {}
+    const em = email.trim().toLowerCase()
+    if (!em) e.email = "Ingresá tu email."
+    else if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)) e.email = "Ese email no parece válido."
+    if (!pwd) e.pwd = "Ingresá tu contraseña."
+    if (Object.keys(e).length) { setErr(e); return }
+    setErr({}); setCredErr(""); setLoggingIn(true)
     try {
-      const user = await login(email, password)
+      const user = await login(em, pwd)
       navigate(user.mustChangePassword ? "/cambiar-password" : from, { replace: true })
-    } catch (err) {
-      setServerError(err.message || "No pudimos iniciar sesión")
+    } catch (error) {
+      setCredErr(error?.message || "Email o contraseña incorrectos. Revisá los datos e intentá de nuevo.")
+      setLoggingIn(false)
     }
   }
+  const onKey = (ev) => { if (ev.key === "Enter") doLogin() }
 
   return (
-    <div className="min-h-screen flex bg-white dark:bg-slate-950">
-      {/* Panel de marca — solo desktop */}
-      <aside className="hidden lg:flex lg:w-1/2 flex-col justify-between bg-slate-900 p-12 text-white">
-        <div className="flex items-center">
-          <BrandLogo variant="dark" height={40} />
+    <div style={{ width: "100%", height: "100vh", display: "flex", background: "#0A0C0D", color: "#fff", overflow: "hidden", fontFamily: "'IBM Plex Sans',system-ui,sans-serif" }}>
+      {/* Panel de marca — oculto en pantallas chicas */}
+      <div className="hidden lg:flex" style={{ flex: 1.1, position: "relative", overflow: "hidden", background: "#070809", borderRight: "1px solid #181C1E", flexDirection: "column", justifyContent: "space-between", padding: "44px 48px" }}>
+        <div style={{ position: "relative", zIndex: 1 }}><BrandLogo variant="dark" height={50} /></div>
+        <img src={tireOpsDark} alt="" style={{ position: "absolute", right: -180, top: "50%", transform: "translateY(-50%)", width: 640, height: "auto", opacity: 0.05, pointerEvents: "none" }} />
+        <div style={{ position: "relative", zIndex: 1, maxWidth: 420 }}>
+          <div style={{ fontFamily: "'Space Grotesk'", fontSize: 30, fontWeight: 700, lineHeight: 1.2, letterSpacing: "-.01em" }}>Cada cubierta,<br />bajo control.</div>
+          <div style={{ fontSize: "14.5px", color: "#8B9197", lineHeight: 1.6, marginTop: 12 }}>Trazabilidad completa del ciclo de vida: alta, montaje, recapados y descarte — con comprobante de cada movimiento.</div>
+          <div style={{ display: "flex", gap: 18, marginTop: 26 }}>
+            {[["Inventario vivo", "#C4ED2B"], ["Recapados", "#1FD0B4"], ["Flota completa", "#6E97F5"]].map(([label, dot]) => (
+              <div key={label} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: "12.5px", color: "#7B8186" }}>
+                <span style={{ width: 7, height: 7, borderRadius: "50%", background: dot }} />{label}
+              </div>
+            ))}
+          </div>
         </div>
-        <div className="max-w-md">
-          <h1 className="font-display text-4xl font-bold leading-tight">
-            El control de tu flota, bajo control.
-          </h1>
-          <p className="mt-4 text-lg text-slate-300">
-            Cubiertas, recapados y vehículos. Cada movimiento registrado, cada cubierta trazada.
-          </p>
-        </div>
-        <p className="text-sm text-slate-500">© {new Date().getFullYear()} TireOps</p>
-      </aside>
+        <div style={{ position: "relative", zIndex: 1, fontFamily: "'IBM Plex Mono'", fontSize: 11, color: "#5E646A" }}>{ver ? `v${ver} · ` : ""}TireOps</div>
+      </div>
 
       {/* Panel de formulario */}
-      <main className="flex flex-1 items-center justify-center p-6 sm:p-12">
-        <div className="w-full max-w-sm">
-          {/* Marca compacta — solo mobile */}
-          <div className="mb-10 flex items-center lg:hidden">
-            <BrandLogo height={34} />
-          </div>
-
-          <h2 className="font-display text-2xl font-bold text-slate-900 dark:text-white">Iniciar sesión</h2>
-          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-            Ingresá con tu cuenta para continuar.
-          </p>
-
-          <form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-5" noValidate>
-            {serverError && (
-              <div
-                role="alert"
-                className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900/50 dark:bg-red-950/40 dark:text-red-300"
-              >
-                {serverError}
+      <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "40px 24px" }}>
+        <div style={{ width: 400, maxWidth: "100%", animation: "none" }}>
+          {step === "login" ? (
+            <>
+              <div style={{ marginBottom: 28 }}>
+                <h1 style={{ margin: 0, fontFamily: "'Space Grotesk'", fontSize: 26, fontWeight: 700 }}>Iniciar sesión</h1>
+                <p style={{ margin: "7px 0 0 0", fontSize: 14, color: "#8B9197" }}>Ingresá con tu cuenta de la empresa.</p>
               </div>
-            )}
 
-            <div>
-              <label htmlFor="email" className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
-                Email
-              </label>
-              <div className="relative">
-                <MailOutlineIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" fontSize="small" />
-                <input
-                  id="email"
-                  type="email"
-                  autoComplete="email"
-                  placeholder="vos@empresa.com"
-                  className={`${inputClass} pl-10 pr-3`}
-                  {...register("email", { required: "Ingresá tu email" })}
-                />
-              </div>
-              {errors.email && <p className="mt-1 text-xs text-red-600">{errors.email.message}</p>}
-            </div>
+              {credErr && (
+                <div role="alert" style={{ display: "flex", gap: 10, padding: "12px 14px", border: "1px solid rgba(240,86,74,.4)", borderRadius: 11, background: "rgba(240,86,74,.08)", marginBottom: 18 }}>
+                  <span style={{ color: BAD, flex: "none", marginTop: 1 }}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="9.2" /><path d="M12 8v5M12 16h.01" /></svg>
+                  </span>
+                  <span style={{ fontSize: "12.5px", color: "#F0A9A4", lineHeight: 1.5 }}>{credErr}</span>
+                </div>
+              )}
 
-            <div>
-              <label htmlFor="password" className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
-                Contraseña
-              </label>
-              <div className="relative">
-                <LockOutlinedIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" fontSize="small" />
-                <input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  autoComplete="current-password"
-                  placeholder="••••••••"
-                  className={`${inputClass} pl-10 pr-10`}
-                  {...register("password", { required: "Ingresá tu contraseña" })}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword((v) => !v)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 transition hover:text-slate-600"
-                  aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
-                >
-                  {showPassword ? (
-                    <VisibilityOffOutlinedIcon fontSize="small" />
-                  ) : (
-                    <VisibilityOutlinedIcon fontSize="small" />
-                  )}
+              <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                <div>
+                  <label style={{ display: "block", fontSize: "12.5px", fontWeight: 600, color: "#D6D9D5", marginBottom: 7 }}>Email</label>
+                  <input value={email} onChange={(e) => { setEmail(e.target.value); setErr((p) => ({ ...p, email: null })); setCredErr("") }} onKeyDown={onKey} onFocus={focus} onBlur={blur(!!err.email)} placeholder="Ej. marcela@transportesdelsur.com" style={inputStyle(!!err.email)} />
+                  {err.email && <div style={{ marginTop: 6, fontSize: 12, color: BAD }}>{err.email}</div>}
+                </div>
+
+                <div>
+                  <div style={{ display: "flex", alignItems: "baseline", marginBottom: 7 }}>
+                    <label style={{ fontSize: "12.5px", fontWeight: 600, color: "#D6D9D5" }}>Contraseña</label>
+                    <span onClick={() => setStep("forgot")} style={{ marginLeft: "auto", fontSize: 12, color: LIME, cursor: "pointer" }}>¿La olvidaste?</span>
+                  </div>
+                  <div style={{ position: "relative" }}>
+                    <input value={pwd} onChange={(e) => { setPwd(e.target.value); setErr((p) => ({ ...p, pwd: null })); setCredErr("") }} onKeyDown={onKey} onFocus={focus} onBlur={blur(!!err.pwd)} type={showPwd ? "text" : "password"} placeholder="Tu contraseña" style={{ ...inputStyle(!!err.pwd), padding: "0 48px 0 15px" }} />
+                    <span onClick={() => setShowPwd((v) => !v)} title={showPwd ? "Ocultar" : "Mostrar"} style={{ position: "absolute", right: 6, top: "50%", transform: "translateY(-50%)", width: 38, height: 38, display: "flex", alignItems: "center", justifyContent: "center", color: "#7B8186", cursor: "pointer", borderRadius: 9 }}>
+                      {showPwd ? (
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3.5-6.5 10-6.5S22 12 22 12s-3.5 6.5-10 6.5S2 12 2 12Z" /><circle cx="12" cy="12" r="2.8" /><path d="M4 4l16 16" /></svg>
+                      ) : (
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3.5-6.5 10-6.5S22 12 22 12s-3.5 6.5-10 6.5S2 12 2 12Z" /><circle cx="12" cy="12" r="2.8" /></svg>
+                      )}
+                    </span>
+                  </div>
+                  {err.pwd && <div style={{ marginTop: 6, fontSize: 12, color: BAD }}>{err.pwd}</div>}
+                </div>
+
+                <button onClick={doLogin} disabled={loggingIn} style={{ width: "100%", height: 50, border: "none", background: LIME, color: "#0A0C0D", borderRadius: 13, fontSize: 15, fontWeight: 700, fontFamily: "'IBM Plex Sans'", cursor: loggingIn ? "default" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 10, marginTop: 4, opacity: loggingIn ? 0.75 : 1 }}>
+                  {loggingIn && <span className="animate-spin" style={{ width: 17, height: 17, borderRadius: "50%", border: "2.5px solid rgba(10,12,13,.25)", borderTopColor: "#0A0C0D" }} />}
+                  {loggingIn ? "Ingresando…" : "Ingresar"}
                 </button>
               </div>
-              {errors.password && <p className="mt-1 text-xs text-red-600">{errors.password.message}</p>}
-            </div>
-
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="w-full rounded-lg bg-brand-500 px-4 py-2.5 font-medium text-slate-900 transition hover:bg-brand-600 focus:ring-2 focus:ring-brand-500/40 disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              {isSubmitting ? "Ingresando…" : "Ingresar"}
-            </button>
-          </form>
+            </>
+          ) : (
+            <>
+              <div style={{ marginBottom: 20 }}>
+                <h1 style={{ margin: 0, fontFamily: "'Space Grotesk'", fontSize: 24, fontWeight: 700 }}>Recuperar acceso</h1>
+                <p style={{ margin: "7px 0 0 0", fontSize: "13.5px", color: "#8B9197", lineHeight: 1.6 }}>Las contraseñas las gestiona el administrador de tu empresa.</p>
+              </div>
+              <div style={{ display: "flex", gap: 10, padding: "13px 15px", border: "1px solid #2A3033", borderRadius: 11, background: "#0C0E0F", marginBottom: 18 }}>
+                <span style={{ color: "#6E97F5", flex: "none", marginTop: 1 }}>
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9" /><path d="M12 16v-4M12 8h.01" /></svg>
+                </span>
+                <span style={{ fontSize: 13, color: "#9AA0A4", lineHeight: 1.6 }}>Pedile a tu administrador que te genere una nueva desde <b style={{ color: "#D6D9D5" }}>Usuarios</b>. Te va a dar una contraseña temporal para tu próximo ingreso.</span>
+              </div>
+              <button onClick={() => setStep("login")} style={{ width: "100%", height: 48, border: "1px solid #2A3033", background: "transparent", color: "#D6D9D5", borderRadius: 12, fontSize: "13.5px", fontWeight: 600, fontFamily: "'IBM Plex Sans'", cursor: "pointer" }}>Volver a iniciar sesión</button>
+            </>
+          )}
         </div>
-      </main>
+      </div>
     </div>
   )
 }
