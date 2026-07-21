@@ -27,14 +27,18 @@ export const useUpdater = () => {
   const dlStRef = useRef(dl.st)
   dlStRef.current = dl.st
 
+  // Versión que electron-updater detectó como disponible (evento update:available). Fallback si
+  // la API de GitHub (listReleases) falla o viene vacía: igual ofrecemos la descarga.
+  const availableVerRef = useRef("")
+
   // Mount: versión instalada + listeners + chequeo en background (para prender el bip).
   useEffect(() => {
     if (!isDesktop) return
 
     api.getVersion?.().then(setCurrent).catch(() => {})
 
-    const onAvailable = () => setBip(true)
-    const onNotAvailable = () => setBip(false)
+    const onAvailable = (_e, info) => { setBip(true); if (info?.version) availableVerRef.current = info.version }
+    const onNotAvailable = () => { setBip(false); availableVerRef.current = "" }
     const onProgress = (_e, payload) => setDl({ st: "downloading", pct: payload?.percent ?? 0 })
     const onDownloaded = () => setDl({ st: "downloaded", pct: 100 })
     const onError = (_e, payload) => {
@@ -65,13 +69,23 @@ export const useUpdater = () => {
   // checking → listReleases → list (si hay) / uptodate (si no o falla).
   const loadList = useCallback(() => {
     setPhase("checking")
+    // Fila de fallback (sin changelog) si electron-updater detectó un update pero listReleases
+    // falla/viene vacía → nunca quedamos trabados sin poder descargar.
+    const fallback = () =>
+      availableVerRef.current
+        ? [{ version: availableVerRef.current, name: `v${availableVerRef.current}`, notes: "", date: "", size: 0 }]
+        : []
     Promise.resolve(api?.listReleases?.())
       .then((rel) => {
-        const arr = Array.isArray(rel) ? rel : []
+        const arr = Array.isArray(rel) && rel.length ? rel : fallback()
         setList(arr)
         setPhase(arr.length ? "list" : "uptodate")
       })
-      .catch(() => setPhase("uptodate"))
+      .catch(() => {
+        const arr = fallback()
+        setList(arr)
+        setPhase(arr.length ? "list" : "uptodate")
+      })
   }, [api])
 
   const openModal = useCallback(() => {
