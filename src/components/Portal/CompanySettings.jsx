@@ -22,6 +22,16 @@ const ordinal = (n) => ORDINALS[n] || `${n}º`
 const ROLE_LABEL = { initial: "Inicial", stock: "Recapado", recap: "A recapar", discard: "Baja" }
 const isFixed = (role) => role === "initial" || role === "recap" || role === "discard"
 
+// Separadores de patente para DISPLAY (la patente se guarda normalizada). Ver utils/plateFormat.js.
+const PLATE_SEPS = [
+  { v: "", label: "Ninguno" },
+  { v: "-", label: "Guión" },
+  { v: ".", label: "Punto" },
+  { v: " ", label: "Espacio" },
+  { v: "/", label: "Barra" },
+]
+const isPresetSep = (v) => PLATE_SEPS.some((p) => p.v === v)
+
 const CompanySettings = () => {
   const { register, handleSubmit, reset, formState: { isSubmitting } } = useForm()
   const [loading, setLoading] = useState(true)
@@ -30,6 +40,7 @@ const CompanySettings = () => {
   const [statuses, setStatuses] = useState([]) // [{name, role, color?}] ordenado
   const [usage, setUsage] = useState({}) // { nombreEstado: cantidadDeCubiertas }
   const [editing, setEditing] = useState(null) // índice del estado en edición (popover)
+  const [plateSep, setPlateSep] = useState("") // separador de patente (solo display)
 
   useEffect(() => {
     Promise.all([getCompany(), getSummary().catch(() => null)])
@@ -39,6 +50,7 @@ const CompanySettings = () => {
           address: c.address || "", receiptPrefix: c.receiptPrefix || "", receiptFooter: c.receiptFooter || "",
         })
         setStatuses(Array.isArray(c.stockStatuses) ? c.stockStatuses : [])
+        setPlateSep(c.plateSeparator || "")
         setUsage(s?.cubiertas?.byStatus || {})
         setMeta({ plan: c.plan, status: c.status, dbName: c.dbName })
       })
@@ -78,12 +90,13 @@ const CompanySettings = () => {
 
   const onSubmit = async (data) => {
     try {
-      const updated = await updateCompany({ ...data, stockStatuses: statuses })
+      const updated = await updateCompany({ ...data, stockStatuses: statuses, plateSeparator: plateSep })
       reset({
         name: updated.name || "", cuit: updated.cuit || "", phone: updated.phone || "",
         address: updated.address || "", receiptPrefix: updated.receiptPrefix || "", receiptFooter: updated.receiptFooter || "",
       })
       setStatuses(Array.isArray(updated.stockStatuses) ? updated.stockStatuses : [])
+      setPlateSep(updated.plateSeparator || "")
       setEditing(null)
       showToast("success", "Datos de la empresa actualizados")
     } catch (err) {
@@ -137,6 +150,44 @@ const CompanySettings = () => {
               <label htmlFor="receiptFooter" className={labelClass}>Pie de recibo</label>
               <textarea id="receiptFooter" rows={2} className={inputClass} {...register("receiptFooter")} />
             </div>
+          </div>
+        </section>
+
+        {/* Patentes (separador de display) */}
+        <section className={cardClass}>
+          <h2 className="font-display text-lg font-semibold text-(--tx)" style={{ fontFamily: "'Space Grotesk'" }}>Patentes</h2>
+          <p className="mt-1 text-sm text-(--tx-4)">
+            Separador para <span className="font-medium text-(--tx-3)">mostrar</span> las patentes. Es solo visual: la patente se guarda sin separadores.
+          </p>
+          <div className="mt-4 flex flex-wrap items-center gap-2">
+            {PLATE_SEPS.map((p) => {
+              const sel = plateSep === p.v
+              return (
+                <button key={p.label} type="button" onClick={() => setPlateSep(p.v)}
+                  className="rounded-full border px-3.5 py-1.5 text-[12.5px] font-semibold transition"
+                  style={{
+                    borderColor: sel ? "var(--ink-lime)" : "var(--bd)",
+                    background: sel ? "color-mix(in srgb, var(--ink-lime) 14%, transparent)" : "var(--elev)",
+                    color: sel ? "var(--tx)" : "var(--tx-3)",
+                  }}>
+                  {p.label}
+                </button>
+              )
+            })}
+            <label className="ml-1 flex items-center gap-2 text-[12px] text-(--tx-4)">
+              Otro
+              <input
+                value={isPresetSep(plateSep) ? "" : plateSep}
+                onChange={(e) => setPlateSep(e.target.value.slice(-1))}
+                maxLength={1}
+                placeholder="·"
+                className="h-9 w-12 rounded-lg border border-(--bd) bg-(--input) text-center text-[15px] font-semibold text-(--tx) outline-none focus:border-(--ink-lime)"
+              />
+            </label>
+          </div>
+          <div className="mt-4 flex items-center gap-2 text-sm text-(--tx-5)">
+            Vista previa:
+            <span className="rounded-md border border-(--bd) bg-(--input) px-2.5 py-1 font-mono text-[13px] text-(--tx-2)">{plateSep ? `EEQ${plateSep}541` : "EEQ541"}</span>
           </div>
         </section>
 

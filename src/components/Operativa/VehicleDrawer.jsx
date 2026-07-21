@@ -7,6 +7,7 @@ import SettingsInputComponentRoundedIcon from "@mui/icons-material/SettingsInput
 import LocalShippingOutlinedIcon from "@mui/icons-material/LocalShippingOutlined"
 import EditarVehiculo from "./EditarVehiculo"
 import ConfigurarEjes from "./ConfigurarEjes"
+import { formatPlate } from "@utils/plateFormat"
 
 // Detalle del vehículo (rediseño Claude Design "DRAWER VEHÍCULO"): stats + posiciones
 // (ver/montar cubierta) + acciones (reconfigurar ejes, editar datos). Recibe el item ya
@@ -56,7 +57,7 @@ const VehicleDrawer = ({ item, onClose, onNavigate }) => {
               <span className="text-[24px] font-bold leading-none" style={{ fontFamily: "'Space Grotesk'", color: "var(--tx)" }}>{v.mobile || "—"}</span>
               {v.type && <span className="rounded-full px-2.5 py-[3px] text-[11px] font-semibold" style={{ color: tipoColor, background: tipoBg }}>{v.type}</span>}
             </div>
-            <div className="mt-[3px] text-[12px]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-5)" }}>{v.licensePlate || "—"} · {v.brand || "—"}</div>
+            <div className="mt-[3px] text-[12px]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-5)" }}>{formatPlate(v.licensePlate) || "—"} · {v.brand || "—"}</div>
           </div>
           <button onClick={onClose} title="Cerrar" className="rounded-lg p-1.5" style={{ color: "var(--tx-5)" }}><CloseRoundedIcon sx={{ fontSize: 20 }} /></button>
         </div>

@@ -1,5 +1,6 @@
 import { createContext, useState, useEffect, useCallback, useMemo } from "react"
 import { getSuggestedCode } from "@utils/suggestedCode"
+import { setPlateSeparator } from "@utils/plateFormat"
 
 // Importar todas las funciones API
 import {
@@ -399,6 +400,7 @@ export const ApiProvider = ({ children }) => {
       getCompanyCached()
         .then((c) => {
           if (cancelled) return
+          setPlateSeparator(c?.plateSeparator || "") // separador de patente configurable (solo display)
           const st = Array.isArray(c?.stockStatuses) ? c.stockStatuses : []
           if (!st.length && attempt < 3) {
             setTimeout(() => loadStatuses(attempt + 1), 400 * (attempt + 1))
