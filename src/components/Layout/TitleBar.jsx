@@ -57,17 +57,18 @@ const TitleBar = () => {
       </div>
       <div style={{ marginLeft: "auto", display: "flex", WebkitAppRegion: "no-drag" }}>
         <Ctrl onClick={() => win.minimizeWindow?.()} title="Minimizar">
-          <svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.2"><path d="M1 6h10" /></svg>
+          <svg width="14" height="14" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.4"><path d="M1 6h10" /></svg>
         </Ctrl>
         <Ctrl onClick={() => win.maximizeWindow?.()} title={isMax ? "Restaurar" : "Maximizar"}>
           {isMax ? (
-            <svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.2"><rect x="2.7" y="1.3" width="8" height="8" /><path d="M1.3 3.7v7h7" /></svg>
+            // Restaurar: cuadro "de adelante" abajo-izquierda + el de atrás asomando arriba-derecha (como Windows/VS Code).
+            <svg width="14" height="14" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.4"><rect x="1.5" y="3.5" width="7" height="7" /><path d="M3.5 1.5h7v7" /></svg>
           ) : (
-            <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.2"><rect x="1.5" y="1.5" width="9" height="9" /></svg>
+            <svg width="13" height="13" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.4"><rect x="1.5" y="1.5" width="9" height="9" /></svg>
           )}
         </Ctrl>
         <Ctrl onClick={() => win.closeWindow?.()} title="Cerrar" danger>
-          <svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.2"><path d="M1.5 1.5l9 9M10.5 1.5l-9 9" /></svg>
+          <svg width="14" height="14" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.4"><path d="M1.5 1.5l9 9M10.5 1.5l-9 9" /></svg>
         </Ctrl>
       </div>
     </div>

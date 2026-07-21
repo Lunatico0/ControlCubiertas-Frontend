@@ -93,8 +93,8 @@ const Login = () => {
       </div>
 
       {/* Panel de formulario */}
-      <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "40px 24px" }}>
-        <div style={{ width: 400, maxWidth: "100%" }}>
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", overflowY: "auto", padding: "40px 24px" }}>
+        <div style={{ width: 400, maxWidth: "100%", margin: "auto" }}>
           {step === "login" ? (
             <>
               <div style={{ marginBottom: 28 }}>
