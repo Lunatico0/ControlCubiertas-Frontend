@@ -41,7 +41,7 @@ const ChangePassword = () => {
   }
 
   return (
-    <div data-app-theme={isDarkMode ? "dark" : "light"} className="flex min-h-screen items-center justify-center p-6" style={{ background: "var(--sidebar)", color: "var(--tx)", fontFamily: "'IBM Plex Sans',system-ui,sans-serif" }}>
+    <div data-app-theme={isDarkMode ? "dark" : "light"} className="flex h-full items-center justify-center p-6" style={{ background: "var(--sidebar)", color: "var(--tx)", fontFamily: "'IBM Plex Sans',system-ui,sans-serif" }}>
       <div className="w-full" style={{ maxWidth: 408 }}>
         <div className="mb-6 flex items-center justify-center">
           <BrandLogo height={38} />

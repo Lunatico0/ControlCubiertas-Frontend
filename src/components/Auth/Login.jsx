@@ -73,7 +73,7 @@ const Login = () => {
   const onKey = (ev) => { if (ev.key === "Enter") doLogin() }
 
   return (
-    <div style={{ width: "100%", height: "100vh", display: "flex", background: "#0A0C0D", color: "#fff", overflow: "hidden", textAlign: "left", fontFamily: "'IBM Plex Sans',system-ui,sans-serif" }}>
+    <div style={{ width: "100%", height: "100%", display: "flex", background: "#0A0C0D", color: "#fff", overflow: "hidden", textAlign: "left", fontFamily: "'IBM Plex Sans',system-ui,sans-serif" }}>
       {/* Panel de marca — oculto en pantallas chicas */}
       <div className="hidden lg:flex" style={{ flex: 1.1, position: "relative", overflow: "hidden", background: "#070809", borderRight: "1px solid #181C1E", flexDirection: "column", padding: "44px 48px" }}>
         <div style={{ position: "relative", zIndex: 1 }}><BrandLogo variant="dark" height={50} /></div>

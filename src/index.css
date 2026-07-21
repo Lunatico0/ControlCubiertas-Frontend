@@ -100,3 +100,17 @@
 /* Barrido global: todo <button> habilitado muestra cursor de mano (evita depender de que
    cada botón lo declare inline — ej. help/logout del panel admin no lo tenían). */
 button:not(:disabled) { cursor: pointer; }
+
+/* Autofill del browser: por defecto pinta un fondo amarillo que rompe el tema oscuro. Lo
+   enmascaramos con un box-shadow inset del color del input y forzamos el color de texto.
+   Theme-aware por los tokens (:root = oscuro; [data-app-theme=light] los pisa; el login, sin
+   data-app-theme, hereda el oscuro de :root). Transición larga para tapar el flash inicial. */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-text-fill-color: var(--tx);
+  -webkit-box-shadow: 0 0 0 1000px var(--input) inset;
+  caret-color: var(--tx);
+  transition: background-color 100000s ease-in-out 0s;
+}

@@ -41,9 +41,9 @@ const Logo = ({ c = "var(--ink-lime)", s = 34 }) => (
 const GuiaShell = ({ sidebarTitle, badge, eyebrow, title, intro, toc, backTo = "/", backLabel = "Volver a la app", footer, children }) => {
   const { isDarkMode, toggleTheme } = useTheme()
   return (
-    <div data-app-theme={isDarkMode ? "dark" : "light"} className="flex h-screen w-full overflow-hidden text-left" style={{ background: "var(--bg)", color: "var(--tx)", fontFamily: "'IBM Plex Sans',system-ui,sans-serif" }}>
+    <div data-app-theme={isDarkMode ? "dark" : "light"} className="flex h-full w-full overflow-hidden text-left" style={{ background: "var(--bg)", color: "var(--tx)", fontFamily: "'IBM Plex Sans',system-ui,sans-serif" }}>
       {/* TOC — fijo (altura de viewport, no scrollea con el contenido) */}
-      <aside className="hidden h-screen w-[270px] flex-none flex-col overflow-y-auto px-5 py-[26px] md:flex" style={{ background: "var(--sidebar)", borderRight: "1px solid var(--bd-faint)" }}>
+      <aside className="hidden h-full w-[270px] flex-none flex-col overflow-y-auto px-5 py-[26px] md:flex" style={{ background: "var(--sidebar)", borderRight: "1px solid var(--bd-faint)" }}>
         <div className="mb-3 flex flex-col gap-2">
           <BrandLogo height={26} />
           <div className="text-[13px] font-bold" style={{ fontFamily: "'Space Grotesk'", color: "var(--tx)" }}>{sidebarTitle}</div>

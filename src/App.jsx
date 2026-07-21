@@ -18,6 +18,7 @@ import GuiaAdmin from '@components/Portal/GuiaAdmin.jsx'
 import OperativaLayout from '@components/Operativa/OperativaLayout.jsx'
 import GuiaDeUso from '@components/Operativa/GuiaDeUso.jsx'
 import NotFound from '@components/NotFound.jsx'
+import TitleBar from '@components/Layout/TitleBar.jsx'
 
 // En la app instalable (Electron) el index.html se carga por file:// → BrowserRouter
 // (history API) rompe las rutas. HashRouter (#/ruta) funciona sobre file://. En web
@@ -28,7 +29,12 @@ function App() {
   return (
     <ContextProvider>
       <Router>
-        <Routes>
+        {/* Columna: titlebar custom (solo Electron) + contenido. En web TitleBar=null → el
+            contenido ocupa todo. Los shells van a h-full para calzar bajo la barra de 38px. */}
+        <div style={{ display: "flex", flexDirection: "column", height: "100vh" }}>
+          <TitleBar />
+          <div style={{ flex: 1, minHeight: 0 }}>
+            <Routes>
           <Route path="/login" element={<Login />} />
           <Route
             path="/cambiar-password"
@@ -103,7 +109,9 @@ function App() {
 
           {/* Catch-all: cualquier ruta inexistente cae en el 404 (no en la operativa). */}
           <Route path="*" element={<NotFound />} />
-        </Routes>
+            </Routes>
+          </div>
+        </div>
       </Router>
     </ContextProvider>
   )

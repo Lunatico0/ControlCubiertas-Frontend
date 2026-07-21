@@ -12,7 +12,7 @@ const NotFound = () => {
   return (
     <div
       data-app-theme={isDarkMode ? "dark" : "light"}
-      className="flex h-screen w-full flex-col items-center justify-center gap-6 px-8 text-center"
+      className="flex h-full w-full flex-col items-center justify-center gap-6 px-8 text-center"
       style={{ background: "var(--bg)", color: "var(--tx)", fontFamily: "'IBM Plex Sans',system-ui,sans-serif" }}
     >
       <BrandLogo height={64} />

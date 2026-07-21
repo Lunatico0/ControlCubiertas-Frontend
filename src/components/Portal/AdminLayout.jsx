@@ -69,7 +69,7 @@ const AdminLayout = () => {
   const initials = displayName.slice(0, 2).toUpperCase()
 
   return (
-    <div data-app-theme={isDarkMode ? "dark" : "light"} className="flex h-screen overflow-hidden text-left" style={{ background: "var(--bg)", color: "var(--tx)", fontFamily: "'IBM Plex Sans',system-ui,sans-serif" }}>
+    <div data-app-theme={isDarkMode ? "dark" : "light"} className="flex h-full overflow-hidden text-left" style={{ background: "var(--bg)", color: "var(--tx)", fontFamily: "'IBM Plex Sans',system-ui,sans-serif" }}>
       {/* Sidebar */}
       <AppSidebar
         nav={NAV.map(({ to, label, Icon, tour }) => ({
