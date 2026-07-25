@@ -3,6 +3,7 @@ import ApiContext from "@context/apiContext"
 import { useTheme } from "@context/ThemeContext"
 import { showToast } from "@utils/toast"
 import { dialog } from "@utils/dialog"
+import isElectron from "@utils/isElectron"
 import { tint, fmtKm } from "./status"
 import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded"
 import ArrowForwardRoundedIcon from "@mui/icons-material/ArrowForwardRounded"
@@ -106,7 +107,7 @@ const ConfigurarEjes = ({ onClose, vehicle }) => {
   }
 
   return (
-    <div data-app-theme={isDarkMode ? "dark" : "light"} className="fixed inset-y-0 right-0 left-64 z-60 flex flex-col" style={{ background: "var(--bg)", color: "var(--tx)", fontFamily: "'IBM Plex Sans',system-ui,sans-serif", borderLeft: "1px solid var(--bd-faint)" }}>
+    <div data-app-theme={isDarkMode ? "dark" : "light"} className="fixed bottom-0 right-0 left-64 z-60 flex flex-col" style={{ top: isElectron() ? 38 : 0, background: "var(--bg)", color: "var(--tx)", fontFamily: "'IBM Plex Sans',system-ui,sans-serif", borderLeft: "1px solid var(--bd-faint)" }}>
       {view === "list" ? (
         /* ===================== LISTA DE PENDIENTES ===================== */
         <>

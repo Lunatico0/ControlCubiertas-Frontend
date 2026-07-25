@@ -1,6 +1,7 @@
 import { useState, useContext } from "react"
 import ApiContext from "@context/apiContext"
 import { useModalEscape } from "@hooks/useModalStack"
+import isElectron from "@utils/isElectron"
 import { showToast } from "@utils/toast"
 import { formatPlate, normalizePlate } from "@utils/plateFormat"
 import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded"
@@ -83,7 +84,7 @@ const NuevoVehiculo = ({ onClose, onCreated }) => {
   const fieldError = (name) => errors[name] || (errField === name ? errMsg || true : false)
 
   return (
-    <div className="fixed inset-y-0 right-0 left-64 z-60 flex flex-col" style={{ background: "var(--bg)", borderLeft: "1px solid var(--bd-faint)" }}>
+    <div className="fixed bottom-0 right-0 left-64 z-60 flex flex-col" style={{ top: isElectron() ? 38 : 0, background: "var(--bg)", borderLeft: "1px solid var(--bd-faint)" }}>
       {/* ===== TOP BAR ===== */}
       <div className="flex h-16 flex-none items-center gap-3.5 px-6" style={{ background: "var(--sidebar)", borderBottom: "1px solid var(--bd-faint)" }}>
         <button onClick={onClose} title="Volver" className="inline-flex h-[38px] w-[38px] items-center justify-center rounded-[9px]" style={{ border: "1px solid var(--bd)", background: "var(--elev)", color: "var(--tx-3)" }}>
