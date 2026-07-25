@@ -1,5 +1,6 @@
 import { useState } from "react"
 import Modal from "@components/common/Modal"
+import Markdown from "@components/common/Markdown"
 
 // Modal del auto-updater. Usa el shell compartido <Modal/> (overlay + card + header + Escape).
 // El contenido cambia según `phase`. La lista de releases es informativa (changelog);
@@ -20,14 +21,6 @@ const fmtDate = (iso) => {
 
 // bytes → "48,2 MB"
 const fmtSize = (bytes) => (bytes ? `${(bytes / 1048576).toFixed(1).replace(".", ",")} MB` : "")
-
-// notas (string markdown/plaintext) → bullets, sin viñetas duplicadas ni líneas vacías.
-const parseNotes = (notes) =>
-  (notes || "")
-    .split(/\r?\n/)
-    .map((l) => l.trim())
-    .filter(Boolean)
-    .map((l) => l.replace(/^[-*]\s+/, ""))
 
 // Spinner autocontenido (Tailwind animate-spin + tokens).
 const Spin = () => (
@@ -135,7 +128,7 @@ const UpdaterModal = ({ current, phase, list, dl, installingV, onClose, onRechec
           {list.map((rel, i) => {
             const isLatest = i === list.length - 1
             const openInfo = infoVer === rel.version
-            const notes = parseNotes(rel.notes)
+            const notes = (rel.notes || "").trim() // body del GitHub Release (markdown)
             return (
               <div key={rel.version} className="rounded-[11px]" style={{ border: `1px solid ${isLatest ? "var(--bd-strong)" : "var(--bd)"}`, padding: 13 }}>
                 {/* Encabezado de la fila */}
@@ -170,18 +163,11 @@ const UpdaterModal = ({ current, phase, list, dl, installingV, onClose, onRechec
                   </button>
                 </div>
 
-                {/* Notas (bullets) */}
+                {/* Notas (markdown del release de GitHub) */}
                 {openInfo && (
                   <div className="mt-2.5 rounded-[9px]" style={{ background: "var(--elev)", border: "1px solid var(--bd-soft)", padding: 12 }}>
-                    {notes.length ? (
-                      <ul className="flex flex-col gap-1.5">
-                        {notes.map((n, k) => (
-                          <li key={k} className="flex gap-2 text-[12px]" style={{ color: "var(--tx-3)", lineHeight: 1.45 }}>
-                            <span className="flex-none" style={{ color: "var(--ink-lime)" }}>•</span>
-                            <span>{n}</span>
-                          </li>
-                        ))}
-                      </ul>
+                    {notes ? (
+                      <Markdown>{notes}</Markdown>
                     ) : (
                       <div className="text-[12px]" style={{ color: "var(--tx-5)" }}>
                         Sin notas para esta versión.

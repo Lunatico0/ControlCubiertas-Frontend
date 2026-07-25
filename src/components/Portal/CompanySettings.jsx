@@ -6,7 +6,10 @@ import RemoveRoundedIcon from "@mui/icons-material/RemoveRounded"
 import AddRoundedIcon from "@mui/icons-material/AddRounded"
 import ArrowForwardRoundedIcon from "@mui/icons-material/ArrowForwardRounded"
 import { getCompany, updateCompany, getSummary } from "@api/admin"
+import { invalidateCompanyCache } from "@api/company"
 import { showToast } from "@utils/toast"
+import Button from "@components/UI/Button"
+import FloatingField from "@components/UI/FloatingField"
 
 const inputClass =
   "w-full rounded-[10px] border border-(--bd) bg-(--input) px-3 py-2.5 text-sm text-(--tx) placeholder:text-(--tx-6) outline-none transition focus:border-(--ink-lime)"
@@ -41,6 +44,7 @@ const CompanySettings = () => {
   const [usage, setUsage] = useState({}) // { nombreEstado: cantidadDeCubiertas }
   const [editing, setEditing] = useState(null) // índice del estado en edición (popover)
   const [plateSep, setPlateSep] = useState("") // separador de patente (solo display)
+  const [codePrefix, setCodePrefix] = useState("") // prefijo del código interno de cubierta (solo display)
 
   useEffect(() => {
     Promise.all([getCompany(), getSummary().catch(() => null)])
@@ -51,6 +55,7 @@ const CompanySettings = () => {
         })
         setStatuses(Array.isArray(c.stockStatuses) ? c.stockStatuses : [])
         setPlateSep(c.plateSeparator || "")
+        setCodePrefix(c.tireCodePrefix || "")
         setUsage(s?.cubiertas?.byStatus || {})
         setMeta({ plan: c.plan, status: c.status, dbName: c.dbName })
       })
@@ -90,13 +95,17 @@ const CompanySettings = () => {
 
   const onSubmit = async (data) => {
     try {
-      const updated = await updateCompany({ ...data, stockStatuses: statuses, plateSeparator: plateSep })
+      const updated = await updateCompany({ ...data, stockStatuses: statuses, plateSeparator: plateSep, tireCodePrefix: codePrefix })
+      // Invalida la cache de company para que la operativa (/op) tome el nuevo separador/prefijo
+      // al entrar, sin necesidad de hard-reload (Ctrl+Shift+R).
+      invalidateCompanyCache()
       reset({
         name: updated.name || "", cuit: updated.cuit || "", phone: updated.phone || "",
         address: updated.address || "", receiptPrefix: updated.receiptPrefix || "", receiptFooter: updated.receiptFooter || "",
       })
       setStatuses(Array.isArray(updated.stockStatuses) ? updated.stockStatuses : [])
       setPlateSep(updated.plateSeparator || "")
+      setCodePrefix(updated.tireCodePrefix || "")
       setEditing(null)
       showToast("success", "Datos de la empresa actualizados")
     } catch (err) {
@@ -120,20 +129,16 @@ const CompanySettings = () => {
           <h2 className="mb-4 font-display text-lg font-semibold text-(--tx)" style={{ fontFamily: "'Space Grotesk'" }}>Datos generales</h2>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="sm:col-span-2">
-              <label htmlFor="name" className={labelClass}>Nombre de la empresa</label>
-              <input id="name" className={inputClass} {...register("name")} />
+              <FloatingField label="Nombre de la empresa" {...register("name")} />
             </div>
             <div>
-              <label htmlFor="cuit" className={labelClass}>CUIT</label>
-              <input id="cuit" className={inputClass} placeholder="30-12345678-9" {...register("cuit")} />
+              <FloatingField label="CUIT" {...register("cuit")} />
             </div>
             <div>
-              <label htmlFor="phone" className={labelClass}>Teléfono</label>
-              <input id="phone" className={inputClass} {...register("phone")} />
+              <FloatingField label="Teléfono" {...register("phone")} />
             </div>
             <div className="sm:col-span-2">
-              <label htmlFor="address" className={labelClass}>Dirección</label>
-              <input id="address" className={inputClass} {...register("address")} />
+              <FloatingField label="Dirección" {...register("address")} />
             </div>
           </div>
         </section>
@@ -143,12 +148,10 @@ const CompanySettings = () => {
           <h2 className="mb-4 font-display text-lg font-semibold text-(--tx)" style={{ fontFamily: "'Space Grotesk'" }}>Recibos</h2>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
-              <label htmlFor="receiptPrefix" className={labelClass}>Prefijo de recibo</label>
-              <input id="receiptPrefix" className={inputClass} placeholder="0001" {...register("receiptPrefix")} />
+              <FloatingField label="Prefijo de recibo" {...register("receiptPrefix")} />
             </div>
             <div className="sm:col-span-2">
-              <label htmlFor="receiptFooter" className={labelClass}>Pie de recibo</label>
-              <textarea id="receiptFooter" rows={2} className={inputClass} {...register("receiptFooter")} />
+              <FloatingField as="textarea" label="Pie de recibo" rows={2} {...register("receiptFooter")} />
             </div>
           </div>
         </section>
@@ -188,6 +191,31 @@ const CompanySettings = () => {
           <div className="mt-4 flex items-center gap-2 text-sm text-(--tx-5)">
             Vista previa:
             <span className="rounded-md border border-(--bd) bg-(--input) px-2.5 py-1 font-mono text-[13px] text-(--tx-2)">{plateSep ? `EEQ${plateSep}541` : "EEQ541"}</span>
+          </div>
+        </section>
+
+        {/* Cubiertas (prefijo del código interno · solo display) */}
+        <section className={cardClass}>
+          <h2 className="font-display text-lg font-semibold text-(--tx)" style={{ fontFamily: "'Space Grotesk'" }}>Cubiertas</h2>
+          <p className="mt-1 text-sm text-(--tx-4)">
+            Prefijo para <span className="font-medium text-(--tx-3)">mostrar</span> el código interno de las cubiertas. Es solo visual: el código se guarda como un número correlativo.
+          </p>
+          <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div>
+              <label htmlFor="tireCodePrefix" className={labelClass}>Prefijo del código interno</label>
+              <input
+                id="tireCodePrefix"
+                value={codePrefix}
+                onChange={(e) => setCodePrefix(e.target.value)}
+                maxLength={10}
+                placeholder="Ej. T- , CUB/"
+                className={inputClass}
+              />
+            </div>
+          </div>
+          <div className="mt-4 flex items-center gap-2 text-sm text-(--tx-5)">
+            Vista previa:
+            <span className="rounded-md border border-(--bd) bg-(--input) px-2.5 py-1 font-mono text-[13px] text-(--tx-2)">{codePrefix ? `${codePrefix}12` : "12"}</span>
           </div>
         </section>
 
@@ -291,10 +319,9 @@ const CompanySettings = () => {
         )}
 
         <div className="flex justify-end">
-          <button type="submit" disabled={isSubmitting}
-            className="rounded-[10px] bg-(--ink-lime) px-5 py-2.5 text-sm font-bold text-(--bg) transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60">
+          <Button type="submit" variant="lime" disabled={isSubmitting} className="text-sm">
             {isSubmitting ? "Guardando…" : "Guardar cambios"}
-          </button>
+          </Button>
         </div>
       </form>
     </div>

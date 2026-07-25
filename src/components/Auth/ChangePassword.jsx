@@ -5,6 +5,8 @@ import { useAuth } from "@context/AuthContext"
 import { useTheme } from "@context/ThemeContext"
 import { showToast } from "@utils/toast"
 import BrandLogo from "@components/BrandLogo"
+import Button from "@components/UI/Button"
+import FloatingField from "@components/UI/FloatingField"
 
 // Establecer/cambiar contraseña (rediseño Claude Design "primer ingreso"). Dos modos:
 //  - mustChangePassword (primer ingreso / tras un reset): solo pide la nueva; el backend
@@ -13,9 +15,6 @@ import BrandLogo from "@components/BrandLogo"
 const KeyIcon = () => (
   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><circle cx="7.5" cy="15.5" r="4.5" /><path d="m10.5 12.5 8-8M16 6l2 2M19 3l2 2" /></svg>
 )
-const labelStyle = { fontSize: 12, fontWeight: 600, color: "var(--tx-4)", display: "block", marginBottom: 7 }
-const inputCls = "w-full rounded-[9px] px-[13px] py-[11px] text-[14px] outline-none"
-const inputStyle = { border: "1px solid var(--bd-strong)", background: "var(--input)", color: "var(--tx)" }
 
 const ChangePassword = () => {
   const { changePassword, mustChangePassword, logout } = useAuth()
@@ -66,28 +65,43 @@ const ChangePassword = () => {
             )}
 
             {!mustChangePassword && (
-              <label className="mb-[14px] block">
-                <span style={labelStyle}>Contraseña actual</span>
-                <input type="password" autoComplete="current-password" placeholder="••••••••" className={inputCls} style={inputStyle} {...register("currentPassword", { required: "Ingresá tu contraseña actual" })} />
-                {errors.currentPassword && <p className="mt-1 text-[12px]" style={{ color: "var(--ink-red)" }}>{errors.currentPassword.message}</p>}
-              </label>
+              <div className="mb-[14px]">
+                <FloatingField
+                  label="Contraseña actual"
+                  type="password"
+                  autoComplete="current-password"
+                  required
+                  error={errors.currentPassword?.message}
+                  {...register("currentPassword", { required: "Ingresá tu contraseña actual" })}
+                />
+              </div>
             )}
 
-            <label className="mb-[14px] block">
-              <span style={labelStyle}>Nueva contraseña</span>
-              <input type="password" autoComplete="new-password" placeholder="••••••••" className={inputCls} style={inputStyle} {...register("newPassword", { required: "Ingresá una contraseña nueva", minLength: { value: 6, message: "Mínimo 6 caracteres" } })} />
-              {errors.newPassword && <p className="mt-1 text-[12px]" style={{ color: "var(--ink-red)" }}>{errors.newPassword.message}</p>}
-            </label>
+            <div className="mb-[14px]">
+              <FloatingField
+                label="Nueva contraseña"
+                type="password"
+                autoComplete="new-password"
+                required
+                error={errors.newPassword?.message}
+                {...register("newPassword", { required: "Ingresá una contraseña nueva", minLength: { value: 6, message: "Mínimo 6 caracteres" } })}
+              />
+            </div>
 
-            <label className="mb-[22px] block">
-              <span style={labelStyle}>Repetir contraseña</span>
-              <input type="password" autoComplete="new-password" placeholder="••••••••" className={inputCls} style={inputStyle} {...register("confirmPassword", { required: "Repetí la contraseña", validate: (v) => v === newPassword || "Las contraseñas no coinciden" })} />
-              {errors.confirmPassword && <p className="mt-1 text-[12px]" style={{ color: "var(--ink-red)" }}>{errors.confirmPassword.message}</p>}
-            </label>
+            <div className="mb-[22px]">
+              <FloatingField
+                label="Repetir contraseña"
+                type="password"
+                autoComplete="new-password"
+                required
+                error={errors.confirmPassword?.message}
+                {...register("confirmPassword", { required: "Repetí la contraseña", validate: (v) => v === newPassword || "Las contraseñas no coinciden" })}
+              />
+            </div>
 
-            <button type="submit" disabled={isSubmitting} className="w-full rounded-[10px] py-[13px] text-[15px] font-bold" style={{ border: "none", background: "#C4ED2B", color: "#0A0C0D", opacity: isSubmitting ? 0.6 : 1 }}>
+            <Button type="submit" variant="lime" disabled={isSubmitting} className="w-full text-[15px]" style={{ background: "#C4ED2B", color: "#0A0C0D", opacity: isSubmitting ? 0.6 : 1 }}>
               {isSubmitting ? "Guardando…" : mustChangePassword ? "Guardar y entrar" : "Guardar"}
-            </button>
+            </Button>
             <button type="button" onClick={mustChangePassword ? logout : () => navigate(-1)} className="mt-3 w-full text-center text-[13px]" style={{ color: "var(--tx-5)", background: "none", border: "none", cursor: "pointer" }}>
               {mustChangePassword ? "Salir" : "Cancelar"}
             </button>

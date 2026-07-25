@@ -1,7 +1,17 @@
 import { useState, useEffect, useRef, useCallback } from "react"
 import { useTheme } from "@context/ThemeContext"
+import { useModalEscape } from "@hooks/useModalStack.js"
 import { _registerDialog, _registerToast } from "@utils/dialog"
 import DlgIcon from "./DialogIcons"
+
+// Cierre por Escape stack-aware. DialogHost se monta UNA vez y vive siempre; por eso no puede
+// llamar useModalEscape a nivel raíz (quedaría fijo abajo del stack y no cerraría los diálogos
+// que aparecen SOBRE un drawer). Este helper se monta solo mientras hay un diálogo activo, así
+// se apila por encima de lo que haya abierto y el hook garantiza que solo el de arriba responde.
+const DialogEscape = ({ onEscape }) => {
+  useModalEscape(onEscape)
+  return null
+}
 
 // Host único del sistema de diálogos. Se monta una vez (ContextProvider) y registra la
 // API imperativa de @utils/dialog. Renderiza el backdrop + la variante activa + el toast.
@@ -65,14 +75,15 @@ const DialogHost = () => {
     if (t && t.focus) setTimeout(() => { try { t.focus() } catch { /* noop */ } }, 10)
   }, [])
 
-  // Foco al abrir + Esc (cierra cualquier variante, incluida print).
+  // Callback estable para el cierre por Escape (cierra cualquier variante, incluida print).
+  const closeOnEscape = useCallback(() => close(false), [close])
+
+  // Foco al abrir el diálogo (el Escape lo maneja <DialogEscape> vía useModalEscape).
   useEffect(() => {
     if (!active) return
     const id = setTimeout(() => { try { dlgRef.current && dlgRef.current.focus() } catch { /* noop */ } }, 30)
-    const onKey = (e) => { if (e.key === "Escape") close(false) }
-    window.addEventListener("keydown", onKey)
-    return () => { clearTimeout(id); window.removeEventListener("keydown", onKey) }
-  }, [active, close])
+    return () => clearTimeout(id)
+  }, [active])
 
   // Foco atrapado (Tab cicla dentro del diálogo).
   const onTrap = (e) => {
@@ -97,6 +108,7 @@ const DialogHost = () => {
 
   return (
     <div data-app-theme={isDarkMode ? "dark" : "light"} style={{ fontFamily: "'IBM Plex Sans',system-ui,sans-serif" }}>
+      {active && <DialogEscape onEscape={closeOnEscape} />}
       {active && (
         <div onClick={onBackdrop} style={{ position: "fixed", inset: 0, background: "rgba(4,5,6,.62)", backdropFilter, zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center", padding: 24, animation: "dlgBackdropIn .16s ease" }}>
 

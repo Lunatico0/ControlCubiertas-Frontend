@@ -17,12 +17,9 @@ export const P = ({ children }) => <p className="text-[15px]" style={{ lineHeigh
 export const B = ({ children }) => <b style={{ color: "var(--tx)" }}>{children}</b>
 export const UL = ({ children }) => <ul className="pl-[22px] text-[15px]" style={{ lineHeight: 1.8, color: "var(--tx-2)" }}>{children}</ul>
 export const Kbd = ({ children }) => <span style={{ fontFamily: "'IBM Plex Mono'", background: "var(--input)", border: "1px solid var(--bd-strong)", borderRadius: 5, padding: "1px 7px" }}>{children}</span>
-export const Callout = ({ Icon, tone, children }) => (
-  <div className="mt-3.5 flex gap-[11px] rounded-[11px] px-4 py-3.5" style={{ border: `1px solid color-mix(in srgb, ${tone} 30%, transparent)`, background: `color-mix(in srgb, ${tone} 7%, transparent)` }}>
-    <span className="inline-flex flex-none" style={{ color: tone }}><Icon sx={{ fontSize: 18 }} /></span>
-    <div className="text-[13.5px]" style={{ lineHeight: 1.6, color: "var(--tx-2)" }}>{children}</div>
-  </div>
-)
+// Callout se promovió a components/common para reutilizarlo en toda la app; se re-exporta acá
+// para no romper los imports existentes de GuiaDeUso/GuiaAdmin (importan { Callout } de este shell).
+export { default as Callout } from "@components/common/Callout"
 export const Faqs = ({ items }) => (
   <div className="mt-4 flex flex-col gap-3">
     {items.map((f) => (
@@ -51,7 +48,19 @@ const GuiaShell = ({ sidebarTitle, badge, eyebrow, title, intro, toc, backTo = "
         {badge && <div className="mb-[18px] ml-[45px] inline-block self-start rounded-full px-[9px] py-[3px] text-[9.5px]" style={{ fontFamily: "'IBM Plex Mono'", letterSpacing: ".1em", color: "var(--ink-purple)", background: "color-mix(in srgb, var(--ink-purple) 14%, transparent)" }}>{badge}</div>}
         <nav className="flex flex-col gap-px">
           {toc.map((t) => (
-            <a key={t.href} href={t.href} className="flex items-center gap-2.5 rounded-lg px-[11px] py-[9px] text-[13px]" style={{ textDecoration: "none", color: "var(--tx-3)" }}>
+            // HashRouter en Electron trata el hash como ruta (file://): navegar por anchor
+            // reescribiría #/guia → #seccion y caería en el catch-all 404. Por eso scrolleamos
+            // manual a la sección (preventDefault) en vez de dejar que el <a> toque la URL.
+            <a
+              key={t.href}
+              href={t.href}
+              onClick={(e) => {
+                e.preventDefault()
+                document.getElementById(t.href.replace(/^#/, ""))?.scrollIntoView({ behavior: "smooth", block: "start" })
+              }}
+              className="flex items-center gap-2.5 rounded-lg px-[11px] py-[9px] text-[13px]"
+              style={{ textDecoration: "none", color: "var(--tx-3)" }}
+            >
               <span style={{ fontFamily: "'IBM Plex Mono'", fontSize: 10, color: "var(--tx-7)", width: 16 }}>{t.num}</span>{t.label}
             </a>
           ))}

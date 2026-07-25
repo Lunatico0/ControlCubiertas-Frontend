@@ -1,4 +1,7 @@
+import { useContext } from "react";
+import ApiContext from "@context/apiContext";
 import { statusStyles } from "@utils/statusStyle";
+import { formatTireCode } from "@utils/tireCode";
 import { colors, text } from "@utils/tokens";
 import InfoItem from "@components/UI/InfoItem";
 
@@ -19,6 +22,8 @@ export const TireInfoVisual = ({ tire }) => (
 
 // Tarjetas con la información detallada
 export const TireInfoData = ({ tire }) => {
+  const { data } = useContext(ApiContext);
+  const tireCodePrefix = data?.tireCodePrefix || "";
   const altaEntry = tire.history?.find(h => h.type === "Alta");
   const currentVehicle = tire.vehicle;
   const totalKm = tire.kilometers || 0;
@@ -33,7 +38,7 @@ export const TireInfoData = ({ tire }) => {
         <h4 className={`${text.heading} text-base font-semibold border-b border-gray-200 dark:border-gray-700 pb-2 mb-2`}>
           Identificación
         </h4>
-        <InfoItem label="Código interno" value={tire.code} />
+        <InfoItem label="Código interno" value={formatTireCode(tire.code, tireCodePrefix)} />
         <InfoItem label="Número de serie" value={tire.serialNumber} />
         <InfoItem label="Marca" value={tire.brand} />
         <InfoItem label="Rodado" value={tire.size} />

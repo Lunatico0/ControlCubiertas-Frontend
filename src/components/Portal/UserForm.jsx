@@ -2,6 +2,10 @@ import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { showToast } from "@utils/toast"
 import Modal from "@components/common/Modal"
+import Button from "@components/UI/Button"
+import Callout from "@components/common/Callout"
+import FloatingField from "@components/UI/FloatingField"
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined"
 import { createUser, updateUser } from "../../api/admin"
 
 // Roles como cards seleccionables (ceñido al diseño Panel Admin). Los títulos siguen la
@@ -41,19 +45,15 @@ const UserForm = ({ user, onClose, onCreated, onSaved }) => {
   }
 
   const labelCls = "mb-[7px] block text-[12px] font-semibold"
-  const inputCls = "w-full rounded-[9px] px-[13px] py-[11px] text-[14px] outline-none"
-  const inputStyle = { border: "1px solid var(--bd-strong)", background: "var(--input)", color: "var(--tx)", fontFamily: "'IBM Plex Sans'" }
-  const onFocus = (e) => (e.target.style.borderColor = "var(--ink-lime)")
-  const onBlur = (e) => (e.target.style.borderColor = "var(--bd-strong)")
 
   const footer = (
     <div className="flex justify-end gap-2.5 px-[22px] py-4" style={{ borderTop: "1px solid var(--bd-soft)" }}>
       <button type="button" onClick={onClose} className="rounded-[9px] px-4 py-2.5 text-[14px] font-semibold" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--tx)" }}>
         Cancelar
       </button>
-      <button type="submit" disabled={isSubmitting} className="rounded-[9px] px-[18px] py-2.5 text-[14px] font-bold disabled:opacity-60" style={{ background: "#C4ED2B", color: "#0A0C0D" }}>
+      <Button type="submit" variant="lime" disabled={isSubmitting} className="text-[14px]" style={{ background: "#C4ED2B", color: "#0A0C0D" }}>
         {isSubmitting ? (isEdit ? "Guardando…" : "Creando…") : isEdit ? "Guardar cambios" : "Crear usuario"}
-      </button>
+      </Button>
     </div>
   )
 
@@ -67,26 +67,17 @@ const UserForm = ({ user, onClose, onCreated, onSaved }) => {
       footer={footer}
       bodyClassName="flex flex-col gap-[15px] p-[22px]"
     >
-      <label className="block">
-        <span className={labelCls} style={{ color: "var(--tx-4)" }}>Email</span>
-        <input
-          type="email"
-          autoComplete="off"
-          placeholder="nombre@empresa.com"
-          className={inputCls}
-          style={{ ...inputStyle, ...(isEdit ? { opacity: 0.6, cursor: "not-allowed" } : {}) }}
-          disabled={isEdit}
-          onFocus={onFocus}
-          onBlur={onBlur}
-          {...register("email", isEdit ? {} : { required: "Ingresá el email" })}
-        />
-        {!isEdit && errors.email && <span className="mt-1 block text-[11px]" style={{ color: "var(--ink-red)" }}>{errors.email.message}</span>}
-      </label>
+      <FloatingField
+        label="Email"
+        type="email"
+        autoComplete="off"
+        required={!isEdit}
+        disabled={isEdit}
+        error={!isEdit ? errors.email?.message : false}
+        {...register("email", isEdit ? {} : { required: "Ingresá el email" })}
+      />
 
-      <label className="block">
-        <span className={labelCls} style={{ color: "var(--tx-4)" }}>Nombre</span>
-        <input type="text" autoComplete="off" placeholder="Nombre y apellido" className={inputCls} style={inputStyle} onFocus={onFocus} onBlur={onBlur} {...register("name")} />
-      </label>
+      <FloatingField label="Nombre" type="text" autoComplete="off" {...register("name")} />
 
       <div>
         <span className={labelCls} style={{ color: "var(--tx-4)" }}>Rol</span>
@@ -111,14 +102,10 @@ const UserForm = ({ user, onClose, onCreated, onSaved }) => {
 
       {/* Nota de contraseña temporal — solo en alta */}
       {!isEdit && (
-        <div className="flex items-start gap-2.5 rounded-[9px] px-[13px] py-[11px]" style={{ background: "rgba(240,184,31,.08)", border: "1px solid rgba(240,184,31,.30)" }}>
-          <span className="inline-flex flex-none" style={{ color: "#F0B81F", marginTop: 1 }}>
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9" /><path d="M12 16v-4M12 8h.01" /></svg>
-          </span>
-          <div className="text-[12px] leading-[1.5]" style={{ color: "#D8B968" }}>
-            Al crear, el sistema genera una <b style={{ color: "#F0C955" }}>contraseña temporal</b>; el usuario la cambia en su primer ingreso.
-          </div>
-        </div>
+        // Ámbar: el design system no tiene var ámbar, se conserva el hex del diseño como tono.
+        <Callout Icon={InfoOutlinedIcon} tone="#F0B81F" className="">
+          Al crear, el sistema genera una <b style={{ color: "#F0C955" }}>contraseña temporal</b>; el usuario la cambia en su primer ingreso.
+        </Callout>
       )}
     </Modal>
   )

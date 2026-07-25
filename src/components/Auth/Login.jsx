@@ -47,10 +47,20 @@ const Login = () => {
   const [fPwd, setFPwd] = useState(false)
   const [err, setErr] = useState({})
   const [credErr, setCredErr] = useState("")
+  // Mensaje de un cierre de sesión FORZADO (ej. tenant eliminado/suspendido) que dejó forceLogout
+  // en sessionStorage. Va en un state APARTE de credErr a propósito: el onChange del email/pwd
+  // limpia credErr (y el AUTOFILL del navegador lo dispara al montar), pero este mensaje debe
+  // sobrevivir hasta que el usuario reintente loguear. Se lee en el initializer (StrictMode-safe:
+  // solo lee, no borra) y se limpia en doLogin.
+  const [logoutMsg, setLogoutMsg] = useState(() => {
+    try { return sessionStorage.getItem("cc_logout_msg") || "" } catch { return "" }
+  })
   const [loggingIn, setLoggingIn] = useState(false)
   const [ver, setVer] = useState("")
 
-  useEffect(() => { window.electronAPI?.getVersion?.().then((v) => setVer(v || "")).catch(() => {}) }, [])
+  useEffect(() => {
+    window.electronAPI?.getVersion?.().then((v) => setVer(v || "")).catch(() => {})
+  }, [])
 
   if (isAuthenticated) return <Navigate to={mustChangePassword ? "/cambiar-password" : from} replace />
 
@@ -61,7 +71,9 @@ const Login = () => {
     else if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)) e.email = "Ese email no parece válido."
     if (!pwd) e.pwd = "Ingresá tu contraseña."
     if (Object.keys(e).length) { setErr(e); return }
-    setErr({}); setCredErr(""); setLoggingIn(true)
+    // Limpiar el mensaje de cierre forzado: el usuario ya lo vio y va a reintentar.
+    try { sessionStorage.removeItem("cc_logout_msg") } catch { /* noop */ }
+    setErr({}); setCredErr(""); setLogoutMsg(""); setLoggingIn(true)
     try {
       const user = await login(em, pwd)
       navigate(user.mustChangePassword ? "/cambiar-password" : from, { replace: true })
@@ -102,12 +114,12 @@ const Login = () => {
                 <p style={{ margin: "7px 0 0 0", fontSize: 14, color: "#8B9197" }}>Ingresá con tu cuenta de la empresa.</p>
               </div>
 
-              {credErr && (
+              {(credErr || logoutMsg) && (
                 <div role="alert" style={{ display: "flex", gap: 10, padding: "12px 14px", border: "1px solid rgba(240,86,74,.4)", borderRadius: 11, background: "rgba(240,86,74,.08)", marginBottom: 18 }}>
                   <span style={{ color: BAD, flex: "none", marginTop: 1 }}>
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="9.2" /><path d="M12 8v5M12 16h.01" /></svg>
                   </span>
-                  <span style={{ fontSize: "12.5px", color: "#F0A9A4", lineHeight: 1.5 }}>{credErr}</span>
+                  <span style={{ fontSize: "12.5px", color: "#F0A9A4", lineHeight: 1.5 }}>{credErr || logoutMsg}</span>
                 </div>
               )}
 

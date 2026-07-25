@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom"
 import { useTheme } from "@context/ThemeContext"
 import HomeRoundedIcon from "@mui/icons-material/HomeRounded"
 import BrandLogo from "@components/BrandLogo"
+import Button from "@components/UI/Button"
 
 // Vista 404 para rutas inexistentes (catch-all `*` en App.jsx). Theme-aware vía
 // data-app-theme (los tokens var(--x) del design system viven en ese scope) + marca TireOps.
@@ -32,14 +33,15 @@ const NotFound = () => {
         </p>
       </div>
 
-      <button
+      <Button
+        variant="lime"
         onClick={() => navigate("/")}
-        className="inline-flex items-center gap-2 rounded-[10px] px-5 py-2.5 text-[14px] font-semibold transition-colors"
-        style={{ background: "#C4ED2B", color: "#0A0C0D" }}
+        className="text-[14px]"
+        style={{ background: "#C4ED2B", color: "#0A0C0D", fontWeight: 600 }}
       >
         <HomeRoundedIcon sx={{ fontSize: 18 }} />
         Volver al inicio
-      </button>
+      </Button>
     </div>
   )
 }

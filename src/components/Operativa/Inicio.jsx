@@ -11,6 +11,7 @@ import WarningAmberRoundedIcon from "@mui/icons-material/WarningAmberRounded"
 import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded"
 import CheckRoundedIcon from "@mui/icons-material/CheckRounded"
 import { tint, metaOf } from "./status"
+import { formatTireCode } from "@utils/tireCode"
 
 // Fecha + hora en es-AR, con la primera letra en mayúscula (ej. "Viernes 18 de julio, 14:30").
 const fmtFechaHora = (d) => {
@@ -55,7 +56,7 @@ const Inicio = ({ onNavigate }) => {
     return [
       ...recapTires.map((t) => ({
         key: `t${t._id}`, isTire: true, color: "var(--ink-orange)", iconBg: "rgba(240,133,31,.14)",
-        title: `#${t.code}${t.brand ? ` · ${t.brand}` : ""}`, desc: "Marcada para recapar", btn: "Recapar",
+        title: `#${formatTireCode(t.code, data?.tireCodePrefix)}${t.brand ? ` · ${t.brand}` : ""}`, desc: "Marcada para recapar", btn: "Recapar",
         onClick: () => onNavigate("cubiertas", { tab: "recapar" }),
       })),
       ...vehiclesSinCub.map((v) => ({

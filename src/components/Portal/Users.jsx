@@ -8,6 +8,7 @@ import RefreshRoundedIcon from "@mui/icons-material/RefreshRounded"
 import { showToast, showConfirm } from "@utils/toast"
 import { useAuth } from "@context/AuthContext"
 import Modal from "@components/UI/Modal"
+import Button from "@components/UI/Button"
 import { listUsers, setUserStatus, resetPassword } from "../../api/admin"
 import UserForm from "./UserForm"
 
@@ -106,10 +107,9 @@ const Users = () => {
           <h1 className="font-display text-[28px] font-bold tracking-[-.02em]" style={{ color: "var(--tx)", fontFamily: "'Space Grotesk'" }}>Usuarios</h1>
           <p className="mt-1 text-sm" style={{ color: "var(--tx-4)" }}>Quién accede a TireOps</p>
         </div>
-        <button onClick={() => setShowForm(true)} className="ml-auto inline-flex items-center gap-2 rounded-[10px] px-[17px] py-[11px] text-sm font-bold"
-          style={{ background: "#C4ED2B", color: "#0A0C0D" }}>
+        <Button variant="lime" onClick={() => setShowForm(true)} className="ml-auto text-sm" style={{ background: "#C4ED2B", color: "#0A0C0D" }}>
           <PersonAddAltRoundedIcon sx={{ fontSize: 17 }} /> Crear usuario
-        </button>
+        </Button>
       </div>
 
       {loading ? (
@@ -186,7 +186,7 @@ const Users = () => {
             </div>
           </div>
           <div className="mt-5 flex justify-end">
-            <button onClick={() => setTempCred(null)} className="rounded-lg px-4 py-2.5 text-sm font-medium" style={{ background: "#C4ED2B", color: "#0A0C0D" }}>Listo</button>
+            <Button variant="lime" onClick={() => setTempCred(null)} className="text-sm" style={{ background: "#C4ED2B", color: "#0A0C0D", fontWeight: 500 }}>Listo</Button>
           </div>
         </Modal>
       )}
@@ -212,7 +212,7 @@ const Users = () => {
           </div>
           <div className="mt-5 flex justify-end gap-3">
             <button onClick={() => setResetTarget(null)} className="rounded-lg px-4 py-2.5 text-sm font-medium" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--tx-2)" }}>Cancelar</button>
-            <button onClick={async () => { await copyReset(); setResetTarget(null) }} className="rounded-lg px-4 py-2.5 text-sm font-medium" style={{ background: "#C4ED2B", color: "#0A0C0D" }}>Copiar y listo</button>
+            <Button variant="lime" onClick={async () => { await copyReset(); setResetTarget(null) }} className="text-sm" style={{ background: "#C4ED2B", color: "#0A0C0D", fontWeight: 500 }}>Copiar y listo</Button>
           </div>
         </Modal>
       )}

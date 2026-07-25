@@ -51,6 +51,10 @@ export const button = {
   outline: "border border-gray-300 dark:border-gray-600 bg-transparent text-gray-700 dark:text-gray-300",
   ghost: "text-blue-600 hover:bg-blue-50 dark:hover:bg-gray-700",
   menu: "w-full px-4 py-3 text-sm text-left transition-colors",
+  // Botón de acción principal de la operativa (lima). Color lima BRILLANTE FIJO en ambos temas
+  // (#C4ED2B/#0A0C0D) — es el diseño intencional de la app (no theme-aware; ver comentario en
+  // Inicio.jsx). Tipografía/padding centralizados; el tamaño (alto/ancho) se ajusta por caso con className.
+  lime: "inline-flex items-center justify-center gap-2 bg-[#C4ED2B] text-[#0A0C0D] font-bold px-5 py-2.5 rounded-[10px] transition hover:opacity-90 disabled:opacity-60 disabled:cursor-not-allowed",
 }
 
 // Utilidades visuales

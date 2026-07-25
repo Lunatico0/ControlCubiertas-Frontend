@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from "react"
+import { useState, useContext, useCallback } from "react"
 import ApiContext from "@context/apiContext"
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded"
 import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded"
@@ -9,6 +9,10 @@ import LocalShippingOutlinedIcon from "@mui/icons-material/LocalShippingOutlined
 import EditarVehiculo from "./EditarVehiculo"
 import ConfigurarEjes from "./ConfigurarEjes"
 import { formatPlate } from "@utils/plateFormat"
+import Callout from "@components/common/Callout"
+import Drawer from "@components/UI/Drawer"
+import Pill from "@components/UI/Pill"
+import MonoLabel from "@components/UI/MonoLabel"
 
 // Detalle del vehículo (rediseño Claude Design "DRAWER VEHÍCULO"): stats + posiciones
 // (ver/montar cubierta) + acciones (reconfigurar ejes, editar datos). Recibe el item ya
@@ -19,13 +23,10 @@ const VehicleDrawer = ({ item, onClose, onNavigate }) => {
   const [showReconfig, setShowReconfig] = useState(false)
   const { v, positions, hasAxles, countLabel, countColor, tipoColor, tipoBg, kmLabel } = item
 
-  useEffect(() => {
-    // Mientras está abierto el editor de ejes, Esc no cierra el detalle (el editor tiene su
-    // propio Cancelar/volver); evita cerrar todo de un tecla.
-    const onKey = (e) => { if (e.key === "Escape" && !showReconfig) onClose() }
-    window.addEventListener("keydown", onKey)
-    return () => window.removeEventListener("keydown", onKey)
-  }, [onClose, showReconfig])
+  // Cierre guardado por !showReconfig: mientras está abierto el editor de ejes, Esc/backdrop no
+  // cierran el detalle (el editor tiene su propio Cancelar/volver). El <Drawer> ni siquiera se
+  // monta durante showReconfig (return anticipado abajo), así que el guard es defensivo.
+  const handleClose = useCallback(() => { if (!showReconfig) onClose() }, [showReconfig, onClose])
 
   const mounted = positions.filter((p) => !p.empty).length
   const total = positions.length
@@ -43,11 +44,14 @@ const VehicleDrawer = ({ item, onClose, onNavigate }) => {
   if (showReconfig) return <ConfigurarEjes vehicle={v} onClose={() => setShowReconfig(false)} />
 
   return (
-    <div className="fixed inset-0 z-40 flex justify-end" style={{ background: "rgba(4,5,6,.55)" }} onClick={onClose}>
-      <aside
-        onClick={(e) => e.stopPropagation()}
-        className="flex h-full w-full max-w-[480px] flex-col"
-        style={{ background: "var(--elev)", borderLeft: "1px solid var(--bd)", animation: "opDrawerIn .22s cubic-bezier(.22,1,.36,1)" }}
+    <>
+      <Drawer
+        onClose={handleClose}
+        z={40}
+        backdrop="rgba(4,5,6,.55)"
+        maxWidth="480px"
+        background="var(--elev)"
+        animation="opDrawerIn .22s cubic-bezier(.22,1,.36,1)"
       >
         {/* Header */}
         <div className="flex flex-none items-start gap-3.5 px-6 py-5" style={{ borderBottom: "1px solid var(--bd-soft)" }}>
@@ -57,7 +61,7 @@ const VehicleDrawer = ({ item, onClose, onNavigate }) => {
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2.5">
               <span className="text-[24px] font-bold leading-none" style={{ fontFamily: "'Space Grotesk'", color: "var(--tx)" }}>{v.mobile || "—"}</span>
-              {v.type && <span className="rounded-full px-2.5 py-[3px] text-[11px] font-semibold" style={{ color: tipoColor, background: tipoBg }}>{v.type}</span>}
+              {v.type && <Pill style={{ color: tipoColor, background: tipoBg }}>{v.type}</Pill>}
             </div>
             <div className="mt-[3px] text-[12px]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-5)" }}>{formatPlate(v.licensePlate, data.plateSep) || "—"} · {v.brand || "—"}</div>
           </div>
@@ -80,7 +84,7 @@ const VehicleDrawer = ({ item, onClose, onNavigate }) => {
           {/* Posiciones */}
           {hasAxles ? (
             <>
-              <div className="mb-3 text-[10.5px] tracking-[.06em]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-6)" }}>POSICIONES</div>
+              <MonoLabel className="mb-3 text-[10.5px] tracking-[.06em]" style={{ color: "var(--tx-6)" }}>POSICIONES</MonoLabel>
               <div className="flex flex-col gap-2">
                 {positions.map((p, i) => (
                   <div key={i} className="flex items-center gap-[13px] rounded-[11px] px-3.5 py-3" style={{ border: "1px solid var(--bd-soft)", background: "var(--card)" }}>
@@ -94,9 +98,9 @@ const VehicleDrawer = ({ item, onClose, onNavigate }) => {
                       ) : (
                         <div className="flex items-center gap-2">
                           <span className="text-[15px] font-bold" style={{ fontFamily: "'Space Grotesk'", color: "var(--tx)" }}>#{p.tireCode}</span>
-                          <span className="inline-flex items-center gap-[5px] rounded-full px-[9px] py-[2px] text-[11px] font-semibold" style={{ color: p.dot, background: p.bg }}>
+                          <Pill className="gap-[5px] px-[9px] py-[2px] text-[11px] font-semibold" style={{ color: p.dot, background: p.bg }}>
                             <span className="rounded-full" style={{ width: 6, height: 6, background: p.dot }} />{p.status}
-                          </span>
+                          </Pill>
                         </div>
                       )}
                     </div>
@@ -114,9 +118,9 @@ const VehicleDrawer = ({ item, onClose, onNavigate }) => {
               </div>
             </>
           ) : (
-            <div className="rounded-[11px] px-4 py-3.5 text-[12.5px]" style={{ background: "var(--input)", border: "1px dashed var(--bd-strong)", color: "var(--tx-4)" }}>
+            <Callout tone="var(--bd-strong)" dashed className="">
               Ejes sin configurar. Reconfigurá el vehículo para definir su esquema y habilitar el montaje de cubiertas.
-            </div>
+            </Callout>
           )}
 
           {/* Acciones */}
@@ -129,11 +133,11 @@ const VehicleDrawer = ({ item, onClose, onNavigate }) => {
             </button>
           </div>
         </div>
-      </aside>
+      </Drawer>
 
       {/* Editar datos: modal sobre el drawer. Al guardar cierra todo → la lista se refresca. */}
       {showEdit && <EditarVehiculo vehicle={v} onClose={() => setShowEdit(false)} onSaved={onClose} />}
-    </div>
+    </>
   )
 }
 

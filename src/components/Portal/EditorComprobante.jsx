@@ -7,6 +7,8 @@ import DeleteOutlineRoundedIcon from "@mui/icons-material/DeleteOutlineRounded"
 import KeyboardArrowUpRoundedIcon from "@mui/icons-material/KeyboardArrowUpRounded"
 import KeyboardArrowDownRoundedIcon from "@mui/icons-material/KeyboardArrowDownRounded"
 import { renderComprobanteHTML } from "@utils/receipt-template"
+import Button from "@components/UI/Button"
+import FloatingField from "@components/UI/FloatingField"
 
 // Editor del comprobante impreso (Claude Design). Pantalla dedicada del portal admin:
 // controles a la izquierda + preview A4 en vivo a la derecha. Persiste en el tenant
@@ -50,9 +52,6 @@ const Segmented = ({ options, value, onChange }) => (
 )
 const sectionLabelStyle = { fontFamily: "'IBM Plex Mono'", color: "var(--tx-6)" }
 const fieldLabelCls = "mb-[5px] block text-[11.5px] font-semibold"
-const fieldStyle = { height: 40, background: "var(--input)", border: "1px solid var(--bd-strong)", color: "var(--tx)" }
-const onFocusLime = (e) => (e.target.style.borderColor = "var(--ink-lime)")
-const onBlurBd = (e) => (e.target.style.borderColor = "var(--bd-strong)")
 
 const EditorComprobante = () => {
   const fileRef = useRef(null)
@@ -142,7 +141,7 @@ const EditorComprobante = () => {
         </div>
         <div className="ml-auto flex items-center gap-2.5">
           <button onClick={reset} className="h-10 rounded-[9px] px-[15px] text-[13.5px] font-semibold" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--tx)" }}>Restablecer</button>
-          <button onClick={save} disabled={saving} className="h-10 rounded-[9px] px-[18px] text-[13.5px] font-bold" style={{ background: "#C4ED2B", color: "#0A0C0D", opacity: saving ? 0.6 : 1 }}>{saving ? "Guardando…" : "Guardar cambios"}</button>
+          <Button variant="lime" onClick={save} disabled={saving} className="h-10 text-[13.5px]" style={{ background: "#C4ED2B", color: "#0A0C0D", opacity: saving ? 0.6 : 1 }}>{saving ? "Guardando…" : "Guardar cambios"}</Button>
         </div>
       </div>
 
@@ -158,12 +157,12 @@ const EditorComprobante = () => {
               <div className="ml-auto"><Toggle on={d.showHeader} onClick={() => setDesign({ showHeader: !d.showHeader })} w={42} knob={18} /></div>
             </div>
             <div className="flex flex-col gap-[11px]">
-              <label className="block"><span className={fieldLabelCls} style={{ color: "var(--tx-4)" }}>Nombre de la empresa</span><input value={empresa} onChange={(e) => setEmpresa(e.target.value)} className="w-full rounded-lg px-3 text-[13.5px] outline-none" style={fieldStyle} onFocus={onFocusLime} onBlur={onBlurBd} /></label>
+              <FloatingField label="Nombre de la empresa" value={empresa} onChange={(e) => setEmpresa(e.target.value)} />
               <div className="grid grid-cols-2 gap-[11px]">
-                <label className="block"><span className={fieldLabelCls} style={{ color: "var(--tx-4)" }}>CUIT</span><input value={cuit} onChange={(e) => setCuit(e.target.value)} className="w-full rounded-lg px-3 text-[13.5px] outline-none" style={{ ...fieldStyle, fontFamily: "'IBM Plex Mono'" }} onFocus={onFocusLime} onBlur={onBlurBd} /></label>
-                <label className="block"><span className={fieldLabelCls} style={{ color: "var(--tx-4)" }}>Teléfono</span><input value={telefono} onChange={(e) => setTelefono(e.target.value)} className="w-full rounded-lg px-3 text-[13.5px] outline-none" style={{ ...fieldStyle, fontFamily: "'IBM Plex Mono'" }} onFocus={onFocusLime} onBlur={onBlurBd} /></label>
+                <FloatingField label="CUIT" value={cuit} onChange={(e) => setCuit(e.target.value)} style={{ fontFamily: "'IBM Plex Mono'" }} />
+                <FloatingField label="Teléfono" value={telefono} onChange={(e) => setTelefono(e.target.value)} style={{ fontFamily: "'IBM Plex Mono'" }} />
               </div>
-              <label className="block"><span className={fieldLabelCls} style={{ color: "var(--tx-4)" }}>Dirección</span><input value={direccion} onChange={(e) => setDireccion(e.target.value)} className="w-full rounded-lg px-3 text-[13.5px] outline-none" style={fieldStyle} onFocus={onFocusLime} onBlur={onBlurBd} /></label>
+              <FloatingField label="Dirección" value={direccion} onChange={(e) => setDireccion(e.target.value)} />
             </div>
           </div>
 
@@ -230,7 +229,7 @@ const EditorComprobante = () => {
           {/* PIE */}
           <div className="px-[22px] py-5" style={{ borderBottom: "1px solid var(--bd-faint)" }}>
             <div className="mb-3 text-[10px] tracking-[.12em]" style={sectionLabelStyle}>PIE DE COMPROBANTE</div>
-            <textarea value={footer} onChange={(e) => setFooter(e.target.value)} rows={3} className="w-full rounded-lg px-3 py-2.5 text-[13px] outline-none" style={{ background: "var(--input)", border: "1px solid var(--bd-strong)", color: "var(--tx)", resize: "vertical", lineHeight: 1.5, fontFamily: "'IBM Plex Sans'" }} onFocus={onFocusLime} onBlur={onBlurBd} />
+            <FloatingField as="textarea" label="Pie de comprobante" value={footer} onChange={(e) => setFooter(e.target.value)} rows={3} />
           </div>
 
           {/* IMPRESIÓN */}

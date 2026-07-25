@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from "react"
+import { useState, useEffect, useContext, useCallback } from "react"
 import ApiContext from "@context/apiContext"
 import { fetchTireById } from "@api/tires"
 import { fetchVehiclePositions } from "@api/vehicles"
@@ -15,8 +15,9 @@ import { buildAssignPrintData, buildUnassignPrintData, buildFinishRecapPrintData
 import { metaOf, tint, fmtKm, fmtDate, StateBadge } from "./status"
 import { OpActionBtn } from "./opActions"
 import Field from "@components/common/Field"
-
-const fieldStyle = { background: "var(--input)", border: "1.5px solid var(--bd)", color: "var(--tx)" }
+import Drawer from "@components/UI/Drawer"
+import FloatingField from "@components/UI/FloatingField"
+import { formatTireCode } from "@utils/tireCode"
 
 // Botón chico de una entrada del timeline (Reimprimir / Corregir / Deshacer), con hover coloreable.
 const TimelineBtn = ({ onClick, disabled, icon, label, hover }) => (
@@ -101,6 +102,7 @@ const TireDrawer = ({ tireId, initialAction, initialAssign, onAssigned, onClose 
   const [action, setAction] = useState(initialAction || null) // null | assign | unassign | recap | discard | undo | editHist
   const [actionEntry, setActionEntry] = useState(null) // entrada del historial sobre la que opera undo/editHist
   const [form, setForm] = useState({})
+  const [errors, setErrors] = useState({}) // marcado de campos obligatorios faltantes por acción
   const [positions, setPositions] = useState(null) // posiciones del vehículo elegido al asignar (null = sin cargar)
 
   // Acciones reales del ApiContext. tires.* (handlers) ya hacen replaceTireInList →
@@ -140,12 +142,6 @@ const TireDrawer = ({ tireId, initialAction, initialAssign, onAssigned, onClose 
     }
   }, [initialAssign, initialAction])
 
-  useEffect(() => {
-    const onKey = (e) => { if (e.key === "Escape") (action ? closeAction() : onClose()) }
-    window.addEventListener("keydown", onKey)
-    return () => window.removeEventListener("keydown", onKey)
-  }, [onClose, action])
-
   // Al elegir vehículo en la asignación, traer su esquema de posiciones (ejes + ocupación).
   useEffect(() => {
     if (action !== "assign" || !form.vehicle) { setPositions(null); return }
@@ -156,15 +152,24 @@ const TireDrawer = ({ tireId, initialAction, initialAssign, onAssigned, onClose 
     return () => { alive = false }
   }, [form.vehicle, action])
 
-  const openAction = (a) => { setForm({}); setActionEntry(null); setAction(a) }
-  const closeAction = () => { setAction(null); setActionEntry(null) }
+  const openAction = (a) => { setForm({}); setActionEntry(null); setErrors({}); setAction(a) }
+  const closeAction = useCallback(() => { setAction(null); setActionEntry(null); setErrors({}) }, [])
+  // Cierre action-aware (Escape / backdrop / botón X): si hay un formulario de acción abierto
+  // vuelve al detalle (closeAction); si no, cierra el drawer entero. Antes solo el Escape era
+  // action-aware — ahora backdrop y X respetan la misma lógica vía el <Drawer> común.
+  const handleClose = useCallback(() => (action ? closeAction() : onClose()), [action, closeAction, onClose])
   const reload = (id) => load(id) // re-fetch del drawer tras la acción → mata Bug 1
-  const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }))
+  // Al editar un campo se limpia su marca de error (border rojo).
+  const set = (k) => (e) => {
+    setForm((f) => ({ ...f, [k]: e.target.value }))
+    setErrors((p) => (p[k] ? { ...p, [k]: false } : p))
+  }
   // Tipo base de una entrada (sin el prefijo "corrección-"), para decidir qué campos corregir.
   const editBaseType = (entry) => (entry?.type || "").replace(/^correcc[ií]on-/i, "")
   // Abrir una acción sobre una entrada del historial (deshacer / corregir), prellenando el form.
   const openEntryAction = (a, entry) => {
     setActionEntry(entry)
+    setErrors({})
     setForm(a === "editHist"
       ? { status: entry.status || tire.status, kmAlta: entry.kmAlta ?? "", kmBaja: entry.kmBaja ?? "", vehicle: entry.vehicle?._id || "", reason: `Corrección de Orden N°${entry.orderNumber || ""}`, orderNumber: "" }
       : {})
@@ -172,9 +177,15 @@ const TireDrawer = ({ tireId, initialAction, initialAssign, onAssigned, onClose 
   }
 
   const doAssign = () => {
-    if (!form.vehicle || !form.kmAlta || !form.orderNumber) return showToast("warning", "Completá vehículo, km y N° de orden")
-    // Si el vehículo tiene ejes configurados, la posición es obligatoria; si no, se asigna sin posición.
-    if (positions && positions.length > 0 && !form.position) return showToast("warning", "Elegí la posición en el vehículo")
+    const e = {}
+    if (!form.vehicle) e.vehicle = true
+    if (!form.kmAlta) e.kmAlta = true
+    if (!form.orderNumber) e.orderNumber = true
+    if (Object.keys(e).length) { setErrors(e); showToast("warning", "Completá los campos obligatorios"); return }
+    // Si el vehículo tiene ejes configurados, la posición es obligatoria; si no, se asigna sin
+    // posición. La grilla de posición no es un FloatingField → se avisa por toast.
+    if (positions && positions.length > 0 && !form.position) { setErrors({}); return showToast("warning", "Elegí la posición en el vehículo") }
+    setErrors({})
     // Montaje dirigido: al éxito no cerramos el panel acá; avisamos (onAssigned) para que el
     // padre limpie el banner de montaje, cierre el drawer y vuelva al vehículo. Flujo normal:
     // se cierra el panel de acción como siempre.
@@ -186,7 +197,11 @@ const TireDrawer = ({ tireId, initialAction, initialAssign, onAssigned, onClose 
     }).then((updated) => { if (updated && initialAssign) onAssigned?.() }).catch(() => { /* error ya notificado */ })
   }
   const doUnassign = () => {
-    if (!form.kmBaja || !form.orderNumber) return showToast("warning", "Completá km y N° de orden")
+    const e = {}
+    if (!form.kmBaja) e.kmBaja = true
+    if (!form.orderNumber) e.orderNumber = true
+    if (Object.keys(e).length) { setErrors(e); showToast("warning", "Completá los campos obligatorios"); return }
+    setErrors({})
     unassignAct.execute({
       tire,
       formData: { kmBaja: Number(form.kmBaja), orderNumber: form.orderNumber, getReceiptNumber: orders.getNextReceipt },
@@ -195,7 +210,11 @@ const TireDrawer = ({ tireId, initialAction, initialAssign, onAssigned, onClose 
     })
   }
   const doRecap = () => {
-    if (!form.status || !form.orderNumber) return showToast("warning", "Elegí el estado y el N° de orden")
+    const e = {}
+    if (!form.status) e.status = true
+    if (!form.orderNumber) e.orderNumber = true
+    if (Object.keys(e).length) { setErrors(e); showToast("warning", "Completá los campos obligatorios"); return }
+    setErrors({})
     recapAct.execute({
       tire,
       formData: { status: form.status, orderNumber: form.orderNumber, getReceiptNumber: orders.getNextReceipt },
@@ -204,7 +223,8 @@ const TireDrawer = ({ tireId, initialAction, initialAssign, onAssigned, onClose 
     })
   }
   const doDiscard = () => {
-    if (!form.orderNumber) return showToast("warning", "Completá el N° de orden")
+    if (!form.orderNumber) { setErrors({ orderNumber: true }); showToast("warning", "Completá los campos obligatorios"); return }
+    setErrors({})
     discardAct.execute({
       tire,
       formData: { status: discardStatus, orderNumber: form.orderNumber, getReceiptNumber: orders.getNextReceipt },
@@ -213,7 +233,8 @@ const TireDrawer = ({ tireId, initialAction, initialAssign, onAssigned, onClose 
     })
   }
   const doUndo = () => {
-    if (!form.orderNumber) return showToast("warning", "Completá el N° de orden")
+    if (!form.orderNumber) { setErrors({ orderNumber: true }); showToast("warning", "Completá los campos obligatorios"); return }
+    setErrors({})
     undoAct.execute({
       tire,
       formData: { orderNumber: form.orderNumber, getReceiptNumber: orders.getNextReceipt },
@@ -223,9 +244,17 @@ const TireDrawer = ({ tireId, initialAction, initialAssign, onAssigned, onClose 
   }
   const doEditHist = () => {
     const base = editBaseType(actionEntry)
-    if (!form.orderNumber || !form.status || !form.reason) return showToast("warning", "Completá N° de orden, estado y motivo")
-    if (base === "Asignación" && (!form.vehicle || !form.kmAlta)) return showToast("warning", "Completá vehículo y km inicial")
-    if (base === "Desasignación" && !form.kmBaja) return showToast("warning", "Completá el km final")
+    const e = {}
+    if (!form.orderNumber) e.orderNumber = true
+    if (!form.status) e.status = true
+    if (!form.reason) e.reason = true
+    if (base === "Asignación") {
+      if (!form.vehicle) e.vehicle = true
+      if (!form.kmAlta) e.kmAlta = true
+    }
+    if (base === "Desasignación" && !form.kmBaja) e.kmBaja = true
+    if (Object.keys(e).length) { setErrors(e); showToast("warning", "Completá los campos obligatorios"); return }
+    setErrors({})
     editHistAct.execute({
       tire,
       entry: actionEntry,
@@ -265,12 +294,7 @@ const TireDrawer = ({ tireId, initialAction, initialAssign, onAssigned, onClose 
   const ACTION_TITLES = { assign: "Asignar a vehículo", unassign: "Desasignar cubierta", recap: "Registrar recapado", discard: "Descartar cubierta", undo: "Deshacer entrada", editHist: "Corregir entrada de historial" }
 
   return (
-    <div className="fixed inset-0 z-50 flex justify-end" style={{ background: "rgba(0,0,0,.45)" }} onClick={onClose}>
-      <aside
-        onClick={(e) => e.stopPropagation()}
-        className="flex h-full w-full max-w-[460px] flex-col"
-        style={{ background: "var(--card)", borderLeft: "1px solid var(--bd)", animation: "opDrawerIn .18s ease" }}
-      >
+    <Drawer onClose={handleClose}>
         {loading || !tire ? (
           <div className="flex h-full items-center justify-center text-[13px]" style={{ color: "var(--tx-5)" }}>
             {loading ? "Cargando…" : "Sin datos"}
@@ -288,12 +312,12 @@ const TireDrawer = ({ tireId, initialAction, initialAssign, onAssigned, onClose 
                 <div>
                   <div className="text-[11px]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-6)" }}>{tire.serialNumber || "—"}</div>
                   <div className="flex items-center gap-3">
-                    <span className="text-[26px] font-bold leading-none" style={{ fontFamily: "'Space Grotesk'", color: "var(--tx)" }}>#{tire.code}</span>
+                    <span className="text-[26px] font-bold leading-none" style={{ fontFamily: "'Space Grotesk'", color: "var(--tx)" }}>#{formatTireCode(tire.code, data?.tireCodePrefix)}</span>
                     <StateBadge status={tire.status} />
                   </div>
                 </div>
               </div>
-              <button onClick={onClose} className="rounded-[7px] p-2" style={{ color: "var(--tx-5)" }} title="Cerrar">
+              <button onClick={handleClose} className="rounded-[7px] p-2" style={{ color: "var(--tx-5)" }} title="Cerrar">
                 <CloseRoundedIcon sx={{ fontSize: 20 }} />
               </button>
             </div>
@@ -303,20 +327,19 @@ const TireDrawer = ({ tireId, initialAction, initialAssign, onAssigned, onClose 
               <div className="flex-1 overflow-auto p-5">
                 <h3 className="mb-4 text-[15px] font-semibold" style={{ fontFamily: "'Space Grotesk'", color: "var(--tx)" }}>{ACTION_TITLES[action]}</h3>
 
+                <div className="flex flex-col gap-3.5">
                 {action === "assign" && (
                   <>
-                    <Field label="Vehículo">
-                      <select className="w-full rounded-[9px] px-3 py-2.5 text-[14px] outline-none" style={fieldStyle} value={form.vehicle || ""} onChange={(e) => setForm((f) => ({ ...f, vehicle: e.target.value, position: "" }))}>
-                        <option value="">Seleccionar vehículo…</option>
-                        {vehicles.map((v) => (
-                          <option key={v._id} value={v._id}>{v.mobile}{v.licensePlate ? ` · ${v.licensePlate}` : ""}</option>
-                        ))}
-                      </select>
-                    </Field>
+                    <FloatingField as="select" label="Vehículo" required error={errors.vehicle} value={form.vehicle || ""} onChange={(e) => { const v = e.target.value; setForm((f) => ({ ...f, vehicle: v, position: "" })); setErrors((p) => (p.vehicle ? { ...p, vehicle: false } : p)) }}>
+                      <option value="">Seleccionar vehículo…</option>
+                      {vehicles.map((v) => (
+                        <option key={v._id} value={v._id}>{v.mobile}{v.licensePlate ? ` · ${v.licensePlate}` : ""}</option>
+                      ))}
+                    </FloatingField>
 
                     {form.vehicle && positions && (
                       positions.length === 0 ? (
-                        <div className="mb-3 rounded-[9px] px-3 py-2.5 text-[12.5px]" style={{ background: "var(--input)", border: "1px dashed var(--bd-strong)", color: "var(--tx-5)" }}>
+                        <div className="rounded-[9px] px-3 py-2.5 text-[12.5px]" style={{ background: "var(--input)", border: "1px dashed var(--bd-strong)", color: "var(--tx-5)" }}>
                           Este vehículo no tiene ejes configurados — se asignará sin posición.
                         </div>
                       ) : (
@@ -351,74 +374,57 @@ const TireDrawer = ({ tireId, initialAction, initialAssign, onAssigned, onClose 
                       )
                     )}
 
-                    <Field label="Kilometraje inicial">
-                      <input type="number" min="0" className="w-full rounded-[9px] px-3 py-2.5 text-[14px] outline-none" style={fieldStyle} value={form.kmAlta || ""} onChange={set("kmAlta")} placeholder="0" />
-                    </Field>
+                    <FloatingField label="Kilometraje inicial" type="number" min="0" required error={errors.kmAlta} value={form.kmAlta || ""} onChange={set("kmAlta")} />
                   </>
                 )}
 
                 {action === "unassign" && (
-                  <Field label="Kilometraje final">
-                    <input type="number" min="0" className="w-full rounded-[9px] px-3 py-2.5 text-[14px] outline-none" style={fieldStyle} value={form.kmBaja || ""} onChange={set("kmBaja")} placeholder={String(tire.kilometers ?? 0)} />
-                  </Field>
+                  <FloatingField label="Kilometraje final" type="number" min="0" required error={errors.kmBaja} value={form.kmBaja || ""} onChange={set("kmBaja")} />
                 )}
 
                 {action === "recap" && (
-                  <Field label="Nuevo estado de recapado">
-                    <select className="w-full rounded-[9px] px-3 py-2.5 text-[14px] outline-none" style={fieldStyle} value={form.status || ""} onChange={set("status")}>
-                      <option value="">Seleccionar estado…</option>
-                      {recapOptions.map((s) => <option key={s} value={s}>{s}</option>)}
-                    </select>
-                  </Field>
+                  <FloatingField as="select" label="Nuevo estado de recapado" required error={errors.status} value={form.status || ""} onChange={set("status")}>
+                    <option value="">Seleccionar estado…</option>
+                    {recapOptions.map((s) => <option key={s} value={s}>{s}</option>)}
+                  </FloatingField>
                 )}
 
                 {action === "discard" && (
-                  <div className="mb-3 rounded-[9px] px-3 py-2.5 text-[12.5px]" style={{ background: tint("var(--ink-red)", 8), border: "1px solid " + tint("var(--ink-red)", 35), color: "var(--ink-red)" }}>
-                    Vas a dar de baja definitiva esta cubierta (#{tire.code}). Queda registrado en el historial con su comprobante.
+                  <div className="rounded-[9px] px-3 py-2.5 text-[12.5px]" style={{ background: tint("var(--ink-red)", 8), border: "1px solid " + tint("var(--ink-red)", 35), color: "var(--ink-red)" }}>
+                    Vas a dar de baja definitiva esta cubierta (#{formatTireCode(tire.code, data?.tireCodePrefix)}). Queda registrado en el historial con su comprobante.
                   </div>
                 )}
 
                 {action === "undo" && (
-                  <div className="mb-3 rounded-[9px] px-3 py-2.5 text-[12.5px]" style={{ background: "var(--input)", border: "1px solid var(--bd-strong)", color: "var(--tx-4)" }}>
+                  <div className="rounded-[9px] px-3 py-2.5 text-[12.5px]" style={{ background: "var(--input)", border: "1px solid var(--bd-strong)", color: "var(--tx-4)" }}>
                     Vas a revertir el movimiento «<b style={{ color: "var(--tx-2)" }}>{actionEntry?.type}</b>» del {fmtDate(actionEntry?.date)}. La reversión queda registrada con su comprobante.
                   </div>
                 )}
 
                 {action === "editHist" && (
                   <>
-                    <Field label="Estado">
-                      <select className="w-full rounded-[9px] px-3 py-2.5 text-[14px] outline-none" style={fieldStyle} value={form.status || ""} onChange={set("status")}>
-                        <option value="">Seleccionar estado…</option>
-                        {statuses.map((s) => <option key={s.name} value={s.name}>{s.name}</option>)}
-                      </select>
-                    </Field>
+                    <FloatingField as="select" label="Estado" required error={errors.status} value={form.status || ""} onChange={set("status")}>
+                      <option value="">Seleccionar estado…</option>
+                      {statuses.map((s) => <option key={s.name} value={s.name}>{s.name}</option>)}
+                    </FloatingField>
                     {editBaseType(actionEntry) === "Asignación" && (
                       <>
-                        <Field label="Vehículo">
-                          <select className="w-full rounded-[9px] px-3 py-2.5 text-[14px] outline-none" style={fieldStyle} value={form.vehicle || ""} onChange={set("vehicle")}>
-                            <option value="">Seleccionar vehículo…</option>
-                            {vehicles.map((v) => <option key={v._id} value={v._id}>{v.mobile}{v.licensePlate ? ` · ${v.licensePlate}` : ""}</option>)}
-                          </select>
-                        </Field>
-                        <Field label="Kilometraje inicial">
-                          <input type="number" min="0" className="w-full rounded-[9px] px-3 py-2.5 text-[14px] outline-none" style={fieldStyle} value={form.kmAlta ?? ""} onChange={set("kmAlta")} placeholder="0" />
-                        </Field>
+                        <FloatingField as="select" label="Vehículo" required error={errors.vehicle} value={form.vehicle || ""} onChange={set("vehicle")}>
+                          <option value="">Seleccionar vehículo…</option>
+                          {vehicles.map((v) => <option key={v._id} value={v._id}>{v.mobile}{v.licensePlate ? ` · ${v.licensePlate}` : ""}</option>)}
+                        </FloatingField>
+                        <FloatingField label="Kilometraje inicial" type="number" min="0" required error={errors.kmAlta} value={form.kmAlta ?? ""} onChange={set("kmAlta")} />
                       </>
                     )}
                     {editBaseType(actionEntry) === "Desasignación" && (
-                      <Field label="Kilometraje final">
-                        <input type="number" min="0" className="w-full rounded-[9px] px-3 py-2.5 text-[14px] outline-none" style={fieldStyle} value={form.kmBaja ?? ""} onChange={set("kmBaja")} placeholder="0" />
-                      </Field>
+                      <FloatingField label="Kilometraje final" type="number" min="0" required error={errors.kmBaja} value={form.kmBaja ?? ""} onChange={set("kmBaja")} />
                     )}
-                    <Field label="Motivo de la corrección">
-                      <input className="w-full rounded-[9px] px-3 py-2.5 text-[14px] outline-none" style={fieldStyle} value={form.reason || ""} onChange={set("reason")} placeholder="Ej. Corrección de km mal cargado" />
-                    </Field>
+                    <FloatingField label="Motivo de la corrección" required error={errors.reason} value={form.reason || ""} onChange={set("reason")} />
                   </>
                 )}
 
-                <Field label="N° de orden">
-                  <input className="w-full rounded-[9px] px-3 py-2.5 text-[14px] outline-none" style={fieldStyle} value={form.orderNumber || ""} onChange={set("orderNumber")} placeholder="Ej. 2026-000123" />
-                </Field>
+                <FloatingField label="N° de orden" required error={errors.orderNumber} value={form.orderNumber || ""} onChange={set("orderNumber")} />
+                </div>
 
                 <div className="mt-5 flex gap-3">
                   <button onClick={() => setAction(null)} className="flex-1 rounded-[9px] py-2.5 text-[13px] font-semibold" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--tx-2)" }}>
@@ -530,8 +536,7 @@ const TireDrawer = ({ tireId, initialAction, initialAssign, onAssigned, onClose 
             )}
           </>
         )}
-      </aside>
-    </div>
+    </Drawer>
   )
 }
 

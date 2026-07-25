@@ -14,6 +14,7 @@ import ApartmentRoundedIcon from "@mui/icons-material/ApartmentRounded"
 import OpenInNewRoundedIcon from "@mui/icons-material/OpenInNewRounded"
 import TaskAltRoundedIcon from "@mui/icons-material/TaskAltRounded"
 import DesktopDownload from "./DesktopDownload"
+import StatCard from "@components/UI/StatCard"
 
 // Paleta de estados del design system (coherente entre donut y barras).
 const STATUS_COLORS = {
@@ -61,19 +62,6 @@ const Donut = ({ segments, size = 176, stroke = 22 }) => {
     </svg>
   )
 }
-
-const StatCard = ({ icon, tint, value, label, sublabel }) => (
-  <div className="rounded-xl p-5" style={card}>
-    <div className="flex items-start justify-between">
-      <div>
-        <p className="text-sm" style={{ color: "var(--tx-4)" }}>{label}</p>
-        <p className="mt-1 font-display text-3xl font-bold" style={{ color: "var(--tx)", fontFamily: "'Space Grotesk'" }}>{value}</p>
-      </div>
-      <span className="grid h-11 w-11 place-items-center rounded-lg" style={{ background: tintBg(tint, 12), color: tint }}>{icon}</span>
-    </div>
-    {sublabel && <p className="mt-3 text-xs" style={{ color: "var(--tx-6)" }}>{sublabel}</p>}
-  </div>
-)
 
 const Dashboard = () => {
   const { user } = useAuth()

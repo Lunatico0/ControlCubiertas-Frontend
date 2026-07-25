@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react"
+import { useModalEscape } from "@hooks/useModalStack.js"
 
 // Motor de tour interactivo (rediseño Claude Design "TOUR INTERACTIVO"). Genérico: recibe
 // los `steps` (cada layout define los suyos) y recorre la app con un spotlight sobre
@@ -47,11 +48,15 @@ const OpTour = ({ steps, active, onNavigate, onClose }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [i, active])
 
+  // Escape: cierre stack-aware vía el hook común (solo cierra el tour si está arriba del stack).
+  useModalEscape(onClose)
+
+  // Flechas ←/→: navegación entre pasos, en su propio listener (el hook solo cubre Escape).
   useEffect(() => {
-    const onKey = (e) => { if (e.key === "Escape") onClose(); else if (e.key === "ArrowRight") next(); else if (e.key === "ArrowLeft") prev() }
+    const onKey = (e) => { if (e.key === "ArrowRight") next(); else if (e.key === "ArrowLeft") prev() }
     window.addEventListener("keydown", onKey)
     return () => window.removeEventListener("keydown", onKey)
-  }, [onClose, next, prev])
+  }, [next, prev])
 
   if (!pos) return null
   const r = pos.rect

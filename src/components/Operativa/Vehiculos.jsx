@@ -1,20 +1,20 @@
 import { useState, useMemo, useContext, useEffect, useRef } from "react"
 import ApiContext from "@context/apiContext"
 import { usePersistedState } from "@hooks/usePersistedState"
-import SearchRoundedIcon from "@mui/icons-material/SearchRounded"
-import AddRoundedIcon from "@mui/icons-material/AddRounded"
+import { useHotkeyFocus } from "@hooks/useHotkeyFocus"
 import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded"
 import LocalShippingOutlinedIcon from "@mui/icons-material/LocalShippingOutlined"
 import TripOriginRoundedIcon from "@mui/icons-material/TripOriginRounded"
-import GridViewRoundedIcon from "@mui/icons-material/GridViewRounded"
-import ViewListRoundedIcon from "@mui/icons-material/ViewListRounded"
 import ReportProblemRoundedIcon from "@mui/icons-material/ReportProblemRounded"
 import { metaOf, tint, fmtKm } from "./status"
 import { formatPlate } from "@utils/plateFormat"
+import { formatTireCode } from "@utils/tireCode"
 import { generatePositions } from "./axles"
 import NuevoVehiculo from "./NuevoVehiculo"
 import ConfigurarEjes from "./ConfigurarEjes"
 import VehicleDrawer from "./VehicleDrawer"
+import ScreenHeader from "@components/UI/ScreenHeader"
+import Pill from "@components/UI/Pill"
 
 // Lista de vehículos (rediseño Claude Design). Dos vistas con toggle (persistido por
 // device): CARDS con el esquema de ejes/posiciones, y TABLA densa. El esquema se deriva
@@ -37,6 +37,7 @@ const Vehiculos = ({ onNavigate, intent }) => {
   const types = useMemo(() => [...new Set(vehicles.map((v) => v.type).filter(Boolean))].sort((a, b) => a.localeCompare(b, "es")), [vehicles])
   const pendingAxles = vehicles.filter((v) => !(v.axles && v.axles.length)).length
   const [vview, setView] = usePersistedState("op_vehview", "grid")
+  const searchRef = useHotkeyFocus() // Ctrl/⌘+K enfoca el buscador (igual que Cubiertas)
 
   // Cubiertas montadas indexadas por vehículo → { byPos: {E1-I: tire}, count }
   const mountedByVeh = useMemo(() => {
@@ -83,8 +84,6 @@ const Vehiculos = ({ onNavigate, intent }) => {
     return filtered.sort((a, b) => (a.v.mobile || "").localeCompare(b.v.mobile || "", "es", { numeric: true }))
   }, [vehicles, mountedByVeh, query, fType])
 
-  const inputStyle = { background: "var(--card)", border: "1.5px solid var(--bd)", color: "var(--tx)" }
-  const toggleBtn = (active) => ({ background: active ? "var(--ink-lime)" : "transparent", color: active ? "var(--bg)" : "var(--tx-5)" })
   // Click en un vehículo → abre su drawer de detalle (no navega directo al inventario).
   const open = (v) => setDetailVeh(fleet.find((it) => String(it.v._id) === String(v._id)) || null)
 
@@ -101,27 +100,23 @@ const Vehiculos = ({ onNavigate, intent }) => {
   return (
     <div>
       {/* ===== TOOLBAR ===== */}
-      <div className="sticky top-0 z-5 px-7 pb-4 pt-5" style={{ background: "var(--bg)", borderBottom: "1px solid var(--bd-faint)" }}>
-        <div className="flex items-center gap-4">
-          <h1 className="text-[24px] font-bold tracking-[-.02em]" style={{ fontFamily: "'Space Grotesk'", color: "var(--tx)" }}>Vehículos</h1>
-          <div className="relative ml-2 max-w-[420px] flex-1">
-            <span className="absolute left-[15px] top-1/2 -translate-y-1/2" style={{ color: "var(--tx-7)" }}><SearchRoundedIcon sx={{ fontSize: 18 }} /></span>
-            <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Buscar móvil, patente o marca…" className="h-[46px] w-full rounded-[11px] pl-[42px] pr-4 text-[14.5px] outline-none" style={inputStyle} onFocus={(e) => (e.target.style.borderColor = "var(--ink-lime)")} onBlur={(e) => (e.target.style.borderColor = "var(--bd)")} />
-          </div>
-          {pendingAxles > 0 && (
-            <button onClick={() => setShowConfigEjes(true)} title="Configurar ejes de vehículos migrados" className="ml-auto inline-flex h-[46px] items-center gap-2 rounded-[11px] px-4 text-[13.5px] font-semibold" style={{ color: "var(--ink-orange)", background: tint("var(--ink-orange)", 12), border: `1px solid ${tint("var(--ink-orange)", 30)}` }}>
-              <ReportProblemRoundedIcon sx={{ fontSize: 17 }} /> Configurar ejes ({pendingAxles})
-            </button>
-          )}
-          <button onClick={() => setShowAlta(true)} className={`${pendingAxles > 0 ? "" : "ml-auto "}inline-flex h-[46px] items-center gap-2 rounded-[11px] px-[18px] text-[14.5px] font-bold`} style={{ background: "#C4ED2B", color: "#0A0C0D" }}>
-            <AddRoundedIcon sx={{ fontSize: 18 }} /> Nuevo vehículo
+      <ScreenHeader
+        title="Vehículos"
+        search={{
+          value: query,
+          onChange: (e) => setQuery(e.target.value),
+          placeholder: "Buscar móvil, patente o marca…",
+          showShortcut: true,
+          inputRef: searchRef,
+        }}
+        secondaryAction={pendingAxles > 0 ? (
+          <button onClick={() => setShowConfigEjes(true)} title="Configurar ejes de vehículos migrados" className="inline-flex h-[46px] items-center gap-2 rounded-[11px] px-4 text-[13.5px] font-semibold" style={{ color: "var(--ink-orange)", background: tint("var(--ink-orange)", 12), border: `1px solid ${tint("var(--ink-orange)", 30)}` }}>
+            <ReportProblemRoundedIcon sx={{ fontSize: 17 }} /> Configurar ejes ({pendingAxles})
           </button>
-          {/* toggle cards/tabla */}
-          <div className="flex gap-[3px] rounded-[9px] p-[3px]" style={{ border: "1px solid var(--bd)", background: "var(--card)" }}>
-            <button onClick={() => setView("grid")} title="Tarjetas" className="inline-flex h-8 w-[38px] items-center justify-center rounded-md" style={toggleBtn(vview !== "table")}><GridViewRoundedIcon sx={{ fontSize: 17 }} /></button>
-            <button onClick={() => setView("table")} title="Lista" className="inline-flex h-8 w-[38px] items-center justify-center rounded-md" style={toggleBtn(vview === "table")}><ViewListRoundedIcon sx={{ fontSize: 17 }} /></button>
-          </div>
-        </div>
+        ) : null}
+        primaryAction={{ label: "Nuevo vehículo", onClick: () => setShowAlta(true) }}
+        viewToggle={{ value: vview === "table" ? "table" : "grid", onChange: setView }}
+      >
         {types.length > 1 && (
           <div className="mt-3 flex flex-wrap gap-2">
             {["", ...types].map((t) => {
@@ -135,7 +130,7 @@ const Vehiculos = ({ onNavigate, intent }) => {
             })}
           </div>
         )}
-      </div>
+      </ScreenHeader>
 
       <div className="px-7 pb-8 pt-5">
         {loading ? (
@@ -158,7 +153,7 @@ const Vehiculos = ({ onNavigate, intent }) => {
                   <span className="text-[14.5px] font-bold" style={{ fontFamily: "'Space Grotesk'", color: "var(--tx)" }}>{v.mobile || "—"}</span>
                 </div>
                 <div className="text-[13px]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-2)" }}>{formatPlate(v.licensePlate, data.plateSep) || "—"}</div>
-                <div>{v.type && <span className="inline-flex rounded-full px-2.5 py-[3px] text-[11px] font-semibold" style={{ color: tipoColor, background: tipoBg }}>{v.type}</span>}</div>
+                <div>{v.type && <Pill style={{ color: tipoColor, background: tipoBg }}>{v.type}</Pill>}</div>
                 <div className="flex items-center gap-[7px] text-[13px] font-semibold" style={{ color: countColor }}><TripOriginRoundedIcon sx={{ fontSize: 14 }} />{countLabel}</div>
                 <div className="flex items-center justify-end">
                   <span className="text-[13px] font-semibold" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx)" }}>{kmLabel}</span>
@@ -177,7 +172,7 @@ const Vehiculos = ({ onNavigate, intent }) => {
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
                       <span className="text-[18px] font-bold" style={{ fontFamily: "'Space Grotesk'", color: "var(--tx)" }}>{v.mobile || "—"}</span>
-                      {v.type && <span className="rounded-full px-[9px] py-[2px] text-[10.5px] font-semibold" style={{ color: tipoColor, background: tipoBg }}>{v.type}</span>}
+                      {v.type && <Pill className="px-[9px] py-[2px] text-[10.5px] font-semibold" style={{ color: tipoColor, background: tipoBg }}>{v.type}</Pill>}
                     </div>
                     <div className="mt-0.5 text-[12px]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-5)" }}>{formatPlate(v.licensePlate, data.plateSep) || "—"} · {v.brand || "—"}</div>
                   </div>
@@ -188,7 +183,7 @@ const Vehiculos = ({ onNavigate, intent }) => {
                 {hasAxles ? (
                   <div className="flex flex-1 flex-wrap content-start gap-[7px]">
                     {positions.map((p, i) => (
-                      <div key={i} title={`${p.label} · ${p.empty ? "Vacía" : `#${p.tireCode} ${p.status}`}`} className="flex w-[42px] flex-col items-center gap-1">
+                      <div key={i} title={`${p.label} · ${p.empty ? "Vacía" : `#${formatTireCode(p.tireCode, data?.tireCodePrefix)} ${p.status}`}`} className="flex w-[42px] flex-col items-center gap-1">
                         <div className="flex h-[30px] w-full items-center justify-center rounded-[7px]" style={{ background: p.empty ? "var(--input)" : p.bg, border: p.empty ? "1.5px dashed var(--bd-strong)" : "1.5px solid transparent" }}>
                           <span className="rounded-full" style={{ width: 9, height: 9, background: p.empty ? "transparent" : p.dot, border: p.empty ? "1.5px solid var(--bd-strong)" : "none" }} />
                         </div>

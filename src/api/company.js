@@ -21,4 +21,9 @@ export const getCompanyCached = () => {
   return companyPromise
 }
 
+// Invalida la cache para que la próxima lectura (ej. al entrar a /op) traiga datos frescos.
+// La llama el panel admin al guardar (separador de patente, prefijo de código, diseño, etc.)
+// para que los cambios se reflejen en la operativa SIN hard-reload.
+export const invalidateCompanyCache = () => { companyPromise = null }
+
 export default companyAPI

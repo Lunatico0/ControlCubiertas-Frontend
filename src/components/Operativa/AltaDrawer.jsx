@@ -1,16 +1,15 @@
-import { useState, useEffect, useContext } from "react"
+import { useState, useContext } from "react"
 import ApiContext from "@context/apiContext"
 import { showToast } from "@utils/toast"
 import { buildCreateTirePrintData } from "@utils/print-data"
 import usePrint from "@hooks/usePrint"
-import Field from "@components/common/Field"
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded"
+import Button from "@components/UI/Button"
+import Drawer from "@components/UI/Drawer"
+import FloatingField from "@components/UI/FloatingField"
 
 // Drawer de alta de cubierta nueva. Crea en depósito (status "Nueva"); la asignación
 // a vehículo es una acción aparte. Reutiliza tires.create (refresca la lista sola).
-const fieldStyle = { background: "var(--input)", border: "1.5px solid var(--bd)", color: "var(--tx)" }
-const inputCls = "w-full rounded-[9px] px-3 py-2.5 text-[14px] outline-none"
-
 const todayLocal = () => {
   const d = new Date()
   // YYYY-MM-DD en hora local (no UTC), para el value del input date.
@@ -32,18 +31,25 @@ const AltaDrawer = ({ onClose, onCreated }) => {
     orderNumber: "",
   })
   const [submitting, setSubmitting] = useState(false)
-  const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }))
-
-  useEffect(() => {
-    const onKey = (e) => { if (e.key === "Escape") onClose() }
-    window.addEventListener("keydown", onKey)
-    return () => window.removeEventListener("keydown", onKey)
-  }, [onClose])
+  const [errors, setErrors] = useState({})
+  // Al editar un campo se limpia su marca de error (border rojo).
+  const set = (k) => (e) => {
+    setForm((f) => ({ ...f, [k]: e.target.value }))
+    setErrors((p) => (p[k] ? { ...p, [k]: false } : p))
+  }
 
   const submit = async () => {
-    if (!form.code || !form.serialNumber || !form.brand || !form.size || !form.pattern || !form.orderNumber) {
-      return showToast("warning", "Completá código, serie, marca, rodado, dibujo y N° de orden")
-    }
+    // Validación por campo: en vez de un toast genérico, marcamos en rojo los faltantes.
+    const e = {}
+    if (!String(form.code ?? "").trim()) e.code = true
+    if (!form.serialNumber?.trim()) e.serialNumber = true
+    if (!form.brand?.trim()) e.brand = true
+    if (!form.size?.trim()) e.size = true
+    if (!form.pattern?.trim()) e.pattern = true
+    if (!form.createdAt) e.createdAt = true
+    if (!form.orderNumber?.trim()) e.orderNumber = true
+    if (Object.keys(e).length) { setErrors(e); showToast("warning", "Completá los campos obligatorios"); return }
+    setErrors({})
     setSubmitting(true)
     try {
       // Bug 2 (Fase 04): anclar la fecha a mediodía LOCAL para que no se corra de día
@@ -55,7 +61,7 @@ const AltaDrawer = ({ onClose, onCreated }) => {
       try { receipt = await orders.getNextReceipt() } catch { /* si falla, se imprime sin N° */ }
       const created = await tires.create({
         status: initialStatus,
-        code: form.code,
+        code: Number(form.code), // el input es editable (string) pero el code se guarda como Number
         serialNumber: form.serialNumber,
         brand: form.brand,
         size: form.size,
@@ -95,12 +101,7 @@ const AltaDrawer = ({ onClose, onCreated }) => {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex justify-end" style={{ background: "rgba(0,0,0,.45)" }} onClick={onClose}>
-      <aside
-        onClick={(e) => e.stopPropagation()}
-        className="flex h-full w-full max-w-[460px] flex-col"
-        style={{ background: "var(--card)", borderLeft: "1px solid var(--bd)", animation: "opDrawerIn .18s ease" }}
-      >
+    <Drawer onClose={onClose}>
         <div className="flex items-center justify-between gap-3 p-5" style={{ borderBottom: "1px solid var(--bd-soft)" }}>
           <h2 className="text-[20px] font-bold" style={{ fontFamily: "'Space Grotesk'", color: "var(--tx)" }}>Nueva cubierta</h2>
           <button onClick={onClose} className="rounded-[7px] p-2" style={{ color: "var(--tx-5)" }} title="Cerrar">
@@ -109,30 +110,35 @@ const AltaDrawer = ({ onClose, onCreated }) => {
         </div>
 
         <div className="flex-1 overflow-auto p-5">
-          <div className="grid grid-cols-2 gap-x-3">
-            <Field label="Código interno"><input className={inputCls} style={fieldStyle} value={form.code} onChange={set("code")} placeholder="Auto" /></Field>
-            <Field label="N° de serie"><input className={inputCls} style={fieldStyle} value={form.serialNumber} onChange={set("serialNumber")} /></Field>
+          <div className="flex flex-col gap-3.5">
+            <div className="grid grid-cols-2 gap-3">
+              {/* Código interno: se SUGIERE el siguiente del tenant (último + 1) pero es EDITABLE.
+                  El code va termofundido en el caucho de la cubierta (inmutable físicamente); al
+                  reingresar/dar de alta una cubierta que ya tiene su código grabado, hay que poder
+                  tipear ESE código, no el sugerido. */}
+              <FloatingField label="Código interno" type="number" min="1" required error={errors.code} value={form.code} onChange={set("code")} />
+              <FloatingField label="N° de serie" required error={errors.serialNumber} value={form.serialNumber} onChange={set("serialNumber")} />
+            </div>
+            <FloatingField label="Marca" required error={errors.brand} value={form.brand} onChange={set("brand")} />
+            <div className="grid grid-cols-2 gap-3">
+              <FloatingField label="Rodado" required error={errors.size} value={form.size} onChange={set("size")} />
+              <FloatingField label="Dibujo" required error={errors.pattern} value={form.pattern} onChange={set("pattern")} />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <FloatingField label="Kilómetros" type="number" min="0" value={form.kilometers} onChange={set("kilometers")} />
+              <FloatingField label="Fecha de alta" type="date" required error={errors.createdAt} value={form.createdAt} onChange={set("createdAt")} />
+            </div>
+            <FloatingField label="N° de orden" required error={errors.orderNumber} value={form.orderNumber} onChange={set("orderNumber")} />
           </div>
-          <Field label="Marca"><input className={inputCls} style={fieldStyle} value={form.brand} onChange={set("brand")} placeholder="Ej. Bridgestone" /></Field>
-          <div className="grid grid-cols-2 gap-x-3">
-            <Field label="Rodado"><input className={inputCls} style={fieldStyle} value={form.size} onChange={set("size")} placeholder="295/80 R22.5" /></Field>
-            <Field label="Dibujo"><input className={inputCls} style={fieldStyle} value={form.pattern} onChange={set("pattern")} placeholder="Con Taco" /></Field>
-          </div>
-          <div className="grid grid-cols-2 gap-x-3">
-            <Field label="Kilómetros (opcional)"><input type="number" min="0" className={inputCls} style={fieldStyle} value={form.kilometers} onChange={set("kilometers")} placeholder="0" /></Field>
-            <Field label="Fecha de alta"><input type="date" className={inputCls} style={fieldStyle} value={form.createdAt} onChange={set("createdAt")} /></Field>
-          </div>
-          <Field label="N° de orden"><input className={inputCls} style={fieldStyle} value={form.orderNumber} onChange={set("orderNumber")} placeholder="Ej. 2026-000123" /></Field>
 
           <div className="mt-5 flex gap-3">
             <button onClick={onClose} className="flex-1 rounded-[9px] py-2.5 text-[13px] font-semibold" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--tx-2)" }}>Cancelar</button>
-            <button onClick={submit} disabled={submitting} className="flex-1 rounded-[9px] py-2.5 text-[13px] font-bold" style={{ background: "#C4ED2B", color: "#0A0C0D", opacity: submitting ? 0.6 : 1 }}>
+            <Button variant="lime" onClick={submit} disabled={submitting} className="flex-1 text-[13px]" style={{ background: "#C4ED2B", color: "#0A0C0D", opacity: submitting ? 0.6 : 1 }}>
               {submitting ? "Creando…" : "Crear cubierta"}
-            </button>
+            </Button>
           </div>
         </div>
-      </aside>
-    </div>
+    </Drawer>
   )
 }
 

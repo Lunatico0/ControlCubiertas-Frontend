@@ -84,6 +84,49 @@
 @keyframes opToastIn  { from { transform: translateY(14px); opacity:0 } to { transform: translateY(0); opacity:1 } }
 
 /* ============================================================================
+   FLOATING FIELD — input/textarea/select con label flotante (patrón del login),
+   theme-aware con los tokens del tema. Ver src/components/UI/FloatingField.jsx.
+   El label flota al enfocar o cuando hay valor (:not(:placeholder-shown) → requiere
+   placeholder=" "). Para select/date se fuerza arriba con [data-float-up].
+   ============================================================================ */
+.ff { position: relative; }
+.ff-control {
+  width: 100%; height: 46px; padding: 0 13px; border-radius: 10px;
+  background: var(--input); border: 1.5px solid var(--bd-strong); color: var(--tx);
+  font-size: 14.5px; font-family: inherit; outline: none; transition: border-color .16s ease;
+}
+textarea.ff-control { height: auto; min-height: 84px; padding: 11px 13px; line-height: 1.5; resize: vertical; }
+.ff-control:focus { border-color: var(--ink-lime); }
+.ff-control:disabled { opacity: .55; cursor: not-allowed; }
+.ff-label {
+  position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
+  font-size: 14.5px; color: var(--tx-5); background: transparent; padding: 0 6px; border-radius: 7px;
+  pointer-events: none; transition: all .16s ease;
+  max-width: calc(100% - 20px); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+textarea.ff-control ~ .ff-label { top: 12px; transform: none; }
+/* Flota arriba: enfocado, con valor, o forzado (select/date). */
+.ff-control:focus ~ .ff-label,
+.ff-control:not(:placeholder-shown) ~ .ff-label,
+.ff[data-float-up="true"] .ff-label {
+  top: 0; transform: translateY(-50%); font-size: 11px; font-weight: 600;
+  color: var(--tx-3); background: var(--input);
+}
+.ff-control:focus ~ .ff-label { color: var(--ink-lime); }
+/* Error: borde + label en rojo (marca campos incompletos/mal cargados al submitear). */
+.ff[data-error="true"] .ff-control { border-color: var(--ink-red); }
+.ff[data-error="true"] .ff-label,
+.ff[data-error="true"] .ff-control:focus ~ .ff-label { color: var(--ink-red); }
+.ff-req { color: var(--ink-red); margin-left: 2px; font-weight: 700; }
+.ff-error-msg { margin-top: 5px; font-size: 11.5px; color: var(--ink-red); }
+
+/* Sin spinners en los inputs numéricos: las flechitas de subir/bajar (webkit en hover,
+   Firefox siempre visibles) ensucian el diseño. Se sube/baja tipeando. Global a toda la app. */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; appearance: none; margin: 0; }
+input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
+
+/* ============================================================================
    SISTEMA DE DIÁLOGOS (reemplazo de SweetAlert2) — animaciones + hover.
    Ver src/components/dialog/. API imperativa en src/utils/dialog.js.
    ============================================================================ */

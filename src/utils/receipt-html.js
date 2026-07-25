@@ -1,4 +1,5 @@
 import { renderComprobanteHTML } from "./receipt-template"
+import { formatTireCode } from "./tireCode"
 
 // Genera el HTML del comprobante para imprimir, usando el MISMO generador que el preview
 // del editor (receipt-template) → lo impreso == lo previsualizado. Mapea el printData
@@ -13,7 +14,7 @@ export const generateReceiptHTML = (data, layoutMode, receiptDesign = null, comp
     cubierta: {
       heading: "Datos de la cubierta",
       rows: [
-        { k: "N° interno", v: tire.code ?? "" },
+        { k: "N° interno", v: formatTireCode(tire.code, company?.tireCodePrefix) },
         { k: "N° de serie", v: tire.serialNumber ?? "" },
         { k: "Marca", v: tire.brand ?? "" },
         { k: "Rodado", v: tire.size ?? "" },

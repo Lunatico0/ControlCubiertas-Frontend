@@ -1,4 +1,7 @@
+import { useContext } from "react";
+import ApiContext from "@context/apiContext";
 import { statusStyles } from "@utils/statusStyle";
+import { formatTireCode } from "@utils/tireCode";
 import QuickActions from "@components/actions/QuickActions";
 import { button } from "@utils/tokens";
 import EditNoteRoundedIcon from '@mui/icons-material/EditNoteRounded';
@@ -11,7 +14,11 @@ const SidebarInfoItem = ({ label, value, className = "" }) => (
   </div>
 );
 
-const TireStatusSidebar = ({ tire, onEdit, onClose, refreshTire }) => (
+const TireStatusSidebar = ({ tire, onEdit, onClose, refreshTire }) => {
+  const { data } = useContext(ApiContext);
+  const tireCodePrefix = data?.tireCodePrefix || "";
+
+  return (
   <div className="w-full lg:w-80 flex-shrink-0 border-b lg:border-b-0 lg:border-r border-gray-200 dark:border-gray-700 flex flex-col">
     {/* Estado y datos clave */}
     <div className="p-6 pt-8 flex-1 space-y-6">
@@ -21,7 +28,8 @@ const TireStatusSidebar = ({ tire, onEdit, onClose, refreshTire }) => (
       </div>
 
       <div className="space-y-4">
-        <SidebarInfoItem label="Código Interno" value={`#${tire.code}`} className="text-lg" />
+        {/* El "#" queda como decoración; el prefijo configurable va pegado al número */}
+        <SidebarInfoItem label="Código Interno" value={`#${formatTireCode(tire.code, tireCodePrefix)}`} className="text-lg" />
         <SidebarInfoItem label="Número de Serie" value={tire.serialNumber} />
         <SidebarInfoItem label="Marca" value={tire.brand} />
         <SidebarInfoItem label="Rodado" value={tire.size} />
@@ -40,6 +48,7 @@ const TireStatusSidebar = ({ tire, onEdit, onClose, refreshTire }) => (
       <QuickActions tire={tire} refreshTire={refreshTire} />
     </div>
   </div>
-);
+  );
+};
 
 export default TireStatusSidebar;

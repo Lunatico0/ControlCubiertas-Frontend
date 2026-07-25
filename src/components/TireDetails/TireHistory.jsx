@@ -5,6 +5,7 @@ import useContextMenu from "@hooks/useContextMenu";
 import { useReprint } from "@hooks/useReprint.js";
 import UndoHistoryEntryModal from "@components/actions/modals/UndoHistoryEntryModal";
 import { buildReprintData } from "@utils/print-data";
+import { formatTireCode } from "@utils/tireCode";
 import { getRowStyle, dictionary } from "@utils/historyStyles";
 import { colors, text, button, utility } from "@utils/tokens";
 
@@ -15,7 +16,8 @@ import EditNoteRoundedIcon from '@mui/icons-material/EditNoteRounded';
 import UndoRoundedIcon from '@mui/icons-material/UndoRounded';
 
 const TireHistory = ({ history = [], code, serialNumber, tire, onEditEntry }) => {
-  const { tires } = useContext(ApiContext);
+  const { tires, data } = useContext(ApiContext);
+  const displayCode = formatTireCode(code, data?.tireCodePrefix); // prefijo configurable (solo display)
   const [undoEntry, setUndoEntry] = useState(null);
   const reversedHistory = [...history];
 
@@ -57,7 +59,7 @@ const TireHistory = ({ history = [], code, serialNumber, tire, onEditEntry }) =>
                   key={`${record._id || i}-${record.date}`}
                   record={record}
                   index={i}
-                  code={code}
+                  code={displayCode}
                   serialNumber={serialNumber}
                   onShowTooltip={showTooltip}
                   onHideTooltip={hideTooltip}

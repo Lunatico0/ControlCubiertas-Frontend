@@ -8,6 +8,8 @@ import BoltRoundedIcon from "@mui/icons-material/BoltRounded"
 import { getReports, getVehicleReports, getVehicleWearCached } from "@api/admin"
 import { showToast } from "@utils/toast"
 import { downloadCSV } from "@utils/csv"
+import Callout from "@components/common/Callout"
+import StatCard from "@components/UI/StatCard"
 import {
   ResponsiveContainer, BarChart, Bar, LineChart, Line, AreaChart, Area,
   PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ScatterChart, Scatter,
@@ -377,13 +379,13 @@ const Reportes = () => {
         <>
           {/* Summary cards */}
           <div className="grid grid-cols-4 gap-4">
-            <SummaryCard label="Marca líder por vida útil" tint="var(--ink-lime)" icon={<EmojiEventsRoundedIcon sx={{ fontSize: 17 }} />}
+            <StatCard variant="spread" label="Marca líder por vida útil" tint="var(--ink-lime)" icon={<EmojiEventsRoundedIcon sx={{ fontSize: 17 }} />}
               value={data.leader?.name ?? "—"} sublabel={data.leader ? `${fmtKm(data.leader.life)} prom. de vida útil` : "Sin datos suficientes"} />
-            <SummaryCard label="Vida útil promedio" tint="var(--ink-blue)" icon={<TimelineRoundedIcon sx={{ fontSize: 17 }} />}
+            <StatCard variant="spread" label="Vida útil promedio" tint="var(--ink-blue)" icon={<TimelineRoundedIcon sx={{ fontSize: 17 }} />}
               value={fmtKm(data.fleetLife)} sublabel="por cubierta, toda la flota" />
-            <SummaryCard label="Tasa de descarte" tint="var(--ink-red)" icon={<DeleteOutlineRoundedIcon sx={{ fontSize: 17 }} />}
+            <StatCard variant="spread" label="Tasa de descarte" tint="var(--ink-red)" icon={<DeleteOutlineRoundedIcon sx={{ fontSize: 17 }} />}
               value={`${data.discardRate}%`} sublabel="de las cubiertas dadas de baja" />
-            <SummaryCard label="Cubiertas analizadas" tint="var(--ink-teal)" icon={<StyleRoundedIcon sx={{ fontSize: 17 }} />}
+            <StatCard variant="spread" label="Cubiertas analizadas" tint="var(--ink-teal)" icon={<StyleRoundedIcon sx={{ fontSize: 17 }} />}
               value={data.total} sublabel="con historial de kilometraje" />
           </div>
 
@@ -480,27 +482,13 @@ const Reportes = () => {
           </div>
 
           {/* Callout: cuándo recapar */}
-          <div className="mt-4 flex items-start gap-2.5 rounded-[12px] px-[18px] py-3.5 text-[12.5px]" style={{ border: "1px solid color-mix(in srgb, var(--st-orange) 28%, transparent)", background: "color-mix(in srgb, var(--st-orange) 7%, transparent)", color: "var(--tx-2)", lineHeight: 1.55 }}>
-            <span className="inline-flex flex-none" style={{ color: "var(--ink-orange)", marginTop: 1 }}><BoltRoundedIcon sx={{ fontSize: 16 }} /></span>
-            <div><b style={{ color: "var(--tx)" }}>Cuándo recapar:</b> {stageInsight}</div>
-          </div>
+          <Callout Icon={BoltRoundedIcon} tone="var(--ink-orange)" className="mt-4">
+            <b style={{ color: "var(--tx)" }}>Cuándo recapar:</b> {stageInsight}
+          </Callout>
         </>
       )}
     </div>
   )
 }
-
-const SummaryCard = ({ label, icon, tint: accent, value, sublabel }) => (
-  <div className="flex flex-col justify-between rounded-[14px] p-[18px_20px]" style={{ background: "var(--card)", border: "1px solid var(--bd)", minHeight: 120 }}>
-    <div className="flex items-start justify-between">
-      <span className="text-[13px]" style={{ color: "var(--tx-4)" }}>{label}</span>
-      <span className="flex flex-none items-center justify-center rounded-[9px]" style={{ width: 32, height: 32, background: tint(accent, 14), color: accent }}>{icon}</span>
-    </div>
-    <div>
-      <div className="font-display text-[26px] font-bold" style={{ fontFamily: "'Space Grotesk'", color: "var(--tx)" }}>{value}</div>
-      <div className="mt-0.5 text-[12px]" style={{ color: "var(--tx-6)" }}>{sublabel}</div>
-    </div>
-  </div>
-)
 
 export default Reportes

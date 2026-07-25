@@ -2,17 +2,17 @@ import { useState, useEffect, useMemo, useContext } from "react"
 import ApiContext from "@context/apiContext"
 import { useHotkeyFocus } from "@hooks/useHotkeyFocus"
 import { usePersistedState } from "@hooks/usePersistedState"
-import SearchRoundedIcon from "@mui/icons-material/SearchRounded"
 import AddRoundedIcon from "@mui/icons-material/AddRounded"
-import GridViewRoundedIcon from "@mui/icons-material/GridViewRounded"
-import ViewListRoundedIcon from "@mui/icons-material/ViewListRounded"
 import ArrowUpwardRoundedIcon from "@mui/icons-material/ArrowUpwardRounded"
 import TuneRoundedIcon from "@mui/icons-material/TuneRounded"
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded"
+import { formatTireCode } from "@utils/tireCode"
 import { metaOf, tint, fmtKm, fmtDate, StateBadge, Pips } from "./status"
 import { OpActionBtn } from "./opActions"
 import TireDrawer from "./TireDrawer"
 import AltaDrawer from "./AltaDrawer"
+import ScreenHeader from "@components/UI/ScreenHeader"
+import Pill from "@components/UI/Pill"
 
 const TABS = [
   { key: "todas", label: "Todas" },
@@ -42,14 +42,11 @@ const COLUMNS = [
 ]
 const GRID_COLS = "0.8fr 1fr 1.2fr 0.9fr 0.6fr 0.8fr 1.1fr"
 
-// Atajo de teclado según plataforma (⌘K en Mac/iOS, Ctrl+K en el resto).
-const IS_MAC = typeof navigator !== "undefined" && /Mac|iPhone|iPad|iPod/i.test(navigator.platform || navigator.userAgent || "")
-const SHORTCUT_LABEL = IS_MAC ? "⌘K" : "Ctrl K"
-
 const Cubiertas = ({ intent, onNavigate }) => {
   const { data, ui } = useContext(ApiContext)
   const tires = data?.tires || []
   const loading = ui?.loading
+  const tireCodePrefix = data?.tireCodePrefix || "" // prefijo configurable (solo display)
 
   const [query, setQuery] = useState("")
   const [tab, setTab] = useState("todas")
@@ -132,33 +129,19 @@ const Cubiertas = ({ intent, onNavigate }) => {
   return (
     <div>
       {/* Toolbar sticky */}
-      <div className="sticky top-0 z-5 px-7 pb-4 pt-5" style={{ background: "var(--bg)", borderBottom: "1px solid var(--bd-faint)" }}>
-        <div className="mb-4 flex items-center gap-4">
-          <h1 className="text-[24px] font-bold tracking-[-.02em]" style={{ fontFamily: "'Space Grotesk'", color: "var(--tx)" }}>Cubiertas</h1>
-          <div className="relative ml-2 max-w-[460px] flex-1">
-            <span className="absolute left-[15px] top-1/2 -translate-y-1/2" style={{ color: "var(--tx-7)" }}>
-              <SearchRoundedIcon sx={{ fontSize: 18 }} />
-            </span>
-            <input
-              ref={searchRef}
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Buscar código, marca, N° de serie…"
-              className="h-[46px] w-full rounded-[11px] pl-[42px] pr-[58px] text-[14.5px] outline-none"
-              style={inputStyle}
-              onFocus={(e) => (e.target.style.borderColor = "var(--ink-lime)")}
-              onBlur={(e) => (e.target.style.borderColor = "var(--bd)")}
-            />
-            <span className="absolute right-[13px] top-1/2 -translate-y-1/2 rounded-[5px] px-[7px] py-[3px] text-[11px]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-5)", border: "1px solid var(--bd-strong)" }}>
-              {SHORTCUT_LABEL}
-            </span>
-          </div>
-          <button data-tour="cub-alta" onClick={() => setShowAlta(true)} className="ml-auto inline-flex h-[46px] items-center gap-2 rounded-[11px] px-[18px] text-[14.5px] font-bold" style={{ background: "#C4ED2B", color: "#0A0C0D" }}>
-            <AddRoundedIcon sx={{ fontSize: 18 }} /> Alta de cubierta
-          </button>
-        </div>
-
-        <div className="flex items-center gap-[14px]">
+      <ScreenHeader
+        title="Cubiertas"
+        search={{
+          value: query,
+          onChange: (e) => setQuery(e.target.value),
+          placeholder: "Buscar código, marca, N° de serie…",
+          showShortcut: true,
+          inputRef: searchRef,
+        }}
+        primaryAction={{ label: "Alta de cubierta", onClick: () => setShowAlta(true), tour: "cub-alta" }}
+        viewToggle={{ value: view, onChange: setView, tour: "cub-viewtoggle" }}
+      >
+        <div className="mt-4 flex items-center gap-[14px]">
           <div data-tour="cub-filters" className="flex flex-wrap gap-2">
             {TABS.map((f) => {
               const on = tab === f.key
@@ -166,7 +149,7 @@ const Cubiertas = ({ intent, onNavigate }) => {
                 <button key={f.key} onClick={() => setTab(f.key)} className="inline-flex h-[38px] items-center gap-2 rounded-[9px] px-[15px] text-[13.5px] font-semibold"
                   style={{ border: `1px solid ${on ? "var(--ink-lime)" : "var(--bd)"}`, background: on ? tint("var(--ink-lime)", 12) : "var(--card)", color: on ? "var(--tx)" : "var(--tx-3)" }}>
                   {f.label}
-                  <span className="rounded-full px-[7px] py-px text-[11.5px]" style={{ fontFamily: "'IBM Plex Mono'", background: "var(--elev)", color: "var(--tx-5)" }}>{counts[f.key]}</span>
+                  <Pill className="px-[7px] py-px text-[11.5px]" style={{ fontFamily: "'IBM Plex Mono'", background: "var(--elev)", color: "var(--tx-5)" }}>{counts[f.key]}</Pill>
                 </button>
               )
             })}
@@ -174,16 +157,8 @@ const Cubiertas = ({ intent, onNavigate }) => {
           <button onClick={() => setShowFilters((v) => !v)} className="ml-auto inline-flex h-[38px] items-center gap-2 rounded-[9px] px-[14px] text-[13.5px] font-semibold"
             style={{ border: `1px solid ${showFilters || activeFilters ? "var(--ink-lime)" : "var(--bd)"}`, background: showFilters || activeFilters ? tint("var(--ink-lime)", 12) : "var(--card)", color: showFilters || activeFilters ? "var(--tx)" : "var(--tx-3)" }}>
             <TuneRoundedIcon sx={{ fontSize: 16 }} /> Filtros
-            {activeFilters > 0 && <span className="rounded-full px-[7px] py-px text-[11px]" style={{ fontFamily: "'IBM Plex Mono'", background: "var(--ink-lime)", color: "var(--bg)" }}>{activeFilters}</span>}
+            {activeFilters > 0 && <Pill className="px-[7px] py-px text-[11px]" style={{ fontFamily: "'IBM Plex Mono'", background: "var(--ink-lime)", color: "var(--bg)" }}>{activeFilters}</Pill>}
           </button>
-          <div data-tour="cub-viewtoggle" className="flex gap-[3px] rounded-[9px] p-[3px]" style={{ border: "1px solid var(--bd)", background: "var(--card)" }}>
-            {[{ key: "grid", icon: <GridViewRoundedIcon sx={{ fontSize: 17 }} /> }, { key: "table", icon: <ViewListRoundedIcon sx={{ fontSize: 17 }} /> }].map((v) => {
-              const on = view === v.key
-              return (
-                <button key={v.key} onClick={() => setView(v.key)} className="flex h-8 w-[38px] items-center justify-center rounded-md" style={{ background: on ? "var(--hover)" : "transparent", color: on ? "var(--ink-lime)" : "var(--tx-5)" }}>{v.icon}</button>
-              )
-            })}
-          </div>
         </div>
 
         {showFilters && (
@@ -218,7 +193,7 @@ const Cubiertas = ({ intent, onNavigate }) => {
             <span className="ml-auto self-center text-[12px]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-5)" }}>{filtered.length} resultado{filtered.length === 1 ? "" : "s"}</span>
           </div>
         )}
-      </div>
+      </ScreenHeader>
 
       <div className="px-7 pb-8 pt-5">
         {assignTo && (
@@ -249,7 +224,7 @@ const Cubiertas = ({ intent, onNavigate }) => {
                   <div className="flex items-start justify-between gap-2.5">
                     <div>
                       <div className="text-[11px]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-6)" }}>{t.serialNumber || "—"}</div>
-                      <div className="text-[22px] font-bold leading-[1.05]" style={{ fontFamily: "'Space Grotesk'", color: "var(--tx)" }}>#{t.code}</div>
+                      <div className="text-[22px] font-bold leading-[1.05]" style={{ fontFamily: "'Space Grotesk'", color: "var(--tx)" }}>#{formatTireCode(t.code, tireCodePrefix)}</div>
                     </div>
                     <StateBadge status={t.status} />
                   </div>
@@ -300,7 +275,7 @@ const Cubiertas = ({ intent, onNavigate }) => {
               return (
                 <div key={t._id} className="grid items-center gap-3 py-3 pl-[14px] pr-[18px]" style={{ gridTemplateColumns: GRID_COLS, borderLeft: `4px solid ${m.color}`, borderBottom: "1px solid var(--bd-faint)" }}>
                   <div className="cursor-pointer" onClick={openDrawer(t._id)}>
-                    <div className="text-[15px] font-bold" style={{ fontFamily: "'Space Grotesk'", color: "var(--tx)" }}>#{t.code}</div>
+                    <div className="text-[15px] font-bold" style={{ fontFamily: "'Space Grotesk'", color: "var(--tx)" }}>#{formatTireCode(t.code, tireCodePrefix)}</div>
                     <div className="text-[10.5px]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-6)" }}>{t.serialNumber || "—"}</div>
                   </div>
                   <div className="min-w-0"><StateBadge status={t.status} small truncate /></div>

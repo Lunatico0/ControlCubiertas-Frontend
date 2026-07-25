@@ -16,8 +16,11 @@ async function refreshAccessToken() {
   return data.accessToken
 }
 
-const forceLogout = () => {
+const forceLogout = (message) => {
   clearTokens()
+  // Mensaje opcional para mostrar en el login tras un cierre forzado (sobrevive el reload de
+  // window.location vía sessionStorage; el Login lo lee y lo limpia).
+  if (message) { try { sessionStorage.setItem("cc_logout_msg", message) } catch { /* sin sessionStorage: se pierde el detalle, igual cierra sesión */ } }
   if (window.location.pathname !== "/login") window.location.assign("/login")
 }
 
@@ -41,6 +44,14 @@ export const createAPI = (path) => {
       const status = error.response?.status
       const original = error.config
       const url = original?.url || ""
+
+      // Tenant eliminado/suspendido (el backend valida el tenant en cada request). Refrescar el
+      // token NO lo arregla → avisamos y cerramos sesión, sin dejar seguir navegando con datos vacíos.
+      if (error.response?.data?.code === "TENANT_INACTIVE") {
+        const msg = error.response.data.message || "Tu empresa ya no está disponible."
+        forceLogout(msg)
+        return Promise.reject(new Error(msg))
+      }
 
       // Access expirado → refresh transparente (una sola vez por request). No se intenta
       // para /login ni /refresh (esos 401 son credenciales o refresh inválido, no expiración).
