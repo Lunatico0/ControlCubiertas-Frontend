@@ -1,10 +1,30 @@
-import { useState, useCallback } from "react"
+import { useState, useCallback, useRef, useEffect } from "react"
+
+// Cuánto esperamos como MÁXIMO a que la ventana de impresión avise. Pasado eso damos la
+// impresión por terminada igual: el comprobante siempre se puede reimprimir desde el historial,
+// pero dejar el botón colgado en "Guardando…" sobre una acción YA ejecutada no tiene arreglo
+// desde la UI.
+const TIMEOUT_MS = 15000
+const POLL_MS = 1000
 
 const usePrintEngine = () => {
   const [isPrinting, setIsPrinting] = useState(false)
+  // Los timers vivos, para poder limpiarlos si el componente se desmonta a mitad de impresión.
+  const pendingRef = useRef(new Set())
+
+  useEffect(
+    () => () => {
+      pendingRef.current.forEach((limpiar) => limpiar())
+      pendingRef.current.clear()
+    },
+    [],
+  )
 
   const printHtml = useCallback((htmlContent, title = "Comprobante") => {
     return new Promise((resolve, reject) => {
+      // El origen del padre, para que el popup no tenga que postear a "*".
+      const origen = window.location.origin
+
       try {
         setIsPrinting(true)
         const printWindow = window.open("", "", "width=800,height=600")
@@ -24,9 +44,12 @@ const usePrintEngine = () => {
             <body>
               <div id="print-root"><div class="receipt-container">${htmlContent}</div></div>
               <script>
+                var PARENT_ORIGIN = ${JSON.stringify(origen)};
+
                 function notifyParent(printed) {
                   if (window.opener) {
-                    window.opener.postMessage({ printed }, "*");
+                    // Origen explícito, no "*": el aviso es sólo para la app que abrió esta ventana.
+                    window.opener.postMessage({ printed: printed }, PARENT_ORIGIN);
                   }
                 }
 
@@ -80,41 +103,56 @@ const usePrintEngine = () => {
         `)
         printWindow.document.close()
 
-        const handleMessage = (event) => {
-          if (event.data?.printed !== undefined) {
-            window.removeEventListener("message", handleMessage)
-            setIsPrinting(false)
-            resolve(event.data.printed)
-          }
+        // `settled` es una variable de la promesa, NO estado de React. Antes el guard de los
+        // dos caminos de rescate era `if (isPrinting)`, y `isPrinting` es el valor capturado
+        // en el render de la llamada: vale false SIEMPRE (setIsPrinting(true) recién aplica en
+        // el próximo render). O sea que ni el timeout ni el detector de ventana cerrada podían
+        // resolver nunca, y si el postMessage no llegaba la promesa quedaba colgada para
+        // siempre — con el botón en "Guardando…" sobre una acción que YA se ejecutó.
+        let settled = false
+        let fallback
+        let checkClosed
+
+        const limpiar = () => {
+          clearTimeout(fallback)
+          clearInterval(checkClosed)
+          window.removeEventListener("message", handleMessage)
+          pendingRef.current.delete(limpiar)
+        }
+
+        const finish = (printed) => {
+          if (settled) return
+          settled = true
+          limpiar()
+          setIsPrinting(false)
+          resolve(printed)
+        }
+
+        function handleMessage(event) {
+          // Sólo escuchamos a NUESTRA ventana de impresión: cualquier otra podía resolver la
+          // promesa antes de tiempo y marcar como impreso algo que no lo fue.
+          if (event.source !== printWindow) return
+          if (event.origin !== origen) return
+          if (event.data?.printed === undefined) return
+          finish(event.data.printed)
         }
 
         window.addEventListener("message", handleMessage)
+        pendingRef.current.add(limpiar)
 
-        const fallback = setTimeout(() => {
-          if (isPrinting) {
-            window.removeEventListener("message", handleMessage)
-            setIsPrinting(false)
-            resolve(true)
-          }
-        }, 15000)
+        fallback = setTimeout(() => finish(true), TIMEOUT_MS)
 
-        const checkClosed = setInterval(() => {
-          if (printWindow.closed) {
-            clearInterval(checkClosed)
-            window.removeEventListener("message", handleMessage)
-            if (isPrinting) {
-              setIsPrinting(false)
-              resolve(true)
-            }
-          }
-        }, 1000)
+        checkClosed = setInterval(() => {
+          // Si el usuario cierra la ventana sin imprimir, el beforeunload puede no llegar.
+          if (printWindow.closed) finish(true)
+        }, POLL_MS)
       } catch (error) {
         console.error("❌ Error imprimiendo:", error)
         setIsPrinting(false)
         reject(error)
       }
     })
-  }, [isPrinting])
+  }, [])
 
   return { printHtml, isPrinting }
 }
