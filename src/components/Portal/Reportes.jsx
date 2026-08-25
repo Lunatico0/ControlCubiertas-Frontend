@@ -25,7 +25,15 @@ const RANK_COLS = "24px 1.4fr 0.8fr 2fr 0.9fr 0.9fr"
 
 // Paleta categórica en orden fijo (misma que los dots del ranking). recharts acepta var() en
 // fill/stroke → los charts siguen el tema (claro/oscuro) sin JS.
-const PALETTE = ["var(--st-lime)", "var(--st-teal)", "var(--st-blue)", "var(--st-purple)", "var(--st-orange)", "var(--st-red)"]
+// Ocho tonos, no seis: con siete marcas el indexado ciclico (i % length) hacia que la septima
+// volviera al primer color y DOS marcas distintas se leyeran igual, en el grafico y en la
+// leyenda. La codificacion por color dejaba de ser inyectiva.
+// El orden tambien importa: --st-blue y --st-purple son casi indistinguibles en deuteranopia
+// (distancia 1.8 sobre un umbral de riesgo de 40), asi que no van pegados.
+const PALETTE = [
+  "var(--st-lime)", "var(--st-blue)", "var(--st-orange)", "var(--st-teal)",
+  "var(--st-purple)", "var(--st-amber)", "var(--st-red)", "var(--st-magenta)",
+]
 const STAGE_ROTATION = ["var(--st-lime)", "var(--st-teal)", "var(--st-blue)", "var(--st-purple)"]
 // Escala de calor (semáforo) por % de desgaste relativo: verde bajo → naranja medio → rojo alto.
 const heatColor = (pct) => (pct >= 70 ? "var(--st-red)" : pct >= 40 ? "var(--st-orange)" : "var(--st-lime)")
@@ -67,7 +75,7 @@ const CatChart = ({ type, data, unit, xShort }) => {
   const needAngle = data.length > 6 || data.some((d) => String(d.name).length > 6)
   const xAxis = (
     <XAxis dataKey="name" tickLine={false} axisLine={{ stroke: "var(--bd)" }} interval={0}
-      tick={{ fill: "var(--tx-6)", fontSize: 10.5, fontFamily: "'IBM Plex Mono'" }}
+      tick={{ fill: "var(--tx-4)", fontSize: 11, fontFamily: "'IBM Plex Mono'" }}
       tickFormatter={xShort} angle={needAngle ? -25 : 0} textAnchor={needAngle ? "end" : "middle"} height={needAngle ? 58 : 22} />
   )
   const yAxis = <YAxis {...AXIS} tickFormatter={unit === "km" ? fmtKmShort : undefined} width={44} />
@@ -113,7 +121,7 @@ const PosScatter = ({ data }) => {
       <ScatterChart margin={{ top: 10, right: 18, left: -4, bottom: 30 }}>
         <CartesianGrid stroke="var(--bd-faint)" />
         <XAxis type="category" dataKey="pos" name="Posición" interval={0} tickLine={false} axisLine={{ stroke: "var(--bd)" }}
-          tick={{ fill: "var(--tx-6)", fontSize: 10.5, fontFamily: "'IBM Plex Mono'" }} angle={-25} textAnchor="end" height={54} />
+          tick={{ fill: "var(--tx-4)", fontSize: 11, fontFamily: "'IBM Plex Mono'" }} angle={-25} textAnchor="end" height={54} />
         <YAxis type="number" dataKey="km" name="Km" {...AXIS} tickFormatter={fmtKmShort} width={48} />
         <Tooltip {...TOOLTIP} cursor={{ strokeDasharray: "3 3", stroke: "var(--bd-strong)" }}
           formatter={(v, n) => (n === "Km" ? [fmtKm(v), "Km"] : [v, "Posición"])} />

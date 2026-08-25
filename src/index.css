@@ -66,17 +66,56 @@
 [data-app-theme="dark"] {
   --bg:#0A0C0D; --sidebar:#070809; --card:#121517; --elev:#0E1112; --input:#0C0E0F; --hover:#15191B; --toast:#1A1E20;
   --bd:#21262A; --bd-soft:#1C2124; --bd-faint:#181C1E; --bd-strong:#2A3033; --bd-2:#23282B; --bd-hover:#3A4145;
-  --tx:#FFFFFF; --tx-2:#D6D9D5; --tx-3:#9AA0A4; --tx-4:#8B9197; --tx-5:#7B8186; --tx-6:#6B7177; --tx-7:#5E646A;
+
+/* ─── Foco visible y chrome nativo ──────────────────────────────────────────────────────────
+   La app no tenia NINGUNA regla de :focus-visible: todo control caia en el outline por defecto
+   del navegador, de 1px y con un color que no se adapta al tema. En oscuro Chrome lo pinta
+   oscuro sobre #0A0C0D, o sea invisible. Para alguien que opera ocho horas con teclado, eso es
+   la diferencia entre poder tabular y no.
+
+   `color-scheme` va de la mano: sin el, los scrollbars, los <select> nativos y el autofill
+   salen con el chrome CLARO del sistema sobre una app negra. /admin/reportes tiene siete
+   selects nativos, uno por cada desplegable que el usuario abre por sesion. */
+
+:where(a, button, input, select, textarea, summary, [tabindex]:not([tabindex="-1"])):focus-visible {
+  outline: 2px solid var(--ink-lime);
+  outline-offset: 2px;
+  border-radius: inherit;
+}
+
+/* El foco por click o toque no debe pintar el anillo; solo la navegacion por teclado. */
+:where(a, button, input, select, textarea, summary, [tabindex]):focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* `color-scheme` NO se declara aca: data-app-theme vive en un div del shell, no en <html>, y
+   el navegador lee el esquema desde la raiz. Lo setea ThemeContext sobre document.documentElement. */
+
+/* --scroll estaba definido en los dos temas y tenia CERO usos. */
+* { scrollbar-color: var(--scroll) transparent; scrollbar-width: thin; }
+
+/* Rampa de texto en DOS ZONAS. No entran siete pasos perceptiblemente distintos que TODOS
+   pasen 4.5:1 sobre un fondo claro: forzarlo colapsa tx-4, tx-5 y tx-6 al mismo color y la
+   jerarquia se muere. Entonces se declara para que sirve cada paso, medido contra --bg, que
+   es la superficie mas exigente de las cuatro:
+     --tx  .. --tx-4  →  TEXTO (>= 4.5:1, WCAG AA)
+     --tx-5           →  texto grande o elementos de UI (>= 3:1)
+     --tx-6           →  elementos de UI: iconos, bordes de control (>= 3:1)
+     --tx-7           →  DECORATIVO: separadores, lineas. NUNCA texto.
+   Si un texto necesita un gris mas claro que --tx-4, el problema es el diseno, no el token. */
+  --tx:#FFFFFF; --tx-2:#D6D9D5; --tx-3:#9AA0A4; --tx-4:#8B9197; --tx-5:#7B8186; --tx-6:#747A80; --tx-7:#5E646A;
   --ink-lime:#C4ED2B; --ink-teal:#3FD9BE; --ink-orange:#F0A85A; --ink-blue:#6E97F5; --ink-purple:#9D90F5; --ink-red:#F0716A;
   --st-lime:#C4ED2B; --st-teal:#1FD0B4; --st-blue:#6E97F5; --st-purple:#B39CF7; --st-orange:#F0851F; --st-red:#F0564A;
+  --st-magenta:#F06AC0; --st-amber:#D9B23A;
   --scroll:#23282B;
 }
 [data-app-theme="light"] {
   --bg:#ECEFE8; --sidebar:#FFFFFF; --card:#FFFFFF; --elev:#F5F7F1; --input:#F0F2EB; --hover:#ECEFE5; --toast:#FFFFFF;
   --bd:#E3E7DC; --bd-soft:#ECEFE6; --bd-faint:#EAEDE4; --bd-strong:#D7DBCE; --bd-2:#E3E7DC; --bd-hover:#C2C8B6;
-  --tx:#15170F; --tx-2:#3C4234; --tx-3:#5C6353; --tx-4:#6B7262; --tx-5:#838A76; --tx-6:#969D86; --tx-7:#A7AE9A;
+  --tx:#15170F; --tx-2:#3C4234; --tx-3:#5C6353; --tx-4:#676D5E; --tx-5:#767C6A; --tx-6:#848A76; --tx-7:#A7AE9A;
   --ink-lime:#4C7A07; --ink-teal:#0A8A6F; --ink-orange:#C25A0E; --ink-blue:#2350D8; --ink-purple:#7B3FD6; --ink-red:#CF2417;
   --st-lime:#6FAF0A; --st-teal:#06AE8C; --st-blue:#2E63E6; --st-purple:#8A47E0; --st-orange:#E86A0C; --st-red:#E12414;
+  --st-magenta:#C41E8A; --st-amber:#96700A;
   --scroll:#D7DBCE;
 }
 /* Animaciones del rediseño (drawer/toast) — se usan en hitos posteriores. */

@@ -103,8 +103,8 @@ const UserForm = ({ user, onClose, onCreated, onSaved }) => {
       {/* Nota de contraseña temporal — solo en alta */}
       {!isEdit && (
         // Ámbar: el design system no tiene var ámbar, se conserva el hex del diseño como tono.
-        <Callout Icon={InfoOutlinedIcon} tone="#F0B81F" className="">
-          Al crear, el sistema genera una <b style={{ color: "#F0C955" }}>contraseña temporal</b>; el usuario la cambia en su primer ingreso.
+        <Callout Icon={InfoOutlinedIcon} tone="var(--ink-orange)" className="">
+          Al crear, el sistema genera una <b style={{ color: "var(--ink-orange)" }}>contraseña temporal</b>; el usuario la cambia en su primer ingreso.
         </Callout>
       )}
     </Modal>
