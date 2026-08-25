@@ -1,5 +1,6 @@
 import axios from "axios"
 import { getAccessToken, getRefreshToken, setTokens, clearTokens } from "./tokenStore"
+import isElectron from "@utils/isElectron"
 
 const BASE_URL = import.meta.env.VITE_API_URL
 
@@ -21,6 +22,18 @@ const forceLogout = (message) => {
   // Mensaje opcional para mostrar en el login tras un cierre forzado (sobrevive el reload de
   // window.location vía sessionStorage; el Login lo lee y lo limpia).
   if (message) { try { sessionStorage.setItem("cc_logout_msg", message) } catch { /* sin sessionStorage: se pierde el detalle, igual cierra sesión */ } }
+  // El destino depende del router, que NO es el mismo en los dos targets: la web usa
+  // BrowserRouter (rutas por path) y la app instalable HashRouter, porque carga por file://
+  // y ahí "/login" es una ruta del FILESYSTEM, no del router. Mandar a "/login" en Electron
+  // dejaba la app en pantalla blanca sin forma de volver ante cualquier 401 no recuperable.
+  if (isElectron()) {
+    if (window.location.hash === "#/login") return
+    window.location.hash = "#/login"
+    // Cambiar el hash no recarga el documento, y el reload es parte de lo que este cierre
+    // forzado necesita: resetea el estado de React y las caches a nivel módulo.
+    window.location.reload()
+    return
+  }
   if (window.location.pathname !== "/login") window.location.assign("/login")
 }
 

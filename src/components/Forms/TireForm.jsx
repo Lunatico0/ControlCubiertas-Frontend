@@ -6,6 +6,13 @@ import { input } from "@utils/tokens"
 import Button from "@components/UI/Button"
 import Spinner from "@components/UI/Spinner"
 
+// Fecha de HOY en zona local: `toISOString()` ya está en el día siguiente después de las 21:00
+// en GMT-3, así que el campo proponía MAÑANA.
+const todayLocal = () => {
+  const d = new Date()
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`
+}
+
 const TireForm = ({
   onSubmit,
   defaultValues = {},
@@ -271,7 +278,7 @@ const TireForm = ({
             {...register("createdAt", getFieldValidation("createdAt"))}
             type="date"
             id='createdAt'
-            defaultValue={new Date().toISOString().split("T")[0]}
+            defaultValue={todayLocal()}
             placeholder=" "
             className={input.base}
             disabled={fieldOptions.createdAt?.disabled}

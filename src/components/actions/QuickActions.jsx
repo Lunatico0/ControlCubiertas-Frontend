@@ -11,7 +11,7 @@ import { button } from "@utils/tokens"
 
 const QuickActions = ({ tire, refreshTire, historyEntry = null }) => {
   const [activeModal, setActiveModal] = useState(null)
-  const { tires } = useContext(ApiContext)
+  const { tires, data } = useContext(ApiContext)
 
   const closeModal = () => {
     setActiveModal(null)
@@ -25,12 +25,21 @@ const QuickActions = ({ tire, refreshTire, historyEntry = null }) => {
     }
   }
 
-  const canAssign = !tire?.vehicle && tire?.status !== "Descartada" && tire?.status !== "A recapar"
+  // Los estados son configurables por tenant: el gating va por ROL, nunca por nombre. Con los
+  // nombres literales, una empresa que renombre "A recapar" a "Para reparar" veía las acciones
+  // mal habilitadas (podía asignar una cubierta que estaba esperando recapado, y no le aparecía
+  // "Recapado listo"). El rol se resuelve del catálogo del tenant.
+  const roleOf = (status) => data?.statusMeta?.[status]?.role
+  const rol = roleOf(tire?.status)
+  const esDescarte = rol === "discard"
+  const esParaRecapar = rol === "recap"
+
+  const canAssign = !tire?.vehicle && !esDescarte && !esParaRecapar
   const canUnassign = !!tire?.vehicle
-  const canSendToRecap =
-    tire?.status !== "A recapar" && tire?.status !== "Descartada" && (!tire?.vehicle || !!tire?.vehicle)
-  const canFinishRecap = tire?.status === "A recapar"
-  const canDiscard = tire?.status !== "Descartada"
+  // Antes decía `(!tire?.vehicle || !!tire?.vehicle)`, que es siempre true: no filtraba nada.
+  const canSendToRecap = !esParaRecapar && !esDescarte
+  const canFinishRecap = esParaRecapar
+  const canDiscard = !esDescarte
   const canEditHistory = !!historyEntry && !historyEntry.type.startsWith("correccion")
   const canUndoHistory = !!historyEntry && !historyEntry.flag
 

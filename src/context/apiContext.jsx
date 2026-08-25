@@ -33,8 +33,11 @@ const initialFilters = {
   sortBy: "",
 }
 
-// Constantes que no cambian
-const STATE_ORDER = ["Nueva", "1er Recapado", "2do Recapado", "3er Recapado", "A recapar", "Descartada"]
+// Orden de estados de la ESCALERA CLÁSICA. Es solo el fallback para el arranque en frío,
+// mientras la config del tenant no llegó: los estados son configurables por empresa, así que
+// el orden real sale de tenant.stockStatuses (ver `stateOrder` abajo). Un tenant que renombre
+// sus estados quedaba fuera de esta lista y perdía el filtro por estado entero.
+const STATE_ORDER_FALLBACK = ["Nueva", "1er Recapado", "2do Recapado", "3er Recapado", "A recapar", "Descartada"]
 
 export const ApiProvider = ({ children }) => {
   // Estados principales
@@ -61,6 +64,11 @@ export const ApiProvider = ({ children }) => {
   const [suggestedCode, setSuggestedCode] = useState("")
   // Estados de cubierta configurables del tenant [{name,role}] — fuente para /op.
   const [statuses, setStatuses] = useState([])
+  // Orden de estados del TENANT. Cae al clásico solo si la config todavía no llegó.
+  const stateOrder = useMemo(
+    () => (statuses.length ? statuses.map((st) => st.name) : STATE_ORDER_FALLBACK),
+    [statuses],
+  )
   const [plateSep, setPlateSep] = useState("") // separador de patente configurable (solo display)
   const [tireCodePrefix, setTireCodePrefix] = useState("") // prefijo del código interno (solo display)
 
@@ -444,8 +452,8 @@ export const ApiProvider = ({ children }) => {
     };
 
     const matchesKm = (tire) => {
-      const kmFrom = parseInt(filters.kmFrom);
-      const kmTo = parseInt(filters.kmTo);
+      const kmFrom = Number(filters.kmFrom);
+      const kmTo = Number(filters.kmTo);
       if (filters.kmFrom && tire.kilometers < kmFrom) return false;
       if (filters.kmTo && tire.kilometers > kmTo) return false;
       return true;
@@ -484,7 +492,12 @@ export const ApiProvider = ({ children }) => {
 
     if (filters.sortBy) {
       const compare = {
-        status: (a, b) => STATE_ORDER.indexOf(a.status) - STATE_ORDER.indexOf(b.status),
+        // Un estado que no está en la config va al FINAL: con indexOf crudo, el -1 lo mandaba
+        // al principio, así que los estados desconocidos encabezaban la lista.
+        status: (a, b) => {
+          const pos = (st) => { const i = stateOrder.indexOf(st); return i === -1 ? Number.MAX_SAFE_INTEGER : i }
+          return pos(a.status) - pos(b.status)
+        },
         codeAsc: (a, b) => a.code - b.code,
         codeDesc: (a, b) => b.code - a.code,
         kmAsc: (a, b) => a.kilometers - b.kilometers,
@@ -495,16 +508,22 @@ export const ApiProvider = ({ children }) => {
     }
 
     setFilteredTireData(filtered);
-  }, [searchQuery, filters, tires]);
+  }, [searchQuery, filters, tires, stateOrder]);
 
   // Efecto para actualizar datos derivados
   useEffect(() => {
-    if (tires.length > 0) {
-      setAvailableStatuses(STATE_ORDER.filter((status) => tires.some((t) => t.status === status)))
-      setAvailableBrands([...new Set(tires.map((t) => t.brand))])
-      setVehiclesWTires([...new Set(tires.map((t) => t.vehicle?.mobile || "Sin asignar"))])
-    }
-  }, [tires])
+    // Sin el guard `tires.length > 0`: al vaciarse la lista, los derivados quedaban con los
+    // valores anteriores y los dropdowns seguían ofreciendo marcas y estados inexistentes.
+    const presentes = [...new Set(tires.map((t) => t.status))]
+    // Primero los configurados por el tenant, en SU orden; después los huérfanos (estados que
+    // todavía viven en alguna cubierta pero ya no están en la config), para no esconderlos.
+    setAvailableStatuses([
+      ...stateOrder.filter((st) => presentes.includes(st)),
+      ...presentes.filter((st) => !stateOrder.includes(st)),
+    ])
+    setAvailableBrands([...new Set(tires.map((t) => t.brand))])
+    setVehiclesWTires([...new Set(tires.map((t) => t.vehicle?.mobile || "Sin asignar"))])
+  }, [tires, stateOrder])
 
   // Estados configurables derivados (para /op): catálogo + roles + escalera + orden.
   const statusHelpers = useMemo(() => {
@@ -518,9 +537,9 @@ export const ApiProvider = ({ children }) => {
       discardStatus: byRole("discard"),
       recapStatus: byRole("recap"),
       stockScale: statuses.filter((s) => s.role === "initial" || s.role === "stock").map((s) => s.name),
-      stateOrder: statuses.map((s) => s.name),
+      stateOrder,
     }
-  }, [statuses, plateSep, tireCodePrefix])
+  }, [statuses, stateOrder, plateSep, tireCodePrefix])
 
   // Valor del contexto memoizado
   const contextValue = useMemo(() => ({

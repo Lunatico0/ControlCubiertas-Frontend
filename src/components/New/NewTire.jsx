@@ -7,6 +7,13 @@ import useCreateEntity from "@hooks/useCreateEntity"
 import { buildCreateTirePrintData } from "@utils/print-data"
 import usePrint from "@hooks/usePrint"
 
+// Fecha de HOY en zona local. `new Date().toISOString()` ya está en el día siguiente después
+// de las 21:00 en GMT-3, así que el formulario proponía MAÑANA como fecha de alta.
+const todayLocal = () => {
+  const d = new Date()
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`
+}
+
 const NewTire = ({ onClose, onSuccess }) => {
   const { tires, data, orders } = useContext(ApiContext)
   const { validateOrderNumber } = useOrderValidation()
@@ -19,16 +26,14 @@ const NewTire = ({ onClose, onSuccess }) => {
   )
 
   const handleSubmit = async (formData) => {
-    console.log("🚀 NewTire: Datos recibidos del formulario:", formData)
-
     const newTire = {
-      status: formData.status || "Nueva",
+      status: formData.status || data.initialStatus,
       code: formData.code || data.suggestedCode,
       orderNumber: formData.orderNumber,
       serialNumber: formData.serialNumber,
       size: formData.size,
       brand: formData.brand,
-      createdAt: formData.createdAt || new Date().toISOString().split("T")[0],
+      createdAt: formData.createdAt || todayLocal(),
       pattern: formData.pattern,
       kilometers: formData.kilometers || 0,
       vehicle: formData.vehicle || null,
@@ -55,8 +60,8 @@ const NewTire = ({ onClose, onSuccess }) => {
         vehicles={data.vehicles}
         defaultValues={{
           code: data.suggestedCode,
-          status: "Nueva",
-          createdAt: new Date().toISOString().split("T")[0],
+          status: data.initialStatus,
+          createdAt: todayLocal(),
         }}
         showFields={{
           status: true,
