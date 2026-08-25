@@ -46,3 +46,7 @@ export const getVehicleWearCached = (id) => {
   }
   return wearCache.get(id)
 }
+
+// Invalida la cache de desgaste. La llama resetClientCaches() al abrir/cerrar sesión: el
+// desgaste es dato del tenant y la cache vive a nivel módulo, así que sobrevive al logout.
+export const invalidateWearCache = () => { wearCache.clear() }

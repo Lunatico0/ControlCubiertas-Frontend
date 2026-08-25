@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useCallback, useMemo } from "react"
 import { loginRequest, changePasswordRequest } from "../api/auth"
 import { setTokens, clearTokens, getAccessToken } from "../api/tokenStore"
+import { resetClientCaches } from "../api/sessionCache"
 
 const USER_KEY = "cc_user"
 const AuthContext = createContext(null)
@@ -21,6 +22,8 @@ export const AuthProvider = ({ children }) => {
 
   const login = useCallback(async (email, password) => {
     const data = await loginRequest(email, password)
+    // Antes de tocar nada: las caches a nivel módulo son del tenant anterior.
+    resetClientCaches()
     setTokens({ accessToken: data.accessToken, refreshToken: data.refreshToken })
     localStorage.setItem(USER_KEY, JSON.stringify(data.user))
     setUser(data.user)
@@ -30,6 +33,9 @@ export const AuthProvider = ({ children }) => {
   const logout = useCallback(() => {
     clearTokens()
     localStorage.removeItem(USER_KEY)
+    // Cerrar sesión NO recarga la página (es navegación del router), así que las caches a
+    // nivel módulo sobreviven. Sin esto el próximo usuario hereda los datos del anterior.
+    resetClientCaches()
     setUser(null)
   }, [])
 
