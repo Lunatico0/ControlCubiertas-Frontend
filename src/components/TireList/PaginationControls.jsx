@@ -50,14 +50,17 @@ const PaginationControls = ({
         <NavigateBeforeRoundedIcon fontSize='small'/>
       </button>
 
+      {/* Las keys van con prefijo: los puntos suspensivos usaban el INDICE y las paginas el
+          NUMERO, asi que el hueco en la posicion 3 chocaba con la pagina 3 y React avisaba
+          "two children with the same key". Con keys repetidas puede duplicar u omitir nodos. */}
       {renderPageNumbers().map((page, idx) =>
         page === "…" ? (
-          <span key={idx} className="px-2 text-gray-400">
+          <span key={`gap-${idx}`} className="px-2 text-gray-400">
             …
           </span>
         ) : (
           <button
-            key={page}
+            key={`page-${page}`}
             onClick={() => goToPage(page)}
             className={`
               px-4 py-2 rounded text-sm

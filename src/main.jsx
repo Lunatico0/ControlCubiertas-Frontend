@@ -4,15 +4,31 @@ import * as Sentry from '@sentry/react'
 import './index.css'
 import App from './App.jsx'
 
-// Sentry (monitoreo de errores). Se inicializa SOLO si hay DSN en VITE_SENTRY_DSN: asi en
-// dev, sin esa env var, no manda nada (no gasta la cuota); en prod (web + desktop) va con DSN.
+// Sentry (monitoreo de errores).
+//
+// En DEV no se inicializa aunque haya DSN. El .env local suele tener el DSN de produccion, y
+// entonces cada sesion de desarrollo ensucia el Sentry real: el HMR de Vite genera errores que
+// NO existen en produccion ("Rendered more hooks than during the previous render", contextos
+// undefined tras un refresh en caliente) y quedan mezclados con los de los clientes.
+// Para depurar el propio Sentry en local, poner VITE_SENTRY_DEV=true.
 const dsn = import.meta.env.VITE_SENTRY_DSN
-if (dsn) {
+const habilitado = !!dsn && (!import.meta.env.DEV || import.meta.env.VITE_SENTRY_DEV === "true")
+
+if (habilitado) {
   Sentry.init({
     dsn,
     environment: import.meta.env.MODE, // "development" | "production"
     // Foco en errores. El tracing de performance (tracesSampleRate) queda para habilitar
     // mas adelante si hace falta; por ahora no lo prendemos para no gastar cuota.
+
+    beforeSend(event, hint) {
+      // Los 4xx no son fallas: son el contrato funcionando. "Kilometraje de baja no puede ser
+      // menor que el de alta" es un operario equivocandose, y la UI ya se lo dice. Reportarlos
+      // quema cuota y ahoga los errores de verdad. Los 5xx y los de red SI se reportan.
+      const status = hint?.originalException?.status
+      if (typeof status === "number" && status >= 400 && status < 500) return null
+      return event
+    },
   })
 }
 
