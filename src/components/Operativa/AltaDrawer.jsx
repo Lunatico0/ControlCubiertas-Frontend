@@ -10,6 +10,11 @@ import FloatingField from "@components/UI/FloatingField"
 
 // Drawer de alta de cubierta nueva. Crea en depósito (status "Nueva"); la asignación
 // a vehículo es una acción aparte. Reutiliza tires.create (refresca la lista sola).
+// Espejo de KM_MAX en el backend (validators/tire.validator.js). Por encima de esto el número
+// dejó de ser un dato y pasó a ser un dedazo. El backend igual lo rechaza; esto es para que el
+// operario lo vea marcado en rojo en vez de comerse un error después de mandar el formulario.
+const KM_MAX = 1_500_000
+
 const todayLocal = () => {
   const d = new Date()
   // YYYY-MM-DD en hora local (no UTC), para el value del input date.
@@ -49,6 +54,15 @@ const AltaDrawer = ({ onClose, onCreated }) => {
     if (!form.createdAt) e.createdAt = true
     if (!form.orderNumber?.trim()) e.orderNumber = true
     if (Object.keys(e).length) { setErrors(e); showToast("warning", "Completá los campos obligatorios"); return }
+
+    // Reglas de valor. Van aparte de las de "campo vacío" porque el mensaje tiene que decir QUÉ
+    // está mal: un km negativo se imprimía tal cual en el comprobante y arrastraba a todos los
+    // cálculos de rendimiento.
+    const km = Number(form.kilometers || 0)
+    if (!Number.isFinite(km) || km < 0) { setErrors({ kilometers: true }); showToast("warning", "El kilometraje no puede ser negativo"); return }
+    if (km > KM_MAX) { setErrors({ kilometers: true }); showToast("warning", `El kilometraje no puede superar los ${KM_MAX.toLocaleString("es-AR")} km`); return }
+    if (form.createdAt > todayLocal()) { setErrors({ createdAt: true }); showToast("warning", "La fecha de alta no puede ser futura"); return }
+
     setErrors({})
     setSubmitting(true)
     try {
@@ -125,8 +139,8 @@ const AltaDrawer = ({ onClose, onCreated }) => {
               <FloatingField label="Dibujo" required error={errors.pattern} value={form.pattern} onChange={set("pattern")} />
             </div>
             <div className="grid grid-cols-2 gap-3">
-              <FloatingField label="Kilómetros" type="number" min="0" value={form.kilometers} onChange={set("kilometers")} />
-              <FloatingField label="Fecha de alta" type="date" required error={errors.createdAt} value={form.createdAt} onChange={set("createdAt")} />
+              <FloatingField label="Kilómetros" type="number" min="0" max={KM_MAX} error={errors.kilometers} value={form.kilometers} onChange={set("kilometers")} />
+              <FloatingField label="Fecha de alta" type="date" required max={todayLocal()} error={errors.createdAt} value={form.createdAt} onChange={set("createdAt")} />
             </div>
             <FloatingField label="N° de orden" required error={errors.orderNumber} value={form.orderNumber} onChange={set("orderNumber")} />
           </div>

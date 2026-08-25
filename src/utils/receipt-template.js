@@ -18,15 +18,45 @@ const DEFAULT_SECTIONS = [
 ]
 
 // Escapa texto para interpolar seguro en el HTML (datos de empresa/movimiento).
-const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]))
+// Incluye la comilla simple: algunos atributos del comprobante la usan.
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]))
+
+// ─── Saneo del receiptDesign ────────────────────────────────────────────────────────────────
+// `accent`, `font` y `logo` NO son texto: se interpolan dentro de atributos (`style="…"`,
+// `src="…"`), donde escapar no alcanza — un valor como `red" onmouseover="…` cierra el atributo
+// y agrega un handler. Y el receiptDesign lo escribe el tenant-admin pero lo renderizan TODOS
+// los operarios al imprimir (con dangerouslySetInnerHTML), así que un admin podía ejecutar
+// código en la sesión de cualquier operario de su empresa.
+//
+// Por eso cada uno se valida contra su forma esperada y, si no encaja, se cae al default.
+// El escapado queda igual como segunda barrera.
+const ACCENT_DEFAULT = "#1F7A43"
+const FONT_DEFAULT = "'Space Grotesk', sans-serif"
+
+// Sólo un color hexadecimal. Los presets del editor son 5 hex; dejamos la forma abierta por si
+// más adelante hay un selector libre, pero nada que no sea un hex entra.
+const safeAccent = (v) => (/^#[0-9a-fA-F]{3,8}$/.test(String(v ?? "")) ? String(v) : ACCENT_DEFAULT)
+
+// Una font-family es una lista de nombres: letras, dígitos, espacios, comas, guiones y comillas.
+// Cualquier otra cosa (paréntesis, punto y coma, `<`, `>`) es un intento de salirse del atributo.
+const safeFont = (v) => (/^[\w\s,'"-]{1,120}$/.test(String(v ?? "")) ? String(v) : FONT_DEFAULT)
+
+// El logo se guarda como dataURL desde el editor. Se aceptan además URLs https por si en algún
+// momento se migra a storage de assets. Todo lo demás se descarta (sin logo → placeholder).
+const safeLogo = (v) => {
+  const s = String(v ?? "").trim()
+  if (!s) return null
+  return /^data:image\/[a-z0-9.+-]+;base64,[A-Za-z0-9+/=\s]+$/i.test(s) || /^https:\/\/[^\s"'<>]+$/i.test(s) ? s : null
+}
 
 // Devuelve el HTML de las "copias" del comprobante (original [+ duplicado]) — el mismo
 // markup que el preview del editor. Envolver en un contenedor blanco para mostrar/imprimir.
 // design: receiptDesign; company: {name,cuit,phone,address}; footer; meta:{numero,fecha,tipo}
 // sectionData: { [key]: { heading, rows: [{k,v}] } }
 export function renderComprobanteHTML({ design = {}, company = {}, footer = "", meta = {}, sectionData = {} }) {
-  const accent = design.accent || "#1F7A43"
-  const font = design.font || "'Space Grotesk', sans-serif"
+  const accent = safeAccent(design.accent)
+  const font = safeFont(design.font)
+  const logo = safeLogo(design.logo)
   const fs = FS[design.textSize] || FS.M
   const align = design.align === "center" ? "center" : "left"
   const headerAlign = align === "center" ? "center" : "flex-start"
@@ -45,8 +75,8 @@ export function renderComprobanteHTML({ design = {}, company = {}, footer = "", 
   const headerHTML = showHeader ? `
     <div style="display:flex;flex-direction:column;align-items:${headerAlign};gap:6px;margin-bottom:9px;width:100%">
       <div style="display:flex;width:100%;justify-content:${logoJustify}">
-        ${design.logo
-          ? `<img src="${design.logo}" alt="logo" style="height:${logoH};max-width:240px;object-fit:contain" />`
+        ${logo
+          ? `<img src="${esc(logo)}" alt="logo" style="height:${logoH};max-width:240px;object-fit:contain" />`
           : `<div style="height:${logoH};width:${logoW};border:1.5px dashed #CFCFCF;border-radius:5px;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono';font-size:10px;color:#BBBBBB;letter-spacing:.1em">LOGO</div>`}
       </div>
       <div style="width:100%;text-align:${align}">
