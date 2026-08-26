@@ -92,6 +92,17 @@ const histBits = (h) => {
   return bits
 }
 
+// Qué va a pasar concretamente al deshacer, en castellano. Antes el aviso solo nombraba el
+// movimiento y la fecha, y el operario no tenía forma de saber que iba a generar un movimiento
+// nuevo con fecha de hoy.
+const efectoDelUndo = (entry, tire) => {
+  const tipo = (entry?.type || "").replace(/^correcc[ií]on-/i, "")
+  if (tipo === "Asignación") return `Se va a desmontar del vehículo ${entry?.vehicle?.mobile || "asignado"} y volver al depósito.`
+  if (tipo === "Desasignación") return `Se va a volver a montar en ${entry?.vehicle?.mobile || "el vehículo anterior"}.`
+  if (tipo === "Estado") return `El estado vuelve a ser el anterior a "${entry?.status || tire?.status}".`
+  return "Se va a registrar el movimiento inverso."
+}
+
 const TireDrawer = ({ tireId, initialAction, initialAssign, onAssigned, onClose }) => {
   useStatusCatalog() // el stepper del ciclo de vida y los guards por rol dependen del catálogo
   const { tires, orders, data } = useContext(ApiContext)
@@ -153,7 +164,9 @@ const TireDrawer = ({ tireId, initialAction, initialAssign, onAssigned, onClose 
     return () => { alive = false }
   }, [form.vehicle, action])
 
-  const openAction = (a) => { setForm({}); setActionEntry(null); setErrors({}); setAction(a) }
+  // Al abrir "recapado listo" el estado viene preseleccionado en el nivel que SIGUE: sin default,
+  // el operario elegía el primero de la lista y repetía un recapado ya hecho.
+  const openAction = (a) => { setForm(a === "recap" && siguienteRecap ? { status: siguienteRecap } : {}); setActionEntry(null); setErrors({}); setAction(a) }
   const closeAction = useCallback(() => { setAction(null); setActionEntry(null); setErrors({}) }, [])
   // Cierre action-aware (Escape / backdrop / botón X): si hay un formulario de acción abierto
   // vuelve al detalle (closeAction); si no, cierra el drawer entero. Antes solo el Escape era
@@ -278,6 +291,9 @@ const TireDrawer = ({ tireId, initialAction, initialAssign, onAssigned, onClose 
 
   const history = [...(tire?.history || [])].sort((a, b) => new Date(b.date) - new Date(a.date))
   const lastReceiptEntry = history.find((h) => h.receiptNumber) // para "Imprimir recibo" (último comprobante)
+  // history está ordenado desc por fecha: la primera es el último movimiento, el único que se
+  // puede deshacer sin inventar movimientos que nunca pasaron.
+  const ultimaEntrada = history[0]
   const steps = tire ? lifecycleSteps(tire, history, stockScale) : []
   const infoItems = tire ? [
     { label: "Marca", value: tire.brand || "—" },
@@ -290,7 +306,41 @@ const TireDrawer = ({ tireId, initialAction, initialAssign, onAssigned, onClose 
     { label: "Fecha de alta", value: fmtDate(tire.createdAt), mono: true },
   ] : []
   // Opciones de "recapado listo": los estados de la escalera con rol stock (los recapados).
-  const recapOptions = statuses.filter((s) => s.role === "stock").map((s) => s.name)
+  //
+  // El nivel de recapado define cuánta vida le queda a la cubierta y cuándo se descarta, así que
+  // dejar elegir uno ya alcanzado corrompe el dato más caro del negocio. Pasaba: el select
+  // arrancaba vacío, ofrecía los tres niveles y un operario apurado tomaba el primero de la
+  // lista, dejando la cubierta con dos "1er Recapado" y el contador atrasado, sin un solo aviso.
+  //
+  // Ahora los niveles ya alcanzados quedan deshabilitados y el siguiente viene preseleccionado.
+  // El nivel se deriva del HISTORIAL y no de tire.recapLevel: ese campo lo calcula getAll para
+  // el listado, y el detalle que trae el drawer no lo incluye. Tampoco sirve el level del estado
+  // actual: una cubierta "Para reparar" tiene rol recap, cuyo level es 0, y quedaría como si
+  // nunca la hubieran recapado.
+  const nivelAlcanzado = (estado) => {
+    const m = metaOf(estado)
+    return m.role === "stock" || m.role === "initial" ? m.level ?? 0 : 0
+  }
+  const nivelActual = tire
+    ? Math.max(nivelAlcanzado(tire.status), ...history.map((h) => nivelAlcanzado(h.status)), 0)
+    : 0
+  const recapOptions = statuses
+    .filter((s) => s.role === "stock")
+    .map((s) => ({ name: s.name, nivel: metaOf(s.name).level ?? 0 }))
+  const siguienteRecap = recapOptions.find((o) => o.nivel > nivelActual)?.name || ""
+
+  // Preselecciona el siguiente recapado también cuando el drawer abre directo en esta acción
+  // desde la tarjeta del inventario (initialAction), camino que no pasa por openAction.
+  useEffect(() => {
+    if (action !== "recap" || !siguienteRecap) return
+    // Corrige también cuando el valor puesto quedó inválido: el efecto puede correr antes de
+    // que llegue el historial, y ahí nivelActual todavía es 0 y preselecciona un recapado que
+    // la cubierta ya hizo. Un nivel ya alcanzado nunca puede ser una elección del usuario,
+    // porque en el select está deshabilitado.
+    const elegido = form.status
+    const yaAlcanzado = elegido && (metaOf(elegido).level ?? 0) <= nivelActual
+    if (!elegido || yaAlcanzado) setForm((f) => ({ ...f, status: siguienteRecap }))
+  }, [action, siguienteRecap, form.status, nivelActual])
 
   const ACTION_TITLES = { assign: "Asignar a vehículo", unassign: "Desasignar cubierta", recap: "Registrar recapado", discard: "Descartar cubierta", undo: "Deshacer entrada", editHist: "Corregir entrada de historial" }
 
@@ -384,10 +434,21 @@ const TireDrawer = ({ tireId, initialAction, initialAssign, onAssigned, onClose 
                 )}
 
                 {action === "recap" && (
-                  <FloatingField as="select" label="Nuevo estado de recapado" required error={errors.status} value={form.status || ""} onChange={set("status")}>
-                    <option value="">Seleccionar estado…</option>
-                    {recapOptions.map((s) => <option key={s} value={s}>{s}</option>)}
-                  </FloatingField>
+                  <>
+                    <FloatingField as="select" label="Nuevo estado de recapado" required error={errors.status} value={form.status || ""} onChange={set("status")}>
+                      <option value="">Seleccionar estado…</option>
+                      {recapOptions.map((o) => (
+                        <option key={o.name} value={o.name} disabled={o.nivel <= nivelActual}>
+                          {o.name}{o.nivel <= nivelActual ? " — ya alcanzado" : ""}
+                        </option>
+                      ))}
+                    </FloatingField>
+                    {!siguienteRecap && (
+                      <div className="rounded-[9px] px-3 py-2.5 text-[12.5px]" style={{ background: tint("var(--ink-orange)", 8), border: "1px solid " + tint("var(--ink-orange)", 35), color: "var(--ink-orange)" }}>
+                        Esta cubierta ya recorrió toda la escalera de recapados del tenant. El paso que sigue es descartarla.
+                      </div>
+                    )}
+                  </>
                 )}
 
                 {action === "discard" && (
@@ -398,7 +459,9 @@ const TireDrawer = ({ tireId, initialAction, initialAssign, onAssigned, onClose 
 
                 {action === "undo" && (
                   <div className="rounded-[9px] px-3 py-2.5 text-[12.5px]" style={{ background: "var(--input)", border: "1px solid var(--bd-strong)", color: "var(--tx-4)" }}>
-                    Vas a revertir el movimiento «<b style={{ color: "var(--tx-2)" }}>{actionEntry?.type}</b>» del {fmtDate(actionEntry?.date)}. La reversión queda registrada con su comprobante.
+                    Vas a revertir el movimiento «<b style={{ color: "var(--tx-2)" }}>{actionEntry?.type}</b>» del {fmtDate(actionEntry?.date)}.
+                    {" "}<b style={{ color: "var(--tx-2)" }}>{efectoDelUndo(actionEntry, tire)}</b>
+                    {" "}La reversión queda registrada con su comprobante.
                   </div>
                 )}
 
@@ -525,7 +588,14 @@ const TireDrawer = ({ tireId, initialAction, initialAssign, onAssigned, onClose 
                             <div className="mt-[10px] flex flex-wrap gap-[6px]">
                               {h.receiptNumber && <TimelineBtn onClick={() => reprintAct.execute({ entry: h, tire })} disabled={reprintAct.isPrinting} icon={<LocalPrintshopOutlinedIcon sx={{ fontSize: 13 }} />} label="Reimprimir" hover="var(--bd-hover)" />}
                               {!isCorr && <TimelineBtn onClick={() => openEntryAction("editHist", h)} icon={<EditOutlinedIcon sx={{ fontSize: 13 }} />} label="Corregir" hover="var(--ink-blue)" />}
-                              {!isCorr && h.type !== "Alta" && <TimelineBtn onClick={() => openEntryAction("undo", h)} icon={<UndoRoundedIcon sx={{ fontSize: 13 }} />} label="Deshacer" hover="var(--ink-red)" />}
+                              {/* Deshacer SOLO en el último movimiento. Fuera de orden, el backend arma la
+                                  reversión contra el estado de HOY: deshacer una asignación vieja de una
+                                  cubierta ya desmontada creaba una desasignación con fecha de hoy y 0 km,
+                                  de un vehículo del que ya no estaba montada. Movimientos que nunca
+                                  ocurrieron, en el historial que respalda cada operación. */}
+                              {!isCorr && h.type !== "Alta" && String(h._id) === String(ultimaEntrada?._id) && (
+                                <TimelineBtn onClick={() => openEntryAction("undo", h)} icon={<UndoRoundedIcon sx={{ fontSize: 13 }} />} label="Deshacer" hover="var(--ink-red)" />
+                              )}
                             </div>
                           </div>
                         </div>
