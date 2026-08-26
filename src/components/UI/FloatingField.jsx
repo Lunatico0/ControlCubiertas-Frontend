@@ -1,4 +1,4 @@
-import { useId } from "react"
+import { useId, forwardRef } from "react"
 
 // Campo con label FLOTANTE (patrón del login, pero theme-aware con los tokens del tema y CSS puro
 // en index.css → funciona igual controlado (value/onChange) o con react-hook-form (spread de register).
@@ -12,13 +12,18 @@ import { useId } from "react"
 //   error      — bool | string. Marca el borde y el label en rojo; si es string, lo muestra debajo.
 //   rightAddon — nodo posicionado a la derecha (ej. el ojo de "mostrar contraseña").
 //   children   — <option>s cuando as="select".
-//   ...rest    — se spreadea al control (value/onChange, name/ref/onBlur de register, disabled, etc.).
+//   ...rest    — se spreadea al control (value/onChange, name/onBlur de register, disabled, etc.).
+//
+// Va envuelto en forwardRef A PROPÓSITO: react-hook-form registra el campo por REF, y `ref` no
+// viaja dentro de props. Sin el forwardRef, un `{...register("x")}` sobre este componente pierde
+// el ref, RHF no ve el input y el formulario queda mudo — ni lee lo tipeado ni lo puebla con
+// reset(). Si alguien lo saca, se rompen en silencio ChangePassword, UserForm y CompanySettings.
 //
 // IMPORTANTE: el input/textarea llevan placeholder=" " (un espacio) para que :not(:placeholder-shown)
 // detecte si hay valor. No pases un placeholder propio: el label ES el placeholder.
 const ALWAYS_UP = new Set(["date", "time", "datetime-local", "month", "week", "color"])
 
-const FloatingField = ({ label, as = "input", type = "text", required = false, error = false, className = "", children, id, rightAddon, ...rest }) => {
+const FloatingField = forwardRef(({ label, as = "input", type = "text", required = false, error = false, className = "", children, id, rightAddon, ...rest }, ref) => {
   const autoId = useId()
   const fieldId = id || autoId
   const isSelect = as === "select"
@@ -28,11 +33,11 @@ const FloatingField = ({ label, as = "input", type = "text", required = false, e
 
   const cls = `ff-control ${className}`.trim()
   const control = isSelect ? (
-    <select id={fieldId} className={cls} {...rest}>{children}</select>
+    <select ref={ref} id={fieldId} className={cls} {...rest}>{children}</select>
   ) : isTextarea ? (
-    <textarea id={fieldId} className={cls} placeholder=" " {...rest} />
+    <textarea ref={ref} id={fieldId} className={cls} placeholder=" " {...rest} />
   ) : (
-    <input id={fieldId} type={type} className={cls} placeholder=" " {...rest} />
+    <input ref={ref} id={fieldId} type={type} className={cls} placeholder=" " {...rest} />
   )
 
   return (
@@ -45,6 +50,8 @@ const FloatingField = ({ label, as = "input", type = "text", required = false, e
       {errMsg && <div className="ff-error-msg">{errMsg}</div>}
     </div>
   )
-}
+})
+
+FloatingField.displayName = "FloatingField"
 
 export default FloatingField
