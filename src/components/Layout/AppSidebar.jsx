@@ -54,8 +54,11 @@ const AppSidebar = ({ nav, belowNav, upd, user, help, onLogout }) => {
             style={{
               fontWeight: item.active ? 600 : 500,
               color: item.active ? "var(--ink-lime)" : "var(--tx-4)",
-              background: item.active ? "color-mix(in srgb, var(--ink-lime) 12%, transparent)" : "transparent",
-              boxShadow: item.active ? "inset 3px 0 0 var(--ink-lime)" : "none",
+              // El tint subió de 12% a 16% al sacar la barra lateral: el fondo más el texto lima
+              // alcanzan para marcar la sección activa. La barra era un left-accent, que
+              // ART-DIRECTION prohíbe explícitamente (sección 2, lista no negociable), y encima
+              // era el único box-shadow de toda la pantalla del panel.
+              background: item.active ? "color-mix(in srgb, var(--ink-lime) 16%, transparent)" : "transparent",
               border: "none",
             }}
             onMouseEnter={(e) => {
