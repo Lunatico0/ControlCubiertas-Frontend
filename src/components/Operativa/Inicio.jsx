@@ -30,6 +30,8 @@ const Inicio = ({ onNavigate }) => {
   const tires = data?.tires || []
   const vehicles = data?.vehicles || []
   const [q, setQ] = useState("")
+  const [abierto, setAbierto] = useState(false) // resultados en vivo desplegados
+  const [activo, setActivo] = useState(-1) // índice resaltado con las flechas (-1 = ninguno)
 
   // Reloj vivo para la fecha/hora del saludo (se refresca cada minuto).
   const [now, setNow] = useState(() => new Date())
@@ -75,6 +77,48 @@ const Inicio = ({ onNavigate }) => {
 
   const goSearch = () => onNavigate("cubiertas", { query: q.trim() })
 
+  // Resultados EN VIVO. Los datos ya están en memoria (ApiContext), así que filtrar mientras
+  // se tipea no cuesta una request. Antes había que apretar Enter para ver algo y el buscador
+  // se leía como roto. Se capea a 6 para no tapar la pantalla.
+  const MAX_RESULTADOS = 6
+  const resultados = useMemo(() => {
+    const term = q.trim().toLowerCase()
+    if (!term) return []
+    return tires
+      .filter((t) =>
+        [formatTireCode(t.code, data?.tireCodePrefix), String(t.code ?? ""), t.brand, t.serialNumber]
+          .some((campo) => String(campo ?? "").toLowerCase().includes(term))
+      )
+      .slice(0, MAX_RESULTADOS)
+  }, [q, tires, data?.tireCodePrefix])
+
+  const desplegado = abierto && q.trim().length > 0
+
+  // Al elegir una cubierta se salta al inventario filtrado por su código, que es único.
+  const abrirCubierta = (t) => {
+    setAbierto(false)
+    onNavigate("cubiertas", { query: String(t.code) })
+  }
+
+  const onSearchKeyDown = (e) => {
+    if (e.key === "Escape") return setAbierto(false) // cierra sin borrar lo tipeado
+    if (e.key === "ArrowDown" && resultados.length) {
+      e.preventDefault()
+      setAbierto(true)
+      return setActivo((i) => (i + 1) % resultados.length)
+    }
+    if (e.key === "ArrowUp" && resultados.length) {
+      e.preventDefault()
+      setAbierto(true)
+      return setActivo((i) => (i <= 0 ? resultados.length - 1 : i - 1))
+    }
+    if (e.key === "Enter") {
+      // Sin nada resaltado, Enter mantiene el comportamiento viejo: ir al inventario con lo tipeado.
+      if (activo >= 0 && resultados[activo]) return abrirCubierta(resultados[activo])
+      goSearch()
+    }
+  }
+
   const TILES = [
     { key: "alta", title: "Alta de cubierta", sub: "Registrar una nueva", icon: <AddRoundedIcon />, primary: true, onClick: () => onNavigate("cubiertas", { alta: true }) },
     { key: "buscar", title: "Buscar cubierta", sub: "Ver el inventario", icon: <TripOriginRoundedIcon />, accent: "var(--ink-lime)", onClick: () => onNavigate("cubiertas") },
@@ -104,15 +148,55 @@ const Inicio = ({ onNavigate }) => {
         <input
           ref={searchRef}
           value={q}
-          onChange={(e) => setQ(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && goSearch()}
+          onChange={(e) => { setQ(e.target.value); setAbierto(true); setActivo(-1) }}
+          onKeyDown={onSearchKeyDown}
+          role="combobox"
+          aria-expanded={desplegado}
+          aria-controls="inicio-search-results"
+          aria-autocomplete="list"
           placeholder="Buscar por código, marca o N° de serie…"
           className="h-16 w-full rounded-[14px] pl-14 pr-24 text-[17px] outline-none"
           style={{ background: "var(--card)", border: "1.5px solid var(--bd)", color: "var(--tx)" }}
           onFocus={(e) => (e.target.style.borderColor = "var(--ink-lime)")}
-          onBlur={(e) => (e.target.style.borderColor = "var(--bd)")}
+          onBlur={(e) => { e.target.style.borderColor = "var(--bd)"; setAbierto(false) }}
         />
         <span className="pointer-events-none absolute right-[18px] top-1/2 -translate-y-1/2 rounded-md px-2 py-1 text-[12px]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-5)", border: "1px solid var(--bd-strong)" }}>Ctrl K</span>
+
+        {desplegado && (
+          <ul
+            id="inicio-search-results"
+            role="listbox"
+            onMouseDown={(e) => e.preventDefault()} // que el clic no le robe el foco al input antes del onClick
+            className="absolute left-0 right-0 top-[70px] z-30 overflow-hidden rounded-[14px] py-1.5 shadow-lg"
+            style={{ background: "var(--card)", border: "1px solid var(--bd)" }}
+          >
+            {resultados.length === 0 ? (
+              <li className="px-5 py-3 text-[14px]" style={{ color: "var(--tx-5)" }}>
+                Sin resultados para “{q.trim()}”
+              </li>
+            ) : (
+              resultados.map((t, i) => (
+                <li key={t._id} role="option" aria-selected={i === activo}>
+                  <button
+                    type="button"
+                    onClick={() => abrirCubierta(t)}
+                    onMouseEnter={() => setActivo(i)}
+                    className="flex w-full items-center gap-3 px-5 py-2.5 text-left text-[15px] transition"
+                    style={{ background: i === activo ? "var(--bg-2)" : "transparent", color: "var(--tx)" }}
+                  >
+                    <span style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-4)" }}>
+                      #{formatTireCode(t.code, data?.tireCodePrefix)}
+                    </span>
+                    <span className="truncate">{t.brand || "Sin marca"}</span>
+                    {t.serialNumber && (
+                      <span className="ml-auto truncate text-[13px]" style={{ color: "var(--tx-5)" }}>{t.serialNumber}</span>
+                    )}
+                  </button>
+                </li>
+              ))
+            )}
+          </ul>
+        )}
       </div>
 
       {/* Tiles de acción — SIEMPRE 3 columnas (no wrappean; se comprimen en pantallas angostas). */}
