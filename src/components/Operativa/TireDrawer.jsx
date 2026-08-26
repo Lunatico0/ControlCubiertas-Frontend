@@ -13,6 +13,7 @@ import CheckRoundedIcon from "@mui/icons-material/CheckRounded"
 import LocalPrintshopOutlinedIcon from "@mui/icons-material/LocalPrintshopOutlined"
 import { buildAssignPrintData, buildUnassignPrintData, buildFinishRecapPrintData, buildDiscardPrintData, buildUndoPrintData, buildCorrectionPrintData, buildEditTirePrintData } from "@utils/print-data"
 import { metaOf, tint, fmtKm, fmtDate, StateBadge, useStatusCatalog } from "./status"
+import SelectorPosicion from "./SelectorPosicion"
 import { OpActionBtn } from "./opActions"
 import Field from "@components/common/Field"
 import Drawer from "@components/UI/Drawer"
@@ -443,32 +444,11 @@ const TireDrawer = ({ tireId, initialAction, initialAssign, onAssigned, onClose 
                         </div>
                       ) : (
                         <Field label="Posición en el vehículo">
-                          <div className="flex flex-wrap gap-2">
-                            {positions.map((p) => {
-                              const occupied = !!p.tire
-                              const selected = form.position === p.code
-                              return (
-                                <button
-                                  key={p.code}
-                                  type="button"
-                                  disabled={occupied}
-                                  onClick={() => setForm((f) => ({ ...f, position: p.code }))}
-                                  title={occupied ? `Ocupada por #${p.tire.code}` : p.label}
-                                  className="rounded-lg px-2.5 py-2 text-[11.5px] font-semibold"
-                                  style={{
-                                    border: `1.5px solid ${selected ? "var(--ink-lime)" : "var(--bd-strong)"}`,
-                                    background: selected ? tint("var(--ink-lime)", 14) : "var(--input)",
-                                    color: occupied ? "var(--tx-6)" : selected ? "var(--ink-lime)" : "var(--tx-2)",
-                                    fontFamily: "'IBM Plex Mono'",
-                                    cursor: occupied ? "not-allowed" : "pointer",
-                                    opacity: occupied ? 0.55 : 1,
-                                  }}
-                                >
-                                  {p.code}{occupied ? ` · #${p.tire.code}` : ""}
-                                </button>
-                              )
-                            })}
-                          </div>
+                          <SelectorPosicion
+                            positions={positions}
+                            value={form.position}
+                            onChange={(code) => setForm((f) => ({ ...f, position: code }))}
+                          />
                         </Field>
                       )
                     )}
