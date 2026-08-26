@@ -27,10 +27,13 @@
   --color-brand-900: #365314;
 
   /* --- TIPOGRAFÍA -----------------------------------------------------------
-     Fuentes nuevas del ART-DIRECTION, ya disponibles como utilidades
-     (font-display / font-mono). El cuerpo sigue en Inter por ahora para no
-     alterar el visual actual; cambiá --font-sans a IBM Plex cuando rediseñemos. */
-  --font-sans: "Inter", system-ui, Avenir, Helvetica, Arial, sans-serif;
+     Fuentes del ART-DIRECTION. El cuerpo pasó de Inter a IBM Plex Sans con el rediseño:
+     los shells fijan IBM Plex por style inline, pero los modales se portalean a <body>,
+     fuera de ese árbol, y heredaban de acá. Se veían TRES familias a la vez en la misma
+     pantalla: título en Space Grotesk, labels e inputs del modal en Inter, y la lista de
+     atrás en IBM Plex. Con la variable alineada, todo lo que caiga fuera de un shell
+     hereda la tipografía correcta. */
+  --font-sans: "IBM Plex Sans", system-ui, Avenir, Helvetica, Arial, sans-serif;
   --font-display: "Space Grotesk", system-ui, sans-serif; /* títulos */
   --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, monospace; /* cifras/datos */
 
