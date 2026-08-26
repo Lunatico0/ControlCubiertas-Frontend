@@ -3,7 +3,12 @@ import { useState, useRef, useEffect, useCallback } from "react"
 const useContextMenu = (customRef = null) => {
   const [openIndex, setOpenIndex] = useState(null)
   const [position, setPosition] = useState({ x: 0, y: 0 })
-  const menuRef = customRef || useRef(null)
+  // useRef SIEMPRE, y recien despues se elige: `customRef || useRef(null)` no llamaba el hook
+  // cuando venia una ref de afuera. Hoy nadie pasa customRef, asi que el orden de hooks es
+  // estable por casualidad; el primer caller que la pase de forma condicional le corrompe el
+  // orden de hooks al componente entero.
+  const ownRef = useRef(null)
+  const menuRef = customRef || ownRef
 
   const openMenu = useCallback((index, e) => {
     e.preventDefault()
