@@ -10,6 +10,7 @@ import { invalidateCompanyCache } from "@api/company"
 import { showToast } from "@utils/toast"
 import Button from "@components/UI/Button"
 import FloatingField from "@components/UI/FloatingField"
+import { tituloPantalla } from "@utils/tokens"
 
 const inputClass =
   "w-full rounded-[10px] border border-(--bd) bg-(--input) px-3 py-2.5 text-sm text-(--tx) placeholder:text-(--tx-6) outline-none transition focus:border-(--ink-lime)"
@@ -139,7 +140,7 @@ const CompanySettings = () => {
   return (
     <div className="mx-auto max-w-3xl">
       <header className="mb-6">
-        <h1 className="font-display text-[28px] font-bold tracking-[-.02em] text-(--tx)" style={{ fontFamily: "'Space Grotesk'" }}>Empresa</h1>
+        <h1 className={tituloPantalla} style={{ color: "var(--tx)" }}>Empresa</h1>
         <p className="mt-1 text-sm text-(--tx-4)">Datos y preferencias de tu empresa.</p>
       </header>
 

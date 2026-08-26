@@ -15,6 +15,7 @@ import OpenInNewRoundedIcon from "@mui/icons-material/OpenInNewRounded"
 import TaskAltRoundedIcon from "@mui/icons-material/TaskAltRounded"
 import DesktopDownload from "./DesktopDownload"
 import StatCard from "@components/UI/StatCard"
+import { tituloPantalla } from "@utils/tokens"
 
 // Paleta de estados del design system (coherente entre donut y barras).
 const STATUS_COLORS = {
@@ -85,7 +86,7 @@ const Dashboard = () => {
 
   return (
     <div className="mx-auto max-w-6xl">
-      <h1 className="font-display text-3xl font-bold" style={{ color: "var(--tx)", fontFamily: "'Space Grotesk'" }}>¡Hola, {displayName}!</h1>
+      <h1 className={tituloPantalla} style={{ color: "var(--tx)" }}>¡Hola, {displayName}!</h1>
       <p className="mt-1" style={{ color: "var(--tx-4)" }}>Este es el estado general de tu flota hoy.</p>
 
       {/* Métricas */}

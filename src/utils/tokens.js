@@ -11,6 +11,16 @@ export const colors = {
 }
 
 // Tipografía
+// Título de PANTALLA (h1 de una sección). Medido antes de unificar: la operativa en 32px/48,
+// el resumen del panel en 30/36, Usuarios-Reportes-Empresa-Comprobantes en 28/42, el login en
+// 26 y el 404 en 22/33. Cuatro tamaños y cuatro line-heights para el mismo nivel semántico:
+// navegar entre secciones hacía saltar el título, y con line-height distinto saltaba también
+// la línea de base de todo lo que venía abajo.
+//
+// NO aplica a los h1 de drawer y modal (21px), que son otro nivel, ni a la portada de la guía
+// (40px), que es una tapa.
+export const tituloPantalla = "font-display text-[28px] leading-[1.25] font-bold tracking-[-.02em]"
+
 export const text = {
   heading: "text-xl font-semibold text-gray-900 dark:text-white",
   label: "text-sm font-medium text-gray-700 dark:text-gray-300",

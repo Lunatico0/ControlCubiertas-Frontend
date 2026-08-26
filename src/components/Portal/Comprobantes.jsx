@@ -11,6 +11,7 @@ import { useReprint } from "@hooks/useReprint"
 import { showToast } from "@utils/toast"
 import { downloadCSV } from "@utils/csv"
 import Pager from "./Pager"
+import { tituloPantalla } from "@utils/tokens"
 
 const COLS = "1.15fr 0.85fr 0.75fr 1.35fr 0.9fr 0.75fr"
 const LIMIT = 15
@@ -117,7 +118,7 @@ const Comprobantes = () => {
       {/* Header */}
       <div className="mb-[22px] flex items-start gap-5">
         <div>
-          <h1 className="font-display text-[28px] font-bold tracking-[-.02em]" style={{ color: "var(--tx)", fontFamily: "'Space Grotesk'" }}>Comprobantes</h1>
+          <h1 className={tituloPantalla} style={{ color: "var(--tx)" }}>Comprobantes</h1>
           <p className="mt-1 text-sm" style={{ color: "var(--tx-4)" }}>Histórico de comprobantes emitidos por cada movimiento de cubierta</p>
         </div>
         <button onClick={exportCSV} className="ml-auto inline-flex items-center gap-2 rounded-[10px] px-[17px] py-[11px] text-sm font-semibold"

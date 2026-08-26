@@ -10,6 +10,7 @@ import { showToast } from "@utils/toast"
 import { downloadCSV } from "@utils/csv"
 import Callout from "@components/common/Callout"
 import StatCard from "@components/UI/StatCard"
+import { tituloPantalla } from "@utils/tokens"
 import {
   ResponsiveContainer, BarChart, Bar, LineChart, Line, AreaChart, Area,
   PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ScatterChart, Scatter,
@@ -366,7 +367,7 @@ const Reportes = () => {
       {/* Header */}
       <div className="mb-[22px] flex items-start gap-5">
         <div>
-          <h1 className="font-display text-[28px] font-bold tracking-[-.02em]" style={{ color: "var(--tx)", fontFamily: "'Space Grotesk'" }}>Reportes</h1>
+          <h1 className={tituloPantalla} style={{ color: "var(--tx)" }}>Reportes</h1>
           <p className="mt-1 text-sm" style={{ color: "var(--tx-4)" }}>Trazabilidad y rendimiento de la flota · análisis por kilometraje</p>
         </div>
         <div className="ml-auto flex items-center gap-3">

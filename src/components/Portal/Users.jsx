@@ -11,6 +11,7 @@ import Modal from "@components/UI/Modal"
 import Button from "@components/UI/Button"
 import { listUsers, setUserStatus, resetPassword } from "../../api/admin"
 import UserForm from "./UserForm"
+import { tituloPantalla } from "@utils/tokens"
 
 const roleLabel = { "tenant-admin": "Administrador", operator: "Operario" }
 const initialsOf = (u) => (u.name || u.email || "?").slice(0, 2).toUpperCase()
@@ -104,7 +105,7 @@ const Users = () => {
     <div style={{ maxWidth: 1040 }}>
       <div className="mb-[22px] flex items-start gap-5">
         <div>
-          <h1 className="font-display text-[28px] font-bold tracking-[-.02em]" style={{ color: "var(--tx)", fontFamily: "'Space Grotesk'" }}>Usuarios</h1>
+          <h1 className={tituloPantalla} style={{ color: "var(--tx)" }}>Usuarios</h1>
           <p className="mt-1 text-sm" style={{ color: "var(--tx-4)" }}>Quién accede a TireOps</p>
         </div>
         <Button variant="lime" onClick={() => setShowForm(true)} className="ml-auto">

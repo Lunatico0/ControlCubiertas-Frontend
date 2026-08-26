@@ -12,6 +12,7 @@ import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded"
 import CheckRoundedIcon from "@mui/icons-material/CheckRounded"
 import { tint, metaOf, useStatusCatalog } from "./status"
 import { formatTireCode } from "@utils/tireCode"
+import { tituloPantalla } from "@utils/tokens"
 
 // Fecha + hora en es-AR, con la primera letra en mayúscula (ej. "Viernes 18 de julio, 14:30").
 const fmtFechaHora = (d) => {
@@ -88,7 +89,7 @@ const Inicio = ({ onNavigate }) => {
 
   return (
     <div className="mx-auto max-w-[1000px] px-8 pb-10 pt-12">
-      <h1 className="text-[32px] font-bold tracking-[-.02em]" style={{ fontFamily: "'Space Grotesk'", color: "var(--tx)" }}>
+      <h1 className={tituloPantalla} style={{ color: "var(--tx)" }}>
         Hola, {displayName} 👋
       </h1>
       <p className="mt-[7px] text-[15px]" style={{ color: "var(--tx-4)" }}>

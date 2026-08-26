@@ -3,6 +3,7 @@ import { useTheme } from "@context/ThemeContext"
 import HomeRoundedIcon from "@mui/icons-material/HomeRounded"
 import BrandLogo from "@components/BrandLogo"
 import Button from "@components/UI/Button"
+import { tituloPantalla } from "@utils/tokens"
 
 // Vista 404 para rutas inexistentes (catch-all `*` en App.jsx). Theme-aware vía
 // data-app-theme (los tokens var(--x) del design system viven en ese scope) + marca TireOps.
@@ -25,7 +26,7 @@ const NotFound = () => {
         >
           404
         </div>
-        <h1 className="text-[22px] font-bold" style={{ fontFamily: "'Space Grotesk'", color: "var(--tx)" }}>
+        <h1 className={tituloPantalla} style={{ color: "var(--tx)" }}>
           Página no encontrada
         </h1>
         <p className="max-w-[420px] text-[14.5px]" style={{ color: "var(--tx-4)" }}>
