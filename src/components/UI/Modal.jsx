@@ -1,7 +1,8 @@
 import { colors, text } from "@utils/tokens"
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded"
-import { useEffect } from "react"
+import { useId } from "react"
 import { useModalEscape } from "@hooks/useModalStack.js"
+import { useFocusTrap } from "@hooks/useFocusTrap"
 
 const Modal = ({ children, title, onClose, overflow = 'auto' , maxWidth = "md", maxHeight = "90dvh", padding = 'md' }) => {
   const maxWidthClasses = {
@@ -40,13 +41,16 @@ const Modal = ({ children, title, onClose, overflow = 'auto' , maxWidth = "md", 
   }
 
   useModalEscape(onClose)
+  // role/aria-modal y el foco van en la CARD, no en el backdrop: el backdrop es el que cierra
+  // al hacer clic, y marcarlo a el dejaba al lector de pantalla anunciando un dialogo mientras
+  // el foco seguia en el fondo, que aria-modal ya habia ocultado.
+  const cardRef = useFocusTrap()
+  const tituloId = useId()
 
   return (
     <div
       className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 p-4 flex items-center justify-center"
       onClick={onClose}
-      role="dialog"
-      aria-modal="true"
     >
       <div
         className={`
@@ -55,11 +59,16 @@ const Modal = ({ children, title, onClose, overflow = 'auto' , maxWidth = "md", 
           overflow-auto relative ${maxHeight ? `max-h-${maxHeight}` : "max-h-[90dvh]"} ${overflowClasses[overflow] || "overflow-auto"}
         `}
         style={{ maxHeight }}
+        ref={cardRef}
+        tabIndex={-1}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={title ? tituloId : undefined}
         onClick={(e) => e.stopPropagation()}
       >
         {title && (
           <div className="flex items-center justify-between mb-4">
-            <h2 className={`${text.heading} text-lg`}>{title}</h2>
+            <h2 id={tituloId} className={`${text.heading} text-lg`}>{title}</h2>
             <button
               onClick={onClose}
               aria-label="Cerrar modal"

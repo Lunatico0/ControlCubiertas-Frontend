@@ -1,6 +1,8 @@
 import { createPortal } from "react-dom"
 import { useTheme } from "@context/ThemeContext"
 import { useModalEscape } from "@hooks/useModalStack.js"
+import { useFocusTrap } from "@hooks/useFocusTrap"
+import { useId } from "react"
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded"
 import { OVERLAY, dialogCard } from "@components/dialog/overlayTokens"
 
@@ -23,6 +25,11 @@ import { OVERLAY, dialogCard } from "@components/dialog/overlayTokens"
 const Modal = ({ title, onClose, maxWidth = OVERLAY.maxWidth, onSubmit, portal = false, footer, bodyClassName = "p-[22px]", bodyStyle, children }) => {
   const { isDarkMode } = useTheme()
   useModalEscape(onClose)
+  // role/aria-modal y el foco van en la CARD, no en el backdrop: el backdrop es el que cierra al
+  // hacer clic, y marcarlo a el dejaba al lector de pantalla anunciando un dialogo mientras el
+  // foco seguia en el fondo, que aria-modal ya habia ocultado.
+  const cardRef = useFocusTrap()
+  const tituloId = useId()
 
   const Card = onSubmit ? "form" : "div"
   const cardProps = onSubmit ? { onSubmit, noValidate: true } : {}
@@ -33,18 +40,21 @@ const Modal = ({ title, onClose, maxWidth = OVERLAY.maxWidth, onSubmit, portal =
       data-app-theme={portal ? (isDarkMode ? "dark" : "light") : undefined}
       className="fixed inset-0 z-50 flex items-center justify-center p-6"
       style={{ background: OVERLAY.backdrop, fontFamily: OVERLAY.fontFamily }}
-      role="dialog"
-      aria-modal="true"
     >
       <Card
         {...cardProps}
+        ref={cardRef}
+        tabIndex={-1}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={title != null ? tituloId : undefined}
         onClick={(e) => e.stopPropagation()}
         className="w-full overflow-hidden"
         style={{ ...dialogCard, maxWidth, border: "1px solid var(--bd-strong)" }}
       >
         {title != null && (
           <div className="flex items-center px-[22px] py-[19px]" style={{ borderBottom: "1px solid var(--bd-soft)" }}>
-            <div className="font-semibold" style={{ fontFamily: OVERLAY.titleFont, fontSize: OVERLAY.titleSize, color: "var(--tx)" }}>{title}</div>
+            <div id={tituloId} className="font-semibold" style={{ fontFamily: OVERLAY.titleFont, fontSize: OVERLAY.titleSize, color: "var(--tx)" }}>{title}</div>
             <button type="button" onClick={onClose} aria-label="Cerrar" className="ml-auto inline-flex rounded-[7px] p-1" style={{ color: "var(--tx-5)" }}>
               <CloseRoundedIcon sx={{ fontSize: 18 }} />
             </button>
