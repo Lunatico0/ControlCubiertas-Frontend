@@ -36,24 +36,42 @@ const AppSidebar = ({ nav, belowNav, upd, user, help, onLogout }) => {
         <BrandLogo height={65} />
       </div>
 
-      {/* Navegación */}
+      {/* Navegación
+          Los ítems son <button> y no <div>: son controles reales, así que tienen que entrar en
+          el orden de tabulación y responder a Enter/Espacio. Antes eran divs clicables y el
+          cursor pointer era su única señal de que se podían tocar.
+          El hover cambia fondo y color: la transición ya estaba declarada, pero no había ningún
+          estado que animar, así que pasar el mouse por encima no producía absolutamente nada. */}
       <nav className="flex flex-col gap-1 px-3 pt-2">
         {nav.map((item) => (
-          <div
+          <button
             key={item.key}
+            type="button"
             data-tour={item.dataTour}
             onClick={item.onClick}
-            className="flex cursor-pointer items-center gap-[13px] rounded-[9px] px-[13px] py-[11px] text-[14px] transition-colors"
+            aria-current={item.active ? "page" : undefined}
+            className="flex w-full cursor-pointer items-center gap-[13px] rounded-[9px] px-[13px] py-[11px] text-left text-[14px] transition-colors"
             style={{
               fontWeight: item.active ? 600 : 500,
               color: item.active ? "var(--ink-lime)" : "var(--tx-4)",
               background: item.active ? "color-mix(in srgb, var(--ink-lime) 12%, transparent)" : "transparent",
               boxShadow: item.active ? "inset 3px 0 0 var(--ink-lime)" : "none",
+              border: "none",
+            }}
+            onMouseEnter={(e) => {
+              if (item.active) return // el activo ya tiene su tratamiento
+              e.currentTarget.style.background = "var(--hover)"
+              e.currentTarget.style.color = "var(--tx-2)"
+            }}
+            onMouseLeave={(e) => {
+              if (item.active) return
+              e.currentTarget.style.background = "transparent"
+              e.currentTarget.style.color = "var(--tx-4)"
             }}
           >
             <span className="inline-flex h-5 w-5 flex-none items-center justify-center">{item.icon}</span>
             <span>{item.label}</span>
-          </div>
+          </button>
         ))}
       </nav>
 
