@@ -13,7 +13,7 @@
 
 export const OVERLAY = {
   backdrop: "rgba(4,5,6,.62)",
-  shadow: "0 24px 64px rgba(0,0,0,.55)",
+  shadow: "var(--elev-3)",
   radius: 14,
   padding: 22, // padding horizontal del header, del cuerpo y del pie
   fontFamily: "'IBM Plex Sans',system-ui,sans-serif",

@@ -167,8 +167,8 @@ const Inicio = ({ onNavigate }) => {
             id="inicio-search-results"
             role="listbox"
             onMouseDown={(e) => e.preventDefault()} // que el clic no le robe el foco al input antes del onClick
-            className="absolute left-0 right-0 top-[70px] z-30 overflow-hidden rounded-[14px] py-1.5 shadow-lg"
-            style={{ background: "var(--card)", border: "1px solid var(--bd)" }}
+            className="absolute left-0 right-0 top-[70px] z-30 overflow-hidden rounded-[14px] py-1.5"
+            style={{ background: "var(--card)", border: "1px solid var(--bd)", boxShadow: "var(--elev-1)" }}
           >
             {resultados.length === 0 ? (
               <li className="px-5 py-3 text-[14px]" style={{ color: "var(--tx-5)" }}>

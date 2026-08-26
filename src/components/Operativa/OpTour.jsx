@@ -69,7 +69,7 @@ const OpTour = ({ steps, active, onNavigate, onClose }) => {
         <div style={{ position: "absolute", inset: 0, background: "rgba(4,5,6,.74)" }} />
       )}
 
-      <div style={{ position: "absolute", top: pos.tipTop, left: pos.tipLeft, width: TIP_W, background: "var(--card)", border: "1px solid var(--bd-strong)", borderRadius: 14, boxShadow: "0 20px 56px rgba(0,0,0,.6)", padding: "19px 20px 16px", transition: "all .18s ease" }}>
+      <div style={{ position: "absolute", top: pos.tipTop, left: pos.tipLeft, width: TIP_W, background: "var(--card)", border: "1px solid var(--bd-strong)", borderRadius: 14, boxShadow: "var(--elev-1)", padding: "19px 20px 16px", transition: "all .18s ease" }}>
         <div className="mb-[9px] flex items-center gap-2">
           <span className="rounded-full px-[9px] py-[2px] text-[10.5px] font-semibold" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--ink-lime)", background: "color-mix(in srgb, var(--ink-lime) 13%, transparent)" }}>{i + 1} / {steps.length}</span>
         </div>

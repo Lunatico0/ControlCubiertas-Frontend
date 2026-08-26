@@ -284,7 +284,7 @@ const CompanySettings = () => {
                   </button>
 
                   {editing === i && (
-                    <div className="absolute left-0 top-10 z-20 w-60 rounded-xl border border-(--bd) bg-(--card) p-3.5 shadow-2xl">
+                    <div className="absolute left-0 top-10 z-20 w-60 rounded-xl border border-(--bd) bg-(--card) p-3.5" style={{ boxShadow: "var(--elev-1)" }}>
                       <div className="mb-1.5 font-mono text-[10px] font-semibold tracking-wider text-(--tx-6)">NOMBRE</div>
                       <input
                         value={s.name}

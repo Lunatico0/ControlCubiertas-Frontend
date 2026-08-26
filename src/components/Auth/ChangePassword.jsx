@@ -46,7 +46,7 @@ const ChangePassword = () => {
           <BrandLogo height={38} />
         </div>
 
-        <div className="rounded-[14px] p-8" style={{ background: "var(--card)", border: "1px solid var(--bd)", boxShadow: "0 24px 64px rgba(0,0,0,.45)" }}>
+        <div className="rounded-[14px] p-8" style={{ background: "var(--card)", border: "1px solid var(--bd)", boxShadow: "var(--elev-2)" }}>
           <div className="mb-[15px] inline-flex items-center gap-[7px] rounded-[7px] px-2.5 py-1 text-[10.5px] font-semibold" style={{ fontFamily: "'IBM Plex Mono'", letterSpacing: ".05em", color: "var(--ink-lime)", background: "color-mix(in srgb, var(--ink-lime) 12%, transparent)" }}>
             <KeyIcon /> {mustChangePassword ? "PRIMER INGRESO" : "SEGURIDAD"}
           </div>

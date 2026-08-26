@@ -70,6 +70,18 @@
   --bg:#0A0C0D; --sidebar:#070809; --card:#121517; --elev:#0E1112; --input:#0C0E0F; --hover:#15191B; --toast:#1A1E20;
   --bd:#21262A; --bd-soft:#1C2124; --bd-faint:#181C1E; --bd-strong:#2A3033; --bd-2:#23282B; --bd-hover:#3A4145;
 
+  /* ELEVACION — tres niveles, uno por tipo de superficie flotante. Antes habia NUEVE sombras
+     distintas escritas a mano, todas con negro literal y ninguna theme-aware: dos overlays
+     apilados proyectaban densidades distintas. ART-DIRECTION: sombra SOLO en overlays reales
+     (modales, dropdowns) y sutil; las cards van con borde, sin sombra flotante.
+       --elev-1 flotantes chicos: tooltip, toast, menu, dropdown
+       --elev-2 paneles y cards principales
+       --elev-3 overlays modales (dialogos y modales centrados)
+     En claro son mas suaves: sobre un fondo claro la misma densidad se lee como suciedad. */
+  --elev-1:0 8px 24px rgba(0,0,0,.45);
+  --elev-2:0 16px 40px rgba(0,0,0,.5);
+  --elev-3:0 24px 64px rgba(0,0,0,.55);
+
 /* ─── Foco visible y chrome nativo ──────────────────────────────────────────────────────────
    La app no tenia NINGUNA regla de :focus-visible: todo control caia en el outline por defecto
    del navegador, de 1px y con un color que no se adapta al tema. En oscuro Chrome lo pinta
@@ -115,6 +127,9 @@
 [data-app-theme="light"] {
   --bg:#ECEFE8; --sidebar:#FFFFFF; --card:#FFFFFF; --elev:#F5F7F1; --input:#F0F2EB; --hover:#ECEFE5; --toast:#FFFFFF;
   --bd:#E3E7DC; --bd-soft:#ECEFE6; --bd-faint:#EAEDE4; --bd-strong:#D7DBCE; --bd-2:#E3E7DC; --bd-hover:#C2C8B6;
+  --elev-1:0 8px 24px rgba(21,23,15,.09);
+  --elev-2:0 16px 40px rgba(21,23,15,.12);
+  --elev-3:0 24px 64px rgba(21,23,15,.16);
   --tx:#15170F; --tx-2:#3C4234; --tx-3:#5C6353; --tx-4:#676D5E; --tx-5:#767C6A; --tx-6:#848A76; --tx-7:#A7AE9A;
   --ink-lime:#4C7A07; --ink-teal:#0A8A6F; --ink-orange:#C25A0E; --ink-blue:#2350D8; --ink-purple:#7B3FD6; --ink-red:#CF2417;
   /* Paleta de estado en tema CLARO. lime/teal/orange se alinearon con sus --ink-* equivalentes

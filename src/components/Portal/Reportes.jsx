@@ -46,7 +46,7 @@ const fmtKmShort = (n) => (n >= 1000 ? `${Math.round(n / 1000)}k` : `${Math.roun
 // Estilos de chart compartidos (temeados a los tokens).
 const AXIS = { tick: { fill: "var(--tx-6)", fontSize: 11, fontFamily: "'IBM Plex Mono'" }, tickLine: false, axisLine: { stroke: "var(--bd)" } }
 const TOOLTIP = {
-  contentStyle: { background: "var(--card)", border: "1px solid var(--bd-strong)", borderRadius: 10, fontSize: 12.5, fontFamily: "'IBM Plex Sans'", boxShadow: "0 8px 24px rgba(0,0,0,.35)" },
+  contentStyle: { background: "var(--card)", border: "1px solid var(--bd-strong)", borderRadius: 10, fontSize: 12.5, fontFamily: "'IBM Plex Sans'", boxShadow: "var(--elev-1)" },
   itemStyle: { color: "var(--tx-2)" }, labelStyle: { color: "var(--tx-4)", marginBottom: 2, fontWeight: 600 },
   cursor: { fill: "color-mix(in srgb, var(--tx-7) 12%, transparent)" },
 }

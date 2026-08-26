@@ -251,7 +251,7 @@ const EditorComprobante = () => {
             <div className="mb-3.5 flex items-center gap-2 text-[11px]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-5)" }}>
               <span className="h-[7px] w-[7px] rounded-full" style={{ background: "var(--ink-lime)" }} />VISTA PREVIA · HOJA A4 · {d.duplicado ? "Original + Duplicado" : "Solo original"}
             </div>
-            <div style={{ background: "#FFFFFF", borderRadius: 3, boxShadow: "0 12px 40px rgba(0,0,0,.45)", overflow: "hidden" }} dangerouslySetInnerHTML={{ __html: previewHtml }} />
+            <div style={{ background: "#FFFFFF", borderRadius: 3, boxShadow: "var(--elev-3)", overflow: "hidden" }} dangerouslySetInnerHTML={{ __html: previewHtml }} />
           </div>
         </div>
       </div>

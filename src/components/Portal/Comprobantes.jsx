@@ -206,7 +206,7 @@ const Comprobantes = () => {
       {/* Modal Ver: preview del comprobante (mismo generador que la impresión) */}
       {preview && (
         <div className="fixed inset-0 z-70 flex items-center justify-center p-4" style={{ background: "rgba(0,0,0,.55)", backdropFilter: "blur(2px)" }} onClick={() => setPreview(null)}>
-          <div className="max-h-[90dvh] overflow-auto rounded-lg" style={{ maxWidth: 560, background: "#fff", boxShadow: "0 20px 60px rgba(0,0,0,.5)" }} onClick={(e) => e.stopPropagation()} dangerouslySetInnerHTML={{ __html: preview }} />
+          <div className="max-h-[90dvh] overflow-auto rounded-lg" style={{ maxWidth: 560, background: "#fff", boxShadow: "var(--elev-3)" }} onClick={(e) => e.stopPropagation()} dangerouslySetInnerHTML={{ __html: preview }} />
         </div>
       )}
     </div>

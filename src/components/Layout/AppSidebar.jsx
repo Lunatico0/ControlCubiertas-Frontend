@@ -131,7 +131,7 @@ const AppSidebar = ({ nav, belowNav, upd, user, help, onLogout }) => {
         {helpMenu && (
           <>
             <div className="fixed inset-0 z-35" onClick={() => setHelpMenu(false)} />
-            <div className="absolute z-40 overflow-hidden rounded-xl" style={{ bottom: 58, right: 12, left: 12, background: "var(--card)", border: "1px solid var(--bd-strong)", boxShadow: "0 18px 44px rgba(0,0,0,.5)" }}>
+            <div className="absolute z-40 overflow-hidden rounded-xl" style={{ bottom: 58, right: 12, left: 12, background: "var(--card)", border: "1px solid var(--bd-strong)", boxShadow: "var(--elev-1)" }}>
               <div className="px-3.5 py-[11px] text-[10px] tracking-[.08em]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-6)", borderBottom: "1px solid var(--bd-soft)" }}>AYUDA</div>
               <button onClick={() => { setHelpMenu(false); help.onStartTour() }} className="flex w-full items-center gap-[11px] px-3.5 py-3 text-left">
                 <span className="flex h-[30px] w-[30px] flex-none items-center justify-center rounded-lg" style={{ background: "color-mix(in srgb, var(--ink-lime) 13%, transparent)", color: "var(--ink-lime)" }}><PlayArrowRoundedIcon sx={{ fontSize: 16 }} /></span>
