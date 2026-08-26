@@ -130,6 +130,26 @@ export const buildCorrectionPrintData = (tire, updated, formData, receiptNumber)
   }, receiptNumber)
 }
 
+// Corrección de los DATOS de la cubierta (serie, marca, rodado, dibujo, código), distinta de
+// la corrección de una entrada del historial: acá no hay km ni vehículo que mostrar.
+export const buildEditTirePrintData = (tire, updated, formData, receiptNumber) => {
+  const fields = formData.form || {}
+  return withReceipt({
+    tire: buildBaseTire(updated?.tire || tire),
+    correction: {
+      date: new Date().toLocaleDateString("es-AR"),
+      reason: fields.reason,
+      orderNumber: fields.orderNumber,
+      kmAlta: "-",
+      kmBaja: "-",
+      status: (updated?.tire || tire).status,
+      vehicle: (updated?.tire || tire).vehicle || defaultVehicle,
+      editedFields: labelEditedFields(updated?.editedFields),
+    },
+    actionType: "Corrección de datos",
+  }, receiptNumber)
+}
+
 export const buildUndoPrintData = (tire, updated, formData, receiptNumber) =>
   withReceipt({
     tire: {

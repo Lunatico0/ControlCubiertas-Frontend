@@ -11,7 +11,7 @@ import EditOutlinedIcon from "@mui/icons-material/EditOutlined"
 import UndoRoundedIcon from "@mui/icons-material/UndoRounded"
 import CheckRoundedIcon from "@mui/icons-material/CheckRounded"
 import LocalPrintshopOutlinedIcon from "@mui/icons-material/LocalPrintshopOutlined"
-import { buildAssignPrintData, buildUnassignPrintData, buildFinishRecapPrintData, buildDiscardPrintData, buildUndoPrintData, buildCorrectionPrintData } from "@utils/print-data"
+import { buildAssignPrintData, buildUnassignPrintData, buildFinishRecapPrintData, buildDiscardPrintData, buildUndoPrintData, buildCorrectionPrintData, buildEditTirePrintData } from "@utils/print-data"
 import { metaOf, tint, fmtKm, fmtDate, StateBadge, useStatusCatalog } from "./status"
 import { OpActionBtn } from "./opActions"
 import Field from "@components/common/Field"
@@ -125,12 +125,15 @@ const TireDrawer = ({ tireId, initialAction, initialAssign, onAssigned, onClose 
   const discardAct = useTireAction({ apiCall: tires.updateStatus, successMessage: "Cubierta descartada", printBuilder: buildDiscardPrintData })
   // Enviar a recapar: mismo endpoint de cambio de estado, destino = el estado de rol recap.
   const sendRecapAct = useTireAction({ apiCall: tires.updateStatus, successMessage: "Cubierta enviada a recapar", printBuilder: buildFinishRecapPrintData })
+  // Editar los datos de la cubierta reusa el endpoint de corrección de alta, que ya registra
+  // los campos editados en el historial: la trazabilidad sale gratis.
+  const editAct = useTireAction({ apiCall: tires.correct, successMessage: "Datos corregidos", printBuilder: buildEditTirePrintData })
   // undo: firma (id, historyId, data) → el entry va por closure (actionEntry). editHist: firma
   // (id, data, entry) → calza con el branch `entry` de useTireAction.
   const undoAct = useTireAction({ apiCall: (tireId, formData) => tires.undoHistory(tireId, actionEntry?._id, formData), successMessage: "Entrada deshecha", printBuilder: buildUndoPrintData })
   const editHistAct = useTireAction({ apiCall: tires.updateHistory, successMessage: "Historial corregido", printBuilder: buildCorrectionPrintData })
   const reprintAct = useReprint()
-  const submitting = assignAct.isSubmitting || unassignAct.isSubmitting || recapAct.isSubmitting || sendRecapAct.isSubmitting || discardAct.isSubmitting || undoAct.isSubmitting || editHistAct.isSubmitting
+  const submitting = assignAct.isSubmitting || unassignAct.isSubmitting || recapAct.isSubmitting || sendRecapAct.isSubmitting || editAct.isSubmitting || discardAct.isSubmitting || undoAct.isSubmitting || editHistAct.isSubmitting
 
   const load = (id) =>
     fetchTireById(id)
@@ -168,7 +171,13 @@ const TireDrawer = ({ tireId, initialAction, initialAssign, onAssigned, onClose 
 
   // Al abrir "recapado listo" el estado viene preseleccionado en el nivel que SIGUE: sin default,
   // el operario elegía el primero de la lista y repetía un recapado ya hecho.
-  const openAction = (a) => { setForm(a === "recap" && siguienteRecap ? { status: siguienteRecap } : {}); setActionEntry(null); setErrors({}); setAction(a) }
+  const openAction = (a) => {
+    const inicial =
+      a === "recap" && siguienteRecap ? { status: siguienteRecap }
+        : a === "edit" ? { serialNumber: tire?.serialNumber || "", code: tire?.code ?? "", brand: tire?.brand || "", size: tire?.size || "", pattern: tire?.pattern || "", reason: "", orderNumber: "" }
+          : {}
+    setForm(inicial); setActionEntry(null); setErrors({}); setAction(a)
+  }
   const closeAction = useCallback(() => { setAction(null); setActionEntry(null); setErrors({}) }, [])
   // Cierre action-aware (Escape / backdrop / botón X): si hay un formulario de acción abierto
   // vuelve al detalle (closeAction); si no, cierra el drawer entero. Antes solo el Escape era
@@ -248,6 +257,33 @@ const TireDrawer = ({ tireId, initialAction, initialAssign, onAssigned, onClose 
       close: closeAction,
     })
   }
+  const doEdit = () => {
+    const e = {}
+    if (!form.reason) e.reason = true
+    if (!form.orderNumber) e.orderNumber = true
+    // El backend rechaza la corrección si no cambió nada; avisarlo acá es más claro.
+    const sinCambios = ["serialNumber", "brand", "size", "pattern"].every((k) => (form[k] ?? "") === (tire[k] ?? "")) && Number(form.code) === Number(tire.code)
+    if (Object.keys(e).length) { setErrors(e); showToast("warning", "Completá los campos obligatorios"); return }
+    if (sinCambios) { showToast("warning", "No cambiaste ningún dato"); return }
+    setErrors({})
+    editAct.execute({
+      tire,
+      formData: {
+        form: {
+          serialNumber: form.serialNumber,
+          code: Number(form.code),
+          brand: form.brand,
+          size: form.size,
+          pattern: form.pattern,
+          reason: form.reason,
+          orderNumber: form.orderNumber,
+        },
+        getReceiptNumber: orders.getNextReceipt,
+      },
+      refresh: reload,
+      close: closeAction,
+    })
+  }
   const doDiscard = () => {
     if (!form.orderNumber) { setErrors({ orderNumber: true }); showToast("warning", "Completá los campos obligatorios"); return }
     setErrors({})
@@ -299,7 +335,7 @@ const TireDrawer = ({ tireId, initialAction, initialAssign, onAssigned, onClose 
       close: closeAction,
     })
   }
-  const actionHandlers = { assign: doAssign, unassign: doUnassign, recap: doRecap, sendRecap: doSendRecap, discard: doDiscard, undo: doUndo, editHist: doEditHist }
+  const actionHandlers = { assign: doAssign, unassign: doUnassign, recap: doRecap, sendRecap: doSendRecap, edit: doEdit, discard: doDiscard, undo: doUndo, editHist: doEditHist }
 
   const history = [...(tire?.history || [])].sort((a, b) => new Date(b.date) - new Date(a.date))
   const lastReceiptEntry = history.find((h) => h.receiptNumber) // para "Imprimir recibo" (último comprobante)
@@ -354,7 +390,7 @@ const TireDrawer = ({ tireId, initialAction, initialAssign, onAssigned, onClose 
     if (!elegido || yaAlcanzado) setForm((f) => ({ ...f, status: siguienteRecap }))
   }, [action, siguienteRecap, form.status, nivelActual])
 
-  const ACTION_TITLES = { assign: "Asignar a vehículo", unassign: "Desasignar cubierta", recap: "Registrar recapado", sendRecap: "Enviar a recapar", discard: "Descartar cubierta", undo: "Deshacer entrada", editHist: "Corregir entrada de historial" }
+  const ACTION_TITLES = { assign: "Asignar a vehículo", unassign: "Desasignar cubierta", recap: "Registrar recapado", sendRecap: "Enviar a recapar", edit: "Editar datos de la cubierta", discard: "Descartar cubierta", undo: "Deshacer entrada", editHist: "Corregir entrada de historial" }
 
   return (
     <Drawer onClose={handleClose}>
@@ -463,6 +499,17 @@ const TireDrawer = ({ tireId, initialAction, initialAssign, onAssigned, onClose 
                   </>
                 )}
 
+                {action === "edit" && (
+                  <>
+                    <FloatingField label="N° de serie" required error={errors.serialNumber} value={form.serialNumber || ""} onChange={set("serialNumber")} />
+                    <FloatingField label="Código interno" type="number" required error={errors.code} value={form.code ?? ""} onChange={set("code")} />
+                    <FloatingField label="Marca" required error={errors.brand} value={form.brand || ""} onChange={set("brand")} />
+                    <FloatingField label="Rodado" required error={errors.size} value={form.size || ""} onChange={set("size")} />
+                    <FloatingField label="Dibujo" required error={errors.pattern} value={form.pattern || ""} onChange={set("pattern")} />
+                    <FloatingField label="Motivo de la corrección" required error={errors.reason} value={form.reason || ""} onChange={set("reason")} />
+                  </>
+                )}
+
                 {action === "sendRecap" && (
                   <div className="rounded-[9px] px-3 py-2.5 text-[12.5px]" style={{ background: tint("var(--ink-orange)", 8), border: "1px solid " + tint("var(--ink-orange)", 35), color: "var(--ink-orange)" }}>
                     Vas a marcar esta cubierta (#{formatTireCode(tire.code, data?.tireCodePrefix)}) como gastada: pasa a «{recapStatus}» y queda a la espera del recapado. Mientras tanto no se puede montar en un vehículo.
@@ -518,7 +565,7 @@ const TireDrawer = ({ tireId, initialAction, initialAssign, onAssigned, onClose 
                     className="flex-1 rounded-[9px] py-2.5 text-[13px] font-bold"
                     style={{ background: action === "discard" ? "var(--ink-red)" : "var(--ink-lime)", color: action === "discard" ? "#fff" : "#0A0C0D", opacity: submitting ? 0.6 : 1 }}
                   >
-                    {submitting ? "Guardando…" : action === "discard" ? "Descartar" : action === "sendRecap" ? "Enviar a recapar" : action === "undo" ? "Deshacer" : action === "editHist" ? "Guardar" : "Confirmar"}
+                    {submitting ? "Guardando…" : action === "discard" ? "Descartar" : action === "sendRecap" ? "Enviar a recapar" : action === "edit" ? "Guardar cambios" : action === "undo" ? "Deshacer" : action === "editHist" ? "Guardar" : "Confirmar"}
                   </button>
                 </div>
               </div>
@@ -563,6 +610,7 @@ const TireDrawer = ({ tireId, initialAction, initialAssign, onAssigned, onClose 
                   {tire.vehicle && <OpActionBtn type="unassign" size={44} onClick={() => openAction("unassign")} />}
                   {metaOf(tire.status).role === "recap" && <OpActionBtn type="recap" size={44} onClick={() => openAction("recap")} />}
                   {!tire.vehicle && recapStatus && ["initial", "stock"].includes(metaOf(tire.status).role) && <OpActionBtn type="sendRecap" size={44} onClick={() => openAction("sendRecap")} />}
+                  {metaOf(tire.status).role !== "discard" && <OpActionBtn type="edit" size={44} onClick={() => openAction("edit")} />}
                   {lastReceiptEntry && <OpActionBtn type="print" size={44} onClick={() => reprintAct.execute({ entry: lastReceiptEntry, tire })} disabled={reprintAct.isPrinting} />}
                   {!tire.vehicle && metaOf(tire.status).role !== "discard" && <OpActionBtn type="discard" size={44} onClick={() => openAction("discard")} />}
                 </div>

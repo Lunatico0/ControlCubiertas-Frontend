@@ -5,6 +5,7 @@ import BuildOutlinedIcon from "@mui/icons-material/BuildOutlined"
 import DeleteOutlineRoundedIcon from "@mui/icons-material/DeleteOutlineRounded"
 import LocalPrintshopOutlinedIcon from "@mui/icons-material/LocalPrintshopOutlined"
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined"
+import EditOutlinedIcon from "@mui/icons-material/EditOutlined"
 import { tint } from "./status"
 
 // Action buttons de la operativa, con el estilo de Claude Design (App Operativa.dc.html):
@@ -29,6 +30,10 @@ const ACTIONS = {
   recap: { label: "Recapado listo", Icon: CheckRoundedIcon, tone: "teal" },
   discard: { label: "Descartar", Icon: DeleteOutlineRoundedIcon, tone: "red" },
   print: { label: "Imprimir recibo", Icon: LocalPrintshopOutlinedIcon, tone: "neutral" },
+  // Los VEHÍCULOS ya tenían "Editar datos"; las cubiertas no, así que un error de tipeo en el
+  // alta (la serie, sobre todo) quedaba para siempre o había que descartarla y darla de alta de
+  // nuevo, rompiendo el historial.
+  edit: { label: "Editar datos", Icon: EditOutlinedIcon, tone: "neutral" },
   view: { label: "Ver detalle", Icon: VisibilityOutlinedIcon, tone: "muted" },
 }
 
