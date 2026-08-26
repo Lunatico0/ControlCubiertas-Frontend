@@ -1,3 +1,5 @@
+import { useSyncExternalStore } from "react"
+
 // Helpers compartidos de la operativa: catálogo de estados (color + nivel + rol),
 // badge, pips y formateadores. Los estados son CONFIGURABLES por tenant: el catálogo se
 // arma desde tenant.stockStatuses ([{name,role}]) y lo setea ApiProvider al cargar, vía
@@ -30,9 +32,34 @@ export const buildStatusMeta = (statuses = []) => {
   return meta
 }
 
-// Catálogo activo del tenant (seteado por ApiProvider al cargar la empresa).
+// Catálogo activo del tenant (lo setea ApiProvider al cargar la empresa).
+//
+// Vive fuera de React a propósito: metaOf() se usa en montones de lugares y pasarlo por props
+// sería prop-drilling por toda la operativa. Pero la carga es ASYNC y compite con la de
+// cubiertas: si las cubiertas ganan la carrera, el primer render sale con el FALLBACK. Antes
+// eso quedaba así hasta que cualquier otro cambio forzara un render, y se veía como badges
+// todos grises, el contador de "a recapar" en cero y el stepper del drawer vacío.
+//
+// Por eso el módulo es un STORE SUSCRIBIBLE: quien lo consuma en render llama a
+// useStatusCatalog() y React lo vuelve a pintar solo cuando el catálogo llega o cambia.
 let _catalog = {}
-export const setStatusCatalog = (catalog) => { _catalog = catalog || {} }
+const suscriptores = new Set()
+
+export const setStatusCatalog = (catalog) => {
+  _catalog = catalog || {}
+  suscriptores.forEach((fn) => fn())
+}
+
+const suscribir = (fn) => {
+  suscriptores.add(fn)
+  return () => suscriptores.delete(fn)
+}
+
+const leerCatalogo = () => _catalog
+
+// Suscribe el componente a los cambios del catálogo. Devuelve el catálogo, pero lo que
+// importa es el efecto: sin esto, un componente que use metaOf() no se entera de que llegó.
+export const useStatusCatalog = () => useSyncExternalStore(suscribir, leerCatalogo, leerCatalogo)
 
 export const metaOf = (status) => _catalog[status] || FALLBACK
 export const tint = (color, pct) => `color-mix(in srgb, ${color} ${pct}%, transparent)`
@@ -40,6 +67,7 @@ export const fmtKm = (n) => `${(n ?? 0).toLocaleString("es-AR")} km`
 export const fmtDate = (d) => (d ? new Date(d).toLocaleDateString("es-AR") : "—")
 
 export const StateBadge = ({ status, small, truncate }) => {
+  useStatusCatalog() // repinta cuando llega/cambia el catálogo del tenant
   const m = metaOf(status)
   return (
     <span
@@ -65,6 +93,7 @@ export const recapScale = () =>
 // Pips de recapado: un chip por recapado posible; prendidos = nivel de recapado de la
 // cubierta (level), cada chip con el color de SU recapado. Apagados = gris.
 export const Pips = ({ level = 0 }) => {
+  useStatusCatalog() // idem: la escalera de recapados sale del catálogo
   const colors = recapScale()
   if (!colors.length) return null
   return (

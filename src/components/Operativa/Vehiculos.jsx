@@ -6,7 +6,7 @@ import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded"
 import LocalShippingOutlinedIcon from "@mui/icons-material/LocalShippingOutlined"
 import TripOriginRoundedIcon from "@mui/icons-material/TripOriginRounded"
 import ReportProblemRoundedIcon from "@mui/icons-material/ReportProblemRounded"
-import { metaOf, tint, fmtKm } from "./status"
+import { metaOf, tint, fmtKm, useStatusCatalog } from "./status"
 import { formatPlate } from "@utils/plateFormat"
 import { formatTireCode } from "@utils/tireCode"
 import { generatePositions } from "./axles"
@@ -25,6 +25,7 @@ const TABLE_COLS = "1.4fr 1fr 1fr 1.4fr 0.7fr"
 const VehTypeIcon = ({ size = 22 }) => <LocalShippingOutlinedIcon sx={{ fontSize: size }} />
 
 const Vehiculos = ({ onNavigate, intent }) => {
+  useStatusCatalog() // el color de las cubiertas montadas sale del catálogo del tenant
   const { data, ui } = useContext(ApiContext)
   const vehicles = data?.vehicles || []
   const tires = data?.tires || []

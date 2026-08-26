@@ -10,7 +10,7 @@ import Inventory2OutlinedIcon from "@mui/icons-material/Inventory2Outlined"
 import WarningAmberRoundedIcon from "@mui/icons-material/WarningAmberRounded"
 import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded"
 import CheckRoundedIcon from "@mui/icons-material/CheckRounded"
-import { tint, metaOf } from "./status"
+import { tint, metaOf, useStatusCatalog } from "./status"
 import { formatTireCode } from "@utils/tireCode"
 
 // Fecha + hora en es-AR, con la primera letra en mayúscula (ej. "Viernes 18 de julio, 14:30").
@@ -41,6 +41,7 @@ const Inicio = ({ onNavigate }) => {
   const searchRef = useHotkeyFocus()
 
   const displayName = user?.name || user?.email?.split("@")[0] || "Operario"
+  const catalogo = useStatusCatalog() // los conteos por rol dependen del catálogo del tenant
   const counts = {
     stock: tires.filter((t) => !t.vehicle).length,
     circ: tires.filter((t) => t.vehicle).length,
@@ -65,7 +66,7 @@ const Inicio = ({ onNavigate }) => {
         onClick: () => onNavigate("vehiculos", { openVehicle: v._id }),
       })),
     ].slice(0, 6)
-  }, [tires, vehicles, onNavigate])
+  }, [tires, vehicles, onNavigate, catalogo])
 
   const pending = counts.recapar + vehicles.filter((v) => !new Set(tires.filter((t) => t.vehicle).map((t) => t.vehicle?._id || t.vehicle)).has(v._id)).length
   const resumen = pending > 0 ? `${pending} ${pending === 1 ? "pendiente" : "pendientes"} para hoy` : "Todo en orden"

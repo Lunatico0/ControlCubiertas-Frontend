@@ -12,7 +12,7 @@ import UndoRoundedIcon from "@mui/icons-material/UndoRounded"
 import CheckRoundedIcon from "@mui/icons-material/CheckRounded"
 import LocalPrintshopOutlinedIcon from "@mui/icons-material/LocalPrintshopOutlined"
 import { buildAssignPrintData, buildUnassignPrintData, buildFinishRecapPrintData, buildDiscardPrintData, buildUndoPrintData, buildCorrectionPrintData } from "@utils/print-data"
-import { metaOf, tint, fmtKm, fmtDate, StateBadge } from "./status"
+import { metaOf, tint, fmtKm, fmtDate, StateBadge, useStatusCatalog } from "./status"
 import { OpActionBtn } from "./opActions"
 import Field from "@components/common/Field"
 import Drawer from "@components/UI/Drawer"
@@ -93,6 +93,7 @@ const histBits = (h) => {
 }
 
 const TireDrawer = ({ tireId, initialAction, initialAssign, onAssigned, onClose }) => {
+  useStatusCatalog() // el stepper del ciclo de vida y los guards por rol dependen del catálogo
   const { tires, orders, data } = useContext(ApiContext)
   const vehicles = data?.vehicles || []
   const { statuses = [], stockScale = [], discardStatus } = data || {}

@@ -7,7 +7,7 @@ import ArrowUpwardRoundedIcon from "@mui/icons-material/ArrowUpwardRounded"
 import TuneRoundedIcon from "@mui/icons-material/TuneRounded"
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded"
 import { formatTireCode } from "@utils/tireCode"
-import { metaOf, tint, fmtKm, fmtDate, StateBadge, Pips } from "./status"
+import { metaOf, tint, fmtKm, fmtDate, StateBadge, Pips, useStatusCatalog } from "./status"
 import { OpActionBtn } from "./opActions"
 import TireDrawer from "./TireDrawer"
 import AltaDrawer from "./AltaDrawer"
@@ -78,6 +78,10 @@ const Cubiertas = ({ intent, onNavigate }) => {
     if (intent.assignTo) setAssignTo(intent.assignTo)
   }, [intent])
 
+  // El catálogo de estados llega async y puede pintar DESPUÉS de las cubiertas; va en las deps
+  // porque los conteos por rol (ej. "A recapar") se derivan de él con metaOf.
+  const catalogo = useStatusCatalog()
+
   const counts = useMemo(
     () => ({
       todas: tires.length,
@@ -86,7 +90,7 @@ const Cubiertas = ({ intent, onNavigate }) => {
       circulacion: tires.filter((t) => t.vehicle).length,
       recapar: tires.filter((t) => metaOf(t.status).role === "recap").length,
     }),
-    [tires],
+    [tires, catalogo],
   )
 
   const filtered = useMemo(() => {
