@@ -2,7 +2,7 @@ import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { showToast } from "@utils/toast"
 import Modal from "@components/common/Modal"
-import Button from "@components/UI/Button"
+import { neutralBtn, primaryBtn } from "@components/dialog/overlayTokens"
 import Callout from "@components/common/Callout"
 import FloatingField from "@components/UI/FloatingField"
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined"
@@ -46,14 +46,16 @@ const UserForm = ({ user, onClose, onCreated, onSaved }) => {
 
   const labelCls = "mb-[7px] block text-[12px] font-semibold"
 
+  // El pie usa los MISMOS botones que los diálogos de DialogHost (overlayTokens): antes Cancelar
+  // media 43px con radio 9 y el primario 40px con radio 10, pegados uno al lado del otro.
   const footer = (
     <div className="flex justify-end gap-2.5 px-[22px] py-4" style={{ borderTop: "1px solid var(--bd-soft)" }}>
-      <button type="button" onClick={onClose} className="rounded-[9px] px-4 py-2.5 text-[14px] font-semibold" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--tx)" }}>
+      <button type="button" onClick={onClose} style={neutralBtn}>
         Cancelar
       </button>
-      <Button type="submit" variant="lime" disabled={isSubmitting}>
+      <button type="submit" disabled={isSubmitting} style={{ ...primaryBtn, opacity: isSubmitting ? 0.6 : 1, cursor: isSubmitting ? "not-allowed" : "pointer" }}>
         {isSubmitting ? (isEdit ? "Guardando…" : "Creando…") : isEdit ? "Guardar cambios" : "Crear usuario"}
-      </Button>
+      </button>
     </div>
   )
 
@@ -61,7 +63,6 @@ const UserForm = ({ user, onClose, onCreated, onSaved }) => {
     <Modal
       title={isEdit ? "Editar usuario" : "Nuevo usuario"}
       onClose={onClose}
-      maxWidth={448}
       portal
       onSubmit={handleSubmit(onSubmit)}
       footer={footer}

@@ -3,6 +3,7 @@ import { useTheme } from "@context/ThemeContext"
 import { useModalEscape } from "@hooks/useModalStack.js"
 import { _registerDialog, _registerToast } from "@utils/dialog"
 import DlgIcon from "./DialogIcons"
+import { OVERLAY, dialogCard, neutralBtn, primaryBtn } from "./overlayTokens"
 
 // Cierre por Escape stack-aware. DialogHost se monta UNA vez y vive siempre; por eso no puede
 // llamar useModalEscape a nivel raíz (quedaría fijo abajo del stack y no cerraría los diálogos
@@ -35,9 +36,9 @@ const ANIM = {
   fade: "dlgFadeIn .18s ease",
 }
 
-const neutralBtn = { height: 44, padding: "0 16px", border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--tx)", borderRadius: 9, fontSize: 14, fontWeight: 600, fontFamily: "'IBM Plex Sans'", cursor: "pointer" }
-const primaryBtn = { height: 44, padding: "0 20px", border: "none", background: "#C4ED2B", color: "#0A0C0D", borderRadius: 9, fontSize: 14, fontWeight: 700, fontFamily: "'IBM Plex Sans'", cursor: "pointer" }
-const cardBase = { width: "100%", background: "var(--card)", borderRadius: 14, boxShadow: "0 24px 64px rgba(0,0,0,.55)", outline: "none" }
+// Los botones y la card salen de overlayTokens: los comparte con common/Modal, que es el otro
+// sistema de overlay que el usuario ve en el mismo flujo.
+const cardBase = dialogCard
 
 const DialogHost = () => {
   const { isDarkMode } = useTheme()
@@ -107,18 +108,18 @@ const DialogHost = () => {
   const dlgProps = { ref: dlgRef, tabIndex: -1, onClick: stop, onKeyDown: onTrap, style: null }
 
   return (
-    <div data-app-theme={isDarkMode ? "dark" : "light"} style={{ fontFamily: "'IBM Plex Sans',system-ui,sans-serif" }}>
+    <div data-app-theme={isDarkMode ? "dark" : "light"} style={{ fontFamily: OVERLAY.fontFamily }}>
       {active && <DialogEscape onEscape={closeOnEscape} />}
       {active && (
-        <div onClick={onBackdrop} style={{ position: "fixed", inset: 0, background: "rgba(4,5,6,.62)", backdropFilter, zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center", padding: 24, animation: "dlgBackdropIn .16s ease" }}>
+        <div onClick={onBackdrop} style={{ position: "fixed", inset: 0, background: OVERLAY.backdrop, backdropFilter, zIndex: OVERLAY.zIndex, display: "flex", alignItems: "center", justifyContent: "center", padding: 24, animation: "dlgBackdropIn .16s ease" }}>
 
           {/* Confirmación simple */}
           {active.type === "confirm" && (
-            <div {...dlgProps} role="dialog" aria-modal="true" style={{ ...cardBase, maxWidth: 420, border: "1px solid var(--bd-strong)", animation: anim }}>
+            <div {...dlgProps} role="dialog" aria-modal="true" style={{ ...cardBase, maxWidth: OVERLAY.maxWidth, border: "1px solid var(--bd-strong)", animation: anim }}>
               <div style={{ padding: "22px 22px 0 22px", display: "flex", gap: 14 }}>
                 <span style={{ width: 42, height: 42, borderRadius: 11, background: "rgba(110,151,245,.14)", color: "var(--ink-blue)", display: "flex", alignItems: "center", justifyContent: "center", flex: "none" }}><DlgIcon kind="ask" size={21} /></span>
                 <div style={{ minWidth: 0, paddingTop: 2 }}>
-                  <div style={{ fontFamily: "'Space Grotesk'", fontSize: 17, fontWeight: 600, color: "var(--tx)" }}>{o.title || "¿Confirmar la acción?"}</div>
+                  <div style={{ fontFamily: OVERLAY.titleFont, fontSize: OVERLAY.titleSize, fontWeight: 600, color: "var(--tx)" }}>{o.title || "¿Confirmar la acción?"}</div>
                   {o.text && <div style={{ fontSize: 13, color: "var(--tx-4)", marginTop: 6, lineHeight: 1.55 }}>{o.text}</div>}
                 </div>
               </div>
@@ -131,11 +132,11 @@ const DialogHost = () => {
 
           {/* Confirmación destructiva */}
           {active.type === "danger" && (
-            <div {...dlgProps} role="dialog" aria-modal="true" style={{ ...cardBase, maxWidth: 440, border: "1px solid rgba(240,86,74,.38)", boxShadow: "0 24px 64px rgba(0,0,0,.55),0 0 0 4px rgba(240,86,74,.07)", animation: anim }}>
+            <div {...dlgProps} role="dialog" aria-modal="true" style={{ ...cardBase, maxWidth: OVERLAY.maxWidth, border: "1px solid rgba(240,86,74,.38)", boxShadow: OVERLAY.shadow + ",0 0 0 4px rgba(240,86,74,.07)", animation: anim }}>
               <div style={{ padding: "22px 22px 0 22px", display: "flex", gap: 14 }}>
                 <span style={{ width: 42, height: 42, borderRadius: 11, background: "rgba(240,90,75,.14)", color: "var(--ink-red)", display: "flex", alignItems: "center", justifyContent: "center", flex: "none" }}><DlgIcon kind="trash" size={20} /></span>
                 <div style={{ minWidth: 0, paddingTop: 2 }}>
-                  <div style={{ fontFamily: "'Space Grotesk'", fontSize: 17, fontWeight: 600, color: "var(--tx)" }}>{o.title || "¿Confirmar la baja?"}</div>
+                  <div style={{ fontFamily: OVERLAY.titleFont, fontSize: OVERLAY.titleSize, fontWeight: 600, color: "var(--tx)" }}>{o.title || "¿Confirmar la baja?"}</div>
                   {o.text && <div style={{ fontSize: 13, color: "var(--tx-4)", marginTop: 6, lineHeight: 1.55 }}>{o.text}</div>}
                 </div>
               </div>
@@ -160,18 +161,20 @@ const DialogHost = () => {
           {active.type === "notice" && (() => {
             const nv = NOTICE[o.kind] || NOTICE.info
             return (
-              <div {...dlgProps} role="alertdialog" aria-modal="true" style={{ ...cardBase, maxWidth: 400, border: "1px solid var(--bd-strong)", textAlign: "center", padding: "28px 26px 22px 26px", animation: anim }}>
+              <div {...dlgProps} role="alertdialog" aria-modal="true" style={{ ...cardBase, maxWidth: OVERLAY.maxWidth, border: "1px solid var(--bd-strong)", textAlign: "center", padding: "28px 26px 22px 26px", animation: anim }}>
                 <span style={{ width: 54, height: 54, borderRadius: 15, background: nv.bg, color: nv.color, display: "inline-flex", alignItems: "center", justifyContent: "center" }}><DlgIcon kind={nv.icon} size={24} /></span>
-                <div style={{ fontFamily: "'Space Grotesk'", fontSize: 17, fontWeight: 600, color: "var(--tx)", marginTop: 15 }}>{o.title || ""}</div>
+                <div style={{ fontFamily: OVERLAY.titleFont, fontSize: OVERLAY.titleSize, fontWeight: 600, color: "var(--tx)", marginTop: 15 }}>{o.title || ""}</div>
                 {o.text && <div style={{ fontSize: 13, color: "var(--tx-4)", marginTop: 7, lineHeight: 1.55 }}>{o.text}</div>}
                 <button className="dlg-btn-primary" onClick={() => close(true)} style={{ ...primaryBtn, marginTop: 20, width: "100%" }}>{o.confirmLabel || "Entendido"}</button>
               </div>
             )
           })()}
 
-          {/* Imprimir y confirmar */}
+          {/* Imprimir y confirmar. Unica variante mas ancha que OVERLAY.maxWidth: muestra la vista
+              previa del comprobante, no un mensaje. */}
           {active.type === "print" && (
-            <div {...dlgProps} role="dialog" aria-modal="true" style={{ ...cardBase, maxWidth: 460, border: "1px solid var(--bd-strong)", display: "flex", flexDirection: "column", maxHeight: "92vh", animation: anim }}>
+            <div {...dlgProps} role="dialog" aria-modal="true"
+              style={{ ...cardBase, maxWidth: 460, border: "1px solid var(--bd-strong)", display: "flex", flexDirection: "column", maxHeight: "92vh", animation: anim }}>
               <div style={{ flex: "none", padding: "18px 22px", borderBottom: "1px solid var(--bd-soft)", display: "flex", alignItems: "center", gap: 12 }}>
                 <span style={{ width: 38, height: 38, borderRadius: 10, background: "rgba(196,237,43,.13)", color: "var(--ink-lime)", display: "flex", alignItems: "center", justifyContent: "center", flex: "none" }}><DlgIcon kind="printer" size={19} /></span>
                 <div style={{ flex: 1, minWidth: 0 }}>
