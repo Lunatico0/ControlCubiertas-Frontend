@@ -114,7 +114,11 @@
   --bd:#E3E7DC; --bd-soft:#ECEFE6; --bd-faint:#EAEDE4; --bd-strong:#D7DBCE; --bd-2:#E3E7DC; --bd-hover:#C2C8B6;
   --tx:#15170F; --tx-2:#3C4234; --tx-3:#5C6353; --tx-4:#676D5E; --tx-5:#767C6A; --tx-6:#848A76; --tx-7:#A7AE9A;
   --ink-lime:#4C7A07; --ink-teal:#0A8A6F; --ink-orange:#C25A0E; --ink-blue:#2350D8; --ink-purple:#7B3FD6; --ink-red:#CF2417;
-  --st-lime:#6FAF0A; --st-teal:#06AE8C; --st-blue:#2E63E6; --st-purple:#8A47E0; --st-orange:#E86A0C; --st-red:#E12414;
+  /* Paleta de estado en tema CLARO. lime/teal/orange se alinearon con sus --ink-* equivalentes
+     porque los valores anteriores (#6FAF0A, #06AE8C, #E86A0C) no llegaban al 3:1 que WCAG pide
+     para componentes de UI: medidos sobre el fondo real del panel daban 2,49 / 2,61 / 2,99.
+     blue, purple y red ya cumplían y se dejaron como estaban. */
+  --st-lime:#4C7A07; --st-teal:#0A8A6F; --st-blue:#2E63E6; --st-purple:#8A47E0; --st-orange:#C25A0E; --st-red:#E12414;
   --st-magenta:#C41E8A; --st-amber:#96700A;
   --scroll:#D7DBCE;
 }

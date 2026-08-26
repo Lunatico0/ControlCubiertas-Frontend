@@ -17,9 +17,29 @@ const labelClass = "mb-1.5 block text-sm font-medium text-(--tx-3)"
 const cardClass = "rounded-xl border border-(--bd) bg-(--card) p-6"
 
 // Presets de color + fallback automático (mismo criterio que /op: escalera por posición).
-const COLOR_PRESETS = ["#C4ED2B", "#3FD9BE", "#6E97F5", "#B39CF7", "#F0A85A", "#F0716A", "#5AC8F0", "#F078C8", "#9AE86A", "#E8C84A"]
-const STOCK_HEX = ["#C4ED2B", "#3FD9BE", "#6E97F5", "#B39CF7"]
-const autoColor = (role, stockIdx) => (role === "recap" ? "#F0A85A" : role === "discard" ? "#F0716A" : STOCK_HEX[stockIdx % STOCK_HEX.length])
+// Los colores del ciclo de vida son TOKENS, no hexes literales.
+//
+// Con hexes fijos los swatches computaban lo mismo en claro y en oscuro, y en tema claro
+// quedaban ilegibles: medido sobre el fondo real (#f5f7f1), el lima #C4ED2B daba 1,26:1 contra
+// el 3:1 que WCAG pide para componentes de UI. El estado "Nueva" era un cuadrado casi blanco.
+// Los tokens --st-* ya tenían su variante light en index.css y no se estaban usando acá.
+//
+// Además, un color guardado como hex queda congelado en la base y deja de adaptarse al tema
+// para siempre; guardado como token, se resuelve en el cliente según el tema activo.
+const STOCK_TOKENS = ["var(--st-lime)", "var(--st-teal)", "var(--st-blue)", "var(--st-purple)"]
+const COLOR_PRESETS = [...STOCK_TOKENS, "var(--st-orange)", "var(--st-red)"]
+const autoColor = (role, stockIdx) => (role === "recap" ? "var(--st-orange)" : role === "discard" ? "var(--st-red)" : STOCK_TOKENS[stockIdx % STOCK_TOKENS.length])
+
+// El input type=color solo entiende hex, así que para arrancar el picker hay que resolver el
+// token al hex del tema activo.
+const aHex = (color) => {
+  if (/^#[0-9a-f]{6}$/i.test(color || "")) return color
+  if (typeof window === "undefined") return "#C4ED2B"
+  const nombre = /^var\((--[\w-]+)\)$/.exec(color || "")?.[1]
+  if (!nombre) return "#C4ED2B"
+  const valor = getComputedStyle(document.documentElement).getPropertyValue(nombre).trim()
+  return /^#[0-9a-f]{6}$/i.test(valor) ? valor : "#C4ED2B"
+}
 const ORDINALS = { 1: "1er", 2: "2do", 3: "3er", 4: "4to", 5: "5to", 6: "6to", 7: "7mo", 8: "8vo", 9: "9no", 10: "10mo" }
 const ordinal = (n) => ORDINALS[n] || `${n}º`
 const ROLE_LABEL = { initial: "Inicial", stock: "Recapado", recap: "A recapar", discard: "Baja" }
@@ -286,7 +306,7 @@ const CompanySettings = () => {
                         })}
                       </div>
                       <label className="mt-3 flex items-center gap-2 text-[11px] text-(--tx-4)">
-                        <input type="color" value={/^#[0-9a-f]{6}$/i.test(colorAt(i)) ? colorAt(i) : "#C4ED2B"} onChange={(e) => patchAt(i, { color: e.target.value })}
+                        <input type="color" value={aHex(colorAt(i))} onChange={(e) => patchAt(i, { color: e.target.value })}
                           className="h-7 w-9 cursor-pointer rounded border border-(--bd) bg-transparent p-0.5" />
                         Color personalizado
                       </label>
