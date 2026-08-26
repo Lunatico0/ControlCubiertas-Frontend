@@ -7,6 +7,7 @@ import ArrowUpwardRoundedIcon from "@mui/icons-material/ArrowUpwardRounded"
 import TuneRoundedIcon from "@mui/icons-material/TuneRounded"
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded"
 import { formatTireCode } from "@utils/tireCode"
+import { clickable } from "@utils/clickable"
 import { metaOf, tint, fmtKm, fmtDate, StateBadge, Pips, useStatusCatalog } from "./status"
 import { usePagination } from "@hooks/usePagination"
 import Paginador from "@components/common/Paginador"
@@ -231,7 +232,7 @@ const Cubiertas = ({ intent, onNavigate }) => {
             {pag.currentItems.map((t) => {
               const m = metaOf(t.status)
               return (
-                <div key={t._id} onClick={openDrawer(t._id)} className="flex cursor-pointer flex-col gap-[13px] rounded-[13px] p-4" style={{ border: "1px solid var(--bd)", background: "var(--card)" }}>
+                <div key={t._id} {...clickable(openDrawer(t._id))} aria-label={`Cubierta ${formatTireCode(t.code, tireCodePrefix)}`} className="flex cursor-pointer flex-col gap-[13px] rounded-[13px] p-4" style={{ border: "1px solid var(--bd)", background: "var(--card)" }}>
                   <div className="flex items-start justify-between gap-2.5">
                     <div>
                       <div className="text-[11px]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-6)" }}>{t.serialNumber || "—"}</div>
@@ -285,7 +286,7 @@ const Cubiertas = ({ intent, onNavigate }) => {
               const m = metaOf(t.status)
               return (
                 <div key={t._id} className="grid items-center gap-3 py-3 pl-[14px] pr-[18px]" style={{ gridTemplateColumns: GRID_COLS, borderLeft: `4px solid ${m.color}`, borderBottom: "1px solid var(--bd-faint)" }}>
-                  <div className="cursor-pointer" onClick={openDrawer(t._id)}>
+                  <div className="cursor-pointer" {...clickable(openDrawer(t._id))} aria-label={`Cubierta ${formatTireCode(t.code, tireCodePrefix)}`}>
                     <div className="text-[15px] font-bold" style={{ fontFamily: "'Space Grotesk'", color: "var(--tx)" }}>#{formatTireCode(t.code, tireCodePrefix)}</div>
                     <div className="text-[10.5px]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-6)" }}>{t.serialNumber || "—"}</div>
                   </div>

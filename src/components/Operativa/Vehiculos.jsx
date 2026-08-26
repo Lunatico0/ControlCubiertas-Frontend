@@ -11,6 +11,7 @@ import { usePagination } from "@hooks/usePagination"
 import Paginador from "@components/common/Paginador"
 import { formatPlate } from "@utils/plateFormat"
 import { formatTireCode } from "@utils/tireCode"
+import { clickable } from "@utils/clickable"
 import { generatePositions } from "./axles"
 import NuevoVehiculo from "./NuevoVehiculo"
 import ConfigurarEjes from "./ConfigurarEjes"
@@ -154,7 +155,7 @@ const Vehiculos = ({ onNavigate, intent }) => {
               <div>Móvil</div><div>Patente</div><div>Tipo</div><div>Cubiertas</div><div className="text-right">Km</div>
             </div>
             {pag.currentItems.map(({ v, countLabel, countColor, tipoColor, tipoBg, kmLabel }) => (
-              <div key={v._id} onClick={() => open(v)} className="grid cursor-pointer items-center gap-3 px-[18px] py-[13px]" style={{ gridTemplateColumns: TABLE_COLS, borderBottom: "1px solid var(--bd-faint)" }}>
+              <div key={v._id} {...clickable(() => open(v))} aria-label={`Vehículo ${v.mobile}`} className="grid cursor-pointer items-center gap-3 px-[18px] py-[13px]" style={{ gridTemplateColumns: TABLE_COLS, borderBottom: "1px solid var(--bd-faint)" }}>
                 <div className="flex min-w-0 items-center gap-[11px]">
                   <span className="flex h-8 w-8 flex-none items-center justify-center rounded-lg" style={{ background: tipoBg, color: tipoColor }}><VehTypeIcon size={17} /></span>
                   <span className="text-[14.5px] font-bold" style={{ fontFamily: "'Space Grotesk'", color: "var(--tx)" }}>{v.mobile || "—"}</span>
@@ -172,7 +173,7 @@ const Vehiculos = ({ onNavigate, intent }) => {
           /* ===== CARDS ===== */
           <div className="grid gap-4" style={{ gridTemplateColumns: "repeat(auto-fill,minmax(330px,1fr))" }}>
             {pag.currentItems.map(({ v, positions, hasAxles, countLabel, countColor, tipoColor, tipoBg, kmLabel }) => (
-              <div key={v._id} onClick={() => open(v)} className="flex cursor-pointer flex-col gap-[15px] rounded-[14px] p-[18px]" style={{ border: "1px solid var(--bd)", background: "var(--card)" }}>
+              <div key={v._id} {...clickable(() => open(v))} aria-label={`Vehículo ${v.mobile}`} className="flex cursor-pointer flex-col gap-[15px] rounded-[14px] p-[18px]" style={{ border: "1px solid var(--bd)", background: "var(--card)" }}>
                 {/* header */}
                 <div className="flex items-start gap-3">
                   <span className="flex h-[42px] w-[42px] flex-none items-center justify-center rounded-[11px]" style={{ background: tipoBg, color: tipoColor }}><VehTypeIcon /></span>

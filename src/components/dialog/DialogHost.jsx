@@ -181,7 +181,7 @@ const DialogHost = () => {
                   <div style={{ fontFamily: "'Space Grotesk'", fontSize: 16, fontWeight: 600, color: "var(--tx)" }}>{o.title || "Comprobante"}</div>
                   <div style={{ fontSize: 12, color: "var(--tx-5)", marginTop: 1 }}>{o.subtitle || "Revisalo antes de confirmar el movimiento"}</div>
                 </div>
-                <div className="dlg-x" onClick={() => close(false)} style={{ color: "var(--tx-5)", cursor: "pointer", display: "inline-flex", padding: 5, borderRadius: 7 }}><DlgIcon kind="x" size={18} /></div>
+                <button type="button" className="dlg-x" onClick={() => close(false)} aria-label="Cerrar" style={{ color: "var(--tx-5)", cursor: "pointer", display: "inline-flex", padding: 5, borderRadius: 7, border: "none", background: "transparent" }}><DlgIcon kind="x" size={18} /></button>
               </div>
               <div style={{ flex: 1, overflowY: "auto", padding: "20px 22px", background: "var(--elev)" }}>
                 {o.receipt

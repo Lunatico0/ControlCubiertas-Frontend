@@ -130,18 +130,18 @@ const Login = () => {
                     onKeyDown={onKey}
                     className="pr-12"
                     rightAddon={
-                      <span onClick={() => setShowPwd((v) => !v)} title={showPwd ? "Ocultar" : "Mostrar"} style={{ position: "absolute", right: 4, top: 4, width: 38, height: 38, display: "flex", alignItems: "center", justifyContent: "center", color: "#7B8186", cursor: "pointer", borderRadius: 9 }}>
+                      <button type="button" onClick={() => setShowPwd((v) => !v)} title={showPwd ? "Ocultar" : "Mostrar"} aria-label={showPwd ? "Ocultar contraseña" : "Mostrar contraseña"} style={{ position: "absolute", right: 4, top: 4, width: 38, height: 38, display: "flex", alignItems: "center", justifyContent: "center", color: "#7B8186", cursor: "pointer", borderRadius: 9, border: "none", background: "transparent" }}>
                       {showPwd ? (
                         <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3.5-6.5 10-6.5S22 12 22 12s-3.5 6.5-10 6.5S2 12 2 12Z" /><circle cx="12" cy="12" r="2.8" /><path d="M4 4l16 16" /></svg>
                       ) : (
                         <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3.5-6.5 10-6.5S22 12 22 12s-3.5 6.5-10 6.5S2 12 2 12Z" /><circle cx="12" cy="12" r="2.8" /></svg>
                       )}
-                      </span>
+                      </button>
                     }
                   />
                   {err.pwd && <div style={{ marginTop: 6, fontSize: 12, color: BAD }}>{err.pwd}</div>}
                   <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 7 }}>
-                    <span onClick={() => setStep("forgot")} style={{ fontSize: 12, color: LIME, cursor: "pointer" }}>¿Olvidaste tu contraseña?</span>
+                    <button type="button" onClick={() => setStep("forgot")} style={{ fontSize: 12, color: LIME, cursor: "pointer", border: "none", background: "transparent", padding: 0, fontFamily: "inherit" }}>¿Olvidaste tu contraseña?</button>
                   </div>
                 </div>
 
