@@ -1,6 +1,7 @@
 import LocalShippingOutlinedIcon from "@mui/icons-material/LocalShippingOutlined"
 import RemoveRoundedIcon from "@mui/icons-material/RemoveRounded"
 import CheckRoundedIcon from "@mui/icons-material/CheckRounded"
+import BuildOutlinedIcon from "@mui/icons-material/BuildOutlined"
 import DeleteOutlineRoundedIcon from "@mui/icons-material/DeleteOutlineRounded"
 import LocalPrintshopOutlinedIcon from "@mui/icons-material/LocalPrintshopOutlined"
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined"
@@ -15,11 +16,16 @@ const TONES = {
   muted: { bd: "var(--bd-strong)", bg: "var(--elev)", fg: "var(--tx-3)", hover: "var(--bd-hover)" },
   teal: { bd: tint("var(--ink-teal)", 40), bg: tint("var(--ink-teal)", 10), fg: "var(--ink-teal)", hover: "var(--ink-teal)" },
   red: { bd: tint("var(--ink-red)", 35), bg: tint("var(--ink-red)", 8), fg: "var(--ink-red)", hover: "var(--ink-red)" },
+  orange: { bd: tint("var(--ink-orange)", 40), bg: tint("var(--ink-orange)", 10), fg: "var(--ink-orange)", hover: "var(--ink-orange)" },
 }
 
 const ACTIONS = {
   assign: { label: "Asignar", Icon: LocalShippingOutlinedIcon, tone: "lime" },
   unassign: { label: "Desasignar", Icon: RemoveRoundedIcon, tone: "neutral" },
+  // "Enviar a recapar" (marcar como gastada) es la transición CENTRAL del ciclo, y no existía:
+  // solo estaba "Recapado listo", que aparece cuando la cubierta YA está en rol recap. El único
+  // camino era corregir una entrada del historial, un rodeo que además ensucia la trazabilidad.
+  sendRecap: { label: "Enviar a recapar", Icon: BuildOutlinedIcon, tone: "orange" },
   recap: { label: "Recapado listo", Icon: CheckRoundedIcon, tone: "teal" },
   discard: { label: "Descartar", Icon: DeleteOutlineRoundedIcon, tone: "red" },
   print: { label: "Imprimir recibo", Icon: LocalPrintshopOutlinedIcon, tone: "neutral" },

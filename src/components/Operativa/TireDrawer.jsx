@@ -107,7 +107,7 @@ const TireDrawer = ({ tireId, initialAction, initialAssign, onAssigned, onClose 
   useStatusCatalog() // el stepper del ciclo de vida y los guards por rol dependen del catálogo
   const { tires, orders, data } = useContext(ApiContext)
   const vehicles = data?.vehicles || []
-  const { statuses = [], stockScale = [], discardStatus } = data || {}
+  const { statuses = [], stockScale = [], discardStatus, recapStatus } = data || {}
 
   const [tire, setTire] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -123,12 +123,14 @@ const TireDrawer = ({ tireId, initialAction, initialAssign, onAssigned, onClose 
   const unassignAct = useTireAction({ apiCall: tires.unassign, successMessage: "Cubierta desasignada", printBuilder: buildUnassignPrintData })
   const recapAct = useTireAction({ apiCall: tires.updateStatus, successMessage: "Recapado registrado", printBuilder: buildFinishRecapPrintData })
   const discardAct = useTireAction({ apiCall: tires.updateStatus, successMessage: "Cubierta descartada", printBuilder: buildDiscardPrintData })
+  // Enviar a recapar: mismo endpoint de cambio de estado, destino = el estado de rol recap.
+  const sendRecapAct = useTireAction({ apiCall: tires.updateStatus, successMessage: "Cubierta enviada a recapar", printBuilder: buildFinishRecapPrintData })
   // undo: firma (id, historyId, data) → el entry va por closure (actionEntry). editHist: firma
   // (id, data, entry) → calza con el branch `entry` de useTireAction.
   const undoAct = useTireAction({ apiCall: (tireId, formData) => tires.undoHistory(tireId, actionEntry?._id, formData), successMessage: "Entrada deshecha", printBuilder: buildUndoPrintData })
   const editHistAct = useTireAction({ apiCall: tires.updateHistory, successMessage: "Historial corregido", printBuilder: buildCorrectionPrintData })
   const reprintAct = useReprint()
-  const submitting = assignAct.isSubmitting || unassignAct.isSubmitting || recapAct.isSubmitting || discardAct.isSubmitting || undoAct.isSubmitting || editHistAct.isSubmitting
+  const submitting = assignAct.isSubmitting || unassignAct.isSubmitting || recapAct.isSubmitting || sendRecapAct.isSubmitting || discardAct.isSubmitting || undoAct.isSubmitting || editHistAct.isSubmitting
 
   const load = (id) =>
     fetchTireById(id)
@@ -236,6 +238,16 @@ const TireDrawer = ({ tireId, initialAction, initialAssign, onAssigned, onClose 
       close: closeAction,
     })
   }
+  const doSendRecap = () => {
+    if (!form.orderNumber) { setErrors({ orderNumber: true }); showToast("warning", "Completá los campos obligatorios"); return }
+    setErrors({})
+    sendRecapAct.execute({
+      tire,
+      formData: { status: recapStatus, orderNumber: form.orderNumber, getReceiptNumber: orders.getNextReceipt },
+      refresh: reload,
+      close: closeAction,
+    })
+  }
   const doDiscard = () => {
     if (!form.orderNumber) { setErrors({ orderNumber: true }); showToast("warning", "Completá los campos obligatorios"); return }
     setErrors({})
@@ -287,7 +299,7 @@ const TireDrawer = ({ tireId, initialAction, initialAssign, onAssigned, onClose 
       close: closeAction,
     })
   }
-  const actionHandlers = { assign: doAssign, unassign: doUnassign, recap: doRecap, discard: doDiscard, undo: doUndo, editHist: doEditHist }
+  const actionHandlers = { assign: doAssign, unassign: doUnassign, recap: doRecap, sendRecap: doSendRecap, discard: doDiscard, undo: doUndo, editHist: doEditHist }
 
   const history = [...(tire?.history || [])].sort((a, b) => new Date(b.date) - new Date(a.date))
   const lastReceiptEntry = history.find((h) => h.receiptNumber) // para "Imprimir recibo" (último comprobante)
@@ -342,7 +354,7 @@ const TireDrawer = ({ tireId, initialAction, initialAssign, onAssigned, onClose 
     if (!elegido || yaAlcanzado) setForm((f) => ({ ...f, status: siguienteRecap }))
   }, [action, siguienteRecap, form.status, nivelActual])
 
-  const ACTION_TITLES = { assign: "Asignar a vehículo", unassign: "Desasignar cubierta", recap: "Registrar recapado", discard: "Descartar cubierta", undo: "Deshacer entrada", editHist: "Corregir entrada de historial" }
+  const ACTION_TITLES = { assign: "Asignar a vehículo", unassign: "Desasignar cubierta", recap: "Registrar recapado", sendRecap: "Enviar a recapar", discard: "Descartar cubierta", undo: "Deshacer entrada", editHist: "Corregir entrada de historial" }
 
   return (
     <Drawer onClose={handleClose}>
@@ -451,6 +463,12 @@ const TireDrawer = ({ tireId, initialAction, initialAssign, onAssigned, onClose 
                   </>
                 )}
 
+                {action === "sendRecap" && (
+                  <div className="rounded-[9px] px-3 py-2.5 text-[12.5px]" style={{ background: tint("var(--ink-orange)", 8), border: "1px solid " + tint("var(--ink-orange)", 35), color: "var(--ink-orange)" }}>
+                    Vas a marcar esta cubierta (#{formatTireCode(tire.code, data?.tireCodePrefix)}) como gastada: pasa a «{recapStatus}» y queda a la espera del recapado. Mientras tanto no se puede montar en un vehículo.
+                  </div>
+                )}
+
                 {action === "discard" && (
                   <div className="rounded-[9px] px-3 py-2.5 text-[12.5px]" style={{ background: tint("var(--ink-red)", 8), border: "1px solid " + tint("var(--ink-red)", 35), color: "var(--ink-red)" }}>
                     Vas a dar de baja definitiva esta cubierta (#{formatTireCode(tire.code, data?.tireCodePrefix)}). Queda registrado en el historial con su comprobante.
@@ -500,7 +518,7 @@ const TireDrawer = ({ tireId, initialAction, initialAssign, onAssigned, onClose 
                     className="flex-1 rounded-[9px] py-2.5 text-[13px] font-bold"
                     style={{ background: action === "discard" ? "var(--ink-red)" : "var(--ink-lime)", color: action === "discard" ? "#fff" : "#0A0C0D", opacity: submitting ? 0.6 : 1 }}
                   >
-                    {submitting ? "Guardando…" : action === "discard" ? "Descartar" : action === "undo" ? "Deshacer" : action === "editHist" ? "Guardar" : "Confirmar"}
+                    {submitting ? "Guardando…" : action === "discard" ? "Descartar" : action === "sendRecap" ? "Enviar a recapar" : action === "undo" ? "Deshacer" : action === "editHist" ? "Guardar" : "Confirmar"}
                   </button>
                 </div>
               </div>
@@ -544,6 +562,7 @@ const TireDrawer = ({ tireId, initialAction, initialAssign, onAssigned, onClose 
                   {!tire.vehicle && !["discard", "recap"].includes(metaOf(tire.status).role) && <OpActionBtn type="assign" size={44} onClick={() => openAction("assign")} />}
                   {tire.vehicle && <OpActionBtn type="unassign" size={44} onClick={() => openAction("unassign")} />}
                   {metaOf(tire.status).role === "recap" && <OpActionBtn type="recap" size={44} onClick={() => openAction("recap")} />}
+                  {!tire.vehicle && recapStatus && ["initial", "stock"].includes(metaOf(tire.status).role) && <OpActionBtn type="sendRecap" size={44} onClick={() => openAction("sendRecap")} />}
                   {lastReceiptEntry && <OpActionBtn type="print" size={44} onClick={() => reprintAct.execute({ entry: lastReceiptEntry, tire })} disabled={reprintAct.isPrinting} />}
                   {!tire.vehicle && metaOf(tire.status).role !== "discard" && <OpActionBtn type="discard" size={44} onClick={() => openAction("discard")} />}
                 </div>
