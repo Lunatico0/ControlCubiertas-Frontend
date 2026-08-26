@@ -339,7 +339,7 @@ const CompanySettings = () => {
         )}
 
         <div className="flex justify-end">
-          <Button type="submit" variant="lime" disabled={isSubmitting} className="text-sm">
+          <Button type="submit" variant="lime" disabled={isSubmitting}>
             {isSubmitting ? "Guardando…" : "Guardar cambios"}
           </Button>
         </div>

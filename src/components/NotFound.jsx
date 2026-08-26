@@ -33,12 +33,7 @@ const NotFound = () => {
         </p>
       </div>
 
-      <Button
-        variant="lime"
-        onClick={() => navigate("/")}
-        className="text-[14px]"
-        style={{ background: "#C4ED2B", color: "#0A0C0D", fontWeight: 600 }}
-      >
+      <Button variant="lime" onClick={() => navigate("/")}>
         <HomeRoundedIcon sx={{ fontSize: 18 }} />
         Volver al inicio
       </Button>

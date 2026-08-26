@@ -3,6 +3,7 @@ import isElectron from "@utils/isElectron"
 import DesktopWindowsRoundedIcon from "@mui/icons-material/DesktopWindowsRounded"
 import DownloadRoundedIcon from "@mui/icons-material/DownloadRounded"
 import OpenInNewRoundedIcon from "@mui/icons-material/OpenInNewRounded"
+import { button } from "@utils/tokens"
 
 // El instalador se publica a GitHub Releases (electron-builder publish). Repo público →
 // la API responde con CORS y el .exe se descarga sin token.
@@ -66,10 +67,11 @@ const DesktopDownload = () => {
           <p className="font-medium" style={{ color: "var(--tx)" }}>TireOps para Windows</p>
           <p className="mt-0.5 text-sm" style={{ color: "var(--tx-5)" }}>{meta}</p>
         </div>
+        {/* El de descarga es un <a>, no un <button>, así que no puede usar <Button>: toma el
+            MISMO token de estilo para no ser un cuarto botón lima con su propia geometría
+            (antes tenía radio 8, peso 600 y el texto en #0f1216). */}
         {asset ? (
-          <a href={asset.browser_download_url} download
-            className="inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold transition hover:opacity-90"
-            style={{ background: "#C4ED2B", color: "#0f1216" }}>
+          <a href={asset.browser_download_url} download className={button.lime}>
             <DownloadRoundedIcon sx={{ fontSize: 18 }} /> Descargar
           </a>
         ) : (

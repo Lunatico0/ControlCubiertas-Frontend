@@ -141,7 +141,7 @@ const EditorComprobante = () => {
         </div>
         <div className="ml-auto flex items-center gap-2.5">
           <button onClick={reset} className="h-10 rounded-[9px] px-[15px] text-[13.5px] font-semibold" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--tx)" }}>Restablecer</button>
-          <Button variant="lime" onClick={save} disabled={saving} className="h-10 text-[13.5px]" style={{ background: "#C4ED2B", color: "#0A0C0D", opacity: saving ? 0.6 : 1 }}>{saving ? "Guardando…" : "Guardar cambios"}</Button>
+          <Button variant="lime" onClick={save} disabled={saving}>{saving ? "Guardando…" : "Guardar cambios"}</Button>
         </div>
       </div>
 

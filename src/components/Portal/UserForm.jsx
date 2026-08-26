@@ -51,7 +51,7 @@ const UserForm = ({ user, onClose, onCreated, onSaved }) => {
       <button type="button" onClick={onClose} className="rounded-[9px] px-4 py-2.5 text-[14px] font-semibold" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--tx)" }}>
         Cancelar
       </button>
-      <Button type="submit" variant="lime" disabled={isSubmitting} className="text-[14px]" style={{ background: "#C4ED2B", color: "#0A0C0D" }}>
+      <Button type="submit" variant="lime" disabled={isSubmitting}>
         {isSubmitting ? (isEdit ? "Guardando…" : "Creando…") : isEdit ? "Guardar cambios" : "Crear usuario"}
       </Button>
     </div>

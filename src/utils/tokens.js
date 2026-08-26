@@ -54,7 +54,13 @@ export const button = {
   // Botón de acción principal de la operativa (lima). Color lima BRILLANTE FIJO en ambos temas
   // (#C4ED2B/#0A0C0D) — es el diseño intencional de la app (no theme-aware; ver comentario en
   // Inicio.jsx). Tipografía/padding centralizados; el tamaño (alto/ancho) se ajusta por caso con className.
-  lime: "inline-flex items-center justify-center gap-2 bg-[#C4ED2B] text-[#0A0C0D] font-bold px-5 py-2.5 rounded-[10px] transition hover:opacity-90 disabled:opacity-60 disabled:cursor-not-allowed",
+  // El token fija tamaño, line-height Y ALTURA. Sin la altura, el mismo botón "Crear usuario"
+  // medía 40px en la página y 43px dentro del modal: no era el padding ni el line-height (los
+  // dos tenían 10px y 20px), era que el de la página lleva un ícono. Un <svg> de 17px como
+  // flex item deja la caja del contenido en los 20px del line-height, mientras que un botón
+  // de solo texto usa la altura real de su caja de línea, ~23px con IBM Plex Sans a 14px.
+  // Por eso la altura es FIJA (h-10): un min-height no baja lo que ya quedó más alto.
+  lime: "inline-flex items-center justify-center gap-2 h-10 bg-[#C4ED2B] text-[#0A0C0D] text-[14px] leading-5 font-bold px-5 rounded-[10px] transition hover:opacity-90 disabled:opacity-60 disabled:cursor-not-allowed",
 }
 
 // Utilidades visuales
