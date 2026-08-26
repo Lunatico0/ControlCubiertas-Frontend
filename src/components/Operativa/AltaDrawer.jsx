@@ -69,10 +69,9 @@ const AltaDrawer = ({ onClose, onCreated }) => {
       // Bug 2 (Fase 04): anclar la fecha a mediodía LOCAL para que no se corra de día
       // al serializar a UTC (input date da "YYYY-MM-DD" = medianoche UTC → -1 día en GMT-3).
       const createdAt = form.createdAt ? `${form.createdAt}T12:00:00` : new Date().toISOString()
-      // Reservar el N° de comprobante ANTES de crear, para persistirlo en el history "Alta".
-      // El backend incrementa el contador por cada llamada → correlativo sin duplicados.
-      let receipt = "0000-00000000"
-      try { receipt = await orders.getNextReceipt() } catch { /* si falla, se imprime sin N° */ }
+      // El N° de comprobante lo reserva el BACKEND dentro del alta y vuelve en la respuesta.
+      // Pedirlo antes quemaba el número cuando el alta se rechazaba (código duplicado, estado
+      // inválido), y dejaba huecos inexplicables en el correlativo.
       const created = await tires.create({
         status: initialStatus,
         code: Number(form.code), // el input es editable (string) pero el code se guarda como Number
@@ -84,8 +83,8 @@ const AltaDrawer = ({ onClose, onCreated }) => {
         createdAt,
         orderNumber: form.orderNumber,
         vehicle: null,
-        receiptNumber: receipt,
       })
+      const receipt = created?.receiptNumber || "0000-00000000"
       // Imprimir el comprobante de alta (mismo layout unificado que el resto de las acciones).
       try {
         const printData = buildCreateTirePrintData({

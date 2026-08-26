@@ -21,41 +21,24 @@ export const useTireAction = ({ printBuilder, apiCall, successMessage }) => {
           throw new Error("apiCall no está definido o no es una función")
         }
 
-        // Obtener número de recibo si es necesario
-        let receipt = "0000-00000000"
-        if (formData.getReceiptNumber && typeof formData.getReceiptNumber === "function") {
-          try {
-            receipt = await formData.getReceiptNumber()
-          } catch (receiptError) {
-            console.warn("⚠️ No se pudo obtener número de recibo:", receiptError)
-          }
-        }
-
-        // Llamar a la API
+        // El número de comprobante NO se pide por adelantado. Antes se pedía acá, y una acción
+        // que el backend rechazaba (un km de baja menor al de alta, por ejemplo) igual dejaba el
+        // número consumido: en el QA de operario quedaron quemados el 281 y el 282, y el papel
+        // siguiente salió con el 283 sin que nadie pudiera explicar el salto. Ahora lo reserva el
+        // backend DENTRO de la mutación y lo devuelve en la respuesta.
         let updated
-        const { getReceiptNumber, ...cleanFormData } = formData
+        const { getReceiptNumber, ...cleanFormData } = formData // getReceiptNumber ya no se usa
         if (entry) {
-          updated = await apiCall(
-            tire._id,
-            {
-              ...cleanFormData,
-              form: {
-                ...cleanFormData.form,
-                receiptNumber: receipt
-              },
-            },
-            entry
-          )
+          updated = await apiCall(tire._id, cleanFormData, entry)
         } else {
-          updated = await apiCall(tire._id, {
-            ...cleanFormData,
-            receiptNumber: receipt
-          })
+          updated = await apiCall(tire._id, cleanFormData)
         }
 
         if (!updated?.tire) {
           throw new Error("Respuesta inválida del servidor")
         }
+
+        const receipt = updated.receiptNumber || "0000-00000000"
 
         // Imprimir comprobante si es necesario
         if (printBuilder) {
