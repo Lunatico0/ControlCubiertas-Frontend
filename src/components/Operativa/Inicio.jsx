@@ -4,7 +4,7 @@ import { useAuth } from "@context/AuthContext"
 import { useHotkeyFocus } from "@hooks/useHotkeyFocus"
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded"
 import AddRoundedIcon from "@mui/icons-material/AddRounded"
-import TripOriginRoundedIcon from "@mui/icons-material/TripOriginRounded"
+import TripOriginOutlinedIcon from "@mui/icons-material/TripOriginOutlined"
 import LocalShippingOutlinedIcon from "@mui/icons-material/LocalShippingOutlined"
 import Inventory2OutlinedIcon from "@mui/icons-material/Inventory2Outlined"
 import WarningAmberRoundedIcon from "@mui/icons-material/WarningAmberRounded"
@@ -121,7 +121,7 @@ const Inicio = ({ onNavigate }) => {
 
   const TILES = [
     { key: "alta", title: "Alta de cubierta", sub: "Registrar una nueva", icon: <AddRoundedIcon />, primary: true, onClick: () => onNavigate("cubiertas", { alta: true }) },
-    { key: "buscar", title: "Buscar cubierta", sub: "Ver el inventario", icon: <TripOriginRoundedIcon />, accent: "var(--ink-lime)", onClick: () => onNavigate("cubiertas") },
+    { key: "buscar", title: "Buscar cubierta", sub: "Ver el inventario", icon: <TripOriginOutlinedIcon />, accent: "var(--ink-lime)", onClick: () => onNavigate("cubiertas") },
     { key: "asignar", title: "Asignar a vehículo", sub: "Montar una cubierta", icon: <LocalShippingOutlinedIcon />, accent: "var(--ink-blue)", onClick: () => onNavigate("cubiertas", { tab: "stock" }) },
   ]
 
@@ -244,7 +244,7 @@ const Inicio = ({ onNavigate }) => {
               style={{ borderBottom: i < hoyItems.length - 1 ? "1px solid var(--bd-faint)" : "none" }}
             >
               <span className="grid h-[38px] w-[38px] flex-none place-items-center rounded-[10px]" style={{ background: h.iconBg, color: h.color }}>
-                {h.isTire ? <TripOriginRoundedIcon sx={{ fontSize: 19 }} /> : <LocalShippingOutlinedIcon sx={{ fontSize: 19 }} />}
+                {h.isTire ? <TripOriginOutlinedIcon sx={{ fontSize: 19 }} /> : <LocalShippingOutlinedIcon sx={{ fontSize: 19 }} />}
               </span>
               <span className="min-w-0 flex-1">
                 <span className="block text-[14px] font-bold" style={{ fontFamily: "'Space Grotesk'", color: "var(--tx)" }}>{h.title}</span>

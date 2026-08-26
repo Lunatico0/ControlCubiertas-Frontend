@@ -1,9 +1,9 @@
 import { useState, useEffect, useCallback } from "react"
 import { useNavigate } from "react-router-dom"
-import PersonAddAltRoundedIcon from "@mui/icons-material/PersonAddAltRounded"
-import ContentCopyRoundedIcon from "@mui/icons-material/ContentCopyRounded"
-import EditRoundedIcon from "@mui/icons-material/EditRounded"
-import LockResetRoundedIcon from "@mui/icons-material/LockResetRounded"
+import PersonAddAltOutlinedIcon from "@mui/icons-material/PersonAddAltOutlined"
+import ContentCopyOutlinedIcon from "@mui/icons-material/ContentCopyOutlined"
+import EditOutlinedIcon from "@mui/icons-material/EditOutlined"
+import LockResetOutlinedIcon from "@mui/icons-material/LockResetOutlined"
 import RefreshRoundedIcon from "@mui/icons-material/RefreshRounded"
 import { showToast, showConfirm } from "@utils/toast"
 import { useAuth } from "@context/AuthContext"
@@ -109,7 +109,7 @@ const Users = () => {
           <p className="mt-1 text-sm" style={{ color: "var(--tx-4)" }}>Quién accede a TireOps</p>
         </div>
         <Button variant="lime" onClick={() => setShowForm(true)} className="ml-auto">
-          <PersonAddAltRoundedIcon sx={{ fontSize: 17 }} /> Crear usuario
+          <PersonAddAltOutlinedIcon sx={{ fontSize: 17 }} /> Crear usuario
         </Button>
       </div>
 
@@ -150,12 +150,12 @@ const Users = () => {
                 <div className="flex items-center justify-end gap-2">
                   <button onClick={() => setEditTarget(u)} title="Editar usuario"
                     className="inline-flex h-[32px] w-[32px] flex-none items-center justify-center rounded-lg" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--tx-3)", cursor: "pointer" }}>
-                    <EditRoundedIcon sx={{ fontSize: 16 }} />
+                    <EditOutlinedIcon sx={{ fontSize: 16 }} />
                   </button>
                   <button onClick={() => (isYou ? navigate("/cambiar-password") : doReset(u))} disabled={!isYou && resetting}
                     title={isYou ? "Cambiar mi contraseña" : "Restablecer contraseña"}
                     className="inline-flex h-[32px] w-[32px] flex-none items-center justify-center rounded-lg" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--tx-3)", cursor: "pointer" }}>
-                    <LockResetRoundedIcon sx={{ fontSize: 16 }} />
+                    <LockResetOutlinedIcon sx={{ fontSize: 16 }} />
                   </button>
                   <button onClick={() => toggleStatus(u)} disabled={isYou} title={isYou ? "No podés cambiar tu propio estado" : ""}
                     className="rounded-lg px-3 py-[7px] text-[12px] font-semibold" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: active ? "var(--ink-red)" : "var(--ink-teal)", opacity: isYou ? 0.4 : 1, cursor: isYou ? "not-allowed" : "pointer" }}>
@@ -182,7 +182,7 @@ const Users = () => {
             <div className="mt-2 flex items-center justify-between gap-3">
               <code className="font-mono text-lg font-semibold" style={{ color: "var(--tx)" }}>{tempCred.tempPassword}</code>
               <button onClick={copyPassword} className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium" style={{ border: "1px solid color-mix(in srgb, var(--ink-orange) 40%, transparent)", color: "var(--ink-orange)" }}>
-                <ContentCopyRoundedIcon fontSize="inherit" /> Copiar
+                <ContentCopyOutlinedIcon fontSize="inherit" /> Copiar
               </button>
             </div>
           </div>
@@ -206,7 +206,7 @@ const Users = () => {
                   <RefreshRoundedIcon fontSize="inherit" /> Otra
                 </button>
                 <button onClick={copyReset} className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium" style={{ border: "1px solid color-mix(in srgb, var(--ink-orange) 40%, transparent)", color: "var(--ink-orange)" }}>
-                  <ContentCopyRoundedIcon fontSize="inherit" /> Copiar
+                  <ContentCopyOutlinedIcon fontSize="inherit" /> Copiar
                 </button>
               </div>
             </div>

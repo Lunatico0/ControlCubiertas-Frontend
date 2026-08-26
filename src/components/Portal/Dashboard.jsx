@@ -3,16 +3,16 @@ import { useNavigate } from "react-router-dom"
 import { useAuth } from "@context/AuthContext"
 import { getSummary } from "@api/admin"
 
-import StyleRoundedIcon from "@mui/icons-material/StyleRounded"
-import LocalShippingRoundedIcon from "@mui/icons-material/LocalShippingRounded"
-import WarehouseRoundedIcon from "@mui/icons-material/WarehouseRounded"
-import DirectionsBusRoundedIcon from "@mui/icons-material/DirectionsBusRounded"
+import StyleOutlinedIcon from "@mui/icons-material/StyleOutlined"
+import LocalShippingOutlinedIcon from "@mui/icons-material/LocalShippingOutlined"
+import WarehouseOutlinedIcon from "@mui/icons-material/WarehouseOutlined"
+import DirectionsBusOutlinedIcon from "@mui/icons-material/DirectionsBusOutlined"
 import WarningAmberRoundedIcon from "@mui/icons-material/WarningAmberRounded"
 import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded"
-import GroupRoundedIcon from "@mui/icons-material/GroupRounded"
-import ApartmentRoundedIcon from "@mui/icons-material/ApartmentRounded"
+import GroupOutlinedIcon from "@mui/icons-material/GroupOutlined"
+import ApartmentOutlinedIcon from "@mui/icons-material/ApartmentOutlined"
 import OpenInNewRoundedIcon from "@mui/icons-material/OpenInNewRounded"
-import TaskAltRoundedIcon from "@mui/icons-material/TaskAltRounded"
+import TaskAltOutlinedIcon from "@mui/icons-material/TaskAltOutlined"
 import DesktopDownload from "./DesktopDownload"
 import StatCard from "@components/UI/StatCard"
 import { tituloPantalla } from "@utils/tokens"
@@ -91,10 +91,10 @@ const Dashboard = () => {
 
       {/* Métricas */}
       <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard icon={<StyleRoundedIcon />} tint="var(--ink-lime)" value={cubiertas.total} label="Total de cubiertas" sublabel="Todas las ubicaciones" />
-        <StatCard icon={<LocalShippingRoundedIcon />} tint="var(--ink-teal)" value={cubiertas.enCirculacion} label="En circulación" sublabel="Asignadas a vehículos" />
-        <StatCard icon={<WarehouseRoundedIcon />} tint="var(--ink-blue)" value={cubiertas.enDeposito} label="En depósito" sublabel="Disponibles en depósito" />
-        <StatCard icon={<DirectionsBusRoundedIcon />} tint="var(--ink-purple)" value={vehiculos.total} label="Vehículos" sublabel="En la flota activa" />
+        <StatCard icon={<StyleOutlinedIcon />} tint="var(--ink-lime)" value={cubiertas.total} label="Total de cubiertas" sublabel="Todas las ubicaciones" />
+        <StatCard icon={<LocalShippingOutlinedIcon />} tint="var(--ink-teal)" value={cubiertas.enCirculacion} label="En circulación" sublabel="Asignadas a vehículos" />
+        <StatCard icon={<WarehouseOutlinedIcon />} tint="var(--ink-blue)" value={cubiertas.enDeposito} label="En depósito" sublabel="Disponibles en depósito" />
+        <StatCard icon={<DirectionsBusOutlinedIcon />} tint="var(--ink-purple)" value={vehiculos.total} label="Vehículos" sublabel="En la flota activa" />
       </div>
 
       <div className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-2">
@@ -140,7 +140,7 @@ const Dashboard = () => {
             {senales.aRecapar === 0 && senales.vehiculosSinCubiertas === 0 ? (
               /* Sin acciones pendientes → estado positivo */
               <div className="flex flex-col items-center gap-2 py-8 text-center">
-                <span className="grid h-12 w-12 place-items-center rounded-xl" style={{ background: tintBg("var(--ink-teal)", 14), color: "var(--ink-teal)" }}><TaskAltRoundedIcon /></span>
+                <span className="grid h-12 w-12 place-items-center rounded-xl" style={{ background: tintBg("var(--ink-teal)", 14), color: "var(--ink-teal)" }}><TaskAltOutlinedIcon /></span>
                 <div className="font-semibold" style={{ color: "var(--tx)" }}>Todo en orden</div>
                 <div className="text-sm" style={{ color: "var(--tx-5)" }}>No hay cubiertas pendientes de recapado ni vehículos sin cubiertas asignadas.</div>
               </div>
@@ -160,7 +160,7 @@ const Dashboard = () => {
                 {senales.vehiculosSinCubiertas > 0 && (
                   <button onClick={() => navigate("/", { state: { op: { section: "vehiculos" } } })} className="flex w-full items-center gap-4 rounded-lg p-4 text-left"
                     style={{ background: "var(--elev)", border: "1px solid var(--bd)" }}>
-                    <span className="grid h-11 w-11 shrink-0 place-items-center rounded-lg" style={{ background: "var(--bd-strong)", color: "var(--tx-3)" }}><DirectionsBusRoundedIcon /></span>
+                    <span className="grid h-11 w-11 shrink-0 place-items-center rounded-lg" style={{ background: "var(--bd-strong)", color: "var(--tx-3)" }}><DirectionsBusOutlinedIcon /></span>
                     <span className="flex-1">
                       <span className="block font-semibold" style={{ color: "var(--tx)" }}>{senales.vehiculosSinCubiertas} vehículos</span>
                       <span className="block text-sm" style={{ color: "var(--tx-4)" }}>Sin cubiertas asignadas</span>
@@ -179,8 +179,8 @@ const Dashboard = () => {
         <h2 className="mb-3 font-display text-lg font-semibold" style={{ color: "var(--tx)", fontFamily: "'Space Grotesk'" }}>Acciones rápidas</h2>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <QuickAction icon={<OpenInNewRoundedIcon />} tint="var(--ink-lime)" title="Abrir operación" subtitle="Ir a la aplicación operativa" onClick={() => navigate("/")} />
-          <QuickAction icon={<GroupRoundedIcon />} tint="var(--ink-teal)" title="Gestionar usuarios" subtitle="Administrar el equipo" onClick={() => navigate("/admin/usuarios")} />
-          <QuickAction icon={<ApartmentRoundedIcon />} tint="var(--ink-purple)" title="Configuración de empresa" subtitle="Editar datos y preferencias" onClick={() => navigate("/admin/empresa")} />
+          <QuickAction icon={<GroupOutlinedIcon />} tint="var(--ink-teal)" title="Gestionar usuarios" subtitle="Administrar el equipo" onClick={() => navigate("/admin/usuarios")} />
+          <QuickAction icon={<ApartmentOutlinedIcon />} tint="var(--ink-purple)" title="Configuración de empresa" subtitle="Editar datos y preferencias" onClick={() => navigate("/admin/empresa")} />
         </div>
       </section>
 

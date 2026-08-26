@@ -7,7 +7,7 @@ const UpdaterButton = ({ current, bip, onClick }) => (
     style={{ border: "1px solid var(--bd)", background: "var(--elev)", color: "var(--tx-3)" }}
   >
     <span className="relative inline-flex h-5 w-5 flex-none items-center" style={{ color: "var(--ink-lime)" }}>
-      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
         <path d="M4 14.9A7 7 0 1 1 15.7 8h1.8a4.5 4.5 0 0 1 2.5 8.2" />
         <path d="M12 12v9" />
         <path d="m8.5 17.5 3.5 3.5 3.5-3.5" />

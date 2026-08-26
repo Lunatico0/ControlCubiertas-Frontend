@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react"
-import PrintRoundedIcon from "@mui/icons-material/PrintRounded"
-import VisibilityRoundedIcon from "@mui/icons-material/VisibilityRounded"
+import PrintOutlinedIcon from "@mui/icons-material/PrintOutlined"
+import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined"
 import FileDownloadRoundedIcon from "@mui/icons-material/FileDownloadRounded"
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded"
 import { getReceipts } from "@api/admin"
@@ -182,11 +182,11 @@ const Comprobantes = () => {
                 <div className="flex items-center justify-end gap-1.5">
                   <button onClick={() => reprint.execute({ entry: toEntry(c), tire: toTire(c) })} disabled={reprint.isPrinting} title="Reimprimir"
                     className="inline-flex h-[34px] w-[34px] items-center justify-center rounded-lg" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--tx-3)" }}>
-                    <PrintRoundedIcon sx={{ fontSize: 15 }} />
+                    <PrintOutlinedIcon sx={{ fontSize: 15 }} />
                   </button>
                   <button onClick={() => openView(c)} title="Ver"
                     className="inline-flex h-[34px] w-[34px] items-center justify-center rounded-lg" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--tx-3)" }}>
-                    <VisibilityRoundedIcon sx={{ fontSize: 15 }} />
+                    <VisibilityOutlinedIcon sx={{ fontSize: 15 }} />
                   </button>
                 </div>
               </div>

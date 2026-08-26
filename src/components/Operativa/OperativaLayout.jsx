@@ -2,9 +2,9 @@ import { useState } from "react"
 import { useNavigate, useLocation } from "react-router-dom"
 import { useTheme } from "@context/ThemeContext"
 import { useAuth } from "@context/AuthContext"
-import AdminPanelSettingsRoundedIcon from "@mui/icons-material/AdminPanelSettingsRounded"
-import HomeRoundedIcon from "@mui/icons-material/HomeRounded"
-import TripOriginRoundedIcon from "@mui/icons-material/TripOriginRounded"
+import AdminPanelSettingsOutlinedIcon from "@mui/icons-material/AdminPanelSettingsOutlined"
+import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined"
+import TripOriginOutlinedIcon from "@mui/icons-material/TripOriginOutlined"
 import LocalShippingOutlinedIcon from "@mui/icons-material/LocalShippingOutlined"
 import { useCacheTenantLogo } from "@hooks/useCacheTenantLogo"
 import { useUpdater } from "@hooks/useUpdater"
@@ -19,8 +19,8 @@ import OpTour from "./OpTour"
 // tokens (var(--x)) + data-app-theme para tema claro/oscuro. Las pantallas internas
 // (inventario, drawer, etc.) llegan en los próximos hitos; por ahora placeholder.
 const NAV = [
-  { key: "inicio", label: "Inicio", icon: <HomeRoundedIcon sx={{ fontSize: 20 }} /> },
-  { key: "cubiertas", label: "Cubiertas", icon: <TripOriginRoundedIcon sx={{ fontSize: 20 }} /> },
+  { key: "inicio", label: "Inicio", icon: <HomeOutlinedIcon sx={{ fontSize: 20 }} /> },
+  { key: "cubiertas", label: "Cubiertas", icon: <TripOriginOutlinedIcon sx={{ fontSize: 20 }} /> },
   { key: "vehiculos", label: "Vehículos", icon: <LocalShippingOutlinedIcon sx={{ fontSize: 20 }} /> },
 ]
 
@@ -86,7 +86,7 @@ const OperativaLayout = () => {
                 className="flex w-full cursor-pointer items-center gap-[13px] rounded-[9px] px-[13px] py-3 text-left text-[14.5px] font-semibold transition-colors"
                 style={{ border: "1px solid color-mix(in srgb, var(--ink-lime) 45%, transparent)", background: "color-mix(in srgb, var(--ink-lime) 8%, transparent)", color: "var(--ink-lime)" }}
               >
-                <span className="inline-flex h-[21px] w-[21px] flex-none items-center"><AdminPanelSettingsRoundedIcon sx={{ fontSize: 20 }} /></span>
+                <span className="inline-flex h-[21px] w-[21px] flex-none items-center"><AdminPanelSettingsOutlinedIcon sx={{ fontSize: 20 }} /></span>
                 <span>Panel administrativo</span>
               </button>
             </>

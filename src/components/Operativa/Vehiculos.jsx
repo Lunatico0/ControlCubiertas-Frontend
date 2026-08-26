@@ -4,8 +4,8 @@ import { usePersistedState } from "@hooks/usePersistedState"
 import { useHotkeyFocus } from "@hooks/useHotkeyFocus"
 import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded"
 import LocalShippingOutlinedIcon from "@mui/icons-material/LocalShippingOutlined"
-import TripOriginRoundedIcon from "@mui/icons-material/TripOriginRounded"
-import ReportProblemRoundedIcon from "@mui/icons-material/ReportProblemRounded"
+import TripOriginOutlinedIcon from "@mui/icons-material/TripOriginOutlined"
+import ReportProblemOutlinedIcon from "@mui/icons-material/ReportProblemOutlined"
 import { metaOf, tint, fmtKm, useStatusCatalog } from "./status"
 import { usePagination } from "@hooks/usePagination"
 import Paginador from "@components/common/Paginador"
@@ -119,7 +119,7 @@ const Vehiculos = ({ onNavigate, intent }) => {
         }}
         secondaryAction={pendingAxles > 0 ? (
           <button onClick={() => setShowConfigEjes(true)} title="Configurar ejes de vehículos migrados" className="inline-flex h-[46px] items-center gap-2 rounded-[11px] px-4 text-[13.5px] font-semibold" style={{ color: "var(--ink-orange)", background: tint("var(--ink-orange)", 12), border: `1px solid ${tint("var(--ink-orange)", 30)}` }}>
-            <ReportProblemRoundedIcon sx={{ fontSize: 17 }} /> Configurar ejes ({pendingAxles})
+            <ReportProblemOutlinedIcon sx={{ fontSize: 17 }} /> Configurar ejes ({pendingAxles})
           </button>
         ) : null}
         primaryAction={{ label: "Nuevo vehículo", onClick: () => setShowAlta(true) }}
@@ -162,7 +162,7 @@ const Vehiculos = ({ onNavigate, intent }) => {
                 </div>
                 <div className="text-[13px]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-2)" }}>{formatPlate(v.licensePlate, data.plateSep) || "—"}</div>
                 <div>{v.type && <Pill style={{ color: tipoColor, background: tipoBg }}>{v.type}</Pill>}</div>
-                <div className="flex items-center gap-[7px] text-[13px] font-semibold" style={{ color: countColor }}><TripOriginRoundedIcon sx={{ fontSize: 14 }} />{countLabel}</div>
+                <div className="flex items-center gap-[7px] text-[13px] font-semibold" style={{ color: countColor }}><TripOriginOutlinedIcon sx={{ fontSize: 14 }} />{countLabel}</div>
                 <div className="flex items-center justify-end">
                   <span className="text-[13px] font-semibold" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx)" }}>{kmLabel}</span>
                 </div>
@@ -207,7 +207,7 @@ const Vehiculos = ({ onNavigate, intent }) => {
 
                 {/* footer — pineado al fondo (mt-auto): el espacio sobrante queda entre las cubiertas y el divider */}
                 <div className="mt-auto flex items-center gap-[14px] border-t pt-[13px] text-[12.5px]" style={{ borderColor: "var(--bd-soft)" }}>
-                  <span className="inline-flex items-center gap-[7px] font-semibold" style={{ color: countColor }}><TripOriginRoundedIcon sx={{ fontSize: 15 }} />{countLabel}</span>
+                  <span className="inline-flex items-center gap-[7px] font-semibold" style={{ color: countColor }}><TripOriginOutlinedIcon sx={{ fontSize: 15 }} />{countLabel}</span>
                   <span className="ml-auto" style={{ color: "var(--tx-5)", fontFamily: "'IBM Plex Mono'" }}>{kmLabel}</span>
                 </div>
               </div>

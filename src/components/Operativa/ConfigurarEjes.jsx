@@ -7,9 +7,9 @@ import isElectron from "@utils/isElectron"
 import { tint, fmtKm } from "./status"
 import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded"
 import ArrowForwardRoundedIcon from "@mui/icons-material/ArrowForwardRounded"
-import TripOriginRoundedIcon from "@mui/icons-material/TripOriginRounded"
+import TripOriginOutlinedIcon from "@mui/icons-material/TripOriginOutlined"
 import LocalShippingOutlinedIcon from "@mui/icons-material/LocalShippingOutlined"
-import ReportProblemRoundedIcon from "@mui/icons-material/ReportProblemRounded"
+import ReportProblemOutlinedIcon from "@mui/icons-material/ReportProblemOutlined"
 import CheckRoundedIcon from "@mui/icons-material/CheckRounded"
 import Button from "@components/UI/Button"
 import Callout from "@components/common/Callout"
@@ -122,7 +122,7 @@ const ConfigurarEjes = ({ onClose, vehicle }) => {
               </div>
               {pending.length > 0 && (
                 <div className="ml-auto inline-flex items-center gap-2 rounded-[9px] px-[13px] py-[7px] text-[12.5px] font-semibold" style={{ color: "var(--ink-orange)", background: tint("var(--ink-orange)", 10), border: `1px solid ${tint("var(--ink-orange)", 30)}` }}>
-                  <ReportProblemRoundedIcon sx={{ fontSize: 15 }} /> {pending.length} {pending.length === 1 ? "pendiente" : "pendientes"}
+                  <ReportProblemOutlinedIcon sx={{ fontSize: 15 }} /> {pending.length} {pending.length === 1 ? "pendiente" : "pendientes"}
                 </div>
               )}
             </div>
@@ -148,12 +148,12 @@ const ConfigurarEjes = ({ onClose, vehicle }) => {
                         <div className="mt-0.5 text-[12px]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-5)" }}>{v.licensePlate || "—"} · {v.brand || "—"}</div>
                       </div>
                     </div>
-                    <Callout Icon={ReportProblemRoundedIcon} tone="var(--ink-orange)" dashed className="">
+                    <Callout Icon={ReportProblemOutlinedIcon} tone="var(--ink-orange)" dashed className="">
                       Ejes sin configurar — definí el esquema del vehículo.
                     </Callout>
                     <div className="flex items-center gap-3">
                       <span className="inline-flex items-center gap-[7px] text-[12.5px] font-semibold" style={{ color: v.cubiertas === 0 ? "var(--ink-orange)" : "var(--ink-teal)" }}>
-                        <TripOriginRoundedIcon sx={{ fontSize: 15 }} />{v.cubiertas} {v.cubiertas === 1 ? "cubierta" : "cubiertas"}
+                        <TripOriginOutlinedIcon sx={{ fontSize: 15 }} />{v.cubiertas} {v.cubiertas === 1 ? "cubierta" : "cubiertas"}
                       </span>
                       <span className="text-[12.5px]" style={{ color: "var(--tx-5)", fontFamily: "'IBM Plex Mono'" }}>{fmtKm(v.kilometers)}</span>
                       <Button variant="lime" onClick={() => openEditor(v)} className="ml-auto h-10 text-[13.5px]" style={{ background: "#C4ED2B", color: "#0A0C0D" }}>
@@ -188,7 +188,7 @@ const ConfigurarEjes = ({ onClose, vehicle }) => {
             <div className="w-[430px] flex-none overflow-y-auto" style={{ background: "var(--elev)", borderRight: "1px solid var(--bd)" }}>
               {/* Aviso de cubiertas montadas (guard) */}
               {mountedCount > 0 && (
-                <Callout Icon={ReportProblemRoundedIcon} tone="var(--ink-orange)" className="mx-6 mt-5">
+                <Callout Icon={ReportProblemOutlinedIcon} tone="var(--ink-orange)" className="mx-6 mt-5">
                   {hasPositionless
                     ? `Este vehículo tiene ${mountedCount} cubierta${mountedCount === 1 ? "" : "s"} montada${mountedCount === 1 ? "" : "s"} sin posición. Desasignalas para poder reconfigurar los ejes.`
                     : `Los ejes con cubierta montada están bloqueados. Desasigná esas cubiertas para reconfigurarlos.`}

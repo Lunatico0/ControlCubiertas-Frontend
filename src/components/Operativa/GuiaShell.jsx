@@ -1,8 +1,8 @@
 import { useTheme } from "@context/ThemeContext"
 import { Link } from "react-router-dom"
 import ChevronLeftRoundedIcon from "@mui/icons-material/ChevronLeftRounded"
-import DarkModeRoundedIcon from "@mui/icons-material/DarkModeRounded"
-import LightModeRoundedIcon from "@mui/icons-material/LightModeRounded"
+import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined"
+import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined"
 import BrandLogo from "@components/BrandLogo"
 
 // Shell común de las guías (manual operativo y manual del admin). Layout: TOC lateral FIJO
@@ -67,7 +67,7 @@ const GuiaShell = ({ sidebarTitle, badge, eyebrow, title, intro, toc, backTo = "
         </nav>
         <div className="mt-auto pt-[18px]" style={{ borderTop: "1px solid var(--bd-faint)" }}>
           <button onClick={toggleTheme} className="mb-2.5 flex w-full items-center gap-2.5 rounded-[9px] border px-3 py-2.5 text-[13px] font-medium" style={{ borderColor: "var(--bd)", background: "var(--elev)", color: "var(--tx-2)" }}>
-            <span className="inline-flex" style={{ color: "var(--ink-lime)" }}>{isDarkMode ? <DarkModeRoundedIcon sx={{ fontSize: 17 }} /> : <LightModeRoundedIcon sx={{ fontSize: 18 }} />}</span>
+            <span className="inline-flex" style={{ color: "var(--ink-lime)" }}>{isDarkMode ? <DarkModeOutlinedIcon sx={{ fontSize: 17 }} /> : <LightModeOutlinedIcon sx={{ fontSize: 18 }} />}</span>
             {isDarkMode ? "Tema oscuro" : "Tema claro"}
           </button>
           <Link to={backTo} className="inline-flex items-center gap-2 text-[12.5px]" style={{ color: "var(--ink-lime)", textDecoration: "none" }}>

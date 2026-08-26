@@ -1,10 +1,10 @@
 import { useState, useEffect, useCallback, useMemo } from "react"
-import EmojiEventsRoundedIcon from "@mui/icons-material/EmojiEventsRounded"
+import EmojiEventsOutlinedIcon from "@mui/icons-material/EmojiEventsOutlined"
 import TimelineRoundedIcon from "@mui/icons-material/TimelineRounded"
 import DeleteOutlineRoundedIcon from "@mui/icons-material/DeleteOutlineRounded"
-import StyleRoundedIcon from "@mui/icons-material/StyleRounded"
+import StyleOutlinedIcon from "@mui/icons-material/StyleOutlined"
 import FileDownloadRoundedIcon from "@mui/icons-material/FileDownloadRounded"
-import BoltRoundedIcon from "@mui/icons-material/BoltRounded"
+import BoltOutlinedIcon from "@mui/icons-material/BoltOutlined"
 import { getReports, getVehicleReports, getVehicleWearCached } from "@api/admin"
 import { showToast } from "@utils/toast"
 import { downloadCSV } from "@utils/csv"
@@ -153,7 +153,7 @@ const TruckHeatmap = ({ wear }) => {
   return (
     <div>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 5, marginBottom: 10, fontSize: 10, letterSpacing: ".14em", color: "var(--tx-6)", fontFamily: "'IBM Plex Mono'" }}>
-        FRENTE <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M6 13l6 6 6-6" /></svg>
+        FRENTE <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M6 13l6 6 6-6" /></svg>
       </div>
       <div style={{ position: "relative", display: "flex", flexDirection: "column", gap: 12, alignItems: "center" }}>
         <div style={{ position: "absolute", top: 6, bottom: 6, left: "50%", width: 3, transform: "translateX(-50%)", background: "var(--bd-strong)", borderRadius: 3 }} />
@@ -202,8 +202,8 @@ const WearResumen = ({ wear }) => {
         <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 9, padding: "10px 12px", borderRadius: 10, background: f.warn ? "color-mix(in srgb, var(--st-orange) 8%, var(--elev))" : "var(--elev)", border: `1px solid ${f.warn ? "color-mix(in srgb, var(--st-orange) 30%, transparent)" : "var(--bd)"}` }}>
           <span style={{ display: "inline-flex", flex: "none", marginTop: 1, color: f.warn ? "var(--ink-orange)" : "var(--ink-lime)" }}>
             {f.warn
-              ? <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z" /><path d="M12 9v4M12 17h.01" /></svg>
-              : <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5" /></svg>}
+              ? <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z" /><path d="M12 9v4M12 17h.01" /></svg>
+              : <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5" /></svg>}
           </span>
           <span style={{ fontSize: 12, color: "var(--tx-3)", lineHeight: 1.45 }}>{f.text}</span>
         </div>
@@ -221,7 +221,7 @@ const Selector = ({ value, onChange, options, icon }) => (
       {options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
     </select>
     <span style={{ position: "absolute", right: 9, top: "50%", transform: "translateY(-50%)", color: "var(--tx-6)", pointerEvents: "none", display: "inline-flex" }}>
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6" /></svg>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6" /></svg>
     </span>
   </div>
 )
@@ -240,7 +240,7 @@ const ChartCard = ({ title, sub, type, onType, typeOpts, extraSelector, insight,
     {children}
     {insight && (
       <div style={{ display: "flex", alignItems: "flex-start", gap: 8, marginTop: 14, paddingTop: 14, borderTop: "1px solid var(--bd-soft)", fontSize: 12, color: "var(--tx-4)", lineHeight: 1.5 }}>
-        <span style={{ display: "inline-flex", color: "var(--ink-lime)", flexShrink: 0, marginTop: 1 }}><BoltRoundedIcon sx={{ fontSize: 15 }} /></span>{insight}
+        <span style={{ display: "inline-flex", color: "var(--ink-lime)", flexShrink: 0, marginTop: 1 }}><BoltOutlinedIcon sx={{ fontSize: 15 }} /></span>{insight}
       </div>
     )}
   </div>
@@ -372,7 +372,7 @@ const Reportes = () => {
         </div>
         <div className="ml-auto flex items-center gap-3">
           <Selector value={range} onChange={setRange} options={RANGES}
-            icon={<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" /></svg>} />
+            icon={<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" /></svg>} />
           <button onClick={exportCSV} className="inline-flex items-center gap-2 rounded-[10px] px-[17px] py-[11px] text-sm font-semibold"
             style={{ background: "var(--elev)", border: "1px solid var(--bd-strong)", color: "var(--tx-2)" }}>
             <FileDownloadRoundedIcon sx={{ fontSize: 17 }} /> Exportar
@@ -388,13 +388,13 @@ const Reportes = () => {
         <>
           {/* Summary cards */}
           <div className="grid grid-cols-4 gap-4">
-            <StatCard variant="spread" label="Marca líder por vida útil" tint="var(--ink-lime)" icon={<EmojiEventsRoundedIcon sx={{ fontSize: 17 }} />}
+            <StatCard variant="spread" label="Marca líder por vida útil" tint="var(--ink-lime)" icon={<EmojiEventsOutlinedIcon sx={{ fontSize: 17 }} />}
               value={data.leader?.name ?? "—"} sublabel={data.leader ? `${fmtKm(data.leader.life)} prom. de vida útil` : "Sin datos suficientes"} />
             <StatCard variant="spread" label="Vida útil promedio" tint="var(--ink-blue)" icon={<TimelineRoundedIcon sx={{ fontSize: 17 }} />}
               value={fmtKm(data.fleetLife)} sublabel="por cubierta, toda la flota" />
             <StatCard variant="spread" label="Tasa de descarte" tint="var(--ink-red)" icon={<DeleteOutlineRoundedIcon sx={{ fontSize: 17 }} />}
               value={`${data.discardRate}%`} sublabel="de las cubiertas dadas de baja" />
-            <StatCard variant="spread" label="Cubiertas analizadas" tint="var(--ink-teal)" icon={<StyleRoundedIcon sx={{ fontSize: 17 }} />}
+            <StatCard variant="spread" label="Cubiertas analizadas" tint="var(--ink-teal)" icon={<StyleOutlinedIcon sx={{ fontSize: 17 }} />}
               value={data.total} sublabel="con historial de kilometraje" />
           </div>
 
@@ -427,7 +427,7 @@ const Reportes = () => {
               ))}
             </div>
             <div className="flex items-center gap-2 px-6 pb-[18px] pt-3 text-[12px]" style={{ color: "var(--tx-6)" }}>
-              <span className="inline-flex" style={{ color: "var(--ink-lime)" }}><BoltRoundedIcon sx={{ fontSize: 15 }} /></span>{brandInsight}
+              <span className="inline-flex" style={{ color: "var(--ink-lime)" }}><BoltOutlinedIcon sx={{ fontSize: 15 }} /></span>{brandInsight}
             </div>
           </div>
 
@@ -452,7 +452,7 @@ const Reportes = () => {
               type={types.vehicle} onType={(v) => setType("vehicle", v)} typeOpts={TYPE_BAR_LINE}
               insight={vehicleInsight}
               extraSelector={<Selector value={vehMetric} onChange={setVehMetric} options={VEH_METRICS}
-                icon={<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M14 18V6a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h1" /><path d="M14 9h4l4 4v4a1 1 0 0 1-1 1h-1" /><circle cx="7" cy="18" r="2" /><circle cx="17" cy="18" r="2" /><path d="M9 18h6" /></svg>} />}>
+                icon={<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M14 18V6a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h1" /><path d="M14 9h4l4 4v4a1 1 0 0 1-1 1h-1" /><circle cx="7" cy="18" r="2" /><circle cx="17" cy="18" r="2" /><path d="M9 18h6" /></svg>} />}>
               <CatChart type={types.vehicle} data={vehicleData} unit={vehUnit} xShort={(v) => String(v).replace("Móvil ", "")} />
             </ChartCard>
           </div>
@@ -464,7 +464,7 @@ const Reportes = () => {
               sub={posVehObj ? `${posVehObj.mobile} · vista superior — km acumulado en cada posición del eje` : "Elegí un camión para ver el mapa de desgaste."}
               insight="El % de cada posición es su km acumulado relativo a la más exigida del camión (verde = poco, rojo = mucho). Deja ver si una posición o un eje entero desgasta más — señal de alineación o rotación."
               extraSelector={<Selector value={posVeh || ""} onChange={setPosVeh} options={posOptions}
-                icon={<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M14 18V6a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h1" /><path d="M14 9h4l4 4v4a1 1 0 0 1-1 1h-1" /><circle cx="7" cy="18" r="2" /><circle cx="17" cy="18" r="2" /><path d="M9 18h6" /></svg>} />}>
+                icon={<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M14 18V6a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h1" /><path d="M14 9h4l4 4v4a1 1 0 0 1-1 1h-1" /><circle cx="7" cy="18" r="2" /><circle cx="17" cy="18" r="2" /><path d="M9 18h6" /></svg>} />}>
               {wearLoading ? (
                 <p style={{ padding: "48px 0", textAlign: "center", color: "var(--tx-6)", fontSize: 13 }}>Cargando…</p>
               ) : !wear || !wear.positions.length ? (
@@ -491,7 +491,7 @@ const Reportes = () => {
           </div>
 
           {/* Callout: cuándo recapar */}
-          <Callout Icon={BoltRoundedIcon} tone="var(--ink-orange)" className="mt-4">
+          <Callout Icon={BoltOutlinedIcon} tone="var(--ink-orange)" className="mt-4">
             <b style={{ color: "var(--tx)" }}>Cuándo recapar:</b> {stageInsight}
           </Callout>
         </>

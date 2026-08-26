@@ -1,7 +1,7 @@
 import GuiaShell, { H2, H3, P, B, UL, Callout, Faqs } from "@components/Operativa/GuiaShell"
-import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded"
-import WarningRoundedIcon from "@mui/icons-material/WarningRounded"
-import InfoRoundedIcon from "@mui/icons-material/InfoRounded"
+import CheckCircleOutlinedIcon from "@mui/icons-material/CheckCircleOutlined"
+import WarningOutlinedIcon from "@mui/icons-material/WarningOutlined"
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined"
 
 // Guía del ADMINISTRADOR (rediseño Claude Design "Guia Admin.dc.html"). Página propia
 // (ruta /admin/guia). Comparte el shell con la guía operativa (GuiaShell).
@@ -39,7 +39,7 @@ const GuiaAdmin = () => (
       <li><B>Tenant-admin:</B> además de operar, accede a este panel para gestionar equipo y configuración.</li>
       <li><B>Operativo:</B> usa la app del día a día (cubiertas, vehículos, comprobantes). No ve el panel de administración.</li>
     </UL>
-    <Callout Icon={CheckCircleRoundedIcon} tone="var(--ink-lime)"><B>Primer ingreso:</B> el alta del admin llega con una contraseña temporal. Al entrar por primera vez se te pide cambiarla antes de continuar.</Callout>
+    <Callout Icon={CheckCircleOutlinedIcon} tone="var(--ink-lime)"><B>Primer ingreso:</B> el alta del admin llega con una contraseña temporal. Al entrar por primera vez se te pide cambiarla antes de continuar.</Callout>
 
     <H2 id="resumen">2 · Resumen (panorama)</H2>
     <P>La pantalla de inicio del panel muestra el estado general de la flota: totales de cubiertas por ubicación (en circulación, en depósito), cantidad de vehículos, la distribución por estado del ciclo y señales de atención (por ejemplo, cubiertas a recapar o vehículos sin cubiertas). Es solo lectura: un vistazo rápido para decidir dónde actuar.</P>
@@ -51,7 +51,7 @@ const GuiaAdmin = () => (
       <li><B>Editar / cambiar rol:</B> ajustás datos o pasás a alguien de operativo a admin y viceversa.</li>
       <li><B>Desactivar:</B> corta el acceso sin borrar el historial. Pide confirmación.</li>
     </UL>
-    <Callout Icon={WarningRoundedIcon} tone="var(--ink-orange)">Si sos el <B>único administrador</B>, no podés desactivarte a vos mismo: siempre debe quedar al menos un admin activo. Primero designá a otro admin.</Callout>
+    <Callout Icon={WarningOutlinedIcon} tone="var(--ink-orange)">Si sos el <B>único administrador</B>, no podés desactivarte a vos mismo: siempre debe quedar al menos un admin activo. Primero designá a otro admin.</Callout>
 
     <H2 id="empresa">4 · Empresa y ciclo de estados</H2>
     <P>Acá viven los <B>datos de la organización</B> (nombre, CUIT, dirección, teléfono) y el <B>ciclo de estados</B> de las cubiertas.</P>
@@ -71,7 +71,7 @@ const GuiaAdmin = () => (
       <li><B>Texto:</B> tipografía, tamaño (S/M/L), alineación y color de acento de la marca.</li>
       <li><B>Pie de comprobante</B> y <B>duplicado:</B> se imprime en A4 con línea de corte — arriba el original, abajo el duplicado. El toggle permite imprimir solo el original.</li>
     </UL>
-    <Callout Icon={InfoRoundedIcon} tone="var(--ink-blue)">El prefijo y el pie del comprobante se configuran acá, en el editor — no en la sección Empresa. Todo lo del comprobante vive en un solo lugar.</Callout>
+    <Callout Icon={InfoOutlinedIcon} tone="var(--ink-blue)">El prefijo y el pie del comprobante se configuran acá, en el editor — no en la sección Empresa. Todo lo del comprobante vive en un solo lugar.</Callout>
 
     <H2 id="faq">7 · Preguntas frecuentes</H2>
     <Faqs items={FAQS} />

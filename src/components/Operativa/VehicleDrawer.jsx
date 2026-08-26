@@ -3,8 +3,8 @@ import ApiContext from "@context/apiContext"
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded"
 import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded"
 import AddRoundedIcon from "@mui/icons-material/AddRounded"
-import EditRoundedIcon from "@mui/icons-material/EditRounded"
-import SettingsInputComponentRoundedIcon from "@mui/icons-material/SettingsInputComponentRounded"
+import EditOutlinedIcon from "@mui/icons-material/EditOutlined"
+import SettingsInputComponentOutlinedIcon from "@mui/icons-material/SettingsInputComponentOutlined"
 import LocalShippingOutlinedIcon from "@mui/icons-material/LocalShippingOutlined"
 import EditarVehiculo from "./EditarVehiculo"
 import ConfigurarEjes from "./ConfigurarEjes"
@@ -126,10 +126,10 @@ const VehicleDrawer = ({ item, onClose, onNavigate }) => {
           {/* Acciones */}
           <div className="mt-5 flex gap-2.5">
             <button onClick={() => setShowReconfig(true)} className="inline-flex h-11 flex-1 items-center justify-center gap-2 rounded-[10px] text-[13px] font-semibold" style={{ border: "1px solid var(--bd-strong)", background: "var(--card)", color: "var(--tx)" }}>
-              <SettingsInputComponentRoundedIcon sx={{ fontSize: 16 }} /> Reconfigurar ejes
+              <SettingsInputComponentOutlinedIcon sx={{ fontSize: 16 }} /> Reconfigurar ejes
             </button>
             <button onClick={() => setShowEdit(true)} className="inline-flex h-11 flex-1 items-center justify-center gap-2 rounded-[10px] text-[13px] font-semibold" style={{ border: "1px solid var(--bd-strong)", background: "var(--card)", color: "var(--tx)" }}>
-              <EditRoundedIcon sx={{ fontSize: 16 }} /> Editar datos
+              <EditOutlinedIcon sx={{ fontSize: 16 }} /> Editar datos
             </button>
           </div>
         </div>

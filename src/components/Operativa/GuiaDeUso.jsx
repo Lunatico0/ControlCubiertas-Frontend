@@ -1,8 +1,8 @@
 import GuiaShell, { H2, H3, P, B, UL, Kbd, Callout, Faqs } from "./GuiaShell"
-import BoltRoundedIcon from "@mui/icons-material/BoltRounded"
-import InfoRoundedIcon from "@mui/icons-material/InfoRounded"
-import WarningRoundedIcon from "@mui/icons-material/WarningRounded"
-import PlayArrowRoundedIcon from "@mui/icons-material/PlayArrowRounded"
+import BoltOutlinedIcon from "@mui/icons-material/BoltOutlined"
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined"
+import WarningOutlinedIcon from "@mui/icons-material/WarningOutlined"
+import PlayArrowOutlinedIcon from "@mui/icons-material/PlayArrowOutlined"
 
 // Guía de uso completa del OPERATIVO (rediseño Claude Design "Guia de Uso.dc.html"). Página
 // propia (ruta /guia). El shell (TOC fijo + toggle tema + layout) vive en GuiaShell.
@@ -43,7 +43,7 @@ const GuiaDeUso = () => (
     backLabel="Volver a la app"
     footer="TireOps · Guía del usuario operativo"
   >
-    <Callout Icon={PlayArrowRoundedIcon} tone="var(--ink-lime)">¿Preferís un recorrido guiado? Usá <B>Ayuda → Ver guía interactiva</B> en la app.</Callout>
+    <Callout Icon={PlayArrowOutlinedIcon} tone="var(--ink-lime)">¿Preferís un recorrido guiado? Usá <B>Ayuda → Ver guía interactiva</B> en la app.</Callout>
 
     <H2 id="intro">1 · Qué es TireOps</H2>
     <P>TireOps es el sistema para administrar el ciclo de vida completo de cada cubierta de la flota: desde que ingresa nueva al depósito hasta que se descarta. Cada cubierta tiene un <B>código único</B>, un <B>estado</B> dentro del ciclo de recapado, una <B>ubicación</B> (depósito o montada en un vehículo) y un <B>historial</B> de todos sus movimientos.</P>
@@ -56,7 +56,7 @@ const GuiaDeUso = () => (
       <li><B>Botones grandes:</B> las acciones más frecuentes (dar de alta, buscar, montar, comprobantes) a un toque — cómodos también en tablet.</li>
       <li><B>Accesos por estado:</B> tarjetas con el conteo de cubiertas en stock, en circulación y a recapar. Tocá una para ir directo a ese grupo filtrado.</li>
     </UL>
-    <Callout Icon={BoltRoundedIcon} tone="var(--ink-lime)"><B>Atajo:</B> apretá <Kbd>Ctrl</Kbd> + <Kbd>K</Kbd> en cualquier pantalla para saltar directo al buscador de cubiertas.</Callout>
+    <Callout Icon={BoltOutlinedIcon} tone="var(--ink-lime)"><B>Atajo:</B> apretá <Kbd>Ctrl</Kbd> + <Kbd>K</Kbd> en cualquier pantalla para saltar directo al buscador de cubiertas.</Callout>
 
     <H2 id="cubiertas">3 · Cubiertas (el inventario)</H2>
     <P>Es el corazón operativo. Podés verlo como <B>tarjetas</B> (más visual) o como <B>lista</B> (más densa) con el toggle de la esquina superior derecha.</P>
@@ -84,7 +84,7 @@ const GuiaDeUso = () => (
       <li><B>Imprimir recibo:</B> reimprime el comprobante de un movimiento.</li>
       <li><B>Descartar:</B> marca el fin de vida útil. Se conserva el historial pero deja de estar disponible.</li>
     </UL>
-    <Callout Icon={InfoRoundedIcon} tone="var(--ink-blue)">Cada cambio se refleja al instante en la lista y en el detalle — no hace falta refrescar. Y todo movimiento queda en el <B>historial</B> de la cubierta, con su comprobante.</Callout>
+    <Callout Icon={InfoOutlinedIcon} tone="var(--ink-blue)">Cada cambio se refleja al instante en la lista y en el detalle — no hace falta refrescar. Y todo movimiento queda en el <B>historial</B> de la cubierta, con su comprobante.</Callout>
 
     <H2 id="vehiculos">4 · Vehículos y ejes</H2>
     <P>Cada vehículo muestra su <B>esquema de ejes</B> (vista superior) con las posiciones coloreadas según el estado de la cubierta montada, más el conteo de cubiertas y el kilometraje. Podés verlos como tarjetas o lista con el toggle.</P>
@@ -92,7 +92,7 @@ const GuiaDeUso = () => (
     <P>Al tocar un vehículo se abre su panel a la derecha con todas las <B>posiciones</B>. En cada una podés <B>Ver</B> la cubierta montada (te lleva a su detalle) o <B>Montar</B> una si está vacía.</P>
     <H3>Reconfigurar ejes</H3>
     <P>Si un vehículo quedó con un esquema de ejes equivocado, en el detalle tocá <B>Reconfigurar ejes</B>. Se abre un editor con presets (Auto, Camión 4×2 / 6×4, Semi, Bus, Moto), ajuste eje por eje (simple/dual, agregar/quitar) y preview en vivo.</P>
-    <Callout Icon={WarningRoundedIcon} tone="var(--ink-orange)">Al reconfigurar, las cubiertas montadas se reubican por orden. Si reducís posiciones, las que sobran quedan liberadas al depósito.</Callout>
+    <Callout Icon={WarningOutlinedIcon} tone="var(--ink-orange)">Al reconfigurar, las cubiertas montadas se reubican por orden. Si reducís posiciones, las que sobran quedan liberadas al depósito.</Callout>
 
     <H2 id="comprobantes">5 · Comprobantes</H2>
     <P>Cada movimiento genera un comprobante con número correlativo. Desde el detalle de una cubierta o desde su historial podés <B>imprimir</B> o <B>reimprimir</B> cualquiera. El número mostrado coincide siempre con el del sistema.</P>

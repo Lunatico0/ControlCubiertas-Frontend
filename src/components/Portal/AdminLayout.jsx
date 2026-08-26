@@ -9,25 +9,25 @@ import AppSidebar from "@components/Layout/AppSidebar"
 import BrandDeco from "@components/common/BrandDeco"
 import OpTour from "@components/Operativa/OpTour"
 
-import HomeRoundedIcon from "@mui/icons-material/HomeRounded"
-import GroupRoundedIcon from "@mui/icons-material/GroupRounded"
-import ApartmentRoundedIcon from "@mui/icons-material/ApartmentRounded"
-import ReceiptLongRoundedIcon from "@mui/icons-material/ReceiptLongRounded"
-import InsightsRoundedIcon from "@mui/icons-material/InsightsRounded"
-import EditRoundedIcon from "@mui/icons-material/EditRounded"
+import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined"
+import GroupOutlinedIcon from "@mui/icons-material/GroupOutlined"
+import ApartmentOutlinedIcon from "@mui/icons-material/ApartmentOutlined"
+import ReceiptLongOutlinedIcon from "@mui/icons-material/ReceiptLongOutlined"
+import InsightsOutlinedIcon from "@mui/icons-material/InsightsOutlined"
+import EditOutlinedIcon from "@mui/icons-material/EditOutlined"
 import OpenInNewRoundedIcon from "@mui/icons-material/OpenInNewRounded"
-import CreditCardRoundedIcon from "@mui/icons-material/CreditCardRounded"
+import CreditCardOutlinedIcon from "@mui/icons-material/CreditCardOutlined"
 
 // Portal del tenant-admin: shell dark propio (design system operativo), separado de la
 // operación. Cada sección entra por <Outlet/>. "Comprobantes" (histórico) es un hito
 // aparte → queda como "próximamente" hasta que exista su vista.
 const NAV = [
-  { to: "/admin", end: true, label: "Resumen", Icon: HomeRoundedIcon },
-  { to: "/admin/reportes", label: "Reportes", Icon: InsightsRoundedIcon, tour: "a-reportes" },
-  { to: "/admin/usuarios", label: "Usuarios", Icon: GroupRoundedIcon, tour: "a-usuarios" },
-  { to: "/admin/empresa", label: "Empresa", Icon: ApartmentRoundedIcon, tour: "a-empresa" },
-  { to: "/admin/comprobantes", label: "Comprobantes", Icon: ReceiptLongRoundedIcon, tour: "a-comprobantes" },
-  { to: "/admin/comprobante", label: "Editor de comprobante", Icon: EditRoundedIcon, tour: "a-editor" },
+  { to: "/admin", end: true, label: "Resumen", Icon: HomeOutlinedIcon },
+  { to: "/admin/reportes", label: "Reportes", Icon: InsightsOutlinedIcon, tour: "a-reportes" },
+  { to: "/admin/usuarios", label: "Usuarios", Icon: GroupOutlinedIcon, tour: "a-usuarios" },
+  { to: "/admin/empresa", label: "Empresa", Icon: ApartmentOutlinedIcon, tour: "a-empresa" },
+  { to: "/admin/comprobantes", label: "Comprobantes", Icon: ReceiptLongOutlinedIcon, tour: "a-comprobantes" },
+  { to: "/admin/comprobante", label: "Editor de comprobante", Icon: EditOutlinedIcon, tour: "a-editor" },
 ]
 
 // Pasos del tour del panel admin. screen = pantalla (ruta); sel = data-tour del elemento.
@@ -84,7 +84,7 @@ const AdminLayout = () => {
           <>
             <div className="my-3.5 h-px" style={{ background: "var(--bd-faint)" }} />
             <div className="flex items-center gap-[13px] rounded-[9px] px-[13px] py-[11px] text-[14px]" style={{ color: "var(--tx-6)", cursor: "default" }}>
-              <span className="inline-flex flex-none items-center justify-center" style={{ width: 20, height: 20 }}><CreditCardRoundedIcon sx={{ fontSize: 18 }} /></span>
+              <span className="inline-flex flex-none items-center justify-center" style={{ width: 20, height: 20 }}><CreditCardOutlinedIcon sx={{ fontSize: 18 }} /></span>
               <span>Cuenta</span>
               <span className="ml-auto rounded-full px-2 py-0.5 text-[9px] font-semibold tracking-wider" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--ink-purple)", background: "color-mix(in srgb, var(--ink-purple) 16%, transparent)" }}>PRÓXIMAMENTE</span>
             </div>
@@ -104,7 +104,7 @@ const AdminLayout = () => {
         <div className="z-2 flex h-[74px] flex-none items-center gap-3.5 px-6" style={{ background: "var(--bg)", borderBottom: "1px solid var(--bd-faint)" }}>
           <div className="ml-auto flex items-center gap-3">
             <div className="inline-flex items-center gap-2.5 rounded-[10px] px-3.5 py-2.5" style={{ background: "var(--elev)", border: "1px solid var(--bd)" }}>
-              <ApartmentRoundedIcon sx={{ fontSize: 17 }} style={{ color: "var(--tx-5)" }} />
+              <ApartmentOutlinedIcon sx={{ fontSize: 17 }} style={{ color: "var(--tx-5)" }} />
               <span className="text-[13.5px] font-semibold" style={{ color: "var(--tx)" }}>{companyName || "Tu empresa"}</span>
             </div>
             <button onClick={() => navigate("/")} className="inline-flex items-center gap-2 rounded-[10px] px-4 py-2.5 text-[13.5px] font-semibold" style={{ background: "color-mix(in srgb, var(--ink-lime) 6%, transparent)", border: "1px solid color-mix(in srgb, var(--ink-lime) 45%, transparent)", color: "var(--ink-lime)" }}>

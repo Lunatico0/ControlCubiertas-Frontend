@@ -102,7 +102,7 @@ const Login = () => {
               {(credErr || logoutMsg) && (
                 <div role="alert" style={{ display: "flex", gap: 10, padding: "12px 14px", border: "1px solid rgba(240,86,74,.4)", borderRadius: 11, background: "rgba(240,86,74,.08)", marginBottom: 18 }}>
                   <span style={{ color: BAD, flex: "none", marginTop: 1 }}>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="9.2" /><path d="M12 8v5M12 16h.01" /></svg>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round"><circle cx="12" cy="12" r="9.2" /><path d="M12 8v5M12 16h.01" /></svg>
                   </span>
                   <span style={{ fontSize: "12.5px", color: "#F0A9A4", lineHeight: 1.5 }}>{credErr || logoutMsg}</span>
                 </div>
@@ -132,9 +132,9 @@ const Login = () => {
                     rightAddon={
                       <button type="button" onClick={() => setShowPwd((v) => !v)} title={showPwd ? "Ocultar" : "Mostrar"} aria-label={showPwd ? "Ocultar contraseña" : "Mostrar contraseña"} style={{ position: "absolute", right: 4, top: 4, width: 38, height: 38, display: "flex", alignItems: "center", justifyContent: "center", color: "#7B8186", cursor: "pointer", borderRadius: 9, border: "none", background: "transparent" }}>
                       {showPwd ? (
-                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3.5-6.5 10-6.5S22 12 22 12s-3.5 6.5-10 6.5S2 12 2 12Z" /><circle cx="12" cy="12" r="2.8" /><path d="M4 4l16 16" /></svg>
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3.5-6.5 10-6.5S22 12 22 12s-3.5 6.5-10 6.5S2 12 2 12Z" /><circle cx="12" cy="12" r="2.8" /><path d="M4 4l16 16" /></svg>
                       ) : (
-                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3.5-6.5 10-6.5S22 12 22 12s-3.5 6.5-10 6.5S2 12 2 12Z" /><circle cx="12" cy="12" r="2.8" /></svg>
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3.5-6.5 10-6.5S22 12 22 12s-3.5 6.5-10 6.5S2 12 2 12Z" /><circle cx="12" cy="12" r="2.8" /></svg>
                       )}
                       </button>
                     }
@@ -159,7 +159,7 @@ const Login = () => {
               </div>
               <div style={{ display: "flex", gap: 10, padding: "13px 15px", border: "1px solid #2A3033", borderRadius: 11, background: "#0C0E0F", marginBottom: 18 }}>
                 <span style={{ color: "#6E97F5", flex: "none", marginTop: 1 }}>
-                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9" /><path d="M12 16v-4M12 8h.01" /></svg>
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9" /><path d="M12 16v-4M12 8h.01" /></svg>
                 </span>
                 <span style={{ fontSize: 13, color: "#9AA0A4", lineHeight: 1.6 }}>Pedile a tu administrador que te genere una nueva desde <b style={{ color: "#D6D9D5" }}>Usuarios</b>. Te va a dar una contraseña temporal para tu próximo ingreso.</span>
               </div>

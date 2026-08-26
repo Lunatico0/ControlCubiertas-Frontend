@@ -4,12 +4,12 @@ import { externalPageProps } from "@utils/isElectron"
 import BrandLogo from "@components/BrandLogo"
 import UpdaterButton from "@components/Updater/UpdaterButton"
 import UpdaterModal from "@components/Updater/UpdaterModal"
-import DarkModeRoundedIcon from "@mui/icons-material/DarkModeRounded"
-import LightModeRoundedIcon from "@mui/icons-material/LightModeRounded"
+import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined"
+import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined"
 import HelpOutlineRoundedIcon from "@mui/icons-material/HelpOutlineRounded"
-import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded"
-import PlayArrowRoundedIcon from "@mui/icons-material/PlayArrowRounded"
-import MenuBookRoundedIcon from "@mui/icons-material/MenuBookRounded"
+import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined"
+import PlayArrowOutlinedIcon from "@mui/icons-material/PlayArrowOutlined"
+import MenuBookOutlinedIcon from "@mui/icons-material/MenuBookOutlined"
 
 // Shell compartido del sidebar (aside) — usado por la app operativa (OperativaLayout)
 // y el panel del tenant-admin (AdminLayout). Unifica ancho (w-64), navegación, updater,
@@ -90,7 +90,7 @@ const AppSidebar = ({ nav, belowNav, upd, user, help, onLogout }) => {
           style={{ borderColor: "var(--bd)", background: "var(--elev)" }}
         >
           <span className="inline-flex h-5 w-5 flex-none items-center" style={{ color: "var(--ink-lime)" }}>
-            {isDarkMode ? <DarkModeRoundedIcon sx={{ fontSize: 18 }} /> : <LightModeRoundedIcon sx={{ fontSize: 19 }} />}
+            {isDarkMode ? <DarkModeOutlinedIcon sx={{ fontSize: 18 }} /> : <LightModeOutlinedIcon sx={{ fontSize: 19 }} />}
           </span>
           <span className="text-[13px] font-medium" style={{ color: "var(--tx-2)" }}>
             {isDarkMode ? "Tema oscuro" : "Tema claro"}
@@ -125,7 +125,7 @@ const AppSidebar = ({ nav, belowNav, upd, user, help, onLogout }) => {
           className="inline-flex cursor-pointer rounded-[7px] p-[7px]"
           style={{ color: "var(--tx-6)" }}
         >
-          <LogoutRoundedIcon sx={{ fontSize: 17 }} />
+          <LogoutOutlinedIcon sx={{ fontSize: 17 }} />
         </button>
 
         {helpMenu && (
@@ -134,14 +134,14 @@ const AppSidebar = ({ nav, belowNav, upd, user, help, onLogout }) => {
             <div className="absolute z-40 overflow-hidden rounded-xl" style={{ bottom: 58, right: 12, left: 12, background: "var(--card)", border: "1px solid var(--bd-strong)", boxShadow: "var(--elev-1)" }}>
               <div className="px-3.5 py-[11px] text-[10px] tracking-[.08em]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-6)", borderBottom: "1px solid var(--bd-soft)" }}>AYUDA</div>
               <button onClick={() => { setHelpMenu(false); help.onStartTour() }} className="flex w-full items-center gap-[11px] px-3.5 py-3 text-left">
-                <span className="flex h-[30px] w-[30px] flex-none items-center justify-center rounded-lg" style={{ background: "color-mix(in srgb, var(--ink-lime) 13%, transparent)", color: "var(--ink-lime)" }}><PlayArrowRoundedIcon sx={{ fontSize: 16 }} /></span>
+                <span className="flex h-[30px] w-[30px] flex-none items-center justify-center rounded-lg" style={{ background: "color-mix(in srgb, var(--ink-lime) 13%, transparent)", color: "var(--ink-lime)" }}><PlayArrowOutlinedIcon sx={{ fontSize: 16 }} /></span>
                 <span style={{ lineHeight: 1.25 }}>
                   <span className="block text-[13px] font-semibold" style={{ color: "var(--tx)" }}>Ver guía interactiva</span>
                   <span className="block text-[11px]" style={{ color: "var(--tx-5)" }}>Tour rápido por la app</span>
                 </span>
               </button>
               <a {...externalPageProps(help.guideHref)} onClick={() => setHelpMenu(false)} className="flex items-center gap-[11px] px-3.5 py-3" style={{ textDecoration: "none", borderTop: "1px solid var(--bd-soft)" }}>
-                <span className="flex h-[30px] w-[30px] flex-none items-center justify-center rounded-lg" style={{ background: "color-mix(in srgb, var(--ink-blue) 16%, transparent)", color: "var(--ink-blue)" }}><MenuBookRoundedIcon sx={{ fontSize: 16 }} /></span>
+                <span className="flex h-[30px] w-[30px] flex-none items-center justify-center rounded-lg" style={{ background: "color-mix(in srgb, var(--ink-blue) 16%, transparent)", color: "var(--ink-blue)" }}><MenuBookOutlinedIcon sx={{ fontSize: 16 }} /></span>
                 <span style={{ lineHeight: 1.25 }}>
                   <span className="block text-[13px] font-semibold" style={{ color: "var(--tx)" }}>{help.guideLabel}</span>
                   <span className="block text-[11px]" style={{ color: "var(--tx-5)" }}>{help.guideSubtitle}</span>

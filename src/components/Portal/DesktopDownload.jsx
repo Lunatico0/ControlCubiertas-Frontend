@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"
 import isElectron from "@utils/isElectron"
-import DesktopWindowsRoundedIcon from "@mui/icons-material/DesktopWindowsRounded"
+import DesktopWindowsOutlinedIcon from "@mui/icons-material/DesktopWindowsOutlined"
 import DownloadRoundedIcon from "@mui/icons-material/DownloadRounded"
 import OpenInNewRoundedIcon from "@mui/icons-material/OpenInNewRounded"
 import { button } from "@utils/tokens"
@@ -61,7 +61,7 @@ const DesktopDownload = () => {
       <h2 className="mb-3 font-display text-lg font-semibold" style={{ color: "var(--tx)", fontFamily: "'Space Grotesk'" }}>App de escritorio</h2>
       <div className="flex flex-col items-start gap-4 rounded-xl p-5 sm:flex-row sm:items-center" style={{ background: "var(--card)", border: "1px solid var(--bd)" }}>
         <span className="grid h-11 w-11 shrink-0 place-items-center rounded-lg" style={{ background: tintBg("var(--ink-lime)", 12), color: "var(--ink-lime)" }}>
-          <DesktopWindowsRoundedIcon />
+          <DesktopWindowsOutlinedIcon />
         </span>
         <div className="flex-1">
           <p className="font-medium" style={{ color: "var(--tx)" }}>TireOps para Windows</p>

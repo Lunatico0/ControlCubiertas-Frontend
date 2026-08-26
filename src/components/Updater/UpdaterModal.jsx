@@ -91,7 +91,7 @@ const UpdaterModal = ({ current, phase, list, dl, installingV, onClose, onRechec
       {phase === "uptodate" && (
         <div className="flex flex-col items-center gap-3 py-6 text-center">
           <div className="flex items-center justify-center rounded-full" style={{ width: 54, height: 54, background: "rgba(196,237,43,.10)", color: "var(--ink-lime)" }}>
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
               <path d="M20 6 9 17l-5-5" />
             </svg>
           </div>
@@ -155,7 +155,7 @@ const UpdaterModal = ({ current, phase, list, dl, installingV, onClose, onRechec
                     className="inline-flex items-center gap-1.5 rounded-[7px] px-2.5 py-[7px] text-[11.5px] font-medium"
                     style={{ border: "1px solid var(--bd)", background: "var(--elev)", color: "var(--tx-3)" }}
                   >
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
                       <circle cx="12" cy="12" r="9" />
                       <path d="M12 16v-4M12 8h.01" />
                     </svg>
