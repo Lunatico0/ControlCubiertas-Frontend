@@ -40,7 +40,11 @@ export const AuthProvider = ({ children }) => {
   }, [])
 
   const changePassword = useCallback(async (currentPassword, newPassword) => {
-    await changePasswordRequest(currentPassword, newPassword)
+    // El backend invalida todos los refresh tokens vivos del usuario al cambiar la contraseña
+    // (incluido el de esta sesión) y devuelve el par nuevo. Sin guardarlo, el propio usuario
+    // que acaba de cambiarla quedaría deslogueado al vencer su access token.
+    const data = await changePasswordRequest(currentPassword, newPassword)
+    setTokens({ accessToken: data?.accessToken, refreshToken: data?.refreshToken })
     setUser((prev) => {
       if (!prev) return prev
       const next = { ...prev, mustChangePassword: false }
