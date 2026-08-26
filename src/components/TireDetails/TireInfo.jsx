@@ -4,13 +4,14 @@ import { statusStyles } from "@utils/statusStyle";
 import { formatTireCode } from "@utils/tireCode";
 import { colors, text } from "@utils/tokens";
 import InfoItem from "@components/UI/InfoItem";
+import cubierta from "@/assets/Cubierta.png"
 
 // Componente visual del estado (imagen y estado)
 export const TireInfoVisual = ({ tire }) => (
   <div className={`${statusStyles[tire.status] || "bg-gray-100 dark:bg-gray-800"} flex flex-col items-center justify-center p-6 rounded-xl shadow-sm h-full`}>
     <div className="size-32 mb-4 flex items-center justify-center">
       <img
-        src="/Cubierta.png"
+        src={cubierta}
         alt="Cubierta"
         className="size-28 object-contain"
       />

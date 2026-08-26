@@ -1,11 +1,12 @@
 import { colors, text, button } from "@utils/tokens";
+import cubierta from "@/assets/Cubierta.png"
 
 const EmptyState = () => {
   return (
     <div className="flex items-center justify-center min-h-96">
       <div className="text-center max-w-md">
         <div className="w-24 h-24 mx-auto mb-6 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center ring-1 ring-black/10 dark:ring-white/10">
-          <img src="Cubierta.png" alt="Sin cubiertas" className="w-16 h-16 opacity-50 filter grayscale" />
+          <img src={cubierta} alt="Sin cubiertas" className="w-16 h-16 opacity-50 filter grayscale" />
         </div>
 
         <h3 className={`${text.heading} text-xl mb-2`}>No hay cubiertas registradas</h3>

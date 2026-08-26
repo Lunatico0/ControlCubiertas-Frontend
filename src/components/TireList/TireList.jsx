@@ -80,9 +80,9 @@ const TireList = ({ onTireSelect }) => {
     }
   }
 
-  useEffect(() => {
-    tires.load()
-  }, [state.refreshTrigger])
+  // Sin efecto de carga propio: el ApiProvider ya carga al montar y recarga con
+  // refreshTrigger. Tenerlo acá disparaba DOS peticiones concurrentes, con carrera entre
+  // respuestas (ganaba la última en llegar, no la más nueva).
 
   // Estados de carga y error
   if (ui.loading) {

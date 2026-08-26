@@ -3,6 +3,7 @@ import { colors, text, button } from "@utils/tokens";
 import EditNoteRoundedIcon from '@mui/icons-material/EditNoteRounded';
 import InfoRow from "@components/UI/InfoRow.jsx";
 import StatusBadge from '@components/UI/StatusBadge'
+import cubierta from "@/assets/Cubierta.png"
 
 const TireCard = ({ tire, onCardClick, onEdit, isLoading = false }) => {
   const isRecap = tire.status === "A recapar"
@@ -62,7 +63,7 @@ const TireCard = ({ tire, onCardClick, onEdit, isLoading = false }) => {
         {/* Capa que se blurea */}
         <div className="absolute inset-0 z-0 group-hover:bg-black/10 group-hover:blur-sm transition-all duration-300">
           <img
-            src="Cubierta.png"
+            src={cubierta}
             alt="Cubierta"
             className={`w-full h-full object-contain ${isRecap ? "opacity-60 grayscale" : ""} ${isDiscarded ? "opacity-40 grayscale" : ""} transition-transform duration-300 group-hover:scale-110`
             }

@@ -12,9 +12,9 @@ const VehicleList = ({ setActive }) => {
   const [isNewVehicleOpen, setIsNewVehicleOpen] = useState(false);
   const [vehicleToEdit, setVehicleToEdit] = useState(null)
 
-  useEffect(() => {
-    vehicles.load();
-  }, [state.refreshTrigger]);
+  // Sin efecto de carga propio: el ApiProvider ya carga al montar y recarga con
+  // refreshTrigger. Tenerlo acá disparaba DOS peticiones concurrentes, con carrera entre
+  // respuestas (ganaba la última en llegar, no la más nueva).
 
   const handleNewVehicle = () => setIsNewVehicleOpen(true);
   const handleVehicleFilter = (vehicle) => {

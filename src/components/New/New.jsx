@@ -2,6 +2,8 @@ import { useState } from "react"
 import NewVehicle from "./NewVehicle"
 import NewTire from "./NewTire"
 import Modal from "@components/UI/Modal"
+import camion from "@/assets/Camion.png"
+import cubierta from "@/assets/Cubierta.png"
 
 const New = ({ onClose }) => {
   const [activeModal, setActiveModal] = useState(null)
@@ -34,7 +36,7 @@ const New = ({ onClose }) => {
             <div className="flex items-center justify-center gap-6 h-full">
               <div className="flex-shrink-0">
                 <img
-                  src="Camion.png"
+                  src={camion}
                   alt="Vehículo"
                   className="h-24 w-full max-w-24 object-contain transform
                   group-hover:-translate-x-4 group-hover:scale-125 transition-all duration-500"
@@ -55,7 +57,7 @@ const New = ({ onClose }) => {
             <div className="flex items-center justify-center gap-6 h-full">
               <div className="flex-shrink-0">
                 <img
-                  src="Cubierta.png"
+                  src={cubierta}
                   alt="Cubierta"
                   className="h-20 w-auto object-contain transform group-hover:scale-125 transition-all duration-500"
                 />

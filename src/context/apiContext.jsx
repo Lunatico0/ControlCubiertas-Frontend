@@ -425,12 +425,17 @@ export const ApiProvider = ({ children }) => {
     return () => { cancelled = true }
   }, [])
 
-  // Efecto para recargar cuando cambia refreshTrigger
+  // Efecto para recargar cuando cambia refreshTrigger.
+  // Recarga cubiertas Y vehículos: asignar o desasignar cambia los dos lados, y antes esto
+  // solo traía cubiertas. El listado de vehículos se refrescaba porque VehicleList tenía su
+  // PROPIO efecto sobre refreshTrigger — o sea que el refresco global dependía de que esa
+  // pantalla estuviera montada.
   useEffect(() => {
     if (refreshTrigger > 0) {
       loadTires()
+      loadVehicles()
     }
-  }, [refreshTrigger, loadTires])
+  }, [refreshTrigger, loadTires, loadVehicles])
 
   // Efecto para filtrar datos
   useEffect(() => {
@@ -617,11 +622,14 @@ export const ApiProvider = ({ children }) => {
     }
 
   }), [
-    // Dependencias (las mismas que antes, agrupadas si querés)
     tires, vehicles, selectedTire, selectedVehicle,
     vehiclesWTires, availableBrands, filteredTireData,
     availableStatuses, suggestedCode, tireCount, statusHelpers,
-    error, loading, selectedLoading, filters, searchQuery
+    error, loading, selectedLoading, filters, searchQuery,
+    // Faltaban, y se exponen en el contexto: los consumidores los usan como dep de sus
+    // efectos de recarga. El refresco global funcionaba POR ACCIDENTE (el memo se recalculaba
+    // porque `tires` cambiaba después); si loadTires fallaba, el trigger nunca llegaba.
+    refreshTrigger, presetVehicleFilter,
   ])
 
   return <ApiContext.Provider value={contextValue}>{children}</ApiContext.Provider>

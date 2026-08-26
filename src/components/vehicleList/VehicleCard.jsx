@@ -1,6 +1,7 @@
 import { colors, text, button } from "@utils/tokens";
 import DirectionsBusFilledRoundedIcon from "@mui/icons-material/DirectionsBusFilledRounded";
 import EditNoteRoundedIcon from "@mui/icons-material/EditNoteRounded";
+import camion from "@/assets/Camion.png"
 
 const VehicleCard = ({ vehicle, onClick = () => { }, onEdit = () => { }, isLoading = false }) => {
   const tireCount = vehicle.tires?.length || 0;
@@ -40,7 +41,7 @@ const VehicleCard = ({ vehicle, onClick = () => { }, onEdit = () => { }, isLoadi
       >
         <div className="absolute inset-0 z-0 group-hover:bg-black/10 transition-all duration-300">
           <img
-            src="Camion.png"
+            src={camion}
             alt="Camion"
             className={`w-full h-full object-contain transition-transform duration-300 group-hover:scale-110`
             }
