@@ -7,6 +7,8 @@ import LocalShippingOutlinedIcon from "@mui/icons-material/LocalShippingOutlined
 import TripOriginRoundedIcon from "@mui/icons-material/TripOriginRounded"
 import ReportProblemRoundedIcon from "@mui/icons-material/ReportProblemRounded"
 import { metaOf, tint, fmtKm, useStatusCatalog } from "./status"
+import { usePagination } from "@hooks/usePagination"
+import Paginador from "@components/common/Paginador"
 import { formatPlate } from "@utils/plateFormat"
 import { formatTireCode } from "@utils/tireCode"
 import { generatePositions } from "./axles"
@@ -85,6 +87,10 @@ const Vehiculos = ({ onNavigate, intent }) => {
     return filtered.sort((a, b) => (a.v.mobile || "").localeCompare(b.v.mobile || "", "es", { numeric: true }))
   }, [vehicles, mountedByVeh, query, fType])
 
+  // Idem Cubiertas: la flota entera se montaba de una. Las tarjetas de vehículo traen además
+  // el diagrama de ejes, así que pesan más que las de cubierta.
+  const pag = usePagination(fleet, 24)
+
   // Click en un vehículo → abre su drawer de detalle (no navega directo al inventario).
   const open = (v) => setDetailVeh(fleet.find((it) => String(it.v._id) === String(v._id)) || null)
 
@@ -147,7 +153,7 @@ const Vehiculos = ({ onNavigate, intent }) => {
             <div className="grid gap-3 px-[18px] py-3 text-[10.5px] font-semibold uppercase tracking-wider" style={{ gridTemplateColumns: TABLE_COLS, fontFamily: "'IBM Plex Mono'", background: "var(--elev)", borderBottom: "1px solid var(--bd)", color: "var(--tx-6)" }}>
               <div>Móvil</div><div>Patente</div><div>Tipo</div><div>Cubiertas</div><div className="text-right">Km</div>
             </div>
-            {fleet.map(({ v, countLabel, countColor, tipoColor, tipoBg, kmLabel }) => (
+            {pag.currentItems.map(({ v, countLabel, countColor, tipoColor, tipoBg, kmLabel }) => (
               <div key={v._id} onClick={() => open(v)} className="grid cursor-pointer items-center gap-3 px-[18px] py-[13px]" style={{ gridTemplateColumns: TABLE_COLS, borderBottom: "1px solid var(--bd-faint)" }}>
                 <div className="flex min-w-0 items-center gap-[11px]">
                   <span className="flex h-8 w-8 flex-none items-center justify-center rounded-lg" style={{ background: tipoBg, color: tipoColor }}><VehTypeIcon size={17} /></span>
@@ -165,7 +171,7 @@ const Vehiculos = ({ onNavigate, intent }) => {
         ) : (
           /* ===== CARDS ===== */
           <div className="grid gap-4" style={{ gridTemplateColumns: "repeat(auto-fill,minmax(330px,1fr))" }}>
-            {fleet.map(({ v, positions, hasAxles, countLabel, countColor, tipoColor, tipoBg, kmLabel }) => (
+            {pag.currentItems.map(({ v, positions, hasAxles, countLabel, countColor, tipoColor, tipoBg, kmLabel }) => (
               <div key={v._id} onClick={() => open(v)} className="flex cursor-pointer flex-col gap-[15px] rounded-[14px] p-[18px]" style={{ border: "1px solid var(--bd)", background: "var(--card)" }}>
                 {/* header */}
                 <div className="flex items-start gap-3">
@@ -207,6 +213,8 @@ const Vehiculos = ({ onNavigate, intent }) => {
             ))}
           </div>
         )}
+
+        <Paginador {...pag} total={fleet.length} mostrados={pag.currentItems.length} />
       </div>
 
       {showAlta && <NuevoVehiculo onClose={() => setShowAlta(false)} />}

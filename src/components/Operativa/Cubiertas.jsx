@@ -8,6 +8,8 @@ import TuneRoundedIcon from "@mui/icons-material/TuneRounded"
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded"
 import { formatTireCode } from "@utils/tireCode"
 import { metaOf, tint, fmtKm, fmtDate, StateBadge, Pips, useStatusCatalog } from "./status"
+import { usePagination } from "@hooks/usePagination"
+import Paginador from "@components/common/Paginador"
 import { OpActionBtn } from "./opActions"
 import TireDrawer from "./TireDrawer"
 import AltaDrawer from "./AltaDrawer"
@@ -120,6 +122,11 @@ const Cubiertas = ({ intent, onNavigate }) => {
     return sortDir === "desc" ? sorted.reverse() : sorted
   }, [tires, query, tab, sortBy, sortDir, fBrand, fStatus, fKmMin, fKmMax])
 
+  // Paginación: antes se montaba el inventario ENTERO. Cada tarjeta son ~15 nodos con estilos
+  // inline, así que una flota de 2.000 cubiertas eran decenas de miles de nodos por render, y
+  // `filtered` se recalcula con cada tecla del buscador.
+  const pag = usePagination(filtered, 24)
+
   const toggleSort = (key) => {
     if (sortBy === key) setSortDir((d) => (d === "asc" ? "desc" : "asc"))
     else { setSortBy(key); setSortDir("asc") }
@@ -221,7 +228,7 @@ const Cubiertas = ({ intent, onNavigate }) => {
         ) : view === "grid" ? (
           /* ---------- GRID ---------- */
           <div className="grid gap-[14px]" style={{ gridTemplateColumns: "repeat(auto-fill,minmax(260px,1fr))" }}>
-            {filtered.map((t) => {
+            {pag.currentItems.map((t) => {
               const m = metaOf(t.status)
               return (
                 <div key={t._id} onClick={openDrawer(t._id)} className="flex cursor-pointer flex-col gap-[13px] rounded-[13px] p-4" style={{ border: "1px solid var(--bd)", background: "var(--card)" }}>
@@ -274,7 +281,7 @@ const Cubiertas = ({ intent, onNavigate }) => {
                 )
               })}
             </div>
-            {filtered.map((t) => {
+            {pag.currentItems.map((t) => {
               const m = metaOf(t.status)
               return (
                 <div key={t._id} className="grid items-center gap-3 py-3 pl-[14px] pr-[18px]" style={{ gridTemplateColumns: GRID_COLS, borderLeft: `4px solid ${m.color}`, borderBottom: "1px solid var(--bd-faint)" }}>
@@ -302,6 +309,8 @@ const Cubiertas = ({ intent, onNavigate }) => {
             })}
           </div>
         )}
+
+        <Paginador {...pag} total={filtered.length} mostrados={pag.currentItems.length} />
       </div>
 
       {selectedId && (
