@@ -114,7 +114,7 @@ const AltaDrawer = ({ onClose, onCreated }) => {
   }
 
   return (
-    <Drawer onClose={onClose}>
+    <Drawer onClose={onClose} onSubmit={() => !submitting && submit()}>
         <div className="flex items-center justify-between gap-3 p-5" style={{ borderBottom: "1px solid var(--bd-soft)" }}>
           <h2 className="text-[20px] font-bold" style={{ fontFamily: "'Space Grotesk'", color: "var(--tx)" }}>Nueva cubierta</h2>
           <button onClick={onClose} className="rounded-[7px] p-2" style={{ color: "var(--tx-5)" }} title="Cerrar">

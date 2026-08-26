@@ -54,7 +54,7 @@ const EditarVehiculo = ({ vehicle, onClose, onSaved }) => {
   }
 
   return (
-    <Drawer onClose={onClose} maxWidth="440px">
+    <Drawer onClose={onClose} maxWidth="440px" onSubmit={() => !submitting && submit()}>
         <div className="flex items-center justify-between gap-3 p-5" style={{ borderBottom: "1px solid var(--bd-soft)" }}>
           <div>
             <h2 className="text-[20px] font-bold" style={{ fontFamily: "'Space Grotesk'", color: "var(--tx)" }}>Editar vehículo</h2>
