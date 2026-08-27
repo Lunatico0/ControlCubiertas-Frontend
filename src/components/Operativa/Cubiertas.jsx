@@ -17,10 +17,12 @@ import AltaDrawer from "./AltaDrawer"
 import ScreenHeader from "@components/UI/ScreenHeader"
 import Pill from "@components/UI/Pill"
 
+// "Disponibles" va antes que "En stock" a propósito: es lo que el operario busca primero
+// (las que puede montar ahora), no el total del depósito.
 const TABS = [
   { key: "todas", label: "Todas" },
-  { key: "stock", label: "En stock" },
   { key: "disponibles", label: "Disponibles" },
+  { key: "stock", label: "En stock" },
   { key: "circulacion", label: "En circulación" },
   { key: "recapar", label: "A recapar" },
 ]
