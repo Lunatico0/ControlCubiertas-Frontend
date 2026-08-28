@@ -85,9 +85,13 @@ const histDetail = (h) => {
 }
 const histBits = (h) => {
   const bits = []
-  const km = h.km ?? h.kmAlta
-  if (km != null) bits.push({ k: "Km", val: fmtKm(km) })
-  if (h.kmBaja != null) bits.push({ k: "Km baja", val: fmtKm(h.kmBaja) })
+  // t140: la palabra "Km" nombraba tres cosas distintas. h.km son los km que RECORRIÓ la
+  // cubierta en ese tramo; kmAlta y kmBaja son el ODÓMETRO DEL MÓVIL al montar y al desmontar.
+  // Un mismo movimiento mostraba "Km 50.000" y "Km baja 250.000" mientras la cubierta pasaba
+  // de 39.527 a 89.527: tres números que no cerraban entre sí porque medían cosas distintas.
+  if (h.km != null) bits.push({ k: "Recorridos", val: fmtKm(h.km) })
+  if (h.kmAlta != null) bits.push({ k: "Odóm. al montar", val: fmtKm(h.kmAlta) })
+  if (h.kmBaja != null) bits.push({ k: "Odóm. al desmontar", val: fmtKm(h.kmBaja) })
   if (h.orderNumber) bits.push({ k: "Orden", val: h.orderNumber })
   if (h.receiptNumber) bits.push({ k: "Comp.", val: h.receiptNumber })
   return bits
@@ -344,6 +348,13 @@ const TireDrawer = ({ tireId, initialAction, initialAssign, onAssigned, onClose 
   // puede deshacer sin inventar movimientos que nunca pasaron.
   const ultimaEntrada = history[0]
   const steps = tire ? lifecycleSteps(tire, history, stockScale) : []
+
+  // t141: contexto del montaje vigente, para la cabecera de "Desasignar". El formulario era
+  // sólo "Kilometraje final" + "N° de orden": no decía de qué móvil ni de qué posición se
+  // estaba bajando la cubierta, ni contra qué odómetro se iba a validar. El operario tenía
+  // que cerrar el modal, ir al historial, anotar el número y volver.
+  const montajeVigente = history.find((h) => /^asign/i.test(h.type || ""))
+  const odometroAlMontar = montajeVigente?.kmAlta ?? montajeVigente?.km
   const infoItems = tire ? [
     { label: "Marca", value: tire.brand || "—" },
     { label: "Rodado", value: tire.size || "—", mono: true },
@@ -454,12 +465,23 @@ const TireDrawer = ({ tireId, initialAction, initialAssign, onAssigned, onClose 
                       )
                     )}
 
-                    <FloatingField label="Kilometraje inicial" type="number" min="0" required error={errors.kmAlta} value={form.kmAlta || ""} onChange={set("kmAlta")} />
+                    <FloatingField label="Odómetro del móvil al montar (km)" type="number" min="0" required error={errors.kmAlta} value={form.kmAlta || ""} onChange={set("kmAlta")} />
                   </>
                 )}
 
                 {action === "unassign" && (
-                  <FloatingField label="Kilometraje final" type="number" min="0" required error={errors.kmBaja} value={form.kmBaja || ""} onChange={set("kmBaja")} />
+                  <>
+                    <div className="rounded-[var(--r-md)] px-3.5 py-3 text-[12.5px]" style={{ background: tint("var(--ink-orange)", 8), border: `1px solid ${tint("var(--ink-orange)", 30)}`, color: "var(--tx-2)" }}>
+                      Bajando de <b style={{ color: "var(--tx)" }}>{tire.vehicle?.mobile || "el vehículo"}</b>
+                      {tire.position && <> · posición <b style={{ color: "var(--tx)", fontFamily: "var(--font-mono)" }}>{tire.position}</b></>}
+                      {odometroAlMontar != null && (
+                        <div className="mt-1" style={{ color: "var(--tx-4)" }}>
+                          Se montó con el odómetro en <b style={{ color: "var(--tx-2)", fontFamily: "var(--font-mono)" }}>{fmtKm(odometroAlMontar)}</b>: el valor de abajo no puede ser menor.
+                        </div>
+                      )}
+                    </div>
+                    <FloatingField label="Odómetro del móvil al desmontar (km)" type="number" min="0" required error={errors.kmBaja} value={form.kmBaja || ""} onChange={set("kmBaja")} />
+                  </>
                 )}
 
                 {action === "recap" && (
@@ -523,11 +545,11 @@ const TireDrawer = ({ tireId, initialAction, initialAssign, onAssigned, onClose 
                           <option value="">Seleccionar vehículo…</option>
                           {vehicles.map((v) => <option key={v._id} value={v._id}>{v.mobile}{v.licensePlate ? ` · ${v.licensePlate}` : ""}</option>)}
                         </FloatingField>
-                        <FloatingField label="Kilometraje inicial" type="number" min="0" required error={errors.kmAlta} value={form.kmAlta ?? ""} onChange={set("kmAlta")} />
+                        <FloatingField label="Odómetro del móvil al montar (km)" type="number" min="0" required error={errors.kmAlta} value={form.kmAlta ?? ""} onChange={set("kmAlta")} />
                       </>
                     )}
                     {editBaseType(actionEntry) === "Desasignación" && (
-                      <FloatingField label="Kilometraje final" type="number" min="0" required error={errors.kmBaja} value={form.kmBaja ?? ""} onChange={set("kmBaja")} />
+                      <FloatingField label="Odómetro del móvil al desmontar (km)" type="number" min="0" required error={errors.kmBaja} value={form.kmBaja ?? ""} onChange={set("kmBaja")} />
                     )}
                     <FloatingField label="Motivo de la corrección" required error={errors.reason} value={form.reason || ""} onChange={set("reason")} />
                   </>

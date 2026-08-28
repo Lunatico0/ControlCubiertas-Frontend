@@ -30,6 +30,10 @@ const AxleEditor = ({
   removeAxle,
   setAxleType,
   isAxleLocked = () => false,
+  // t139: por qué NO se puede aplicar este preset (string) o null si sí se puede. Lo provee
+  // ConfigurarEjes cruzando las posiciones ocupadas contra el layout del preset; en el alta no
+  // hay nada montado, así que el default deja todo habilitado.
+  motivoPreset = () => null,
 }) => (
   <>
     {/* TIPO DE VEHÍCULO (derivado de los ejes) */}
@@ -40,13 +44,32 @@ const AxleEditor = ({
         {Object.keys(catalog).map((k) => {
           const p = catalog[k]
           const on = matchedKey === k
+          // El preset que YA está aplicado nunca se bloquea: es el estado actual del vehículo.
+          const motivo = on ? null : motivoPreset(p.axles)
+          const bloqueado = !!motivo
           return (
-            <button key={k} onClick={applyPreset(k)} className="flex min-w-[104px] flex-col items-start gap-0.5 rounded-[var(--r-md)] px-[13px] py-2.5" style={{ border: `1px solid ${on ? "var(--ink-lime)" : "var(--bd)"}`, background: on ? tint("var(--ink-lime)", 8) : "var(--input)" }}>
+            <button
+              key={k}
+              onClick={bloqueado ? undefined : applyPreset(k)}
+              disabled={bloqueado}
+              title={motivo || undefined}
+              aria-disabled={bloqueado || undefined}
+              className="flex min-w-[104px] flex-col items-start gap-0.5 rounded-[var(--r-md)] px-[13px] py-2.5"
+              style={{
+                border: `1px solid ${on ? "var(--ink-lime)" : "var(--bd)"}`,
+                background: on ? tint("var(--ink-lime)", 8) : "var(--input)",
+                opacity: bloqueado ? 0.45 : 1,
+                cursor: bloqueado ? "not-allowed" : "pointer",
+              }}
+            >
               <span className="flex items-center gap-1.5 text-[13px] font-bold" style={{ fontFamily: "var(--font-display)", color: on ? "var(--ink-lime)" : "var(--tx)" }}>
                 {p.label}
                 {p.custom && <Pill className="px-1.5 py-px text-[8.5px] font-semibold" style={{ fontFamily: "var(--font-mono)", color: "var(--ink-purple)", background: tint("var(--ink-purple)", 16) }}>CUSTOM</Pill>}
               </span>
               <span className="text-[10.5px]" style={{ fontFamily: "var(--font-mono)", color: on ? "var(--ink-lime)" : "var(--tx-5)" }}>{tiresOf(p.axles)} cubiertas</span>
+              {bloqueado && (
+                <span className="mt-0.5 text-[10px] leading-tight" style={{ color: "var(--ink-orange)" }}>Hay cubiertas montadas</span>
+              )}
             </button>
           )
         })}

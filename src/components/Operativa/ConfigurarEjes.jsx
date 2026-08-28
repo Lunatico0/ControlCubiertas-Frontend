@@ -14,6 +14,7 @@ import CheckRoundedIcon from "@mui/icons-material/CheckRounded"
 import Button from "@components/UI/Button"
 import Callout from "@components/common/Callout"
 import { useAxleConfig } from "./useAxleConfig"
+import { motivoPresetIncompatible } from "./axleGuards"
 import AxleEditor from "./AxleEditor"
 import TruckDiagram from "./TruckDiagram"
 
@@ -59,6 +60,23 @@ const ConfigurarEjes = ({ onClose, vehicle }) => {
   }, [tires, sel, isReconfig])
 
   const axleLocked = (i) => isReconfig && (hasPositionless || occupiedAxles.has(i + 1))
+
+  // Posiciones hoy ocupadas de ESTE vehículo (E2-DE y compañía). Es contra esto que se decide
+  // si un preset se puede aplicar: el mismo criterio que usa el 409 del backend (t139).
+  const ocupadas = useMemo(() => (
+    isReconfig && sel
+      ? tires
+        .filter((t) => String(t.vehicle?._id || t.vehicle || "") === String(sel._id))
+        .map((t) => t.position)
+        .filter(Boolean)
+      : []
+  ), [tires, sel, isReconfig])
+
+  // t139: los presets ya no pisan el bloqueo. Antes seguían activos y rehacían el esquema
+  // entero; el error llegaba recién al guardar, con toda la configuración ya tirada.
+  const motivoPreset = (layout) => (
+    isReconfig ? motivoPresetIncompatible(ocupadas, layout, { hayMontadaSinPosicion: hasPositionless }) : null
+  )
 
   // Editor de ejes compartido con el alta. typeHint desempata presets con el mismo layout
   // usando el nombre previo del vehículo; isAxleLocked aplica el guard de ejes ocupados.
@@ -211,6 +229,7 @@ const ConfigurarEjes = ({ onClose, vehicle }) => {
                 removeAxle={removeAxle}
                 setAxleType={setAxleType}
                 isAxleLocked={axleLocked}
+                motivoPreset={motivoPreset}
               />
             </div>
 
