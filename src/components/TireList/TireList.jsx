@@ -3,7 +3,6 @@ import ApiContext from "@context/apiContext"
 import TireCard from "./TireCard"
 import TireDetails from "@components/TireDetails/TireDetails"
 import UpdateTire from "@components/UpdateTire/UpdateTire"
-import { usePasswordCheck } from "@hooks/usePasswordCheck"
 import LoadingGrid from "./LoadingGrid"
 import EmptyState from "./EmptyState"
 import { colors } from "@utils/legacyTokens"
@@ -34,7 +33,6 @@ const TireList = ({ onTireSelect }) => {
   const [isUpdateTireModalOpen, setIsUpdateTireModalOpen] = useState(false)
   const [loadingTireId, setLoadingTireId] = useState(null)
 
-  const { checkPassword } = usePasswordCheck()
 
   const handleCardClick = async (id) => {
     try {
@@ -52,12 +50,14 @@ const TireList = ({ onTireSelect }) => {
     }
   }
 
-  const handleEdit = async (id) => {
-    const confirmed = await checkPassword()
-    if (confirmed) {
-      setTireToUpdate(id)
-      setIsUpdateTireModalOpen(true)
-    }
+  // t3/t51: acá había un gate de contraseña client-side que comparaba contra un "1234"
+  // hardcodeado en el bundle. No era un control de seguridad: la contraseña viajaba al
+  // navegador y se leía en DevTools, así que lo único que hacía era pedirle un trámite al
+  // operario legítimo. Sacarlo no baja la seguridad ni un punto, y se lleva puesta la última
+  // dependencia de sweetalert2 (~70 KB del bundle por este único uso).
+  const handleEdit = (id) => {
+    setTireToUpdate(id)
+    setIsUpdateTireModalOpen(true)
   }
 
   const handleCloseTireModal = () => {
@@ -70,13 +70,10 @@ const TireList = ({ onTireSelect }) => {
     setTireToUpdate(null)
   }
 
-  const handleEditFromDetails = async (id) => {
-    const confirmed = await checkPassword()
-    if (confirmed) {
-      setTireToUpdate(id)
-      setIsUpdateTireModalOpen(true)
-      setIsTireModalOpen(false) // Cerrar el modal de detalles
-    }
+  const handleEditFromDetails = (id) => {
+    setTireToUpdate(id)
+    setIsUpdateTireModalOpen(true)
+    setIsTireModalOpen(false) // Cerrar el modal de detalles
   }
 
   // Sin efecto de carga propio: el ApiProvider ya carga al montar y recarga con
@@ -162,7 +159,6 @@ const TireList = ({ onTireSelect }) => {
           selectedTire={data.selectedTire}
           onClose={handleCloseTireModal}
           onEdit={handleEditFromDetails}
-          handlePasswordCheck={checkPassword}
         />
       )}
 

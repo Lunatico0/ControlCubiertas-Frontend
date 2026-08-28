@@ -448,10 +448,22 @@ export const ApiProvider = ({ children }) => {
 
     const query = searchQuery.toLowerCase();
 
-    const matchesSearch = (tire) =>
-      tire.code.toString().includes(query) ||
-      Object.values(tire).some((val) => typeof val === "string" && val.toLowerCase().includes(query)) ||
-      tire.vehicle?.mobile?.toLowerCase().includes(query);
+    // t82: esto hacía Object.values(tire).some() sobre CADA campo de CADA cubierta en cada
+    // tecla, o sea que recorría _id, createdAt, updatedAt, __v y el status además de lo que el
+    // operario podía querer buscar. Con inventarios grandes el buscador se sentía pegajoso, y
+    // de paso un texto como un fragmento de ObjectId devolvía resultados sin sentido.
+    // Los campos son los MISMOS que ya usa Cubiertas.jsx, que es el buscador vigente.
+    const matchesSearch = (tire) => {
+      if (!query) return true;
+      return (
+        String(tire.code ?? "").includes(query) ||
+        tire.serialNumber?.toLowerCase().includes(query) ||
+        tire.brand?.toLowerCase().includes(query) ||
+        tire.size?.toLowerCase().includes(query) ||
+        tire.pattern?.toLowerCase().includes(query) ||
+        tire.vehicle?.mobile?.toLowerCase().includes(query)
+      );
+    };
 
     const matchesVehicle = (tire) => {
       const v = filters.vehicle?.toLowerCase();

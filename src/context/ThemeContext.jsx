@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from "react"
+import { createContext, useContext, useEffect, useState, useCallback, useMemo } from "react"
 
 const ThemeContext = createContext()
 
@@ -26,10 +26,16 @@ export const ThemeProvider = ({ children }) => {
     }
   }, [isDarkMode])
 
-  const toggleTheme = () => setIsDarkMode((prev) => !prev)
+  const toggleTheme = useCallback(() => setIsDarkMode((prev) => !prev), [])
+
+  // t81: el value era un objeto literal nuevo en CADA render del provider, así que todo lo que
+  // consume el tema (OperativaLayout, AdminLayout, DialogHost, common/Modal, Sidebar) se
+  // repintaba ante cualquier render de acá, aunque el tema no hubiera cambiado. apiContext ya
+  // memoizaba bien; estos dos providers eran la excepción.
+  const value = useMemo(() => ({ isDarkMode, toggleTheme }), [isDarkMode, toggleTheme])
 
   return (
-    <ThemeContext.Provider value={{ isDarkMode, toggleTheme }}>
+    <ThemeContext.Provider value={value}>
       {children}
     </ThemeContext.Provider>
   )

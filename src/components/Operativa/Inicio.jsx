@@ -61,39 +61,40 @@ const Inicio = () => {
     recapar: tires.filter((t) => metaOf(t.status).role === "recap").length,
   }
 
+  // Vehículos que HOY son una tarea. Se calcula UNA vez y lo usan la lista y el contador
+  // (t82: antes cada uno armaba su propio Set de vehículos montados, y el del contador lo
+  // hacía DENTRO del callback de filter, o sea un Set nuevo por cada vehículo de la flota).
+  //
+  // t145: un vehículo marcado FUERA DE SERVICIO no es una tarea pendiente. Antes, un acoplado
+  // de temporada o un móvil parado quedaba clavado en "PARA HOY" todos los días, sin forma de
+  // sacarlo; la lista perdía credibilidad y el operario dejaba de mirarla — y con ella dejaba
+  // de ver lo que sí importa.
+  const vehiculosPendientes = useMemo(() => {
+    const montados = new Set(tires.filter((t) => t.vehicle).map((t) => t.vehicle?._id || t.vehicle))
+    return vehicles.filter((v) => !v.outOfService && !montados.has(v._id))
+  }, [tires, vehicles])
+
   // "Para hoy": lo accionable = cubiertas a recapar + vehículos sin cubiertas montadas.
   // Cada fila navega a donde se resuelve. Se cap­ea para no inundar el inicio.
   const hoyItems = useMemo(() => {
     const recapTires = tires.filter((t) => metaOf(t.status).role === "recap")
-    const mountedVehIds = new Set(tires.filter((t) => t.vehicle).map((t) => t.vehicle?._id || t.vehicle))
-    // t145: un vehículo marcado FUERA DE SERVICIO no es una tarea pendiente. Antes, un acoplado
-    // de temporada o un móvil parado quedaba clavado en "PARA HOY" todos los días, sin forma de
-    // sacarlo; la lista perdía credibilidad y el operario dejaba de mirarla — y con ella dejaba
-    // de ver lo que sí importa.
-    const vehiclesSinCub = vehicles.filter((v) => !v.outOfService && !mountedVehIds.has(v._id))
     return [
       ...recapTires.map((t) => ({
         key: `t${t._id}`, isTire: true, color: "var(--ink-orange)", iconBg: "rgba(240,133,31,.14)",
         title: `#${formatTireCode(t.code, data?.tireCodePrefix)}${t.brand ? ` · ${t.brand}` : ""}`, desc: "Marcada para recapar", btn: "Recapar",
         onClick: () => onNavigate("cubiertas", { tab: "recapar" }),
       })),
-      ...vehiclesSinCub.map((v) => ({
+      ...vehiculosPendientes.map((v) => ({
         key: `v${v._id}`, isVeh: true, color: "var(--ink-blue)", iconBg: "rgba(110,151,245,.16)",
         title: v.mobile, desc: "Sin cubiertas montadas", btn: "Montar",
         onClick: () => onNavigate("vehiculos", { openVehicle: v._id }),
       })),
     ].slice(0, 6)
-  }, [tires, vehicles, onNavigate, catalogo])
+  }, [tires, vehiculosPendientes, onNavigate, catalogo, data?.tireCodePrefix])
 
-  // Vehículos que cuentan como pendientes (misma regla que hoyItems, sin el cap de 6).
-  const hoyVehiculos = useMemo(() => {
-    const mountedVehIds = new Set(tires.filter((t) => t.vehicle).map((t) => t.vehicle?._id || t.vehicle))
-    return vehicles.filter((v) => !v.outOfService && !mountedVehIds.has(v._id)).length
-  }, [tires, vehicles])
-
-  // El contador del saludo tiene que contar EXACTAMENTE lo mismo que la lista: si dice
-  // "3 pendientes" y abajo hay 2, el que sobra es el número.
-  const pending = counts.recapar + hoyVehiculos
+  // El contador del saludo cuenta EXACTAMENTE lo mismo que la lista: si dice "3 pendientes" y
+  // abajo hay 2, el que sobra es el número.
+  const pending = counts.recapar + vehiculosPendientes.length
   const resumen = loading ? "Cargando tu día…" : pending > 0 ? `${pending} ${pending === 1 ? "pendiente" : "pendientes"} para hoy` : "Todo en orden"
   const resumenColor = loading ? "var(--tx-5)" : pending > 0 ? "var(--ink-orange)" : "var(--ink-teal)"
 

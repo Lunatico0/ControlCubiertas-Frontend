@@ -1,4 +1,4 @@
-import { createContext, useEffect, useState} from 'react'
+import { createContext, useCallback, useEffect, useMemo, useState } from 'react'
 import { showToast } from '@utils/toast'
 
 export const SettingsContext = createContext()
@@ -47,29 +47,31 @@ export const SettingsProvider = ({ children }) => {
     }
   }, [])
 
-  const setReceiptLayout = (layout) => {
+  const setReceiptLayout = useCallback((layout) => {
     setReceiptLayoutState(layout)
     localStorage.setItem("receiptLayout", layout)
-  }
+  }, [])
 
-  const setStockStatuses = (statuses) => {
+  const setStockStatuses = useCallback((statuses) => {
     setStockStatusesState(statuses)
     localStorage.setItem("stockStatuses", JSON.stringify(statuses))
-  }
+  }, [])
 
-  const resetStockStatuses = () => {
+  const resetStockStatuses = useCallback(() => {
     setStockStatuses(DEFAULT_STOCK_STATUSES)
     showToast("success", "Estados de stock reiniciados a valores por defecto")
-  }
+  }, [setStockStatuses])
+
+  // t81: el value era un objeto literal nuevo en cada render (y el archivo importaba useMemo
+  // sin usarlo). Los setters van con useCallback porque si no la memoización del value no
+  // sirve de nada: cambiarían de identidad igual en cada render.
+  const value = useMemo(
+    () => ({ receiptLayout, setReceiptLayout, stockStatuses, setStockStatuses, resetStockStatuses }),
+    [receiptLayout, setReceiptLayout, stockStatuses, setStockStatuses, resetStockStatuses],
+  )
 
   return (
-    <SettingsContext.Provider value={{
-      receiptLayout,
-      setReceiptLayout,
-      stockStatuses,
-      setStockStatuses,
-      resetStockStatuses
-    }}>
+    <SettingsContext.Provider value={value}>
       {children}
     </SettingsContext.Provider>
   )

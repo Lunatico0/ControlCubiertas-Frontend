@@ -40,6 +40,25 @@ export const useTireAction = ({ printBuilder, apiCall, successMessage }) => {
 
         const receipt = updated.receiptNumber || "0000-00000000"
 
+        // Bug 1 de BUGS.md / t1: el refresco del detalle corría DESPUÉS del bloque de
+        // impresión, y por lo tanto dependía de que ese bloque terminara. Con la impresión
+        // resolviendo bien no se reproducía nada (por eso el QA no lo pudo reproducir), pero
+        // si la promesa de impresión se colgaba, el `await print(...)` no volvía nunca y el
+        // refresh no llegaba a ejecutarse: el drawer se quedaba con la respuesta de la
+        // mutación, que viene SIN el history populado, y mostraba "0 registros". Los datos
+        // estaban intactos en el backend; era la UI la que nunca se enteraba.
+        //
+        // Es la misma doctrina que ya aplica el resto del flujo: la acción se persiste
+        // primero y la impresión es un efecto POSTERIOR que no gatea nada. El refresco de
+        // datos es parte de la acción, no del efecto.
+        if (refresh && typeof refresh === "function") {
+          try {
+            await refresh(updated.tire._id)
+          } catch (refreshError) {
+            console.error("❌ Error al refrescar:", refreshError)
+          }
+        }
+
         // La acción YA está persistida acá arriba. Lo que sigue es un efecto posterior: la
         // impresión NUNCA condiciona ni revierte la mutación, porque la web no puede informar
         // si el operario imprimió o canceló el diálogo (ver usePrintEngine). Cualquier regla
@@ -69,15 +88,6 @@ export const useTireAction = ({ printBuilder, apiCall, successMessage }) => {
         }
 
         if (aviso) showToast("success", aviso)
-
-        // Refrescar datos
-        if (refresh && typeof refresh === "function") {
-          try {
-            await refresh(updated.tire._id)
-          } catch (refreshError) {
-            console.error("❌ Error al refrescar:", refreshError)
-          }
-        }
 
         // Cerrar modal
         if (close && typeof close === "function") {
