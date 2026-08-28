@@ -1,4 +1,5 @@
 import { useState, useContext } from "react"
+import { buttonLegacy as button } from "@utils/legacyTokens"
 import ApiContext from "@context/apiContext"
 import AssignTireModal from "./modals/AssignTireModal"
 import UnassignTireModal from "./modals/UnassignTireModal"
@@ -7,7 +8,7 @@ import FinishRecapModal from "./modals/FinishRecapModal"
 import DiscardTireModal from "./modals/ConfirmDiscardModal"
 import UndoHistoryEntryModal from "./modals/UndoHistoryEntryModal"
 import EditHistoryModal from "./modals/EditHistoryModal"
-import { button } from "@utils/tokens"
+
 
 const QuickActions = ({ tire, refreshTire, historyEntry = null }) => {
   const [activeModal, setActiveModal] = useState(null)

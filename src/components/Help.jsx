@@ -2,7 +2,7 @@ import { useContext } from "react";
 import ApiContext from "@context/apiContext";
 import tireStatusInfo from "@utils/tireStatusInfo";
 import HelpOutlineRoundedIcon from '@mui/icons-material/HelpOutlineRounded';
-import { colors } from "@utils/tokens"
+import { colors } from "@utils/legacyTokens"
 
 const Help = () => {
   const { data } = useContext(ApiContext)

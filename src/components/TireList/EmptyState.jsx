@@ -1,4 +1,4 @@
-import { colors, text, button } from "@utils/tokens";
+import { colors, text, buttonLegacy as button } from "@utils/legacyTokens";
 import cubierta from "@/assets/Cubierta.png"
 
 const EmptyState = () => {

@@ -1,4 +1,4 @@
-import { colors, text } from "@utils/tokens"
+import { colors, text } from "@utils/legacyTokens"
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 
 const SelectedTiresList = ({ tires = [], onRemoveTire }) => (

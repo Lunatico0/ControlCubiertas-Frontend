@@ -1,4 +1,4 @@
-import { colors, text, button } from "@utils/tokens";
+import { colors, text, buttonLegacy as button } from "@utils/legacyTokens";
 import EditNoteRoundedIcon from "@mui/icons-material/EditNoteRounded";
 import camion from "@/assets/Camion.png"
 

@@ -156,7 +156,11 @@ const Inicio = () => {
   return (
     <div className="mx-auto max-w-[1000px] px-8 pb-10 pt-12">
       <h1 className={tituloPantalla} style={{ color: "var(--tx)" }}>
-        Hola, {displayName} 👋
+        {/* t120: el emoji de la mano era la única glifa a COLOR de toda la interfaz y rompía la escala de
+            grises del sistema; ART-DIRECTION lista los emojis en la lista negra. Además el
+            mismo saludo al mismo usuario llevaba el emoji acá y no en el panel, que además
+            abría con signo de exclamación. Gana la forma del panel: la bien escrita. */}
+        ¡Hola, {displayName}!
       </h1>
       <p className="mt-[7px] text-[15px]" style={{ color: "var(--tx-4)" }}>
         {fmtFechaHora(now)} · <span style={{ color: resumenColor, fontWeight: 500 }}>{resumen}</span>

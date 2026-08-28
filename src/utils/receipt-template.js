@@ -75,6 +75,18 @@ const safeLogo = (v) => {
 // design: receiptDesign; company: {name,cuit,phone,address}; footer; meta:{numero,fecha,tipo}
 // sectionData: { [key]: { heading, rows: [{k,v}] } }
 export function renderComprobanteHTML({ design = {}, company = {}, footer = "", meta = {}, sectionData = {} }) {
+  // t123: la cabecera rellenaba los campos vacíos con un guión, y sin ningún dato de contacto
+  // quedaba "CUIT — · Tel ——" en la pieza que el cliente recibe en la mano: tres guiones
+  // sueltos se leen como un error de impresión, no como "sin dato". Un campo vacío se OMITE, y
+  // si no queda ninguno, la línea entera no se renderiza.
+  const contacto = (() => {
+    const inline = [
+      company.cuit && `CUIT ${esc(company.cuit)}`,
+      company.phone && `Tel ${esc(company.phone)}`,
+    ].filter(Boolean).join(" · ")
+    const dir = company.address ? esc(company.address) : ""
+    return [inline, dir].filter(Boolean).join("<br/>")
+  })()
   const accent = safeAccent(design.accent)
   const font = safeFont(design.font)
   const logo = safeLogo(design.logo)
@@ -102,7 +114,7 @@ export function renderComprobanteHTML({ design = {}, company = {}, footer = "", 
       </div>
       <div style="width:100%;text-align:${align}">
         <div style="font-size:${fs.h1};font-weight:700;color:${TINTA.fuerte};letter-spacing:-.01em">${esc(company.name) || "Tu empresa"}</div>
-        <div style="font-size:${fs.small};color:${TINTA.media};line-height:1.5;margin-top:2px">CUIT ${esc(company.cuit) || "—"} · Tel ${esc(company.phone) || "—"}<br/>${esc(company.address) || "—"}</div>
+        ${contacto ? `<div style="font-size:${fs.small};color:${TINTA.media};line-height:1.5;margin-top:2px">${contacto}</div>` : ""}
       </div>
     </div>` : ""
 

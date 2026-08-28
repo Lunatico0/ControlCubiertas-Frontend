@@ -6,7 +6,7 @@ import { useReprint } from "@hooks/useReprint.js";
 import UndoHistoryEntryModal from "@components/actions/modals/UndoHistoryEntryModal";
 import { formatTireCode } from "@utils/tireCode";
 import { getRowStyle, dictionary } from "@utils/historyStyles";
-import {text, button, utility } from "@utils/tokens";
+import { text, utility, buttonLegacy as button } from "@utils/legacyTokens";
 
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import MoreVertRoundedIcon from '@mui/icons-material/MoreVertRounded';

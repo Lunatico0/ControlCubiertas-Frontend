@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react"
 import { etiquetaDeRol } from "@utils/roles"
+import Pill from "@components/UI/Pill"
 import { useNavigate } from "react-router-dom"
 import PersonAddAltOutlinedIcon from "@mui/icons-material/PersonAddAltOutlined"
 import ContentCopyOutlinedIcon from "@mui/icons-material/ContentCopyOutlined"
@@ -137,13 +138,13 @@ const Users = () => {
                   <div className="min-w-0">
                     <div className="flex items-center gap-[7px] text-[13.5px] font-semibold" style={{ color: "var(--tx)" }}>
                       {u.name || "—"}
-                      {isYou && <span className="rounded-full px-[7px] py-px text-[9.5px]" style={{ fontFamily: "var(--font-mono)", color: "var(--ink-lime)", background: "color-mix(in srgb, var(--ink-lime) 13%, transparent)" }}>VOS</span>}
+                      {isYou && <Pill size="tag" style={{ color: "var(--ink-lime)", background: "color-mix(in srgb, var(--ink-lime) 13%, transparent)" }}>VOS</Pill>}
                     </div>
                     <div className="truncate text-[12px]" style={{ color: "var(--tx-5)" }}>{u.email}</div>
                   </div>
                 </div>
                 <div>
-                  <span className="inline-flex items-center rounded-full px-[11px] py-[3px] text-[11.5px] font-semibold" style={{ color: isAdmin ? "var(--ink-lime)" : "var(--tx-3)", background: isAdmin ? "color-mix(in srgb, var(--ink-lime) 13%, transparent)" : "var(--bd-strong)" }}>{etiquetaDeRol(u.role)}</span>
+                  <Pill style={{ color: isAdmin ? "var(--ink-lime)" : "var(--tx-2)", background: isAdmin ? "color-mix(in srgb, var(--ink-lime) 13%, transparent)" : "var(--bd-strong)" }}>{etiquetaDeRol(u.role)}</Pill>
                 </div>
                 <div>
                   <span className="inline-flex items-center gap-[7px] text-[12px] font-medium" style={{ color: active ? "var(--ink-teal)" : "var(--tx-5)" }}>

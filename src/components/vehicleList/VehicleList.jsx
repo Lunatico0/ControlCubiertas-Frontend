@@ -1,6 +1,6 @@
 import { useContext, useState } from "react";
 import ApiContext from "@context/apiContext";
-import { colors, text} from "@utils/tokens";
+import { colors, text } from "@utils/legacyTokens";
 import VehicleCard from "./VehicleCard";
 import NewVehicle from "@components/New/NewVehicle";
 import EmptyState from "@components/TireList/EmptyState";

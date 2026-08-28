@@ -5,7 +5,7 @@ import { buildCorrectionPrintData } from "@utils/print-data"
 import TireForm from "@components/Forms/TireForm"
 import Modal from "@components/UI/Modal"
 import { useOrderValidation } from "@hooks/useOrderValidation"
-import { text, button, colors } from '@utils/tokens'
+import { text, colors, buttonLegacy as button } from "@utils/legacyTokens"
 
 const EditHistoryModal = ({ tire, entry, onClose}) => {
   const {

@@ -1,4 +1,4 @@
-import { text, Label } from "@utils/tokens";
+import { text, Label } from "@utils/legacyTokens";
 
 const TireField = ({ label, children, error, id }) => (
   <div className="relative w-full font-inter mb-6">

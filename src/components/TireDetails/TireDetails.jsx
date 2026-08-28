@@ -7,7 +7,7 @@ import TireStatusSidebar from './TireStatusSidebar'
 import EditHistoryModal from "@components/actions/modals/EditHistoryModal"
 import EditNoteRoundedIcon from '@mui/icons-material/EditNoteRounded'
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded'
-import { colors, text, button } from "@utils/tokens"
+import { colors, text, buttonLegacy as button } from "@utils/legacyTokens"
 
 const TireDetails = ({ selectedLoading, selectedTire, onClose, onEdit}) => {
   const { tires } = useContext(ApiContext)

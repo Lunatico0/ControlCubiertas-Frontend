@@ -1,5 +1,5 @@
 import { statusStyles } from "@utils/statusStyle";
-import { colors, text} from "@utils/tokens";
+import { colors, text } from "@utils/legacyTokens";
 import EditNoteRoundedIcon from '@mui/icons-material/EditNoteRounded';
 import InfoRow from "@components/UI/InfoRow.jsx";
 import StatusBadge from '@components/UI/StatusBadge'

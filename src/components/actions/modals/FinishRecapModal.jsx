@@ -5,7 +5,7 @@ import { buildFinishRecapPrintData } from "@utils/print-data"
 import TireForm from "@components/Forms/TireForm"
 import Modal from "@components/UI/Modal"
 import { useOrderValidation } from "@hooks/useOrderValidation"
-import { Label, input } from "@utils/tokens"
+import { Label, input } from "@utils/legacyTokens"
 
 const FinishRecapModal = ({ tire, onClose}) => {
   const {

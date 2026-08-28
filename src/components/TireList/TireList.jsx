@@ -6,7 +6,7 @@ import UpdateTire from "@components/UpdateTire/UpdateTire"
 import { usePasswordCheck } from "@hooks/usePasswordCheck"
 import LoadingGrid from "./LoadingGrid"
 import EmptyState from "./EmptyState"
-import { colors } from "@utils/tokens"
+import { colors } from "@utils/legacyTokens"
 import { usePagination } from "@hooks/usePagination.js"
 import PaginationControls from "@components/TireList/PaginationControls.jsx"
 import WarningAmberRoundedIcon from '@mui/icons-material/WarningAmberRounded';

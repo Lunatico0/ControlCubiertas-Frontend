@@ -4,7 +4,7 @@ import { SettingsContext } from "@context/SettingsContext";
 import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
 import TuneRoundedIcon from '@mui/icons-material/TuneRounded';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
-import { colors, input, button } from "@utils/tokens";
+import { colors, input, buttonLegacy as button } from "@utils/legacyTokens";
 
 const SearchFilter = ({ showFilters, setShowFilters }) => {
   const modalRef = useRef(null);

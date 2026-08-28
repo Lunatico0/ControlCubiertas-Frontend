@@ -1,4 +1,4 @@
-import { input} from "@utils/tokens"
+import { input } from "@utils/legacyTokens"
 
 const TireSearchBox = ({ availableTires = [], onAddTire = () => { }, query = "", setQuery = () => { } }) => (
   <div className="relative">

@@ -4,7 +4,7 @@ import TireForm from "@components/Forms/TireForm"
 import Modal from "@components/UI/Modal"
 import { useOrderValidation } from "@hooks/useOrderValidation"
 import { showToast } from "@utils/toast"
-import { colors } from "@utils/tokens"
+import { colors } from "@utils/legacyTokens"
 import WarningAmberRoundedIcon from '@mui/icons-material/WarningAmberRounded';
 
 const UpdateTire = ({ id, onClose, onSuccess }) => {

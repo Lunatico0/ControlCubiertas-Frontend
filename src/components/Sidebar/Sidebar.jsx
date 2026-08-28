@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { colors, text, utility } from "@utils/tokens";
+import { colors, text, utility } from "@utils/legacyTokens";
 import { useTheme } from "@context/ThemeContext";
 import { useAuth } from "@context/AuthContext";
 import isElectron from "@utils/isElectron";

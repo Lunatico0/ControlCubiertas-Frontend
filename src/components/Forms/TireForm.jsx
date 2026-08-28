@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 import TireField from "./fields/TireField"
-import { input } from "@utils/tokens"
+import { input } from "@utils/legacyTokens"
 import Button from "@components/UI/Button"
 import Spinner from "@components/UI/Spinner"
 
@@ -312,7 +312,7 @@ const TireForm = ({
                     <span>
                       {vehicle.mobile} - {vehicle.licensePlate}
                     </span>
-                    <Button type="button" className="p-1 bg-green-500 text-white rounded">
+                    <Button variant="primary" type="button" className="p-1 bg-green-500 text-white rounded">
                       Seleccionar
                     </Button>
                   </div>
@@ -339,7 +339,7 @@ const TireForm = ({
       )}
 
       <div className="flex gap-4 justify-center mt-4">
-        <Button
+        <Button variant="primary"
           type="submit"
           disabled={isSubmitting}
           className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold px-6 py-2 rounded-[var(--r-sm)] transition flex items-center gap-2"

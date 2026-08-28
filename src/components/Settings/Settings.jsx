@@ -1,4 +1,4 @@
-import { text } from '@utils/tokens'
+import { text } from "@utils/legacyTokens"
 import ReceiptSettings from './ReceiptSettings'
 import UpdateSettings from './UpdateSettings'
 import StockStatusSettings from './StockStatusSettings'

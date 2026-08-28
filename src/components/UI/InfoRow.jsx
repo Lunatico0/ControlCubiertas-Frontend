@@ -1,4 +1,4 @@
-import { colors } from "@utils/tokens"
+import { colors } from "@utils/legacyTokens"
 
 const InfoRow = ({ label, value, valueClass = "" }) => (
   <div className="flex justify-between items-center">

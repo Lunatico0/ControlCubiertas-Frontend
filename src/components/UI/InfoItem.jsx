@@ -1,4 +1,4 @@
-import { colors } from "@utils/tokens"
+import { colors } from "@utils/legacyTokens"
 
 const InfoItem = ({ label, value, className = "" }) => (
   <div className="flex items-start justify-between space-2">
