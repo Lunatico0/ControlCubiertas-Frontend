@@ -31,9 +31,9 @@ const TOAST = {
   info: { color: "var(--ink-blue)", bg: "rgba(110,151,245,.16)", icon: "info" },
 }
 const ANIM = {
-  pop: "dlgPopIn .2s cubic-bezier(.22,1,.36,1)",
-  slide: "dlgSlideIn .24s cubic-bezier(.22,1,.36,1)",
-  fade: "dlgFadeIn .18s ease",
+  pop: "dlgPopIn var(--t-base) var(--t-ease)",
+  slide: "dlgSlideIn var(--t-base) var(--t-ease)",
+  fade: "dlgFadeIn var(--t-fast) var(--t-ease)",
 }
 
 // Los botones y la card salen de overlayTokens: los comparte con common/Modal, que es el otro
@@ -111,13 +111,13 @@ const DialogHost = () => {
     <div data-app-theme={isDarkMode ? "dark" : "light"} style={{ fontFamily: OVERLAY.fontFamily }}>
       {active && <DialogEscape onEscape={closeOnEscape} />}
       {active && (
-        <div onClick={onBackdrop} style={{ position: "fixed", inset: 0, background: OVERLAY.backdrop, backdropFilter, zIndex: OVERLAY.zIndex, display: "flex", alignItems: "center", justifyContent: "center", padding: 24, animation: "dlgBackdropIn .16s ease" }}>
+        <div onClick={onBackdrop} style={{ position: "fixed", inset: 0, background: OVERLAY.backdrop, backdropFilter, zIndex: OVERLAY.zIndex, display: "flex", alignItems: "center", justifyContent: "center", padding: 24, animation: "dlgBackdropIn var(--t-fast) var(--t-ease)" }}>
 
           {/* Confirmación simple */}
           {active.type === "confirm" && (
             <div {...dlgProps} role="dialog" aria-modal="true" style={{ ...cardBase, maxWidth: OVERLAY.maxWidth, border: "1px solid var(--bd-strong)", animation: anim }}>
               <div style={{ padding: "22px 22px 0 22px", display: "flex", gap: 14 }}>
-                <span style={{ width: 42, height: 42, borderRadius: 11, background: "rgba(110,151,245,.14)", color: "var(--ink-blue)", display: "flex", alignItems: "center", justifyContent: "center", flex: "none" }}><DlgIcon kind="ask" size={21} /></span>
+                <span style={{ width: 42, height: 42, borderRadius: "var(--r-md)", background: "rgba(110,151,245,.14)", color: "var(--ink-blue)", display: "flex", alignItems: "center", justifyContent: "center", flex: "none" }}><DlgIcon kind="ask" size={21} /></span>
                 <div style={{ minWidth: 0, paddingTop: 2 }}>
                   <div style={{ fontFamily: OVERLAY.titleFont, fontSize: OVERLAY.titleSize, fontWeight: 600, color: "var(--tx)" }}>{o.title || "¿Confirmar la acción?"}</div>
                   {o.text && <div style={{ fontSize: 13, color: "var(--tx-4)", marginTop: 6, lineHeight: 1.55 }}>{o.text}</div>}
@@ -134,14 +134,14 @@ const DialogHost = () => {
           {active.type === "danger" && (
             <div {...dlgProps} role="dialog" aria-modal="true" style={{ ...cardBase, maxWidth: OVERLAY.maxWidth, border: "1px solid rgba(240,86,74,.38)", boxShadow: OVERLAY.shadow + ",0 0 0 4px rgba(240,86,74,.07)", animation: anim }}>
               <div style={{ padding: "22px 22px 0 22px", display: "flex", gap: 14 }}>
-                <span style={{ width: 42, height: 42, borderRadius: 11, background: "rgba(240,90,75,.14)", color: "var(--ink-red)", display: "flex", alignItems: "center", justifyContent: "center", flex: "none" }}><DlgIcon kind="trash" size={20} /></span>
+                <span style={{ width: 42, height: 42, borderRadius: "var(--r-md)", background: "rgba(240,90,75,.14)", color: "var(--ink-red)", display: "flex", alignItems: "center", justifyContent: "center", flex: "none" }}><DlgIcon kind="trash" size={20} /></span>
                 <div style={{ minWidth: 0, paddingTop: 2 }}>
                   <div style={{ fontFamily: OVERLAY.titleFont, fontSize: OVERLAY.titleSize, fontWeight: 600, color: "var(--tx)" }}>{o.title || "¿Confirmar la baja?"}</div>
                   {o.text && <div style={{ fontSize: 13, color: "var(--tx-4)", marginTop: 6, lineHeight: 1.55 }}>{o.text}</div>}
                 </div>
               </div>
               {o.ack && (
-                <label style={{ display: "flex", alignItems: "flex-start", gap: 10, margin: "16px 22px 0 22px", padding: "12px 13px", border: "1px solid var(--bd-strong)", borderRadius: 10, background: "var(--elev)", cursor: "pointer", userSelect: "none" }}>
+                <label style={{ display: "flex", alignItems: "flex-start", gap: 10, margin: "16px 22px 0 22px", padding: "12px 13px", border: "1px solid var(--bd-strong)", borderRadius: "var(--r-md)", background: "var(--elev)", cursor: "pointer", userSelect: "none" }}>
                   <input type="checkbox" checked={ack} onChange={(e) => setAck(e.target.checked)} style={{ width: 16, height: 16, margin: "1px 0 0 0", accentColor: "var(--st-red)", cursor: "pointer" }} />
                   <span style={{ fontSize: 12.5, color: "var(--tx-3)", lineHeight: 1.5 }}>{o.ack}</span>
                 </label>
@@ -151,7 +151,7 @@ const DialogHost = () => {
                 <button
                   onClick={() => { if (!o.ack || ack) close(true) }}
                   disabled={o.ack && !ack}
-                  style={{ height: 44, padding: "0 20px", border: "none", borderRadius: 9, fontSize: 14, fontWeight: 700, fontFamily: "var(--font-sans)", background: !o.ack || ack ? "#E04434" : "var(--elev)", color: !o.ack || ack ? "#fff" : "var(--tx-6)", cursor: !o.ack || ack ? "pointer" : "not-allowed" }}
+                  style={{ height: 44, padding: "0 20px", border: "none", borderRadius: "var(--r-md)", fontSize: 14, fontWeight: 700, fontFamily: "var(--font-sans)", background: !o.ack || ack ? "#E04434" : "var(--elev)", color: !o.ack || ack ? "#fff" : "var(--tx-6)", cursor: !o.ack || ack ? "pointer" : "not-allowed" }}
                 >{o.confirmLabel || "Sí, dar de baja"}</button>
               </div>
             </div>
@@ -162,7 +162,7 @@ const DialogHost = () => {
             const nv = NOTICE[o.kind] || NOTICE.info
             return (
               <div {...dlgProps} role="alertdialog" aria-modal="true" style={{ ...cardBase, maxWidth: OVERLAY.maxWidth, border: "1px solid var(--bd-strong)", textAlign: "center", padding: "28px 26px 22px 26px", animation: anim }}>
-                <span style={{ width: 54, height: 54, borderRadius: 15, background: nv.bg, color: nv.color, display: "inline-flex", alignItems: "center", justifyContent: "center" }}><DlgIcon kind={nv.icon} size={24} /></span>
+                <span style={{ width: 54, height: 54, borderRadius: "var(--r-lg)", background: nv.bg, color: nv.color, display: "inline-flex", alignItems: "center", justifyContent: "center" }}><DlgIcon kind={nv.icon} size={24} /></span>
                 <div style={{ fontFamily: OVERLAY.titleFont, fontSize: OVERLAY.titleSize, fontWeight: 600, color: "var(--tx)", marginTop: 15 }}>{o.title || ""}</div>
                 {o.text && <div style={{ fontSize: 13, color: "var(--tx-4)", marginTop: 7, lineHeight: 1.55 }}>{o.text}</div>}
                 <button className="dlg-btn-primary" onClick={() => close(true)} style={{ ...primaryBtn, marginTop: 20, width: "100%" }}>{o.confirmLabel || "Entendido"}</button>
@@ -176,12 +176,12 @@ const DialogHost = () => {
             <div {...dlgProps} role="dialog" aria-modal="true"
               style={{ ...cardBase, maxWidth: 460, border: "1px solid var(--bd-strong)", display: "flex", flexDirection: "column", maxHeight: "92vh", animation: anim }}>
               <div style={{ flex: "none", padding: "18px 22px", borderBottom: "1px solid var(--bd-soft)", display: "flex", alignItems: "center", gap: 12 }}>
-                <span style={{ width: 38, height: 38, borderRadius: 10, background: "rgba(196,237,43,.13)", color: "var(--ink-lime)", display: "flex", alignItems: "center", justifyContent: "center", flex: "none" }}><DlgIcon kind="printer" size={19} /></span>
+                <span style={{ width: 38, height: 38, borderRadius: "var(--r-md)", background: "rgba(196,237,43,.13)", color: "var(--ink-lime)", display: "flex", alignItems: "center", justifyContent: "center", flex: "none" }}><DlgIcon kind="printer" size={19} /></span>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontFamily: "var(--font-display)", fontSize: 16, fontWeight: 600, color: "var(--tx)" }}>{o.title || "Comprobante"}</div>
                   <div style={{ fontSize: 12, color: "var(--tx-5)", marginTop: 1 }}>{o.subtitle || "Revisalo antes de confirmar el movimiento"}</div>
                 </div>
-                <button type="button" className="dlg-x" onClick={() => close(false)} aria-label="Cerrar" style={{ color: "var(--tx-5)", cursor: "pointer", display: "inline-flex", padding: 5, borderRadius: 7, border: "none", background: "transparent" }}><DlgIcon kind="x" size={18} /></button>
+                <button type="button" className="dlg-x" onClick={() => close(false)} aria-label="Cerrar" style={{ color: "var(--tx-5)", cursor: "pointer", display: "inline-flex", padding: 5, borderRadius: "var(--r-sm)", border: "none", background: "transparent" }}><DlgIcon kind="x" size={18} /></button>
               </div>
               <div style={{ flex: 1, overflowY: "auto", padding: "20px 22px", background: "var(--elev)" }}>
                 {o.receipt
@@ -204,8 +204,8 @@ const DialogHost = () => {
         const tv = TOAST[toast.kind] || TOAST.ok
         return (
           <div style={{ position: "fixed", bottom: 24, left: "50%", transform: "translateX(-50%)", zIndex: 60 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 12, background: "var(--toast)", border: "1px solid var(--bd-strong)", borderRadius: 12, padding: "12px 16px", boxShadow: "var(--elev-1)", minWidth: 280, animation: "dlgToastIn .22s ease" }}>
-              <span style={{ width: 30, height: 30, borderRadius: 8, background: tv.bg, color: tv.color, display: "flex", alignItems: "center", justifyContent: "center", flex: "none" }}><DlgIcon kind={tv.icon} size={17} /></span>
+            <div style={{ display: "flex", alignItems: "center", gap: 12, background: "var(--toast)", border: "1px solid var(--bd-strong)", borderRadius: "var(--r-md)", padding: "12px 16px", boxShadow: "var(--elev-1)", minWidth: 280, animation: "dlgToastIn var(--t-base) var(--t-ease)" }}>
+              <span style={{ width: 30, height: 30, borderRadius: "var(--r-sm)", background: tv.bg, color: tv.color, display: "flex", alignItems: "center", justifyContent: "center", flex: "none" }}><DlgIcon kind={tv.icon} size={17} /></span>
               <div style={{ lineHeight: 1.3 }}>
                 <div style={{ fontSize: 13, fontWeight: 600, color: "var(--tx)" }}>{toast.title}</div>
                 {toast.sub && <div style={{ fontSize: 11.5, color: "var(--tx-5)", fontFamily: "var(--font-mono)" }}>{toast.sub}</div>}

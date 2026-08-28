@@ -15,15 +15,15 @@ import Toggle from "@components/common/Toggle"
 import { mensajeDeError } from "@utils/apiError"
 
 const inputClass =
-  "w-full rounded-[10px] border border-(--bd) bg-(--input) px-3 py-2.5 text-sm text-(--tx) placeholder:text-(--tx-6) outline-none transition focus:border-(--ink-lime)"
+  "w-full rounded-[var(--r-md)] border border-(--bd) bg-(--input) px-3 py-2.5 text-sm text-(--tx) placeholder:text-(--tx-6) outline-none transition focus:border-(--ink-lime)"
 const labelClass = "mb-1.5 block text-sm font-medium text-(--tx-3)"
-const cardClass = "rounded-xl border border-(--bd) bg-(--card) p-6"
+const cardClass = "rounded-[var(--r-lg)] border border-(--bd) bg-(--card) p-6"
 
 // Presets de color + fallback automático (mismo criterio que /op: escalera por posición).
 // Los colores del ciclo de vida son TOKENS, no hexes literales.
 //
 // Con hexes fijos los swatches computaban lo mismo en claro y en oscuro, y en tema claro
-// quedaban ilegibles: medido sobre el fondo real (#f5f7f1), el lima #C4ED2B daba 1,26:1 contra
+// quedaban ilegibles: medido sobre el fondo real (#f5f7f1), el lima de marca (--brand) daba 1,26:1 contra
 // el 3:1 que WCAG pide para componentes de UI. El estado "Nueva" era un cuadrado casi blanco.
 // Los tokens --st-* ya tenían su variante light en index.css y no se estaban usando acá.
 //
@@ -37,11 +37,11 @@ const autoColor = (role, stockIdx) => (role === "recap" ? "var(--st-orange)" : r
 // token al hex del tema activo.
 const aHex = (color) => {
   if (/^#[0-9a-f]{6}$/i.test(color || "")) return color
-  if (typeof window === "undefined") return "#C4ED2B"
+  if (typeof window === "undefined") return "var(--brand)"
   const nombre = /^var\((--[\w-]+)\)$/.exec(color || "")?.[1]
-  if (!nombre) return "#C4ED2B"
+  if (!nombre) return "var(--brand)"
   const valor = getComputedStyle(document.documentElement).getPropertyValue(nombre).trim()
-  return /^#[0-9a-f]{6}$/i.test(valor) ? valor : "#C4ED2B"
+  return /^#[0-9a-f]{6}$/i.test(valor) ? valor : "var(--brand)"
 }
 const ORDINALS = { 1: "1er", 2: "2do", 3: "3er", 4: "4to", 5: "5to", 6: "6to", 7: "7mo", 8: "8vo", 9: "9no", 10: "10mo" }
 const ordinal = (n) => ORDINALS[n] || `${n}º`
@@ -210,13 +210,13 @@ const CompanySettings = () => {
                 onChange={(e) => setPlateSep(e.target.value.slice(-1))}
                 maxLength={1}
                 placeholder="·"
-                className="h-9 w-12 rounded-lg border border-(--bd) bg-(--input) text-center text-[15px] font-semibold text-(--tx) outline-none focus:border-(--ink-lime)"
+                className="h-9 w-12 rounded-[var(--r-md)] border border-(--bd) bg-(--input) text-center text-[15px] font-semibold text-(--tx) outline-none focus:border-(--ink-lime)"
               />
             </label>
           </div>
           <div className="mt-4 flex items-center gap-2 text-sm text-(--tx-5)">
             Vista previa:
-            <span className="rounded-md border border-(--bd) bg-(--input) px-2.5 py-1 font-mono text-[13px] text-(--tx-2)">{plateSep ? `EEQ${plateSep}541` : "EEQ541"}</span>
+            <span className="rounded-[var(--r-sm)] border border-(--bd) bg-(--input) px-2.5 py-1 font-mono text-[13px] text-(--tx-2)">{plateSep ? `EEQ${plateSep}541` : "EEQ541"}</span>
           </div>
         </section>
 
@@ -241,7 +241,7 @@ const CompanySettings = () => {
           </div>
           <div className="mt-4 flex items-center gap-2 text-sm text-(--tx-5)">
             Vista previa:
-            <span className="rounded-md border border-(--bd) bg-(--input) px-2.5 py-1 font-mono text-[13px] text-(--tx-2)">{codePrefix ? `${codePrefix}12` : "12"}</span>
+            <span className="rounded-[var(--r-sm)] border border-(--bd) bg-(--input) px-2.5 py-1 font-mono text-[13px] text-(--tx-2)">{codePrefix ? `${codePrefix}12` : "12"}</span>
           </div>
         </section>
 
@@ -251,7 +251,7 @@ const CompanySettings = () => {
           <p className="mt-1 text-sm text-(--tx-4)">
             Qué pasa con el comprobante cuando el operario confirma un movimiento.
           </p>
-          <div className="mt-4 flex items-center gap-4 rounded-xl border border-(--bd) bg-(--elev) p-4">
+          <div className="mt-4 flex items-center gap-4 rounded-[var(--r-lg)] border border-(--bd) bg-(--elev) p-4">
             <div className="min-w-0 flex-1">
               <div className="text-sm font-semibold text-(--tx-2)">Imprimir al confirmar</div>
               <div className="mt-0.5 text-xs text-(--tx-5)">
@@ -275,19 +275,19 @@ const CompanySettings = () => {
           </p>
 
           {/* Recapados permitidos (stepper) */}
-          <div className="mt-4 mb-5 flex items-center gap-4 rounded-xl border border-(--bd) bg-(--elev) p-4">
+          <div className="mt-4 mb-5 flex items-center gap-4 rounded-[var(--r-lg)] border border-(--bd) bg-(--elev) p-4">
             <div className="min-w-0 flex-1">
               <div className="text-sm font-semibold text-(--tx-2)">Recapados permitidos</div>
               <div className="mt-0.5 text-xs text-(--tx-5)">Cuántas veces se puede recapar antes de descartar. Agrega o quita estados intermedios.</div>
             </div>
-            <div className="flex flex-none items-center gap-1 rounded-lg border border-(--bd) bg-(--input) p-1">
+            <div className="flex flex-none items-center gap-1 rounded-[var(--r-md)] border border-(--bd) bg-(--input) p-1">
               <button type="button" onClick={removeRecap} disabled={recapCount === 0} title="Menos"
-                className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-(--bd-strong) text-(--tx-3) transition hover:bg-(--hover) disabled:cursor-not-allowed disabled:opacity-40">
+                className="inline-flex h-9 w-9 items-center justify-center rounded-[var(--r-sm)] border border-(--bd-strong) text-(--tx-3) transition hover:bg-(--hover) disabled:cursor-not-allowed disabled:opacity-40">
                 <RemoveRoundedIcon sx={{ fontSize: 17 }} />
               </button>
               <div className="w-12 text-center font-display text-2xl font-bold text-(--tx)" style={{ fontFamily: "var(--font-display)" }}>{recapCount}</div>
               <button type="button" onClick={addRecap} disabled={recapCount >= 10} title="Más"
-                className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-(--bd-strong) text-(--tx-3) transition hover:bg-(--hover) disabled:cursor-not-allowed disabled:opacity-40">
+                className="inline-flex h-9 w-9 items-center justify-center rounded-[var(--r-sm)] border border-(--bd-strong) text-(--tx-3) transition hover:bg-(--hover) disabled:cursor-not-allowed disabled:opacity-40">
                 <AddRoundedIcon sx={{ fontSize: 17 }} />
               </button>
             </div>
@@ -311,14 +311,14 @@ const CompanySettings = () => {
                   </button>
 
                   {editing === i && (
-                    <div className="absolute left-0 top-10 z-20 w-60 rounded-xl border border-(--bd) bg-(--card) p-3.5" style={{ boxShadow: "var(--elev-1)" }}>
+                    <div className="absolute left-0 top-10 z-20 w-60 rounded-[var(--r-lg)] border border-(--bd) bg-(--card) p-3.5" style={{ boxShadow: "var(--elev-1)" }}>
                       <div className="mb-1.5 font-mono text-[10px] font-semibold tracking-wider text-(--tx-6)">NOMBRE</div>
                       <input
                         value={s.name}
                         onChange={(e) => patchAt(i, { name: e.target.value })}
                         disabled={inUse}
                         title={inUse ? "En uso por cubiertas — no se puede renombrar" : ""}
-                        className="mb-3 h-9 w-full rounded-lg border border-(--bd) bg-(--input) px-3 text-[13.5px] font-semibold text-(--tx) outline-none focus:border-(--ink-lime) disabled:opacity-50"
+                        className="mb-3 h-9 w-full rounded-[var(--r-md)] border border-(--bd) bg-(--input) px-3 text-[13.5px] font-semibold text-(--tx) outline-none focus:border-(--ink-lime) disabled:opacity-50"
                       />
                       {inUse && <div className="-mt-2 mb-3 text-[11px] text-(--tx-5)">En uso ({usage[s.name]}) — el nombre no se puede cambiar.</div>}
 
@@ -328,7 +328,7 @@ const CompanySettings = () => {
                           const sel = (colorAt(i) || "").toLowerCase() === c.toLowerCase()
                           return (
                             <button key={c} type="button" onClick={() => patchAt(i, { color: c })}
-                              className="aspect-square w-full rounded-md transition hover:scale-110"
+                              className="aspect-square w-full rounded-[var(--r-sm)] transition hover:scale-110"
                               style={{ background: c, border: `2px solid ${sel ? "var(--tx)" : "transparent"}`, outline: "1px solid var(--bd-strong)", outlineOffset: -1 }} />
                           )
                         })}

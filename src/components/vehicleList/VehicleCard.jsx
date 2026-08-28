@@ -8,9 +8,9 @@ const VehicleCard = ({ vehicle, onClick = () => { }, onEdit = () => { }, isLoadi
   return (
     <div
       className={`
-        relative group transition-all duration-300 transform hover:scale-[1.015]
+        relative group transition-all duration-[var(--t-slow)] transform hover:scale-[1.015]
         ${colors.surface} ${colors.border} ${colors.shadow}
-        rounded-xl overflow-hidden cursor-pointer flex flex-col h-full
+        rounded-[var(--r-lg)] overflow-hidden cursor-pointer flex flex-col h-full
         ${isLoading ? "opacity-50 pointer-events-none" : ""}
       `}
       onClick={() => onClick(vehicle._id)}
@@ -25,7 +25,7 @@ const VehicleCard = ({ vehicle, onClick = () => { }, onEdit = () => { }, isLoadi
         disabled={isLoading}
         className={`
           absolute top-3 right-3 z-20 ${button.primary}
-          text-white rounded-lg transition-transform transform hover:scale-105
+          text-white rounded-[var(--r-md)] transition-transform transform hover:scale-105
           opacity-0 group-hover:opacity-100
         `}
         title="Editar vehículo"
@@ -38,11 +38,11 @@ const VehicleCard = ({ vehicle, onClick = () => { }, onEdit = () => { }, isLoadi
         className={`relative h-48 w-full overflow-hidden bg-gray-100 dark:bg-gray-700`
         }
       >
-        <div className="absolute inset-0 z-0 group-hover:bg-black/10 transition-all duration-300">
+        <div className="absolute inset-0 z-0 group-hover:bg-black/10 transition-all duration-[var(--t-slow)]">
           <img
             src={camion}
             alt="Camion"
-            className={`w-full h-full object-contain transition-transform duration-300 group-hover:scale-110`
+            className={`w-full h-full object-contain transition-transform duration-[var(--t-slow)] group-hover:scale-110`
             }
           />
         </div>

@@ -24,7 +24,7 @@ import { formatTireCode } from "@utils/tireCode"
 const TimelineBtn = ({ onClick, disabled, icon, label, hover }) => (
   <button
     type="button" onClick={onClick} disabled={disabled}
-    className="inline-flex items-center gap-1.5 rounded-[7px] px-[11px] py-[5px] text-[11.5px] font-semibold"
+    className="inline-flex items-center gap-1.5 rounded-[var(--r-sm)] px-[11px] py-[5px] text-[11.5px] font-semibold"
     style={{ border: "1px solid var(--bd-strong)", background: "var(--card)", color: "var(--tx-2)", fontFamily: "var(--font-sans)", cursor: disabled ? "default" : "pointer", opacity: disabled ? 0.5 : 1 }}
     onMouseEnter={(e) => { if (hover && !disabled) { e.currentTarget.style.borderColor = hover; e.currentTarget.style.color = hover } }}
     onMouseLeave={(e) => { e.currentTarget.style.borderColor = "var(--bd-strong)"; e.currentTarget.style.color = "var(--tx-2)" }}
@@ -405,7 +405,7 @@ const TireDrawer = ({ tireId, initialAction, initialAssign, onAssigned, onClose 
             <div className="flex items-start justify-between gap-3 p-5" style={{ borderBottom: "1px solid var(--bd-soft)" }}>
               <div className="flex items-center gap-3">
                 {action && (
-                  <button onClick={closeAction} className="rounded-[7px] p-1" style={{ color: "var(--tx-4)" }} title="Volver">
+                  <button onClick={closeAction} className="rounded-[var(--r-sm)] p-1" style={{ color: "var(--tx-4)" }} title="Volver">
                     <ArrowBackRoundedIcon sx={{ fontSize: 20 }} />
                   </button>
                 )}
@@ -417,7 +417,7 @@ const TireDrawer = ({ tireId, initialAction, initialAssign, onAssigned, onClose 
                   </div>
                 </div>
               </div>
-              <button onClick={handleClose} className="rounded-[7px] p-2" style={{ color: "var(--tx-5)" }} title="Cerrar">
+              <button onClick={handleClose} className="rounded-[var(--r-sm)] p-2" style={{ color: "var(--tx-5)" }} title="Cerrar">
                 <CloseRoundedIcon sx={{ fontSize: 20 }} />
               </button>
             </div>
@@ -439,7 +439,7 @@ const TireDrawer = ({ tireId, initialAction, initialAssign, onAssigned, onClose 
 
                     {form.vehicle && positions && (
                       positions.length === 0 ? (
-                        <div className="rounded-[9px] px-3 py-2.5 text-[12.5px]" style={{ background: "var(--input)", border: "1px dashed var(--bd-strong)", color: "var(--tx-5)" }}>
+                        <div className="rounded-[var(--r-md)] px-3 py-2.5 text-[12.5px]" style={{ background: "var(--input)", border: "1px dashed var(--bd-strong)", color: "var(--tx-5)" }}>
                           Este vehículo no tiene ejes configurados — se asignará sin posición.
                         </div>
                       ) : (
@@ -472,7 +472,7 @@ const TireDrawer = ({ tireId, initialAction, initialAssign, onAssigned, onClose 
                       ))}
                     </FloatingField>
                     {!siguienteRecap && (
-                      <div className="rounded-[9px] px-3 py-2.5 text-[12.5px]" style={{ background: tint("var(--ink-orange)", 8), border: "1px solid " + tint("var(--ink-orange)", 35), color: "var(--ink-orange)" }}>
+                      <div className="rounded-[var(--r-md)] px-3 py-2.5 text-[12.5px]" style={{ background: tint("var(--ink-orange)", 8), border: "1px solid " + tint("var(--ink-orange)", 35), color: "var(--ink-orange)" }}>
                         Esta cubierta ya recorrió toda la escalera de recapados del tenant. El paso que sigue es descartarla.
                       </div>
                     )}
@@ -491,19 +491,19 @@ const TireDrawer = ({ tireId, initialAction, initialAssign, onAssigned, onClose 
                 )}
 
                 {action === "sendRecap" && (
-                  <div className="rounded-[9px] px-3 py-2.5 text-[12.5px]" style={{ background: tint("var(--ink-orange)", 8), border: "1px solid " + tint("var(--ink-orange)", 35), color: "var(--ink-orange)" }}>
+                  <div className="rounded-[var(--r-md)] px-3 py-2.5 text-[12.5px]" style={{ background: tint("var(--ink-orange)", 8), border: "1px solid " + tint("var(--ink-orange)", 35), color: "var(--ink-orange)" }}>
                     Vas a marcar esta cubierta (#{formatTireCode(tire.code, data?.tireCodePrefix)}) como gastada: pasa a «{recapStatus}» y queda a la espera del recapado. Mientras tanto no se puede montar en un vehículo.
                   </div>
                 )}
 
                 {action === "discard" && (
-                  <div className="rounded-[9px] px-3 py-2.5 text-[12.5px]" style={{ background: tint("var(--ink-red)", 8), border: "1px solid " + tint("var(--ink-red)", 35), color: "var(--ink-red)" }}>
+                  <div className="rounded-[var(--r-md)] px-3 py-2.5 text-[12.5px]" style={{ background: tint("var(--ink-red)", 8), border: "1px solid " + tint("var(--ink-red)", 35), color: "var(--ink-red)" }}>
                     Vas a dar de baja definitiva esta cubierta (#{formatTireCode(tire.code, data?.tireCodePrefix)}). Queda registrado en el historial con su comprobante.
                   </div>
                 )}
 
                 {action === "undo" && (
-                  <div className="rounded-[9px] px-3 py-2.5 text-[12.5px]" style={{ background: "var(--input)", border: "1px solid var(--bd-strong)", color: "var(--tx-4)" }}>
+                  <div className="rounded-[var(--r-md)] px-3 py-2.5 text-[12.5px]" style={{ background: "var(--input)", border: "1px solid var(--bd-strong)", color: "var(--tx-4)" }}>
                     Vas a revertir el movimiento «<b style={{ color: "var(--tx-2)" }}>{actionEntry?.type}</b>» del {fmtDate(actionEntry?.date)}.
                     {" "}<b style={{ color: "var(--tx-2)" }}>{efectoDelUndo(actionEntry, tire)}</b>
                     {" "}La reversión queda registrada con su comprobante.
@@ -536,14 +536,14 @@ const TireDrawer = ({ tireId, initialAction, initialAssign, onAssigned, onClose 
                 </div>
 
                 <div className="mt-5 flex gap-3">
-                  <button onClick={() => setAction(null)} className="flex-1 rounded-[9px] py-2.5 text-[13px] font-semibold" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--tx-2)" }}>
+                  <button onClick={() => setAction(null)} className="flex-1 rounded-[var(--r-md)] py-2.5 text-[13px] font-semibold" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--tx-2)" }}>
                     Cancelar
                   </button>
                   <button
                     onClick={actionHandlers[action]}
                     disabled={submitting}
-                    className="flex-1 rounded-[9px] py-2.5 text-[13px] font-bold"
-                    style={{ background: action === "discard" ? "var(--ink-red)" : "var(--ink-lime)", color: action === "discard" ? "#fff" : "#0A0C0D", opacity: submitting ? 0.6 : 1 }}
+                    className="flex-1 rounded-[var(--r-md)] py-2.5 text-[13px] font-bold"
+                    style={{ background: action === "discard" ? "var(--ink-red)" : "var(--ink-lime)", color: action === "discard" ? "#fff" : "var(--brand-ink)", opacity: submitting ? 0.6 : 1 }}
                   >
                     {submitting ? "Guardando…" : action === "discard" ? "Descartar" : action === "sendRecap" ? "Enviar a recapar" : action === "edit" ? "Guardar cambios" : action === "undo" ? "Deshacer" : action === "editHist" ? "Guardar" : "Confirmar"}
                   </button>
@@ -575,7 +575,7 @@ const TireDrawer = ({ tireId, initialAction, initialAssign, onAssigned, onClose 
                 </div>
 
                 {/* Info grid */}
-                <div className="mb-6 grid" style={{ gridTemplateColumns: "1fr 1fr", gap: "16px 18px", padding: "18px 19px", border: "1px solid var(--bd-soft)", borderRadius: 12, background: "var(--input)" }}>
+                <div className="mb-6 grid" style={{ gridTemplateColumns: "1fr 1fr", gap: "16px 18px", padding: "18px 19px", border: "1px solid var(--bd-soft)", borderRadius: "var(--r-md)", background: "var(--input)" }}>
                   {infoItems.map((it) => (
                     <div key={it.label}>
                       <div className="mb-[3px] text-[11px] font-medium" style={{ color: "var(--tx-5)" }}>{it.label}</div>
@@ -625,7 +625,7 @@ const TireDrawer = ({ tireId, initialAction, initialAssign, onAssigned, onClose 
                             {histBits(h).length > 0 && (
                               <div className="mt-[9px] flex flex-wrap gap-[6px]">
                                 {histBits(h).map((bit, bi) => (
-                                  <span key={bi} className="rounded-md px-[9px] py-[2px] text-[11px]" style={{ background: "var(--hover)", border: "1px solid var(--bd)" }}>
+                                  <span key={bi} className="rounded-[var(--r-sm)] px-[9px] py-[2px] text-[11px]" style={{ background: "var(--hover)", border: "1px solid var(--bd)" }}>
                                     <span style={{ color: "var(--tx-6)" }}>{bit.k} </span>
                                     <span style={{ fontFamily: "var(--font-mono)", fontWeight: 600, color: "var(--tx-2)" }}>{bit.val}</span>
                                   </span>

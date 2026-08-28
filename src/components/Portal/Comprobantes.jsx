@@ -122,7 +122,7 @@ const Comprobantes = () => {
           <h1 className={tituloPantalla} style={{ color: "var(--tx)" }}>Comprobantes</h1>
           <p className="mt-1 text-sm" style={{ color: "var(--tx-4)" }}>Histórico de comprobantes emitidos por cada movimiento de cubierta</p>
         </div>
-        <button onClick={exportCSV} className="ml-auto inline-flex items-center gap-2 rounded-[10px] px-[17px] py-[11px] text-sm font-semibold"
+        <button onClick={exportCSV} className="ml-auto inline-flex items-center gap-2 rounded-[var(--r-md)] px-[17px] py-[11px] text-sm font-semibold"
           style={{ background: "var(--elev)", border: "1px solid var(--bd-strong)", color: "var(--tx-2)" }}>
           <FileDownloadRoundedIcon sx={{ fontSize: 17 }} /> Exportar CSV
         </button>
@@ -133,7 +133,7 @@ const Comprobantes = () => {
         <div className="relative max-w-[340px] flex-1">
           <SearchRoundedIcon sx={{ fontSize: 17 }} style={{ position: "absolute", left: 13, top: "50%", transform: "translateY(-50%)", color: "var(--tx-7)" }} />
           <input value={q} onChange={(e) => onSearch(e.target.value)} placeholder="Buscar N°, cubierta, patente…"
-            className="h-[42px] w-full rounded-[10px] pl-[38px] pr-3 text-[13.5px] outline-none"
+            className="h-[42px] w-full rounded-[var(--r-md)] pl-[38px] pr-3 text-[13.5px] outline-none"
             style={{ background: "var(--input)", border: "1px solid var(--bd)", color: "var(--tx)" }}
             onFocus={(e) => (e.target.style.borderColor = "var(--ink-lime)")} onBlur={(e) => (e.target.style.borderColor = "var(--bd)")} />
         </div>
@@ -141,7 +141,7 @@ const Comprobantes = () => {
           {FILTERS.map((f) => {
             const on = type === f.value
             return (
-              <button key={f.value} onClick={() => onFilter(f.value)} className="h-[38px] rounded-[9px] px-[14px] text-[12.5px] font-semibold"
+              <button key={f.value} onClick={() => onFilter(f.value)} className="h-[38px] rounded-[var(--r-md)] px-[14px] text-[12.5px] font-semibold"
                 style={{ border: `1px solid ${on ? "var(--ink-lime)" : "var(--bd)"}`, background: on ? tint("var(--ink-lime)", 12) : "var(--elev)", color: on ? "var(--ink-lime)" : "var(--tx-4)" }}>
                 {f.label}
               </button>
@@ -151,7 +151,7 @@ const Comprobantes = () => {
       </div>
 
       {/* Tabla */}
-      <div className="overflow-hidden rounded-[13px]" style={{ background: "var(--card)", border: "1px solid var(--bd)" }}>
+      <div className="overflow-hidden rounded-[var(--r-lg)]" style={{ background: "var(--card)", border: "1px solid var(--bd)" }}>
         <div className="grid gap-3 px-5 py-3 text-[10.5px] font-semibold uppercase tracking-wider" style={{ gridTemplateColumns: COLS, background: "var(--elev)", borderBottom: "1px solid var(--bd)", fontFamily: "var(--font-mono)", color: "var(--tx-6)" }}>
           <div>N° / Fecha</div><div>Tipo</div><div>Cubierta</div><div>Detalle</div><div>Usuario</div><div className="text-right">Acción</div>
         </div>
@@ -182,11 +182,11 @@ const Comprobantes = () => {
                 </div>
                 <div className="flex items-center justify-end gap-1.5">
                   <button onClick={() => reprint.execute({ entry: toEntry(c), tire: toTire(c) })} disabled={reprint.isPrinting} title="Reimprimir"
-                    className="inline-flex h-[34px] w-[34px] items-center justify-center rounded-lg" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--tx-3)" }}>
+                    className="inline-flex h-[34px] w-[34px] items-center justify-center rounded-[var(--r-md)]" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--tx-3)" }}>
                     <PrintOutlinedIcon sx={{ fontSize: 15 }} />
                   </button>
                   <button onClick={() => openView(c)} title="Ver"
-                    className="inline-flex h-[34px] w-[34px] items-center justify-center rounded-lg" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--tx-3)" }}>
+                    className="inline-flex h-[34px] w-[34px] items-center justify-center rounded-[var(--r-md)]" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--tx-3)" }}>
                     <VisibilityOutlinedIcon sx={{ fontSize: 15 }} />
                   </button>
                 </div>
@@ -207,7 +207,7 @@ const Comprobantes = () => {
       {/* Modal Ver: preview del comprobante (mismo generador que la impresión) */}
       {preview && (
         <div className="fixed inset-0 z-70 flex items-center justify-center p-4" style={{ background: "rgba(0,0,0,.55)", backdropFilter: "blur(2px)" }} onClick={() => setPreview(null)}>
-          <div className="max-h-[90dvh] overflow-auto rounded-lg" style={{ maxWidth: 560, background: "#fff", boxShadow: "var(--elev-3)" }} onClick={(e) => e.stopPropagation()} dangerouslySetInnerHTML={{ __html: preview }} />
+          <div className="max-h-[90dvh] overflow-auto rounded-[var(--r-md)]" style={{ maxWidth: 560, background: "#fff", boxShadow: "var(--elev-3)" }} onClick={(e) => e.stopPropagation()} dangerouslySetInnerHTML={{ __html: preview }} />
         </div>
       )}
     </div>

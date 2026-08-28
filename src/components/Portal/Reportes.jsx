@@ -47,7 +47,7 @@ const fmtKmShort = (n) => (n >= 1000 ? `${Math.round(n / 1000)}k` : `${Math.roun
 // Estilos de chart compartidos (temeados a los tokens).
 const AXIS = { tick: { fill: "var(--tx-6)", fontSize: 11, fontFamily: "var(--font-mono)" }, tickLine: false, axisLine: { stroke: "var(--bd)" } }
 const TOOLTIP = {
-  contentStyle: { background: "var(--card)", border: "1px solid var(--bd-strong)", borderRadius: 10, fontSize: 12.5, fontFamily: "var(--font-sans)", boxShadow: "var(--elev-1)" },
+  contentStyle: { background: "var(--card)", border: "1px solid var(--bd-strong)", borderRadius: "var(--r-md)", fontSize: 12.5, fontFamily: "var(--font-sans)", boxShadow: "var(--elev-1)" },
   itemStyle: { color: "var(--tx-2)" }, labelStyle: { color: "var(--tx-4)", marginBottom: 2, fontWeight: 600 },
   cursor: { fill: "color-mix(in srgb, var(--tx-7) 12%, transparent)" },
 }
@@ -145,7 +145,7 @@ const TruckHeatmap = ({ wear }) => {
     const c = heatColor(pct)
     return (
       <div title={`${p.code} · ${fmtKm(p.km)}${p.current ? ` · #${p.current.code} ${p.current.status}` : " · libre"}`}
-        style={{ width: 62, height: 50, borderRadius: 9, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 1, background: tint(c, 16), border: `1px solid ${tint(c, 38)}` }}>
+        style={{ width: 62, height: 50, borderRadius: "var(--r-md)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 1, background: tint(c, 16), border: `1px solid ${tint(c, 38)}` }}>
         <span style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 15, lineHeight: 1, color: c }}>{pct}%</span>
         <span style={{ fontSize: 8.5, fontFamily: "var(--font-mono)", color: "var(--tx-6)" }}>{p.current ? `R${p.current.level ?? 0}·` : ""}{p.code.split("-")[1]}</span>
       </div>
@@ -157,7 +157,7 @@ const TruckHeatmap = ({ wear }) => {
         FRENTE <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M6 13l6 6 6-6" /></svg>
       </div>
       <div style={{ position: "relative", display: "flex", flexDirection: "column", gap: 12, alignItems: "center" }}>
-        <div style={{ position: "absolute", top: 6, bottom: 6, left: "50%", width: 3, transform: "translateX(-50%)", background: "var(--bd-strong)", borderRadius: 3 }} />
+        <div style={{ position: "absolute", top: 6, bottom: 6, left: "50%", width: 3, transform: "translateX(-50%)", background: "var(--bd-strong)", borderRadius: "var(--r-sm)" }} />
         {wear.axles.map((a) => {
           const ps = wear.positions.filter((p) => p.axle === a.axle)
           const left = ps.filter((p) => p.side === "L")
@@ -200,7 +200,7 @@ const WearResumen = ({ wear }) => {
     <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
       <div style={{ fontSize: 12, fontWeight: 600, color: "var(--tx-4)" }}>Resumen</div>
       {flags.map((f, i) => (
-        <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 9, padding: "10px 12px", borderRadius: 10, background: f.warn ? "color-mix(in srgb, var(--st-orange) 8%, var(--elev))" : "var(--elev)", border: `1px solid ${f.warn ? "color-mix(in srgb, var(--st-orange) 30%, transparent)" : "var(--bd)"}` }}>
+        <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 9, padding: "10px 12px", borderRadius: "var(--r-md)", background: f.warn ? "color-mix(in srgb, var(--st-orange) 8%, var(--elev))" : "var(--elev)", border: `1px solid ${f.warn ? "color-mix(in srgb, var(--st-orange) 30%, transparent)" : "var(--bd)"}` }}>
           <span style={{ display: "inline-flex", flex: "none", marginTop: 1, color: f.warn ? "var(--ink-orange)" : "var(--ink-lime)" }}>
             {f.warn
               ? <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z" /><path d="M12 9v4M12 17h.01" /></svg>
@@ -218,7 +218,7 @@ const Selector = ({ value, onChange, options, icon }) => (
   <div style={{ position: "relative", flex: "none", minWidth: icon ? 180 : undefined }}>
     {icon && <span style={{ position: "absolute", left: 11, top: "50%", transform: "translateY(-50%)", color: "var(--tx-5)", pointerEvents: "none", display: "inline-flex" }}>{icon}</span>}
     <select value={value} onChange={(e) => onChange(e.target.value)}
-      style={{ appearance: "none", WebkitAppearance: "none", width: icon ? "100%" : undefined, height: 34, padding: icon ? "0 30px 0 34px" : "0 30px 0 12px", border: "1px solid var(--bd-strong)", borderRadius: 8, background: "var(--elev)", color: icon ? "var(--tx)" : "var(--tx-2)", fontSize: 12.5, fontWeight: 600, fontFamily: "var(--font-sans)", cursor: "pointer", outline: "none" }}>
+      style={{ appearance: "none", WebkitAppearance: "none", width: icon ? "100%" : undefined, height: 34, padding: icon ? "0 30px 0 34px" : "0 30px 0 12px", border: "1px solid var(--bd-strong)", borderRadius: "var(--r-sm)", background: "var(--elev)", color: icon ? "var(--tx)" : "var(--tx-2)", fontSize: 12.5, fontWeight: 600, fontFamily: "var(--font-sans)", cursor: "pointer", outline: "none" }}>
       {options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
     </select>
     <span style={{ position: "absolute", right: 9, top: "50%", transform: "translateY(-50%)", color: "var(--tx-6)", pointerEvents: "none", display: "inline-flex" }}>
@@ -229,9 +229,9 @@ const Selector = ({ value, onChange, options, icon }) => (
 
 // Card de chart con chrome del diseño: título/sub, selector(es) y (opcional) insight al pie.
 const ChartCard = ({ title, sub, type, onType, typeOpts, extraSelector, insight, children }) => (
-  <div style={{ background: "var(--card)", border: "1px solid var(--bd)", borderRadius: 14, padding: "20px 22px 18px 22px" }}>
-    <div style={{ display: "flex", alignItems: "flex-start", gap: 12, marginBottom: 16 }}>
-      <div style={{ flex: 1, minWidth: 0 }}>
+  <div style={{ background: "var(--card)", border: "1px solid var(--bd)", borderRadius: "var(--r-lg)", padding: "20px 22px 18px 22px" }}>
+    <div style={{ display: "flex", flexWrap: "wrap", alignItems: "flex-start", gap: 12, marginBottom: 16 }}>
+      <div style={{ flex: "1 1 240px", minWidth: 0 }}>
         <div style={{ fontFamily: "var(--font-display)", fontSize: 16, fontWeight: 600, color: "var(--tx)" }}>{title}</div>
         <div style={{ fontSize: 12, color: "var(--tx-6)", marginTop: 3, lineHeight: 1.45 }}>{sub}</div>
       </div>
@@ -374,7 +374,7 @@ const Reportes = () => {
         <div className="ml-auto flex items-center gap-3">
           <Selector value={range} onChange={setRange} options={RANGES}
             icon={<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" /></svg>} />
-          <button onClick={exportCSV} className="inline-flex items-center gap-2 rounded-[10px] px-[17px] py-[11px] text-sm font-semibold"
+          <button onClick={exportCSV} className="inline-flex items-center gap-2 rounded-[var(--r-md)] px-[17px] py-[11px] text-sm font-semibold"
             style={{ background: "var(--elev)", border: "1px solid var(--bd-strong)", color: "var(--tx-2)" }}>
             <FileDownloadRoundedIcon sx={{ fontSize: 17 }} /> Exportar
           </button>
@@ -400,14 +400,15 @@ const Reportes = () => {
           </div>
 
           {/* Ranking de marcas */}
-          <div className="mt-4 overflow-hidden rounded-[14px]" style={{ background: "var(--card)", border: "1px solid var(--bd)" }}>
+          <div className="mt-4 overflow-hidden rounded-[var(--r-lg)]" style={{ background: "var(--card)", border: "1px solid var(--bd)" }}>
             <div className="px-6 pb-1 pt-5">
               <h2 className="font-display text-[17px] font-semibold" style={{ fontFamily: "var(--font-display)", color: "var(--tx)" }}>Ranking de marcas</h2>
               <p className="mt-[3px] text-[12.5px]" style={{ color: "var(--tx-6)" }}>Ordenado por vida útil promedio. La base para decidir qué marca conviene comprar.</p>
             </div>
-            <div className="px-6 pb-1.5 pt-3.5">
+            <div className="scroll-x px-6 pb-1.5 pt-3.5">
+              <div style={{ minWidth: 620 }}>
               <div className="grid gap-3.5 border-b pb-2.5 text-[10.5px] font-semibold uppercase tracking-wider" style={{ gridTemplateColumns: RANK_COLS, borderColor: "var(--bd-soft)", fontFamily: "var(--font-mono)", color: "var(--tx-6)" }}>
-                <div>#</div><div>Marca</div><div>Cubiertas</div><div>Vida útil promedio</div><div className="text-right">Recap. prom.</div><div className="text-right">Descarte</div>
+                <div>#</div><div>Marca</div><div className="text-right">Cubiertas</div><div>Vida útil promedio</div><div className="text-right">Recap. prom.</div><div className="text-right">Descarte</div>
               </div>
               {brandsDot.map((b, i) => (
                 <div key={b.name} className="grid items-center gap-3.5 py-[13px]" style={{ gridTemplateColumns: RANK_COLS, borderBottom: "1px solid var(--bd-faint)" }}>
@@ -415,10 +416,10 @@ const Reportes = () => {
                   <div className="flex items-center gap-2.5 text-[13.5px] font-semibold" style={{ color: "var(--tx)", minWidth: 0 }}>
                     <span className="flex-none rounded-full" style={{ width: 9, height: 9, background: b.dot }} /><span className="truncate">{b.name}</span>
                   </div>
-                  <div className="text-[13px]" style={{ fontFamily: "var(--font-mono)", color: "var(--tx-3)" }}>{b.count}</div>
+                  <div className="text-right text-[13px]" style={{ fontFamily: "var(--font-mono)", color: "var(--tx-3)" }}>{b.count}</div>
                   <div className="flex items-center gap-[11px]">
-                    <div className="h-2 flex-1 overflow-hidden rounded-[5px]" style={{ background: "var(--bd-soft)" }}>
-                      <div className="h-full rounded-[5px]" style={{ width: `${(b.life / maxLife) * 100}%`, background: b.dot }} />
+                    <div className="h-2 flex-1 overflow-hidden rounded-[var(--r-sm)]" style={{ background: "var(--bd-soft)" }}>
+                      <div className="h-full rounded-[var(--r-sm)]" style={{ width: `${(b.life / maxLife) * 100}%`, background: b.dot }} />
                     </div>
                     <span className="w-[88px] whitespace-nowrap text-right text-[12.5px] font-semibold" style={{ fontFamily: "var(--font-mono)", color: "var(--tx)" }}>{fmtKm(b.life)}</span>
                   </div>
@@ -426,6 +427,7 @@ const Reportes = () => {
                   <div className="text-right text-[12.5px] font-semibold" style={{ fontFamily: "var(--font-mono)", color: b.discardRate > 15 ? "var(--ink-red)" : "var(--tx-3)" }}>{b.discardRate}%</div>
                 </div>
               ))}
+              </div>
             </div>
             <div className="flex items-center gap-2 px-6 pb-[18px] pt-3 text-[12px]" style={{ color: "var(--tx-6)" }}>
               <span className="inline-flex" style={{ color: "var(--ink-lime)" }}><BoltOutlinedIcon sx={{ fontSize: 15 }} /></span>{brandInsight}

@@ -60,7 +60,7 @@ const EditarVehiculo = ({ vehicle, onClose, onSaved }) => {
             <h2 className="text-[20px] font-bold" style={{ fontFamily: "var(--font-display)", color: "var(--tx)" }}>Editar vehículo</h2>
             <div className="mt-0.5 text-[11.5px]" style={{ color: "var(--tx-5)", fontFamily: "var(--font-mono)" }}>Datos · los ejes se editan aparte</div>
           </div>
-          <button onClick={onClose} className="rounded-[7px] p-2" style={{ color: "var(--tx-5)" }} title="Cerrar">
+          <button onClick={onClose} className="rounded-[var(--r-sm)] p-2" style={{ color: "var(--tx-5)" }} title="Cerrar">
             <CloseRoundedIcon sx={{ fontSize: 20 }} />
           </button>
         </div>
@@ -76,8 +76,8 @@ const EditarVehiculo = ({ vehicle, onClose, onSaved }) => {
           </Callout>
 
           <div className="mt-5 flex gap-3">
-            <button onClick={onClose} className="flex-1 rounded-[9px] py-2.5 text-[13px] font-semibold" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--tx-2)" }}>Cancelar</button>
-            <Button variant="lime" onClick={submit} disabled={submitting} className="flex-1 text-[13px]" style={{ background: "#C4ED2B", color: "#0A0C0D", opacity: submitting ? 0.6 : 1 }}>
+            <button onClick={onClose} className="flex-1 rounded-[var(--r-md)] py-2.5 text-[13px] font-semibold" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--tx-2)" }}>Cancelar</button>
+            <Button variant="lime" onClick={submit} disabled={submitting} className="flex-1 text-[13px]" style={{ background: "var(--brand)", color: "var(--brand-ink)", opacity: submitting ? 0.6 : 1 }}>
               {submitting ? "Guardando…" : "Guardar cambios"}
             </Button>
           </div>

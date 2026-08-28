@@ -83,7 +83,7 @@ const AdminLayout = () => {
         belowNav={
           <>
             <div className="my-3.5 h-px" style={{ background: "var(--bd-faint)" }} />
-            <div className="flex items-center gap-[13px] rounded-[9px] px-[13px] py-[11px] text-[14px]" style={{ color: "var(--tx-6)", cursor: "default" }}>
+            <div className="flex items-center gap-[13px] rounded-[var(--r-md)] px-[13px] py-[11px] text-[14px]" style={{ color: "var(--tx-6)", cursor: "default" }}>
               <span className="inline-flex flex-none items-center justify-center" style={{ width: 20, height: 20 }}><CreditCardOutlinedIcon sx={{ fontSize: 18 }} /></span>
               <span>Cuenta</span>
               <span className="ml-auto rounded-full px-2 py-0.5 text-[9px] font-semibold tracking-wider" style={{ fontFamily: "var(--font-mono)", color: "var(--ink-purple)", background: "color-mix(in srgb, var(--ink-purple) 16%, transparent)" }}>PRÓXIMAMENTE</span>
@@ -102,15 +102,20 @@ const AdminLayout = () => {
         {location.pathname === "/admin" && <BrandDeco variant="icon" />}
         {/* Top bar */}
         <div className="z-2 flex h-[74px] flex-none items-center gap-3.5 px-6" style={{ background: "var(--bg)", borderBottom: "1px solid var(--bd-faint)" }}>
+          {/* ALTURA FIJA en los tres controles de la fila. Antes el pill y el avatar medían 44px
+              y el botón 42.25, porque cada uno la componía distinto (padding + border +
+              line-height contra caja fija): los centros coincidían pero los bordes quedaban
+              0.88px adentro, y tres alturas distintas en la misma fila rompen la línea
+              horizontal que el ojo espera. */}
           <div className="ml-auto flex items-center gap-3">
-            <div className="inline-flex items-center gap-2.5 rounded-[10px] px-3.5 py-2.5" style={{ background: "var(--elev)", border: "1px solid var(--bd)" }}>
+            <div className="inline-flex h-11 items-center gap-2.5 rounded-[var(--r-md)] px-3.5" style={{ background: "var(--elev)", border: "1px solid var(--bd)" }}>
               <ApartmentOutlinedIcon sx={{ fontSize: 17 }} style={{ color: "var(--tx-5)" }} />
               <span className="text-[13.5px] font-semibold" style={{ color: "var(--tx)" }}>{companyName || "Tu empresa"}</span>
             </div>
-            <button onClick={() => navigate("/")} className="inline-flex items-center gap-2 rounded-[10px] px-4 py-2.5 text-[13.5px] font-semibold" style={{ background: "color-mix(in srgb, var(--ink-lime) 6%, transparent)", border: "1px solid color-mix(in srgb, var(--ink-lime) 45%, transparent)", color: "var(--ink-lime)" }}>
+            <button onClick={() => navigate("/")} className="inline-flex h-11 items-center gap-2 rounded-[var(--r-md)] px-4 text-[13.5px] font-semibold" style={{ background: "color-mix(in srgb, var(--ink-lime) 6%, transparent)", border: "1px solid color-mix(in srgb, var(--ink-lime) 45%, transparent)", color: "var(--ink-lime)" }}>
               <OpenInNewRoundedIcon sx={{ fontSize: 16 }} /> Ir a la operación
             </button>
-            <div className="flex items-center gap-2.5 rounded-[10px] py-1.5 pl-2 pr-3" style={{ background: "var(--elev)", border: "1px solid var(--bd)" }}>
+            <div className="flex items-center gap-2.5 rounded-[var(--r-md)] py-1.5 pl-2 pr-3" style={{ background: "var(--elev)", border: "1px solid var(--bd)" }}>
               <span className="flex flex-none items-center justify-center rounded-full text-[11.5px] font-bold" style={{ width: 30, height: 30, background: "var(--ink-lime)", color: "var(--bg)", fontFamily: "var(--font-display)" }}>{initials}</span>
               <span className="hidden sm:block" style={{ lineHeight: 1.25 }}>
                 <span className="block text-[13px] font-semibold" style={{ color: "var(--tx)" }}>{displayName}</span>

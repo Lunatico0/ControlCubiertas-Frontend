@@ -59,7 +59,7 @@ export const OpActionBtn = ({ type, onClick, disabled, full, square, size = 40 }
         height: size, width: square ? size : undefined, flex: full ? 1 : "none",
         minWidth: full ? 0 : undefined,
         padding: label ? (full ? "0 clamp(6px, 3.6cqi, 14px)" : "0 14px") : 0,
-        border: `1px solid ${T.bd}`, background: T.bg, color: T.fg, borderRadius: 9,
+        border: `1px solid ${T.bd}`, background: T.bg, color: T.fg, borderRadius: "var(--r-md)",
         fontSize: 13, fontWeight: 600, fontFamily: "var(--font-sans)",
         cursor: disabled ? "default" : "pointer", opacity: disabled ? 0.55 : 1, overflow: "hidden",
       }}

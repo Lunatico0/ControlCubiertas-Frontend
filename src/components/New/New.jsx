@@ -30,7 +30,7 @@ const New = ({ onClose }) => {
       <Modal title="Agregar nuevo" onClose={onClose} maxWidth="lg">
         <div className="flex flex-col items-center gap-6">
           <button
-            className="group relative w-full h-40 rounded-xl bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 p-6 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
+            className="group relative w-full h-40 rounded-[var(--r-lg)] bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 p-6 transition-all duration-[var(--t-slow)] transform hover:scale-105 shadow-lg hover:shadow-xl"
             onClick={handleOpenVehicleModal}
           >
             <div className="flex items-center justify-center gap-6 h-full">
@@ -39,7 +39,7 @@ const New = ({ onClose }) => {
                   src={camion}
                   alt="Vehículo"
                   className="h-24 w-full max-w-24 object-contain transform
-                  group-hover:-translate-x-4 group-hover:scale-125 transition-all duration-500"
+                  group-hover:-translate-x-4 group-hover:scale-125 transition-all duration-[var(--t-slow)]"
                 />
               </div>
               <div className="text-left">
@@ -47,11 +47,11 @@ const New = ({ onClose }) => {
                 <p className="text-blue-100 text-sm">Registrar un nuevo vehículo en el sistema</p>
               </div>
             </div>
-            <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 rounded-xl transition-opacity duration-300"></div>
+            <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 rounded-[var(--r-lg)] transition-opacity duration-[var(--t-slow)]"></div>
           </button>
 
           <button
-            className="group relative w-full h-40 rounded-xl bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 p-6 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
+            className="group relative w-full h-40 rounded-[var(--r-lg)] bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 p-6 transition-all duration-[var(--t-slow)] transform hover:scale-105 shadow-lg hover:shadow-xl"
             onClick={handleOpenTireModal}
           >
             <div className="flex items-center justify-center gap-6 h-full">
@@ -59,7 +59,7 @@ const New = ({ onClose }) => {
                 <img
                   src={cubierta}
                   alt="Cubierta"
-                  className="h-20 w-auto object-contain transform group-hover:scale-125 transition-all duration-500"
+                  className="h-20 w-auto object-contain transform group-hover:scale-125 transition-all duration-[var(--t-slow)]"
                 />
               </div>
               <div className="text-left">
@@ -67,7 +67,7 @@ const New = ({ onClose }) => {
                 <p className="text-green-100 text-sm">Registrar una nueva cubierta en el inventario</p>
               </div>
             </div>
-            <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 rounded-xl transition-opacity duration-300"></div>
+            <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 rounded-[var(--r-lg)] transition-opacity duration-[var(--t-slow)]"></div>
           </button>
         </div>
       </Modal>

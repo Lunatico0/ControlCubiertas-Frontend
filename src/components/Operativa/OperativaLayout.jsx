@@ -83,7 +83,7 @@ const OperativaLayout = () => {
                 type="button"
                 onClick={() => goToRoute("/admin")}
                 title="Ir al panel administrativo"
-                className="flex w-full cursor-pointer items-center gap-[13px] rounded-[9px] px-[13px] py-3 text-left text-[14.5px] font-semibold transition-colors"
+                className="flex w-full cursor-pointer items-center gap-[13px] rounded-[var(--r-md)] px-[13px] py-3 text-left text-[14.5px] font-semibold transition-colors"
                 style={{ border: "1px solid color-mix(in srgb, var(--ink-lime) 45%, transparent)", background: "color-mix(in srgb, var(--ink-lime) 8%, transparent)", color: "var(--ink-lime)" }}
               >
                 <span className="inline-flex h-[21px] w-[21px] flex-none items-center"><AdminPanelSettingsOutlinedIcon sx={{ fontSize: 20 }} /></span>

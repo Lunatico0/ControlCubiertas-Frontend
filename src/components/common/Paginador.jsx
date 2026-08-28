@@ -23,7 +23,7 @@ const Paginador = ({ currentPage, totalPages, goToPage, nextPage, prevPage, tota
   const btn = (activo) => ({
     minWidth: 34,
     height: 34,
-    borderRadius: 9,
+    borderRadius: "var(--r-md)",
     border: `1px solid ${activo ? "var(--ink-lime)" : "var(--bd)"}`,
     background: activo ? "color-mix(in srgb, var(--ink-lime) 12%, transparent)" : "var(--card)",
     color: activo ? "var(--tx)" : "var(--tx-3)",

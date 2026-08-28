@@ -114,7 +114,7 @@ const AltaDrawer = ({ onClose, onCreated }) => {
     <Drawer onClose={onClose} onSubmit={() => !submitting && submit()}>
         <div className="flex items-center justify-between gap-3 p-5" style={{ borderBottom: "1px solid var(--bd-soft)" }}>
           <h2 className="text-[20px] font-bold" style={{ fontFamily: "var(--font-display)", color: "var(--tx)" }}>Nueva cubierta</h2>
-          <button onClick={onClose} className="rounded-[7px] p-2" style={{ color: "var(--tx-5)" }} title="Cerrar">
+          <button onClick={onClose} className="rounded-[var(--r-sm)] p-2" style={{ color: "var(--tx-5)" }} title="Cerrar">
             <CloseRoundedIcon sx={{ fontSize: 20 }} />
           </button>
         </div>
@@ -142,8 +142,8 @@ const AltaDrawer = ({ onClose, onCreated }) => {
           </div>
 
           <div className="mt-5 flex gap-3">
-            <button onClick={onClose} className="flex-1 rounded-[9px] py-2.5 text-[13px] font-semibold" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--tx-2)" }}>Cancelar</button>
-            <Button variant="lime" onClick={submit} disabled={submitting} className="flex-1 text-[13px]" style={{ background: "#C4ED2B", color: "#0A0C0D", opacity: submitting ? 0.6 : 1 }}>
+            <button onClick={onClose} className="flex-1 rounded-[var(--r-md)] py-2.5 text-[13px] font-semibold" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--tx-2)" }}>Cancelar</button>
+            <Button variant="lime" onClick={submit} disabled={submitting} className="flex-1 text-[13px]" style={{ background: "var(--brand)", color: "var(--brand-ink)", opacity: submitting ? 0.6 : 1 }}>
               {submitting ? "Creando…" : "Crear cubierta"}
             </Button>
           </div>

@@ -45,7 +45,7 @@ const Sidebar = ({ active, setActive }) => {
   }, []);
 
   const sidebarClass = `
-    fixed top-0 left-0 h-full z-50 transition-all duration-300
+    fixed top-0 left-0 h-full z-50 transition-all duration-[var(--t-slow)]
     ${isMobile ? (isMobileOpen ? "translate-x-0" : "-translate-x-full") : (expanded ? "w-56" : "w-14")}
     flex flex-col justify-between
     ${colors.bgSidebar} border-r ${colors.borderSider}
@@ -96,7 +96,7 @@ const Sidebar = ({ active, setActive }) => {
                   setActive(key);
                   if (isMobile) setIsMobileOpen(false);
                 }}
-                className={`flex items-center gap-3 px-2 py-2 rounded-lg cursor-pointer transition-colors
+                className={`flex items-center gap-3 px-2 py-2 rounded-[var(--r-md)] cursor-pointer transition-colors
                 ${active === key ? `${colors.bgActive} ${colors.shadow}` : `${colors.shadow} ${utility.hoverBg} text-gray-400`}`}
               >
                 <span className={`text-xl ${text.value}`}>{icon}</span>
@@ -111,7 +111,7 @@ const Sidebar = ({ active, setActive }) => {
                   navigate("/admin");
                   if (isMobile) setIsMobileOpen(false);
                 }}
-                className={`flex items-center gap-3 px-2 py-2 rounded-lg cursor-pointer transition-colors ${colors.shadow} ${utility.hoverBg} text-gray-400`}
+                className={`flex items-center gap-3 px-2 py-2 rounded-[var(--r-md)] cursor-pointer transition-colors ${colors.shadow} ${utility.hoverBg} text-gray-400`}
               >
                 <span className={`text-xl ${text.value}`}><AdminPanelSettingsRoundedIcon /></span>
                 {(expanded || isMobile) && <span className={text.value}>Administración</span>}
@@ -125,7 +125,7 @@ const Sidebar = ({ active, setActive }) => {
           {/* Botón actualizar */}
           {electron && (
             <div
-              className={`relative flex items-center gap-2 px-2 py-2 rounded-lg cursor-pointer transition-colors ${colors.shadow} ${utility.hoverBg} ${text.value}`}
+              className={`relative flex items-center gap-2 px-2 py-2 rounded-[var(--r-md)] cursor-pointer transition-colors ${colors.shadow} ${utility.hoverBg} ${text.value}`}
               onClick={upd.openModal}
             >
               <CloudDownloadRoundedIcon fontSize="small" />
@@ -138,7 +138,7 @@ const Sidebar = ({ active, setActive }) => {
 
           {/* Botón toggle modo */}
           <div
-            className={`mt-3 flex items-center gap-2 px-2 py-2 rounded-lg cursor-pointer transition-colors
+            className={`mt-3 flex items-center gap-2 px-2 py-2 rounded-[var(--r-md)] cursor-pointer transition-colors
               ${colors.shadow} ${utility.hoverBg} ${text.value}`}
             onClick={toggleTheme}
           >
@@ -150,7 +150,7 @@ const Sidebar = ({ active, setActive }) => {
 
           {/* Cerrar sesión */}
           <div
-            className={`mt-3 flex items-center gap-2 px-2 py-2 rounded-lg cursor-pointer transition-colors
+            className={`mt-3 flex items-center gap-2 px-2 py-2 rounded-[var(--r-md)] cursor-pointer transition-colors
               ${colors.shadow} ${utility.hoverBg} ${text.value}`}
             onClick={logout}
             title="Cerrar sesión"

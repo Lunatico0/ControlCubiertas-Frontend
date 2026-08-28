@@ -118,7 +118,7 @@ const Vehiculos = ({ onNavigate, intent }) => {
           inputRef: searchRef,
         }}
         secondaryAction={pendingAxles > 0 ? (
-          <button onClick={() => setShowConfigEjes(true)} title="Configurar ejes de vehículos migrados" className="inline-flex h-[46px] items-center gap-2 rounded-[11px] px-4 text-[13.5px] font-semibold" style={{ color: "var(--ink-orange)", background: tint("var(--ink-orange)", 12), border: `1px solid ${tint("var(--ink-orange)", 30)}` }}>
+          <button onClick={() => setShowConfigEjes(true)} title="Configurar ejes de vehículos migrados" className="inline-flex h-[46px] items-center gap-2 rounded-[var(--r-md)] px-4 text-[13.5px] font-semibold" style={{ color: "var(--ink-orange)", background: tint("var(--ink-orange)", 12), border: `1px solid ${tint("var(--ink-orange)", 30)}` }}>
             <ReportProblemOutlinedIcon sx={{ fontSize: 17 }} /> Configurar ejes ({pendingAxles})
           </button>
         ) : null}
@@ -130,7 +130,7 @@ const Vehiculos = ({ onNavigate, intent }) => {
             {["", ...types].map((t) => {
               const on = fType === t
               return (
-                <button key={t || "all"} onClick={() => setFType(t)} className="inline-flex h-[34px] items-center rounded-[9px] px-[13px] text-[12.5px] font-semibold"
+                <button key={t || "all"} onClick={() => setFType(t)} className="inline-flex h-[34px] items-center rounded-[var(--r-md)] px-[13px] text-[12.5px] font-semibold"
                   style={{ border: `1px solid ${on ? "var(--ink-lime)" : "var(--bd)"}`, background: on ? tint("var(--ink-lime)", 12) : "var(--card)", color: on ? "var(--tx)" : "var(--tx-4)" }}>
                   {t || "Todos"}
                 </button>
@@ -150,14 +150,14 @@ const Vehiculos = ({ onNavigate, intent }) => {
           </div>
         ) : vview === "table" ? (
           /* ===== TABLA ===== */
-          <div className="overflow-hidden rounded-[13px]" style={{ border: "1px solid var(--bd)", background: "var(--card)" }}>
+          <div className="overflow-hidden rounded-[var(--r-lg)]" style={{ border: "1px solid var(--bd)", background: "var(--card)" }}>
             <div className="grid gap-3 px-[18px] py-3 text-[10.5px] font-semibold uppercase tracking-wider" style={{ gridTemplateColumns: TABLE_COLS, fontFamily: "var(--font-mono)", background: "var(--elev)", borderBottom: "1px solid var(--bd)", color: "var(--tx-6)" }}>
               <div>Móvil</div><div>Patente</div><div>Tipo</div><div>Cubiertas</div><div className="text-right">Km</div>
             </div>
             {pag.currentItems.map(({ v, countLabel, countColor, tipoColor, tipoBg, kmLabel }) => (
               <div key={v._id} {...clickable(() => open(v))} aria-label={`Vehículo ${v.mobile}`} className="grid cursor-pointer items-center gap-3 px-[18px] py-[13px]" style={{ gridTemplateColumns: TABLE_COLS, borderBottom: "1px solid var(--bd-faint)" }}>
                 <div className="flex min-w-0 items-center gap-[11px]">
-                  <span className="flex h-8 w-8 flex-none items-center justify-center rounded-lg" style={{ background: tipoBg, color: tipoColor }}><VehTypeIcon size={17} /></span>
+                  <span className="flex h-8 w-8 flex-none items-center justify-center rounded-[var(--r-md)]" style={{ background: tipoBg, color: tipoColor }}><VehTypeIcon size={17} /></span>
                   <span className="text-[14.5px] font-bold" style={{ fontFamily: "var(--font-display)", color: "var(--tx)" }}>{v.mobile || "—"}</span>
                 </div>
                 <div className="text-[13px]" style={{ fontFamily: "var(--font-mono)", color: "var(--tx-2)" }}>{formatPlate(v.licensePlate, data.plateSep) || "—"}</div>
@@ -173,10 +173,10 @@ const Vehiculos = ({ onNavigate, intent }) => {
           /* ===== CARDS ===== */
           <div className="grid gap-4" style={{ gridTemplateColumns: "repeat(auto-fill,minmax(330px,1fr))" }}>
             {pag.currentItems.map(({ v, positions, hasAxles, countLabel, countColor, tipoColor, tipoBg, kmLabel }) => (
-              <div key={v._id} {...clickable(() => open(v))} aria-label={`Vehículo ${v.mobile}`} className="flex cursor-pointer flex-col gap-[15px] rounded-[14px] p-[18px]" style={{ border: "1px solid var(--bd)", background: "var(--card)" }}>
+              <div key={v._id} {...clickable(() => open(v))} aria-label={`Vehículo ${v.mobile}`} className="flex cursor-pointer flex-col gap-[15px] rounded-[var(--r-lg)] p-[18px]" style={{ border: "1px solid var(--bd)", background: "var(--card)" }}>
                 {/* header */}
                 <div className="flex items-start gap-3">
-                  <span className="flex h-[42px] w-[42px] flex-none items-center justify-center rounded-[11px]" style={{ background: tipoBg, color: tipoColor }}><VehTypeIcon /></span>
+                  <span className="flex h-[42px] w-[42px] flex-none items-center justify-center rounded-[var(--r-md)]" style={{ background: tipoBg, color: tipoColor }}><VehTypeIcon /></span>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
                       <span className="text-[18px] font-bold" style={{ fontFamily: "var(--font-display)", color: "var(--tx)" }}>{v.mobile || "—"}</span>
@@ -192,7 +192,7 @@ const Vehiculos = ({ onNavigate, intent }) => {
                   <div className="flex flex-1 flex-wrap content-start gap-[7px]">
                     {positions.map((p, i) => (
                       <div key={i} title={`${p.label} · ${p.empty ? "Vacía" : `#${formatTireCode(p.tireCode, data?.tireCodePrefix)} ${p.status}`}`} className="flex w-[42px] flex-col items-center gap-1">
-                        <div className="flex h-[30px] w-full items-center justify-center rounded-[7px]" style={{ background: p.empty ? "var(--input)" : p.bg, border: p.empty ? "1.5px dashed var(--bd-strong)" : "1.5px solid transparent" }}>
+                        <div className="flex h-[30px] w-full items-center justify-center rounded-[var(--r-sm)]" style={{ background: p.empty ? "var(--input)" : p.bg, border: p.empty ? "1.5px dashed var(--bd-strong)" : "1.5px solid transparent" }}>
                           <span className="rounded-full" style={{ width: 9, height: 9, background: p.empty ? "transparent" : p.dot, border: p.empty ? "1.5px solid var(--bd-strong)" : "none" }} />
                         </div>
                         <span className="text-[9px]" style={{ fontFamily: "var(--font-mono)", color: "var(--tx-6)" }}>{p.label}</span>
@@ -200,7 +200,7 @@ const Vehiculos = ({ onNavigate, intent }) => {
                     ))}
                   </div>
                 ) : (
-                  <div className="rounded-[9px] px-3 py-2.5 text-[12px]" style={{ background: "var(--input)", border: "1px dashed var(--bd-strong)", color: "var(--tx-5)" }}>
+                  <div className="rounded-[var(--r-md)] px-3 py-2.5 text-[12px]" style={{ background: "var(--input)", border: "1px dashed var(--bd-strong)", color: "var(--tx-5)" }}>
                     Ejes sin configurar — abrí el detalle para configurarlos.
                   </div>
                 )}

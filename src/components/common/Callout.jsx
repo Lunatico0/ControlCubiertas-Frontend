@@ -10,7 +10,7 @@
 //   - className: overridea el margen por defecto (mt-3.5) según el contexto de uso.
 const Callout = ({ Icon, tone, dashed = false, className = "mt-3.5", children }) => (
   <div
-    className={`flex gap-[11px] rounded-[11px] px-4 py-3.5 ${className}`}
+    className={`flex gap-[11px] rounded-[var(--r-md)] px-4 py-3.5 ${className}`}
     style={{
       border: `1px ${dashed ? "dashed" : "solid"} color-mix(in srgb, ${tone} 30%, transparent)`,
       background: `color-mix(in srgb, ${tone} 7%, transparent)`,

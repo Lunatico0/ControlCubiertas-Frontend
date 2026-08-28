@@ -99,7 +99,7 @@ export const Pips = ({ level = 0 }) => {
   return (
     <div className="flex gap-[5px]">
       {colors.map((c, i) => (
-        <span key={i} className="rounded-[3px]" style={{ width: 18, height: 6, background: i < level ? c : "var(--bd-strong)" }} />
+        <span key={i} className="rounded-[var(--r-sm)]" style={{ width: 18, height: 6, background: i < level ? c : "var(--bd-strong)" }} />
       ))}
     </div>
   )

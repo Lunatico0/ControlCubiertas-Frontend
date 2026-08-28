@@ -87,7 +87,7 @@ const NuevoVehiculo = ({ onClose, onCreated }) => {
     <div className="fixed bottom-0 right-0 left-64 z-60 flex flex-col" style={{ top: isElectron() ? 38 : 0, background: "var(--bg)", borderLeft: "1px solid var(--bd-faint)" }}>
       {/* ===== TOP BAR ===== */}
       <div className="flex h-16 flex-none items-center gap-3.5 px-6" style={{ background: "var(--sidebar)", borderBottom: "1px solid var(--bd-faint)" }}>
-        <button onClick={onClose} title="Volver" className="inline-flex h-[38px] w-[38px] items-center justify-center rounded-[9px]" style={{ border: "1px solid var(--bd)", background: "var(--elev)", color: "var(--tx-3)" }}>
+        <button onClick={onClose} title="Volver" className="inline-flex h-[38px] w-[38px] items-center justify-center rounded-[var(--r-md)]" style={{ border: "1px solid var(--bd)", background: "var(--elev)", color: "var(--tx-3)" }}>
           <ArrowBackRoundedIcon sx={{ fontSize: 18 }} />
         </button>
         <div style={{ lineHeight: 1.2 }}>
@@ -95,8 +95,8 @@ const NuevoVehiculo = ({ onClose, onCreated }) => {
           <div className="text-[11.5px]" style={{ color: "var(--tx-5)", fontFamily: "var(--font-mono)" }}>Vehículos · Alta</div>
         </div>
         <div className="ml-auto flex items-center gap-2.5">
-          <button onClick={onClose} className="h-10 rounded-[9px] px-[15px] text-[13.5px] font-semibold" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--tx)" }}>Cancelar</button>
-          <Button variant="lime" onClick={submit} disabled={submitting} className="h-10 text-[13.5px]" style={{ background: "#C4ED2B", color: "#0A0C0D", opacity: submitting ? 0.6 : 1 }}>
+          <button onClick={onClose} className="h-10 rounded-[var(--r-md)] px-[15px] text-[13.5px] font-semibold" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--tx)" }}>Cancelar</button>
+          <Button variant="lime" onClick={submit} disabled={submitting} className="h-10 text-[13.5px]" style={{ background: "var(--brand)", color: "var(--brand-ink)", opacity: submitting ? 0.6 : 1 }}>
             {submitting ? "Creando…" : "Crear vehículo"}
           </Button>
         </div>

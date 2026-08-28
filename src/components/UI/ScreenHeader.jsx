@@ -35,13 +35,13 @@ const ScreenHeader = ({ title, search, primaryAction, secondaryAction, viewToggl
             value={value}
             onChange={onChange}
             placeholder={placeholder}
-            className={`h-[46px] w-full rounded-[11px] pl-[42px] ${showShortcut ? "pr-[58px]" : "pr-4"} text-[14.5px] outline-none`}
+            className={`h-[46px] w-full rounded-[var(--r-md)] pl-[42px] ${showShortcut ? "pr-[58px]" : "pr-4"} text-[14.5px] outline-none`}
             style={inputStyle}
             onFocus={(e) => (e.target.style.borderColor = "var(--ink-lime)")}
             onBlur={(e) => (e.target.style.borderColor = "var(--bd)")}
           />
           {showShortcut && (
-            <span className="absolute right-[13px] top-1/2 -translate-y-1/2 rounded-[5px] px-[7px] py-[3px] text-[11px]" style={{ fontFamily: "var(--font-mono)", color: "var(--tx-5)", border: "1px solid var(--bd-strong)" }}>
+            <span className="absolute right-[13px] top-1/2 -translate-y-1/2 rounded-[var(--r-sm)] px-[7px] py-[3px] text-[11px]" style={{ fontFamily: "var(--font-mono)", color: "var(--tx-5)", border: "1px solid var(--bd-strong)" }}>
               {SHORTCUT_LABEL}
             </span>
           )}
@@ -49,7 +49,7 @@ const ScreenHeader = ({ title, search, primaryAction, secondaryAction, viewToggl
         <div className="ml-auto flex items-center gap-4">
           {secondaryAction}
           {primaryAction && (
-            <Button variant="lime" data-tour={primaryAction.tour} onClick={primaryAction.onClick} className="h-[46px] text-[14.5px]" style={{ background: "#C4ED2B", color: "#0A0C0D" }}>
+            <Button variant="lime" data-tour={primaryAction.tour} onClick={primaryAction.onClick} className="h-[46px] text-[14.5px]" style={{ background: "var(--brand)", color: "var(--brand-ink)" }}>
               {primaryAction.icon || <AddRoundedIcon sx={{ fontSize: 18 }} />} {primaryAction.label}
             </Button>
           )}

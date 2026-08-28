@@ -40,13 +40,13 @@ const TireHistory = ({ history = [], code, serialNumber, tire, onEditEntry }) =>
 
       {history.length === 0 ? (
         <div className="flex-1 flex items-center justify-center">
-          <div className="text-center py-8 bg-gray-50 dark:bg-gray-800 rounded-lg mx-6 text-gray-500">
+          <div className="text-center py-8 bg-gray-50 dark:bg-gray-800 rounded-[var(--r-md)] mx-6 text-gray-500">
             No hay registros en el historial
           </div>
         </div>
       ) : (
         <div className="flex-1 min-h-0 px-6 pb-6">
-          <div className="border rounded-lg shadow-sm max-h-96 flex flex-col overflow-hidden">
+          <div className="border rounded-[var(--r-md)] shadow-sm max-h-96 flex flex-col overflow-hidden">
             <div className="bg-gray-100 dark:bg-gray-800 flex-shrink-0 grid grid-cols-11 gap-2 p-3 text-xs font-medium">
               {["Fecha", "N° Orden", "Móvil", "Patente", "Km Alta", "Km Baja", "Km Total", "Estado", "N° Int", "N° Serie", "Acciones"]
                 .map((label, i) => <div key={i} className="text-center">{label}</div>)}
@@ -73,7 +73,7 @@ const TireHistory = ({ history = [], code, serialNumber, tire, onEditEntry }) =>
 
       {tooltip.visible && (
         <div
-          className="fixed z-50 bg-gray-800 text-white text-xs p-3 rounded-lg shadow-lg max-w-xs"
+          className="fixed z-50 bg-gray-800 text-white text-xs p-3 rounded-[var(--r-md)] shadow-lg max-w-xs"
           style={{ top: tooltip.y, left: tooltip.x }}
         >
           <div className="space-y-1">
@@ -87,7 +87,7 @@ const TireHistory = ({ history = [], code, serialNumber, tire, onEditEntry }) =>
       {openIndex !== null && (
         <div
           ref={menuRef}
-          className="fixed z-50 max-w-fit flex flex-col items-start gap-2 p-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-lg"
+          className="fixed z-50 max-w-fit flex flex-col items-start gap-2 p-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-[var(--r-md)] shadow-lg"
           style={{ top: `${position.y}px`, left: `${position.x}px` }}
         >
           <button className={`${button.base} ${utility.hoverBg} w-full text-start`} onClick={() => handleReprintEntry(reversedHistory[openIndex])}>

@@ -51,11 +51,11 @@ const VehicleDrawer = ({ item, onClose, onNavigate }) => {
         backdrop="rgba(4,5,6,.55)"
         maxWidth="480px"
         background="var(--elev)"
-        animation="opDrawerIn .22s cubic-bezier(.22,1,.36,1)"
+        animation="opDrawerIn var(--t-base) var(--t-ease)"
       >
         {/* Header */}
         <div className="flex flex-none items-start gap-3.5 px-6 py-5" style={{ borderBottom: "1px solid var(--bd-soft)" }}>
-          <span className="flex h-11 w-11 flex-none items-center justify-center rounded-[11px]" style={{ background: tipoBg, color: tipoColor }}>
+          <span className="flex h-11 w-11 flex-none items-center justify-center rounded-[var(--r-md)]" style={{ background: tipoBg, color: tipoColor }}>
             <LocalShippingOutlinedIcon sx={{ fontSize: 24 }} />
           </span>
           <div className="min-w-0 flex-1">
@@ -65,17 +65,17 @@ const VehicleDrawer = ({ item, onClose, onNavigate }) => {
             </div>
             <div className="mt-[3px] text-[12px]" style={{ fontFamily: "var(--font-mono)", color: "var(--tx-5)" }}>{formatPlate(v.licensePlate, data.plateSep) || "—"} · {v.brand || "—"}</div>
           </div>
-          <button onClick={onClose} title="Cerrar" className="rounded-lg p-1.5" style={{ color: "var(--tx-5)" }}><CloseRoundedIcon sx={{ fontSize: 20 }} /></button>
+          <button onClick={onClose} title="Cerrar" className="rounded-[var(--r-md)] p-1.5" style={{ color: "var(--tx-5)" }}><CloseRoundedIcon sx={{ fontSize: 20 }} /></button>
         </div>
 
         <div className="flex-1 overflow-auto px-6 py-[22px]">
           {/* Stats */}
           <div className="mb-[22px] grid grid-cols-2 gap-2.5">
-            <div className="rounded-[11px] px-[15px] py-[13px]" style={{ border: "1px solid var(--bd-soft)" }}>
+            <div className="rounded-[var(--r-md)] px-[15px] py-[13px]" style={{ border: "1px solid var(--bd-soft)" }}>
               <div className="text-[11.5px]" style={{ color: "var(--tx-5)" }}>Km del vehículo</div>
               <div className="mt-[3px] text-[19px] font-semibold" style={{ fontFamily: "var(--font-mono)", color: "var(--tx)" }}>{kmLabel}</div>
             </div>
-            <div className="rounded-[11px] px-[15px] py-[13px]" style={{ border: "1px solid var(--bd-soft)" }}>
+            <div className="rounded-[var(--r-md)] px-[15px] py-[13px]" style={{ border: "1px solid var(--bd-soft)" }}>
               <div className="text-[11.5px]" style={{ color: "var(--tx-5)" }}>Cubiertas montadas</div>
               <div className="mt-[3px] text-[19px] font-semibold" style={{ fontFamily: "var(--font-mono)", color: countColor }}>{mountedLabel}</div>
             </div>
@@ -87,8 +87,8 @@ const VehicleDrawer = ({ item, onClose, onNavigate }) => {
               <MonoLabel className="mb-3 text-[10.5px] tracking-[.06em]" style={{ color: "var(--tx-6)" }}>POSICIONES</MonoLabel>
               <div className="flex flex-col gap-2">
                 {positions.map((p, i) => (
-                  <div key={i} className="flex items-center gap-[13px] rounded-[11px] px-3.5 py-3" style={{ border: "1px solid var(--bd-soft)", background: "var(--card)" }}>
-                    <span className="flex h-[38px] w-[38px] flex-none items-center justify-center rounded-[9px] text-[10px] font-semibold" style={{ fontFamily: "var(--font-mono)", background: p.empty ? "var(--input)" : p.bg, border: p.empty ? "1.5px dashed var(--bd-strong)" : "1.5px solid transparent", color: p.empty ? "var(--tx-6)" : p.dot }}>{p.label}</span>
+                  <div key={i} className="flex items-center gap-[13px] rounded-[var(--r-md)] px-3.5 py-3" style={{ border: "1px solid var(--bd-soft)", background: "var(--card)" }}>
+                    <span className="flex h-[38px] w-[38px] flex-none items-center justify-center rounded-[var(--r-md)] text-[10px] font-semibold" style={{ fontFamily: "var(--font-mono)", background: p.empty ? "var(--input)" : p.bg, border: p.empty ? "1.5px dashed var(--bd-strong)" : "1.5px solid transparent", color: p.empty ? "var(--tx-6)" : p.dot }}>{p.label}</span>
                     <div className="min-w-0 flex-1">
                       {p.empty ? (
                         <>
@@ -105,11 +105,11 @@ const VehicleDrawer = ({ item, onClose, onNavigate }) => {
                       )}
                     </div>
                     {p.empty ? (
-                      <button onClick={() => montar(p)} className="inline-flex h-[34px] flex-none items-center gap-1.5 rounded-lg px-3 text-[12px] font-semibold" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--ink-lime)" }}>
+                      <button onClick={() => montar(p)} className="inline-flex h-[34px] flex-none items-center gap-1.5 rounded-[var(--r-md)] px-3 text-[12px] font-semibold" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--ink-lime)" }}>
                         <AddRoundedIcon sx={{ fontSize: 15 }} /> Montar
                       </button>
                     ) : (
-                      <button onClick={() => verCubierta(p)} className="inline-flex h-[34px] flex-none items-center gap-1.5 rounded-lg px-3 text-[12px] font-semibold" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--tx-2)" }}>
+                      <button onClick={() => verCubierta(p)} className="inline-flex h-[34px] flex-none items-center gap-1.5 rounded-[var(--r-md)] px-3 text-[12px] font-semibold" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--tx-2)" }}>
                         Ver <ChevronRightRoundedIcon sx={{ fontSize: 15 }} />
                       </button>
                     )}
@@ -125,10 +125,10 @@ const VehicleDrawer = ({ item, onClose, onNavigate }) => {
 
           {/* Acciones */}
           <div className="mt-5 flex gap-2.5">
-            <button onClick={() => setShowReconfig(true)} className="inline-flex h-11 flex-1 items-center justify-center gap-2 rounded-[10px] text-[13px] font-semibold" style={{ border: "1px solid var(--bd-strong)", background: "var(--card)", color: "var(--tx)" }}>
+            <button onClick={() => setShowReconfig(true)} className="inline-flex h-11 flex-1 items-center justify-center gap-2 rounded-[var(--r-md)] text-[13px] font-semibold" style={{ border: "1px solid var(--bd-strong)", background: "var(--card)", color: "var(--tx)" }}>
               <SettingsInputComponentOutlinedIcon sx={{ fontSize: 16 }} /> Reconfigurar ejes
             </button>
-            <button onClick={() => setShowEdit(true)} className="inline-flex h-11 flex-1 items-center justify-center gap-2 rounded-[10px] text-[13px] font-semibold" style={{ border: "1px solid var(--bd-strong)", background: "var(--card)", color: "var(--tx)" }}>
+            <button onClick={() => setShowEdit(true)} className="inline-flex h-11 flex-1 items-center justify-center gap-2 rounded-[var(--r-md)] text-[13px] font-semibold" style={{ border: "1px solid var(--bd-strong)", background: "var(--card)", color: "var(--tx)" }}>
               <EditOutlinedIcon sx={{ fontSize: 16 }} /> Editar datos
             </button>
           </div>

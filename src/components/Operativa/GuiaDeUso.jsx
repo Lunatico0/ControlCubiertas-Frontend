@@ -18,7 +18,7 @@ const TOC = [
 ]
 // Colores de estado (datos, espejo de /op) — se ven igual en claro y oscuro.
 const ESTADOS = [
-  { label: "Nueva", color: "#C4ED2B", dot: "#C4ED2B", bg: "rgba(196,237,43,.13)", desc: "Recién ingresada al inventario, sin usar." },
+  { label: "Nueva", color: "var(--brand)", dot: "var(--brand)", bg: "rgba(196,237,43,.13)", desc: "Recién ingresada al inventario, sin usar." },
   { label: "1er Recapado", color: "#3FD9BE", dot: "#1FD0B4", bg: "rgba(24,184,158,.14)", desc: "Pasó por su primer recapado y está operativa." },
   { label: "2do Recapado", color: "#6E97F5", dot: "#6E97F5", bg: "rgba(110,151,245,.16)", desc: "Segundo recapado completado." },
   { label: "3er Recapado", color: "#9D90F5", dot: "#B39CF7", bg: "rgba(157,144,245,.16)", desc: "Tercer recapado — último tramo de vida útil." },
@@ -66,7 +66,7 @@ const GuiaDeUso = () => (
     <P>Cada cubierta avanza por un ciclo. El estado siempre se muestra con su <B>nombre</B> (por accesibilidad) y con un <B>color</B> distinto como ayuda visual:</P>
     <div className="mt-3.5 flex flex-col gap-2">
       {ESTADOS.map((e) => (
-        <div key={e.label} className="flex items-center gap-[13px] rounded-[9px] px-3.5 py-[11px]" style={{ border: "1px solid var(--bd)", borderLeft: `4px solid ${e.dot}`, background: "var(--card)" }}>
+        <div key={e.label} className="flex items-center gap-[13px] rounded-[var(--r-md)] px-3.5 py-[11px]" style={{ border: "1px solid var(--bd)", borderLeft: `4px solid ${e.dot}`, background: "var(--card)" }}>
           <span className="inline-flex items-center gap-[7px] rounded-full px-[11px] py-[3px] text-[12.5px] font-semibold" style={{ color: e.color, background: e.bg, minWidth: 120 }}>
             <span className="rounded-full" style={{ width: 7, height: 7, background: e.dot }} />{e.label}
           </span>
@@ -106,8 +106,8 @@ const GuiaDeUso = () => (
     <H2 id="atajos">7 · Atajos de teclado</H2>
     <div className="mt-3.5 flex flex-col gap-2">
       {[["Ctrl + K", "Ir al buscador de cubiertas"], ["Esc", "Cerrar paneles y ventanas abiertas"]].map(([k, d]) => (
-        <div key={k} className="flex items-center gap-3.5 rounded-[9px] px-3.5 py-[11px]" style={{ border: "1px solid var(--bd)", background: "var(--card)" }}>
-          <span style={{ fontFamily: "var(--font-mono)", fontSize: 13, background: "var(--input)", border: "1px solid var(--bd-strong)", borderRadius: 6, padding: "3px 11px", color: "var(--ink-lime)" }}>{k}</span>
+        <div key={k} className="flex items-center gap-3.5 rounded-[var(--r-md)] px-3.5 py-[11px]" style={{ border: "1px solid var(--bd)", background: "var(--card)" }}>
+          <span style={{ fontFamily: "var(--font-mono)", fontSize: 13, background: "var(--input)", border: "1px solid var(--bd-strong)", borderRadius: "var(--r-sm)", padding: "3px 11px", color: "var(--ink-lime)" }}>{k}</span>
           <span className="text-[14px]" style={{ color: "var(--tx-2)" }}>{d}</span>
         </div>
       ))}

@@ -8,7 +8,7 @@ import cubierta from "@/assets/Cubierta.png"
 
 // Componente visual del estado (imagen y estado)
 export const TireInfoVisual = ({ tire }) => (
-  <div className={`${statusStyles[tire.status] || "bg-gray-100 dark:bg-gray-800"} flex flex-col items-center justify-center p-6 rounded-xl shadow-sm h-full`}>
+  <div className={`${statusStyles[tire.status] || "bg-gray-100 dark:bg-gray-800"} flex flex-col items-center justify-center p-6 rounded-[var(--r-lg)] shadow-sm h-full`}>
     <div className="size-32 mb-4 flex items-center justify-center">
       <img
         src={cubierta}
@@ -34,7 +34,7 @@ export const TireInfoData = ({ tire }) => {
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
       {/* Identificación */}
       <div
-        className="px-4 py-2 flex flex-col gap-1 rounded-xl bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700"
+        className="px-4 py-2 flex flex-col gap-1 rounded-[var(--r-lg)] bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700"
       >
         <h4 className={`${text.heading} text-base font-semibold border-b border-gray-200 dark:border-gray-700 pb-2 mb-2`}>
           Identificación
@@ -47,7 +47,7 @@ export const TireInfoData = ({ tire }) => {
       </div>
 
       {/* Estado actual */}
-      <div className="px-4 py-2 flex flex-col gap-1 rounded-xl bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+      <div className="px-4 py-2 flex flex-col gap-1 rounded-[var(--r-lg)] bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
         <h4 className={`${text.heading} text-base font-semibold border-b border-gray-200 dark:border-gray-700 pb-2 mb-2`}>
           Estado actual
         </h4>
@@ -63,7 +63,7 @@ export const TireInfoData = ({ tire }) => {
       </div>
 
       {/* Estadísticas */}
-      <div className="px-4 py-2 flex flex-col gap-1 rounded-xl bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+      <div className="px-4 py-2 flex flex-col gap-1 rounded-[var(--r-lg)] bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
         <h4 className={`${text.heading} text-base font-semibold border-b border-gray-200 dark:border-gray-700 pb-2 mb-2`}>
           Estadísticas
         </h4>

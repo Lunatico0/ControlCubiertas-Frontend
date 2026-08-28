@@ -160,7 +160,7 @@ const Cubiertas = ({ intent, onNavigate }) => {
             {TABS.map((f) => {
               const on = tab === f.key
               return (
-                <button key={f.key} onClick={() => setTab(f.key)} className="inline-flex h-[38px] items-center gap-2 rounded-[9px] px-[15px] text-[13.5px] font-semibold"
+                <button key={f.key} onClick={() => setTab(f.key)} className="inline-flex h-[38px] items-center gap-2 rounded-[var(--r-md)] px-[15px] text-[13.5px] font-semibold"
                   style={{ border: `1px solid ${on ? "var(--ink-lime)" : "var(--bd)"}`, background: on ? tint("var(--ink-lime)", 12) : "var(--card)", color: on ? "var(--tx)" : "var(--tx-3)" }}>
                   {f.label}
                   <Pill className="px-[7px] py-px text-[11.5px]" style={{ fontFamily: "var(--font-mono)", background: "var(--elev)", color: "var(--tx-5)" }}>{counts[f.key]}</Pill>
@@ -168,7 +168,7 @@ const Cubiertas = ({ intent, onNavigate }) => {
               )
             })}
           </div>
-          <button onClick={() => setShowFilters((v) => !v)} className="ml-auto inline-flex h-[38px] items-center gap-2 rounded-[9px] px-[14px] text-[13.5px] font-semibold"
+          <button onClick={() => setShowFilters((v) => !v)} className="ml-auto inline-flex h-[38px] items-center gap-2 rounded-[var(--r-md)] px-[14px] text-[13.5px] font-semibold"
             style={{ border: `1px solid ${showFilters || activeFilters ? "var(--ink-lime)" : "var(--bd)"}`, background: showFilters || activeFilters ? tint("var(--ink-lime)", 12) : "var(--card)", color: showFilters || activeFilters ? "var(--tx)" : "var(--tx-3)" }}>
             <TuneRoundedIcon sx={{ fontSize: 16 }} /> Filtros
             {activeFilters > 0 && <Pill className="px-[7px] py-px text-[11px]" style={{ fontFamily: "var(--font-mono)", background: "var(--ink-lime)", color: "var(--bg)" }}>{activeFilters}</Pill>}
@@ -176,31 +176,31 @@ const Cubiertas = ({ intent, onNavigate }) => {
         </div>
 
         {showFilters && (
-          <div className="mt-3 flex flex-wrap items-end gap-3.5 rounded-[11px] p-3.5" style={{ border: "1px solid var(--bd)", background: "var(--card)" }}>
+          <div className="mt-3 flex flex-wrap items-end gap-3.5 rounded-[var(--r-md)] p-3.5" style={{ border: "1px solid var(--bd)", background: "var(--card)" }}>
             <label className="flex flex-col gap-1.5">
               <span className="text-[11px] font-semibold" style={{ color: "var(--tx-4)" }}>Marca</span>
-              <select value={fBrand} onChange={(e) => setFBrand(e.target.value)} className="h-[38px] min-w-[150px] rounded-lg px-2.5 text-[13px] outline-none" style={inputStyle}>
+              <select value={fBrand} onChange={(e) => setFBrand(e.target.value)} className="h-[38px] min-w-[150px] rounded-[var(--r-md)] px-2.5 text-[13px] outline-none" style={inputStyle}>
                 <option value="">Todas</option>
                 {brands.map((b) => <option key={b} value={b}>{b}</option>)}
               </select>
             </label>
             <label className="flex flex-col gap-1.5">
               <span className="text-[11px] font-semibold" style={{ color: "var(--tx-4)" }}>Estado</span>
-              <select value={fStatus} onChange={(e) => setFStatus(e.target.value)} className="h-[38px] min-w-[150px] rounded-lg px-2.5 text-[13px] outline-none" style={inputStyle}>
+              <select value={fStatus} onChange={(e) => setFStatus(e.target.value)} className="h-[38px] min-w-[150px] rounded-[var(--r-md)] px-2.5 text-[13px] outline-none" style={inputStyle}>
                 <option value="">Todos</option>
                 {(data?.stateOrder || []).map((s) => <option key={s} value={s}>{s}</option>)}
               </select>
             </label>
             <label className="flex flex-col gap-1.5">
               <span className="text-[11px] font-semibold" style={{ color: "var(--tx-4)" }}>Km desde</span>
-              <input type="number" min="0" value={fKmMin} onChange={(e) => setFKmMin(e.target.value)} placeholder="0" className="h-[38px] w-[120px] rounded-lg px-2.5 text-[13px] outline-none" style={{ ...inputStyle, fontFamily: "var(--font-mono)" }} />
+              <input type="number" min="0" value={fKmMin} onChange={(e) => setFKmMin(e.target.value)} placeholder="0" className="h-[38px] w-[120px] rounded-[var(--r-md)] px-2.5 text-[13px] outline-none" style={{ ...inputStyle, fontFamily: "var(--font-mono)" }} />
             </label>
             <label className="flex flex-col gap-1.5">
               <span className="text-[11px] font-semibold" style={{ color: "var(--tx-4)" }}>Km hasta</span>
-              <input type="number" min="0" value={fKmMax} onChange={(e) => setFKmMax(e.target.value)} placeholder="—" className="h-[38px] w-[120px] rounded-lg px-2.5 text-[13px] outline-none" style={{ ...inputStyle, fontFamily: "var(--font-mono)" }} />
+              <input type="number" min="0" value={fKmMax} onChange={(e) => setFKmMax(e.target.value)} placeholder="—" className="h-[38px] w-[120px] rounded-[var(--r-md)] px-2.5 text-[13px] outline-none" style={{ ...inputStyle, fontFamily: "var(--font-mono)" }} />
             </label>
             {activeFilters > 0 && (
-              <button onClick={clearFilters} className="inline-flex h-[38px] items-center gap-1.5 rounded-lg px-3 text-[12.5px] font-semibold" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--tx-3)" }}>
+              <button onClick={clearFilters} className="inline-flex h-[38px] items-center gap-1.5 rounded-[var(--r-md)] px-3 text-[12.5px] font-semibold" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--tx-3)" }}>
                 <CloseRoundedIcon sx={{ fontSize: 15 }} /> Limpiar
               </button>
             )}
@@ -211,12 +211,12 @@ const Cubiertas = ({ intent, onNavigate }) => {
 
       <div className="px-7 pb-8 pt-5">
         {assignTo && (
-          <div className="mb-4 flex items-center gap-3 rounded-[11px] px-4 py-3" style={{ border: `1px solid ${tint("var(--ink-lime)", 40)}`, background: tint("var(--ink-lime)", 8) }}>
+          <div className="mb-4 flex items-center gap-3 rounded-[var(--r-md)] px-4 py-3" style={{ border: `1px solid ${tint("var(--ink-lime)", 40)}`, background: tint("var(--ink-lime)", 8) }}>
             <span className="inline-flex flex-none" style={{ color: "var(--ink-lime)" }}><AddRoundedIcon sx={{ fontSize: 18 }} /></span>
             <span className="flex-1 text-[13px]" style={{ color: "var(--tx-2)" }}>
               Montando en <b style={{ color: "var(--tx)" }}>{assignTo.mobile}</b> · posición <b style={{ color: "var(--tx)", fontFamily: "var(--font-mono)" }}>{assignTo.position}</b> — elegí una cubierta disponible y tocá <b>Asignar</b>.
             </span>
-            <button onClick={() => setAssignTo(null)} className="inline-flex flex-none items-center gap-1 rounded-lg px-2.5 py-1.5 text-[12px] font-semibold" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--tx-3)" }}>
+            <button onClick={() => setAssignTo(null)} className="inline-flex flex-none items-center gap-1 rounded-[var(--r-md)] px-2.5 py-1.5 text-[12px] font-semibold" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--tx-3)" }}>
               <CloseRoundedIcon sx={{ fontSize: 14 }} /> Cancelar montaje
             </button>
           </div>
@@ -234,7 +234,7 @@ const Cubiertas = ({ intent, onNavigate }) => {
             {pag.currentItems.map((t) => {
               const m = metaOf(t.status)
               return (
-                <div key={t._id} {...clickable(openDrawer(t._id))} aria-label={`Cubierta ${formatTireCode(t.code, tireCodePrefix)}`} className="flex cursor-pointer flex-col gap-[13px] rounded-[13px] p-4" style={{ border: "1px solid var(--bd)", background: "var(--card)" }}>
+                <div key={t._id} {...clickable(openDrawer(t._id))} aria-label={`Cubierta ${formatTireCode(t.code, tireCodePrefix)}`} className="flex cursor-pointer flex-col gap-[13px] rounded-[var(--r-lg)] p-4" style={{ border: "1px solid var(--bd)", background: "var(--card)" }}>
                   <div className="flex items-start justify-between gap-2.5">
                     <div>
                       <div className="text-[11px]" style={{ fontFamily: "var(--font-mono)", color: "var(--tx-6)" }}>{t.serialNumber || "—"}</div>
@@ -265,7 +265,7 @@ const Cubiertas = ({ intent, onNavigate }) => {
           </div>
         ) : (
           /* ---------- TABLA ---------- */
-          <div className="overflow-hidden rounded-[13px]" style={{ border: "1px solid var(--bd)", background: "var(--card)" }}>
+          <div className="overflow-hidden rounded-[var(--r-lg)]" style={{ border: "1px solid var(--bd)", background: "var(--card)" }}>
             <div className="grid gap-3 px-[18px] py-3 text-[10.5px] font-semibold uppercase tracking-wider" style={{ gridTemplateColumns: GRID_COLS, fontFamily: "var(--font-mono)", background: "var(--elev)", borderBottom: "1px solid var(--bd)", color: "var(--tx-6)" }}>
               {COLUMNS.map((c) => {
                 const active = sortBy === c.key

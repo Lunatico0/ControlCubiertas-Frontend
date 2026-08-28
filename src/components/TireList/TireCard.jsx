@@ -33,7 +33,7 @@ const TireCard = ({ tire, onCardClick, onEdit, isLoading = false }) => {
   return (
     <div
       className={`
-        relative group transition-all duration-300 transform hover:scale-105 ${colors.surface} ${colors.border} ${colors.shadow} rounded-xl overflow-hidden cursor-pointer h-full flex flex-col ${isLoading ? "opacity-50 pointer-events-none" : ""} ${isRecap || isDiscarded ? "opacity-80" : ""}
+        relative group transition-all duration-[var(--t-slow)] transform hover:scale-105 ${colors.surface} ${colors.border} ${colors.shadow} rounded-[var(--r-lg)] overflow-hidden cursor-pointer h-full flex flex-col ${isLoading ? "opacity-50 pointer-events-none" : ""} ${isRecap || isDiscarded ? "opacity-80" : ""}
       `}
       onClick={handleCardClick}
       tabIndex="0"
@@ -48,7 +48,7 @@ const TireCard = ({ tire, onCardClick, onEdit, isLoading = false }) => {
         onClick={handleEdit}
         disabled={isLoading}
         className={
-          `absolute top-3 right-3 z-20 shadow-sm hover:shadow-md px-3 py-1 rounded-lg hover:scale-105 opacity-0 group-hover:opacity-100 bg-blue-600 hover:bg-blue-700 text-white transition-all transform duration-300`
+          `absolute top-3 right-3 z-20 shadow-sm hover:shadow-md px-3 py-1 rounded-[var(--r-md)] hover:scale-105 opacity-0 group-hover:opacity-100 bg-blue-600 hover:bg-blue-700 text-white transition-all transform duration-[var(--t-slow)]`
         }
         title="Editar cubierta"
       >
@@ -61,18 +61,18 @@ const TireCard = ({ tire, onCardClick, onEdit, isLoading = false }) => {
         }
       >
         {/* Capa que se blurea */}
-        <div className="absolute inset-0 z-0 group-hover:bg-black/10 group-hover:blur-sm transition-all duration-300">
+        <div className="absolute inset-0 z-0 group-hover:bg-black/10 group-hover:blur-sm transition-all duration-[var(--t-slow)]">
           <img
             src={cubierta}
             alt="Cubierta"
-            className={`w-full h-full object-contain ${isRecap ? "opacity-60 grayscale" : ""} ${isDiscarded ? "opacity-40 grayscale" : ""} transition-transform duration-300 group-hover:scale-110`
+            className={`w-full h-full object-contain ${isRecap ? "opacity-60 grayscale" : ""} ${isDiscarded ? "opacity-40 grayscale" : ""} transition-transform duration-[var(--t-slow)] group-hover:scale-110`
             }
           />
         </div>
 
         {/* Elementos que NO deben verse afectados por el blur */}
         <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
-          <span className="text-white font-medium text-md opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          <span className="text-white font-medium text-md opacity-0 group-hover:opacity-100 transition-opacity duration-[var(--t-slow)]">
             Ver detalles
           </span>
         </div>
@@ -103,13 +103,13 @@ const TireCard = ({ tire, onCardClick, onEdit, isLoading = false }) => {
         {/* Información del vehículo si está asignado - Siempre en la parte inferior */}
         <div className="mt-4">
           {tire.vehicle ? (
-            <div className="p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
+            <div className="p-3 bg-green-50 dark:bg-green-900/20 rounded-[var(--r-md)] border border-green-200 dark:border-green-800">
               <p className="text-xs text-green-700 dark:text-green-300 font-medium">
                 Asignado a: {tire.vehicle.mobile} ({tire.vehicle.licensePlate})
               </p>
             </div>
           ) : (
-            <div className="p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700">
+            <div className="p-3 bg-gray-50 dark:bg-gray-800/50 rounded-[var(--r-md)] border border-gray-200 dark:border-gray-700">
               <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">Sin asignar a vehículo</p>
             </div>
           )}

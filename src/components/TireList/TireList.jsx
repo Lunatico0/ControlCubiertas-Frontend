@@ -99,7 +99,7 @@ const TireList = ({ onTireSelect }) => {
           <p className={`${colors.muted} mb-4`}>{ui.error}</p>
           <button
             onClick={tires.load}
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-[var(--r-md)] transition-colors"
           >
             Reintentar
           </button>

@@ -29,7 +29,7 @@ const TireDetails = ({ selectedLoading, selectedTire, onClose, onEdit}) => {
   if (selectedLoading || !selectedTire) {
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-        <div className={`${colors.surface} ${text.heading} rounded-xl p-6 w-full max-w-md shadow-xl`}>
+        <div className={`${colors.surface} ${text.heading} rounded-[var(--r-lg)] p-6 w-full max-w-md shadow-xl`}>
           <div className="flex items-center justify-center py-8">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500" />
             <span className="ml-2">
@@ -45,7 +45,7 @@ const TireDetails = ({ selectedLoading, selectedTire, onClose, onEdit}) => {
     <>
       <Modal padding='none' onClose={onClose} maxWidth="7xl" maxHeight='100dvh'>
         <div
-          className="w-full max-w-7xl mx-auto shadow-2xl rounded-xl overflow-hidden flex flex-col lg:flex-row h-full max-h-[95vh] bg-white dark:bg-gray-900"
+          className="w-full max-w-7xl mx-auto shadow-2xl rounded-[var(--r-lg)] overflow-hidden flex flex-col lg:flex-row h-full max-h-[95vh] bg-white dark:bg-gray-900"
           onClick={(e) => e.stopPropagation()}
         >
           <TireStatusSidebar
@@ -69,7 +69,7 @@ const TireDetails = ({ selectedLoading, selectedTire, onClose, onEdit}) => {
                 </button>
                 <button
                   onClick={onClose}
-                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-2 rounded-[var(--r-md)] hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                 >
                   <CloseRoundedIcon fontSize="small" />
                 </button>

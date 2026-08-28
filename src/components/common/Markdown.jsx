@@ -44,7 +44,7 @@ const components = {
 
   // Bloque de código: el <pre> pone fondo/borde/scroll; el <code> de adentro va "pelado".
   pre: ({ children }) => (
-    <pre className="overflow-x-auto rounded-lg border border-(--bd-soft) bg-(--input) p-3 text-xs leading-relaxed text-(--tx-2)">
+    <pre className="overflow-x-auto rounded-[var(--r-md)] border border-(--bd-soft) bg-(--input) p-3 text-xs leading-relaxed text-(--tx-2)">
       {children}
     </pre>
   ),
@@ -72,7 +72,7 @@ const components = {
   ),
   td: ({ children }) => <td className="border border-(--bd) px-2 py-1 text-(--tx-3)">{children}</td>,
 
-  img: ({ src, alt }) => <img src={src} alt={alt} className="max-w-full rounded-md" />,
+  img: ({ src, alt }) => <img src={src} alt={alt} className="max-w-full rounded-[var(--r-sm)]" />,
 }
 
 const Markdown = ({ children, className = "" }) => (

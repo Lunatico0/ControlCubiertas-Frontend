@@ -14,7 +14,7 @@ const Toggle = ({ on, onChange, label, disabled = false, w = 38, knob = 16 }) =>
     style={{
       width: w,
       height: knob + 6,
-      borderRadius: 20,
+      borderRadius: "var(--r-pill)",
       border: "none",
       background: on ? "var(--ink-lime)" : "var(--bd-strong)",
       cursor: "pointer",

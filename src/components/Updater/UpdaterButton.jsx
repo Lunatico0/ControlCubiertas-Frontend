@@ -3,7 +3,7 @@
 const UpdaterButton = ({ current, bip, onClick }) => (
   <button
     onClick={onClick}
-    className="relative flex w-full items-center gap-[11px] rounded-[9px] px-3 py-[10px]"
+    className="relative flex w-full items-center gap-[11px] rounded-[var(--r-md)] px-3 py-[10px]"
     style={{ border: "1px solid var(--bd)", background: "var(--elev)", color: "var(--tx-3)" }}
   >
     <span className="relative inline-flex h-5 w-5 flex-none items-center" style={{ color: "var(--ink-lime)" }}>

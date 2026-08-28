@@ -75,7 +75,7 @@ const UpdateTire = ({ id, onClose, onSuccess }) => {
           <p className="text-red-500">No se pudo cargar la información de la cubierta</p>
           <button
             onClick={onClose}
-            className="mt-4 px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded-md transition"
+            className="mt-4 px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded-[var(--r-sm)] transition"
           >
             Cerrar
           </button>
@@ -87,7 +87,7 @@ const UpdateTire = ({ id, onClose, onSuccess }) => {
   return (
     <Modal title="Corregir datos de la cubierta" onClose={onClose} maxWidth="lg">
       <div className="mb-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-[var(--r-md)]">
           <div className="border rounded px-3 py-1">
             <span className={`${colors.muted} text-sm font-medium`}>Código actual:</span>
             <p className="font-semibold">{data.selectedTire.code}</p>
@@ -110,7 +110,7 @@ const UpdateTire = ({ id, onClose, onSuccess }) => {
           </div>
         </div>
 
-        <div className="mt-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+        <div className="mt-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-[var(--r-md)]">
           <div className="flex items-start">
             <span className="text-yellow-600 dark:text-yellow-400 mr-2">
               <WarningAmberRoundedIcon />

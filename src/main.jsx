@@ -46,10 +46,10 @@ if (habilitado) {
 // Pantalla de ultimo recurso si algo revienta en el render de React. Colores fijos (no tokens):
 // si el arbol crashea, el shell temeado puede no estar montado.
 const AppCrash = () => (
-  <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 12, fontFamily: "system-ui, sans-serif", background: "#0A0C0D", color: "#e5e7eb", padding: 24, textAlign: "center" }}>
+  <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 12, fontFamily: "system-ui, sans-serif", background: "var(--brand-ink)", color: "#e5e7eb", padding: 24, textAlign: "center" }}>
     <div style={{ fontSize: 20, fontWeight: 700 }}>Algo salió mal</div>
     <div style={{ fontSize: 14, opacity: 0.7, maxWidth: 420 }}>Registramos el error y ya lo estamos viendo. Probá recargar la app.</div>
-    <button onClick={() => window.location.reload()} style={{ marginTop: 8, padding: "10px 18px", borderRadius: 9, border: "none", background: "#C4ED2B", color: "#0A0C0D", fontWeight: 700, cursor: "pointer" }}>
+    <button onClick={() => window.location.reload()} style={{ marginTop: 8, padding: "10px 18px", borderRadius: "var(--r-md)", border: "none", background: "var(--brand)", color: "var(--brand-ink)", fontWeight: 700, cursor: "pointer" }}>
       Recargar
     </button>
   </div>

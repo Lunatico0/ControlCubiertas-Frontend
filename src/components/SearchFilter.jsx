@@ -102,7 +102,7 @@ const SearchFilter = ({ showFilters, setShowFilters }) => {
       <button
         onClick={onClear}
         disabled={!value}
-        className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 disabled:opacity-30 disabled:cursor-not-allowed p-1 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+        className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 disabled:opacity-30 disabled:cursor-not-allowed p-1 rounded-[var(--r-sm)] hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
         title="Limpiar filtro"
       >
         <CloseRoundedIcon />
@@ -114,13 +114,13 @@ const SearchFilter = ({ showFilters, setShowFilters }) => {
     <div className="flex flex-col">
       {/* Botones superiores */}
       <div className="relative flex items-center justify-around mb-4">
-        <button onClick={handleStockClick} className={`flex items-center gap-3 px-6 py-4 rounded-xl font-medium transition-all shadow-sm hover:shadow-md ${getButtonStyle(isStockActive)}`}>
+        <button onClick={handleStockClick} className={`flex items-center gap-3 px-6 py-4 rounded-[var(--r-lg)] font-medium transition-all shadow-sm hover:shadow-md ${getButtonStyle(isStockActive)}`}>
           <span>Cubiertas en Stock</span>
         </button>
-        <button onClick={handleAllTires} className={`flex items-center gap-3 px-6 py-4 rounded-xl font-medium transition-all shadow-sm hover:shadow-md ${getButtonStyle(false)}`}>
+        <button onClick={handleAllTires} className={`flex items-center gap-3 px-6 py-4 rounded-[var(--r-lg)] font-medium transition-all shadow-sm hover:shadow-md ${getButtonStyle(false)}`}>
           <span>Todas las cubiertas</span>
         </button>
-        <button onClick={handleActiveClick} className={`flex items-center gap-3 px-6 py-4 rounded-xl font-medium transition-all shadow-sm hover:shadow-md ${getButtonStyle(isCirculationActive)}`}>
+        <button onClick={handleActiveClick} className={`flex items-center gap-3 px-6 py-4 rounded-[var(--r-lg)] font-medium transition-all shadow-sm hover:shadow-md ${getButtonStyle(isCirculationActive)}`}>
           <span>Cubiertas en Circulación</span>
         </button>
       </div>
@@ -136,7 +136,7 @@ const SearchFilter = ({ showFilters, setShowFilters }) => {
             value={ui.searchQuery}
             onChange={(e) => ui.setSearchQuery(e.target.value)}
             placeholder="Buscar por código, marca, serie..."
-            className={`w-full pl-12 pr-12 py-5 rounded-xl dark:bg-gray-800 ${input.base} hover:shadow-md transition-shadow`}
+            className={`w-full pl-12 pr-12 py-5 rounded-[var(--r-lg)] dark:bg-gray-800 ${input.base} hover:shadow-md transition-shadow`}
           />
           {ui.searchQuery && (
             <button onClick={() => ui.setSearchQuery("")} className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600 transition-colors">
@@ -149,7 +149,7 @@ const SearchFilter = ({ showFilters, setShowFilters }) => {
         <div className="relative">
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className={`flex items-center gap-3 px-6 py-4 rounded-xl font-medium transition-all shadow-sm hover:shadow-md ${hasActiveFilters ? button.primary : `${colors.surface} ${colors.border} text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700`}`}
+            className={`flex items-center gap-3 px-6 py-4 rounded-[var(--r-lg)] font-medium transition-all shadow-sm hover:shadow-md ${hasActiveFilters ? button.primary : `${colors.surface} ${colors.border} text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700`}`}
           >
             <span className="text-lg"><TuneRoundedIcon /></span>
             <span>Filtros</span>
@@ -161,7 +161,7 @@ const SearchFilter = ({ showFilters, setShowFilters }) => {
           </button>
 
           {showFilters && (
-            <div ref={modalRef} className="absolute right-0 mt-3 bg-white/80 dark:bg-gray-800/90 backdrop-blur-md border-gray-200 dark:border-gray-700 rounded-xl shadow-xl ring-1 ring-black/10 z-50 p-6">
+            <div ref={modalRef} className="absolute right-0 mt-3 bg-white/80 dark:bg-gray-800/90 backdrop-blur-md border-gray-200 dark:border-gray-700 rounded-[var(--r-lg)] shadow-xl ring-1 ring-black/10 z-50 p-6">
               <div className="absolute -top-2 right-6 w-4 h-4 bg-white dark:bg-gray-800 border-l border-t border-gray-200 dark:border-gray-700 rotate-45"></div>
 
               {/* Header */}
@@ -169,7 +169,7 @@ const SearchFilter = ({ showFilters, setShowFilters }) => {
                 <h3 className="font-semibold text-gray-900 dark:text-white text-lg">Filtros y ordenamiento</h3>
                 <button
                   onClick={() => setShowFilters(false)}
-                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-1 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-1 rounded-[var(--r-sm)] hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                 >
                   <CloseRoundedIcon />
                 </button>
@@ -234,7 +234,7 @@ const SearchFilter = ({ showFilters, setShowFilters }) => {
                 <button
                   onClick={clearAllFilters}
                   disabled={!hasActiveFilters}
-                  className={`${button.danger} text-sm px-4 py-2 rounded-lg disabled:bg-gray-300 disabled:text-gray-600 disabled:cursor-not-allowed`}
+                  className={`${button.danger} text-sm px-4 py-2 rounded-[var(--r-md)] disabled:bg-gray-300 disabled:text-gray-600 disabled:cursor-not-allowed`}
                 >
                   Limpiar filtros
                 </button>

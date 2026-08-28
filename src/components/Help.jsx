@@ -10,7 +10,7 @@ const Help = () => {
   return (
     <div className="relative group">
       <button
-        className={`flex items-center gap-3 px-4 py-3 ${colors.muted} hover:text-gray-800 dark:hover:text-gray-200 transition-all duration-200 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
+        className={`flex items-center gap-3 px-4 py-3 ${colors.muted} hover:text-gray-800 dark:hover:text-gray-200 transition-all duration-[var(--t-base)] rounded-[var(--r-lg)] hover:bg-gray-100 dark:hover:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
         title="Ver información de estados`}
       >
         <span className="text-xl"><HelpOutlineRoundedIcon /></span>
@@ -18,8 +18,8 @@ const Help = () => {
       </button>
 
       {/* Tooltip de ayuda mejorado */}
-      <div className="absolute top-full left-0 mt-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
-        <div className="relative bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-2xl p-6 w-96">
+      <div className="absolute top-full left-0 mt-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-[var(--t-slow)] z-50">
+        <div className="relative bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-[var(--r-lg)] shadow-2xl p-6 w-96">
           {/* Flecha del tooltip */}
           <div className="absolute -top-2 left-6 w-4 h-4 bg-white dark:bg-gray-800 border-l border-t border-gray-200 dark:border-gray-700 rotate-45"></div>
 
@@ -39,7 +39,7 @@ const Help = () => {
                 return (
                   <div
                     key={status}
-                    className="flex items-start gap-4 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+                    className="flex items-start gap-4 p-3 rounded-[var(--r-md)] hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
                   >
                     <div className="flex-shrink-0 mt-1">
                       <div className="flex items-center gap-2">

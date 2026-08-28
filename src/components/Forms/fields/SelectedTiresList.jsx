@@ -9,7 +9,7 @@ const SelectedTiresList = ({ tires = [], onRemoveTire }) => (
       tires.map((tire) => (
         <div
           key={tire._id}
-          className={`flex items-center justify-between gap-2 p-3 rounded-md border bg-gray-100 dark:bg-gray-800 dark:border-gray-700`}
+          className={`flex items-center justify-between gap-2 p-3 rounded-[var(--r-sm)] border bg-gray-100 dark:bg-gray-800 dark:border-gray-700`}
         >
           <p className="text-sm truncate">
             <span className="font-bold">{tire.code}</span>

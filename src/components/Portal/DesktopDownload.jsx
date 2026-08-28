@@ -59,8 +59,8 @@ const DesktopDownload = () => {
   return (
     <section className="mt-6">
       <h2 className="mb-3 font-display text-lg font-semibold" style={{ color: "var(--tx)", fontFamily: "var(--font-display)" }}>App de escritorio</h2>
-      <div className="flex flex-col items-start gap-4 rounded-xl p-5 sm:flex-row sm:items-center" style={{ background: "var(--card)", border: "1px solid var(--bd)" }}>
-        <span className="grid h-11 w-11 shrink-0 place-items-center rounded-lg" style={{ background: tintBg("var(--ink-lime)", 12), color: "var(--ink-lime)" }}>
+      <div className="flex flex-col items-start gap-4 rounded-[var(--r-lg)] p-5 sm:flex-row sm:items-center" style={{ background: "var(--card)", border: "1px solid var(--bd)" }}>
+        <span className="grid h-11 w-11 shrink-0 place-items-center rounded-[var(--r-md)]" style={{ background: tintBg("var(--ink-lime)", 12), color: "var(--ink-lime)" }}>
           <DesktopWindowsOutlinedIcon />
         </span>
         <div className="flex-1">
@@ -76,7 +76,7 @@ const DesktopDownload = () => {
           </a>
         ) : (
           <a href={RELEASES_PAGE} target="_blank" rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold transition"
+            className="inline-flex items-center gap-2 rounded-[var(--r-md)] px-4 py-2.5 text-sm font-semibold transition"
             style={{ background: "var(--elev)", border: "1px solid var(--bd)", color: "var(--tx-3)" }}>
             <OpenInNewRoundedIcon sx={{ fontSize: 18 }} /> Ver releases
           </a>

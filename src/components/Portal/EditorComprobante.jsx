@@ -40,10 +40,10 @@ const ACCENTS = ["#1F7A43", "#2358C5", "#334155", "#C2410C", "#6D28D9"]
 
 // Control segmentado
 const Segmented = ({ options, value, onChange }) => (
-  <div className="flex gap-[5px] rounded-[9px] p-1" style={{ border: "1px solid var(--bd-strong)", background: "var(--input)" }}>
+  <div className="flex gap-[5px] rounded-[var(--r-md)] p-1" style={{ border: "1px solid var(--bd-strong)", background: "var(--input)" }}>
     {options.map((o) => {
       const on = value === o.value
-      return <button key={o.value} onClick={() => onChange(o.value)} className="h-[34px] flex-1 rounded-md text-[12.5px] font-semibold" style={{ border: "none", background: on ? "var(--ink-lime)" : "transparent", color: on ? "var(--bg)" : "var(--tx-3)" }}>{o.label}</button>
+      return <button key={o.value} onClick={() => onChange(o.value)} className="h-[34px] flex-1 rounded-[var(--r-sm)] text-[12.5px] font-semibold" style={{ border: "none", background: on ? "var(--ink-lime)" : "transparent", color: on ? "var(--bg)" : "var(--tx-3)" }}>{o.label}</button>
     })}
   </div>
 )
@@ -142,7 +142,7 @@ const EditorComprobante = () => {
           <div className="text-[11.5px]" style={{ color: "var(--tx-5)", fontFamily: "var(--font-mono)" }}>Diseño del comprobante impreso · A4</div>
         </div>
         <div className="ml-auto flex items-center gap-2.5">
-          <button onClick={reset} className="h-10 rounded-[9px] px-[15px] text-[13.5px] font-semibold" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--tx)" }}>Restablecer</button>
+          <button onClick={reset} className="h-10 rounded-[var(--r-md)] px-[15px] text-[13.5px] font-semibold" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--tx)" }}>Restablecer</button>
           <Button variant="lime" onClick={save} disabled={saving}>{saving ? "Guardando…" : "Guardar cambios"}</Button>
         </div>
       </div>
@@ -172,10 +172,10 @@ const EditorComprobante = () => {
           <div className="px-[22px] py-5" style={{ borderBottom: "1px solid var(--bd-faint)" }}>
             <div className="mb-[15px] text-[10px] tracking-[.12em]" style={sectionLabelStyle}>LOGO</div>
             <div className="mb-3.5 flex gap-2.5">
-              <button onClick={pickLogo} className="inline-flex h-[42px] flex-1 items-center justify-center gap-2 rounded-[9px] text-[13px] font-semibold" style={{ border: "1px dashed var(--bd-hover)", background: "var(--input)", color: "var(--ink-lime)" }}>
+              <button onClick={pickLogo} className="inline-flex h-[42px] flex-1 items-center justify-center gap-2 rounded-[var(--r-md)] text-[13px] font-semibold" style={{ border: "1px dashed var(--bd-hover)", background: "var(--input)", color: "var(--ink-lime)" }}>
                 <FileUploadRoundedIcon sx={{ fontSize: 16 }} /> {d.logo ? "Cambiar logo" : "Subir logo"}
               </button>
-              {d.logo && <button onClick={() => setDesign({ logo: null })} title="Quitar logo" className="inline-flex h-[42px] w-[42px] flex-none items-center justify-center rounded-[9px]" style={{ border: "1px solid var(--bd-strong)", background: "var(--input)", color: "var(--ink-red)" }}><DeleteOutlineRoundedIcon sx={{ fontSize: 18 }} /></button>}
+              {d.logo && <button onClick={() => setDesign({ logo: null })} title="Quitar logo" className="inline-flex h-[42px] w-[42px] flex-none items-center justify-center rounded-[var(--r-md)]" style={{ border: "1px solid var(--bd-strong)", background: "var(--input)", color: "var(--ink-red)" }}><DeleteOutlineRoundedIcon sx={{ fontSize: 18 }} /></button>}
             </div>
             <span className={fieldLabelCls} style={{ color: "var(--tx-4)" }}>Posición</span>
             <div className="mb-3"><Segmented value={d.logoPos} onChange={(v) => setDesign({ logoPos: v })} options={[{ value: "left", label: "Izq." }, { value: "center", label: "Centro" }, { value: "right", label: "Der." }]} /></div>
@@ -189,7 +189,7 @@ const EditorComprobante = () => {
             <div className="mb-3 text-[11.5px]" style={{ color: "var(--tx-6)" }}>Mostrá, ocultá y reordená cada bloque.</div>
             <div className="flex flex-col gap-2">
               {d.sections.map((s, i) => (
-                <div key={s.key} className="flex items-center gap-2.5 rounded-[9px] px-3 py-2.5" style={{ border: "1px solid var(--bd)", background: "var(--input)" }}>
+                <div key={s.key} className="flex items-center gap-2.5 rounded-[var(--r-md)] px-3 py-2.5" style={{ border: "1px solid var(--bd)", background: "var(--input)" }}>
                   <div className="flex flex-col">
                     <button onClick={() => moveSection(i, -1)} className="inline-flex h-4 w-[22px] items-center justify-center p-0" style={{ border: "none", background: "transparent", color: i === 0 ? "var(--bd-hover)" : "var(--tx-3)", cursor: i === 0 ? "default" : "pointer" }}><KeyboardArrowUpRoundedIcon sx={{ fontSize: 16 }} /></button>
                     <button onClick={() => moveSection(i, 1)} className="inline-flex h-4 w-[22px] items-center justify-center p-0" style={{ border: "none", background: "transparent", color: i === d.sections.length - 1 ? "var(--bd-hover)" : "var(--tx-3)", cursor: i === d.sections.length - 1 ? "default" : "pointer" }}><KeyboardArrowDownRoundedIcon sx={{ fontSize: 16 }} /></button>
@@ -208,7 +208,7 @@ const EditorComprobante = () => {
             <div className="mb-3.5 grid grid-cols-2 gap-1.5">
               {FONTS.map(([label, ff]) => {
                 const on = d.font === ff
-                return <button key={label} onClick={() => setDesign({ font: ff })} className="h-[38px] rounded-lg text-[12.5px] font-semibold" style={{ border: `1px solid ${on ? "var(--ink-lime)" : "var(--bd-strong)"}`, background: on ? tint("var(--ink-lime)", 10) : "var(--input)", color: on ? "var(--ink-lime)" : "var(--tx-2)", fontFamily: ff }}>{label}</button>
+                return <button key={label} onClick={() => setDesign({ font: ff })} className="h-[38px] rounded-[var(--r-md)] text-[12.5px] font-semibold" style={{ border: `1px solid ${on ? "var(--ink-lime)" : "var(--bd-strong)"}`, background: on ? tint("var(--ink-lime)", 10) : "var(--input)", color: on ? "var(--ink-lime)" : "var(--tx-2)", fontFamily: ff }}>{label}</button>
               })}
             </div>
             <span className={fieldLabelCls} style={{ color: "var(--tx-4)" }}>Tamaño de texto</span>
@@ -237,7 +237,7 @@ const EditorComprobante = () => {
           {/* IMPRESIÓN */}
           <div className="px-[22px] pb-7 pt-5">
             <div className="mb-3 text-[10px] tracking-[.12em]" style={sectionLabelStyle}>IMPRESIÓN</div>
-            <div className="flex items-center gap-3 rounded-[10px] px-3.5 py-3.5" style={{ border: "1px solid var(--bd)", background: "var(--input)" }}>
+            <div className="flex items-center gap-3 rounded-[var(--r-md)] px-3.5 py-3.5" style={{ border: "1px solid var(--bd)", background: "var(--input)" }}>
               <div className="flex-1">
                 <div className="text-[13.5px] font-semibold" style={{ color: "var(--tx)" }}>Imprimir duplicado</div>
                 <div className="mt-0.5 text-[11.5px]" style={{ color: "var(--tx-5)" }}>Original + duplicado en la misma A4, con línea de corte.</div>
@@ -253,7 +253,7 @@ const EditorComprobante = () => {
             <div className="mb-3.5 flex items-center gap-2 text-[11px]" style={{ fontFamily: "var(--font-mono)", color: "var(--tx-5)" }}>
               <span className="h-[7px] w-[7px] rounded-full" style={{ background: "var(--ink-lime)" }} />VISTA PREVIA · HOJA A4 · {d.duplicado ? "Original + Duplicado" : "Solo original"}
             </div>
-            <div style={{ background: "#FFFFFF", borderRadius: 3, boxShadow: "var(--elev-3)", overflow: "hidden" }} dangerouslySetInnerHTML={{ __html: previewHtml }} />
+            <div style={{ background: "#FFFFFF", borderRadius: "var(--r-sm)", boxShadow: "var(--elev-3)", overflow: "hidden" }} dangerouslySetInnerHTML={{ __html: previewHtml }} />
           </div>
         </div>
       </div>

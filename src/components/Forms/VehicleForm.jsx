@@ -33,7 +33,7 @@ const VehicleForm = ({
   } = useForm({ defaultValues, mode: "onBlur" })
 
   const baseInputStyles =
-    "w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-900 text-black dark:text-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
+    "w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-[var(--r-sm)] bg-white dark:bg-gray-900 text-black dark:text-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
 
   const renderIf = (name, element) => (showFields[name] ? element : null)
 
@@ -115,7 +115,7 @@ const VehicleForm = ({
         <Button
           type="submit"
           disabled={isSubmitting}
-          className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold px-6 py-2 rounded-md transition flex items-center gap-2"
+          className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold px-6 py-2 rounded-[var(--r-sm)] transition flex items-center gap-2"
         >
           {isSubmitting && <Spinner size={4} />}
           {submitLabel}

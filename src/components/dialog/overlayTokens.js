@@ -34,7 +34,7 @@ export const dialogCard = {
 
 const btnBase = {
   height: 44,
-  borderRadius: 9,
+  borderRadius: "var(--r-md)",
   fontSize: 14,
   fontFamily: OVERLAY.fontFamily,
   cursor: "pointer",
@@ -53,7 +53,7 @@ export const primaryBtn = {
   ...btnBase,
   padding: "0 20px",
   border: "none",
-  background: "#C4ED2B", // lima brillante fijo, igual que el resto de las acciones primarias
-  color: "#0A0C0D",
+  background: "var(--brand)", // lima brillante fijo, igual que el resto de las acciones primarias
+  color: "var(--brand-ink)",
   fontWeight: 700,
 }

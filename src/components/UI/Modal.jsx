@@ -55,7 +55,7 @@ const Modal = ({ children, title, onClose, overflow = 'auto' , maxWidth = "md", 
       <div
         className={`
           ${colors.surface} ${colors.shadow} text-gray-900 dark:text-gray-100
-          rounded-xl ${paddingClasses[padding] || 'p-0'} w-full ${maxWidthClasses[maxWidth] || "max-w-md"}
+          rounded-[var(--r-lg)] ${paddingClasses[padding] || 'p-0'} w-full ${maxWidthClasses[maxWidth] || "max-w-md"}
           overflow-auto relative max-h-[90dvh] ${overflowClasses[overflow] || "overflow-auto"}
         `}
         style={{ maxHeight }}
@@ -72,7 +72,7 @@ const Modal = ({ children, title, onClose, overflow = 'auto' , maxWidth = "md", 
             <button
               onClick={onClose}
               aria-label="Cerrar modal"
-              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-2 rounded-[var(--r-sm)] hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
             >
               <CloseRoundedIcon fontSize="small" />
             </button>

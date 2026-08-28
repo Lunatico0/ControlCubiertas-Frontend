@@ -25,7 +25,7 @@ const HelpNew = () => {
       <div className="flex items-center">
         <button
           onClick={handleOpenNew}
-          className="inline-flex items-center gap-2 px-4 py-3 rounded-md bg-blue-600 hover:bg-blue-700 text-white font-medium shadow-md hover:shadow-lg transition-transform transform hover:scale-[1.02]"
+          className="inline-flex items-center gap-2 px-4 py-3 rounded-[var(--r-sm)] bg-blue-600 hover:bg-blue-700 text-white font-medium shadow-md hover:shadow-lg transition-transform transform hover:scale-[1.02]"
         >
           <AddIcon fontSize="small" />
           <span className="uppercase text-sm">Agregar nuevo</span>

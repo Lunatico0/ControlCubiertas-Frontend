@@ -18,7 +18,7 @@ const LoadingGrid = () => {
 }
 
 const LoadingCard = () => (
-  <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden shadow-md ring-1 ring-black/5 dark:ring-white/5" aria-busy="true">
+  <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-[var(--r-lg)] overflow-hidden shadow-md ring-1 ring-black/5 dark:ring-white/5" aria-busy="true">
     <div className="h-44 bg-gray-200 dark:bg-gray-700 animate-pulse"></div>
     <div className="p-4 space-y-3">
       <div className="flex justify-between">

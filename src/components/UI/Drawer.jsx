@@ -17,7 +17,7 @@ import { useFocusTrap } from "@hooks/useFocusTrap"
 //                divs), asi que sin esto Enter no hacia absolutamente nada y habia que ir al
 //                boton con el mouse. Enter sobre un boton o dentro de un textarea no lo dispara.
 //   z          — z-index del overlay (default 50; VehicleDrawer usa 40).
-//   animation  — animación de entrada del panel (default opDrawerIn .18s ease).
+//   animation  — animación de entrada del panel (default opDrawerIn var(--t-fast) var(--t-ease)).
 //   children   — contenido del panel (header + cuerpo; cada drawer arma el suyo).
 const Drawer = ({
   onClose,
@@ -26,7 +26,7 @@ const Drawer = ({
   backdrop = "rgba(0,0,0,.45)",
   maxWidth = "460px",
   z = 50,
-  animation = "opDrawerIn .18s ease",
+  animation = "opDrawerIn var(--t-fast) var(--t-ease)",
   children,
 }) => {
   useModalEscape(onClose)

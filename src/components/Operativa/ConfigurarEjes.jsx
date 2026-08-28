@@ -113,7 +113,7 @@ const ConfigurarEjes = ({ onClose, vehicle }) => {
         <>
           <div className="flex-none px-[30px] py-5" style={{ background: "var(--sidebar)", borderBottom: "1px solid var(--bd-faint)" }}>
             <div className="flex items-center gap-3.5">
-              <button onClick={onClose} title="Volver" className="inline-flex h-[38px] w-[38px] flex-none items-center justify-center rounded-[9px]" style={{ border: "1px solid var(--bd)", background: "var(--elev)", color: "var(--tx-3)" }}>
+              <button onClick={onClose} title="Volver" className="inline-flex h-[38px] w-[38px] flex-none items-center justify-center rounded-[var(--r-md)]" style={{ border: "1px solid var(--bd)", background: "var(--elev)", color: "var(--tx-3)" }}>
                 <ArrowBackRoundedIcon sx={{ fontSize: 18 }} />
               </button>
               <div>
@@ -121,7 +121,7 @@ const ConfigurarEjes = ({ onClose, vehicle }) => {
                 <p className="mt-1 text-[13px]" style={{ color: "var(--tx-4)" }}>Vehículos sin esquema de ejes. Definí su configuración para habilitar el montaje de cubiertas.</p>
               </div>
               {pending.length > 0 && (
-                <div className="ml-auto inline-flex items-center gap-2 rounded-[9px] px-[13px] py-[7px] text-[12.5px] font-semibold" style={{ color: "var(--ink-orange)", background: tint("var(--ink-orange)", 10), border: `1px solid ${tint("var(--ink-orange)", 30)}` }}>
+                <div className="ml-auto inline-flex items-center gap-2 rounded-[var(--r-md)] px-[13px] py-[7px] text-[12.5px] font-semibold" style={{ color: "var(--ink-orange)", background: tint("var(--ink-orange)", 10), border: `1px solid ${tint("var(--ink-orange)", 30)}` }}>
                   <ReportProblemOutlinedIcon sx={{ fontSize: 15 }} /> {pending.length} {pending.length === 1 ? "pendiente" : "pendientes"}
                 </div>
               )}
@@ -131,7 +131,7 @@ const ConfigurarEjes = ({ onClose, vehicle }) => {
           <div className="flex-1 overflow-y-auto px-[30px] py-6">
             {pending.length === 0 ? (
               <div className="mx-auto my-10 max-w-[460px] text-center">
-                <div className="mx-auto mb-4 flex h-[58px] w-[58px] items-center justify-center rounded-[14px]" style={{ background: tint("var(--ink-teal)", 14), color: "var(--ink-teal)" }}>
+                <div className="mx-auto mb-4 flex h-[58px] w-[58px] items-center justify-center rounded-[var(--r-lg)]" style={{ background: tint("var(--ink-teal)", 14), color: "var(--ink-teal)" }}>
                   <CheckRoundedIcon sx={{ fontSize: 28 }} />
                 </div>
                 <div className="text-[18px] font-semibold" style={{ fontFamily: "var(--font-display)", color: "var(--tx)" }}>Todo configurado</div>
@@ -140,9 +140,9 @@ const ConfigurarEjes = ({ onClose, vehicle }) => {
             ) : (
               <div className="grid gap-4" style={{ gridTemplateColumns: "repeat(auto-fill,minmax(420px,1fr))" }}>
                 {pending.map((v) => (
-                  <div key={v._id} className="flex flex-col gap-3.5 rounded-[14px] p-[18px]" style={{ border: "1px solid var(--bd)", background: "var(--card)" }}>
+                  <div key={v._id} className="flex flex-col gap-3.5 rounded-[var(--r-lg)] p-[18px]" style={{ border: "1px solid var(--bd)", background: "var(--card)" }}>
                     <div className="flex items-start gap-3">
-                      <span className="flex h-[42px] w-[42px] flex-none items-center justify-center rounded-[11px]" style={{ background: tint("var(--ink-blue)", 16), color: "var(--ink-blue)" }}><LocalShippingOutlinedIcon sx={{ fontSize: 22 }} /></span>
+                      <span className="flex h-[42px] w-[42px] flex-none items-center justify-center rounded-[var(--r-md)]" style={{ background: tint("var(--ink-blue)", 16), color: "var(--ink-blue)" }}><LocalShippingOutlinedIcon sx={{ fontSize: 22 }} /></span>
                       <div className="min-w-0 flex-1">
                         <div className="text-[18px] font-bold" style={{ fontFamily: "var(--font-display)", color: "var(--tx)" }}>{v.mobile || "—"}</div>
                         <div className="mt-0.5 text-[12px]" style={{ fontFamily: "var(--font-mono)", color: "var(--tx-5)" }}>{v.licensePlate || "—"} · {v.brand || "—"}</div>
@@ -156,7 +156,7 @@ const ConfigurarEjes = ({ onClose, vehicle }) => {
                         <TripOriginOutlinedIcon sx={{ fontSize: 15 }} />{v.cubiertas} {v.cubiertas === 1 ? "cubierta" : "cubiertas"}
                       </span>
                       <span className="text-[12.5px]" style={{ color: "var(--tx-5)", fontFamily: "var(--font-mono)" }}>{fmtKm(v.kilometers)}</span>
-                      <Button variant="lime" onClick={() => openEditor(v)} className="ml-auto h-10 text-[13.5px]" style={{ background: "#C4ED2B", color: "#0A0C0D" }}>
+                      <Button variant="lime" onClick={() => openEditor(v)} className="ml-auto h-10 text-[13.5px]" style={{ background: "var(--brand)", color: "var(--brand-ink)" }}>
                         Configurar ejes <ArrowForwardRoundedIcon sx={{ fontSize: 15 }} />
                       </Button>
                     </div>
@@ -170,7 +170,7 @@ const ConfigurarEjes = ({ onClose, vehicle }) => {
         /* ===================== EDITOR ===================== */
         <>
           <div className="flex h-16 flex-none items-center gap-3.5 px-6" style={{ background: "var(--sidebar)", borderBottom: "1px solid var(--bd-faint)" }}>
-            <button onClick={backToList} title="Volver" className="inline-flex h-[38px] w-[38px] items-center justify-center rounded-[9px]" style={{ border: "1px solid var(--bd)", background: "var(--elev)", color: "var(--tx-3)" }}>
+            <button onClick={backToList} title="Volver" className="inline-flex h-[38px] w-[38px] items-center justify-center rounded-[var(--r-md)]" style={{ border: "1px solid var(--bd)", background: "var(--elev)", color: "var(--tx-3)" }}>
               <ArrowBackRoundedIcon sx={{ fontSize: 18 }} />
             </button>
             <div style={{ lineHeight: 1.2 }}>
@@ -178,8 +178,8 @@ const ConfigurarEjes = ({ onClose, vehicle }) => {
               <div className="text-[11.5px]" style={{ color: "var(--tx-5)", fontFamily: "var(--font-mono)" }}>{sel?.licensePlate} · {sel?.brand}</div>
             </div>
             <div className="ml-auto flex items-center gap-2.5">
-              <button onClick={backToList} className="h-10 rounded-[9px] px-[15px] text-[13.5px] font-semibold" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--tx)" }}>Cancelar</button>
-              <Button variant="lime" onClick={save} disabled={saving || hasPositionless} className="h-10 text-[13.5px]" style={{ background: "#C4ED2B", color: "#0A0C0D", opacity: saving || hasPositionless ? 0.5 : 1, cursor: hasPositionless ? "not-allowed" : "pointer" }}>{saving ? "Guardando…" : "Guardar esquema"}</Button>
+              <button onClick={backToList} className="h-10 rounded-[var(--r-md)] px-[15px] text-[13.5px] font-semibold" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--tx)" }}>Cancelar</button>
+              <Button variant="lime" onClick={save} disabled={saving || hasPositionless} className="h-10 text-[13.5px]" style={{ background: "var(--brand)", color: "var(--brand-ink)", opacity: saving || hasPositionless ? 0.5 : 1, cursor: hasPositionless ? "not-allowed" : "pointer" }}>{saving ? "Guardando…" : "Guardar esquema"}</Button>
             </div>
           </div>
 

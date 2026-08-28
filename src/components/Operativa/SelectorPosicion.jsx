@@ -41,7 +41,7 @@ const Rueda = ({ pos, seleccionada, onSelect }) => {
         aria-label={`Posición ${pos.code}${ocupada ? `, ocupada por la cubierta ${pos.tire.code}` : ", libre"}`}
         aria-pressed={seleccionada}
         style={{
-          width: 26, height: 44, borderRadius: 6,
+          width: 26, height: 44, borderRadius: "var(--r-sm)",
           border: `2px solid ${borde}`, background: fondo,
           cursor: ocupada ? "not-allowed" : "pointer",
           display: "flex", alignItems: "center", justifyContent: "center",
@@ -68,7 +68,7 @@ const SelectorPosicion = ({ positions = [], value, onChange }) => {
   const libres = positions.filter((p) => !p.tire).length
 
   return (
-    <div className="rounded-[11px] px-3 py-3.5" style={{ border: "1px solid var(--bd)", background: "var(--input)" }}>
+    <div className="rounded-[var(--r-md)] px-3 py-3.5" style={{ border: "1px solid var(--bd)", background: "var(--input)" }}>
       <div className="mb-2 flex flex-col items-center gap-0.5">
         <span className="text-[9.5px] tracking-[.14em]" style={{ fontFamily: "var(--font-mono)", color: "var(--tx-6)" }}>FRENTE</span>
         <ArrowUpwardRoundedIcon sx={{ fontSize: 14 }} style={{ color: "var(--tx-7)" }} />
@@ -85,9 +85,9 @@ const SelectorPosicion = ({ positions = [], value, onChange }) => {
               <div className="flex gap-1">{izq.map((p) => <Rueda key={p.code} pos={p} seleccionada={p.code === value} onSelect={onChange} />)}</div>
               {/* El eje: la barra que une las dos mitades, con su número */}
               <div className="mt-[19px] flex items-center">
-                <div style={{ height: 5, width: 30, background: "var(--bd-strong)", borderRadius: 3 }} />
+                <div style={{ height: 5, width: 30, background: "var(--bd-strong)", borderRadius: "var(--r-sm)" }} />
                 <span className="px-1 text-[9px]" style={{ fontFamily: "var(--font-mono)", color: "var(--tx-7)" }}>E{n}</span>
-                <div style={{ height: 5, width: 30, background: "var(--bd-strong)", borderRadius: 3 }} />
+                <div style={{ height: 5, width: 30, background: "var(--bd-strong)", borderRadius: "var(--r-sm)" }} />
               </div>
               <div className="flex gap-1">{der.map((p) => <Rueda key={p.code} pos={p} seleccionada={p.code === value} onSelect={onChange} />)}</div>
             </div>

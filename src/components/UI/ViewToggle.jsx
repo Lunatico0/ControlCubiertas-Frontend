@@ -10,7 +10,7 @@ const DEFAULT_OPTIONS = [
 ]
 
 const ViewToggle = ({ value, onChange, options = DEFAULT_OPTIONS, className = "", ...rest }) => (
-  <div className={`flex gap-[3px] rounded-[9px] p-[3px] ${className}`} style={{ border: "1px solid var(--bd)", background: "var(--card)" }} {...rest}>
+  <div className={`flex gap-[3px] rounded-[var(--r-md)] p-[3px] ${className}`} style={{ border: "1px solid var(--bd)", background: "var(--card)" }} {...rest}>
     {options.map((o) => {
       const on = value === o.value
       return (
@@ -18,7 +18,7 @@ const ViewToggle = ({ value, onChange, options = DEFAULT_OPTIONS, className = ""
           key={o.value}
           onClick={() => onChange(o.value)}
           title={o.title}
-          className="inline-flex h-8 w-[38px] items-center justify-center rounded-md"
+          className="inline-flex h-8 w-[38px] items-center justify-center rounded-[var(--r-sm)]"
           style={{ background: on ? "var(--ink-lime)" : "transparent", color: on ? "var(--bg)" : "var(--tx-5)" }}
         >
           {o.icon}

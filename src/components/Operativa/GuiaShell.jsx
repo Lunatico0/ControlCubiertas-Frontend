@@ -16,14 +16,14 @@ export const H3 = ({ children }) => <h3 className="mb-2 mt-[26px] text-[17px] fo
 export const P = ({ children }) => <p className="text-[15px]" style={{ lineHeight: 1.7, color: "var(--tx-2)" }}>{children}</p>
 export const B = ({ children }) => <b style={{ color: "var(--tx)" }}>{children}</b>
 export const UL = ({ children }) => <ul className="pl-[22px] text-[15px]" style={{ lineHeight: 1.8, color: "var(--tx-2)" }}>{children}</ul>
-export const Kbd = ({ children }) => <span style={{ fontFamily: "var(--font-mono)", background: "var(--input)", border: "1px solid var(--bd-strong)", borderRadius: 5, padding: "1px 7px" }}>{children}</span>
+export const Kbd = ({ children }) => <span style={{ fontFamily: "var(--font-mono)", background: "var(--input)", border: "1px solid var(--bd-strong)", borderRadius: "var(--r-sm)", padding: "1px 7px" }}>{children}</span>
 // Callout se promovió a components/common para reutilizarlo en toda la app; se re-exporta acá
 // para no romper los imports existentes de GuiaDeUso/GuiaAdmin (importan { Callout } de este shell).
 export { default as Callout } from "@components/common/Callout"
 export const Faqs = ({ items }) => (
   <div className="mt-4 flex flex-col gap-3">
     {items.map((f) => (
-      <div key={f.q} className="rounded-[11px] px-[18px] py-4" style={{ border: "1px solid var(--bd)", background: "var(--card)" }}>
+      <div key={f.q} className="rounded-[var(--r-md)] px-[18px] py-4" style={{ border: "1px solid var(--bd)", background: "var(--card)" }}>
         <div className="mb-1.5 text-[15px] font-semibold" style={{ fontFamily: "var(--font-display)", color: "var(--tx)" }}>{f.q}</div>
         <div className="text-[14px]" style={{ lineHeight: 1.65, color: "var(--tx-2)" }}>{f.a}</div>
       </div>
@@ -58,7 +58,7 @@ const GuiaShell = ({ sidebarTitle, badge, eyebrow, title, intro, toc, backTo = "
                 e.preventDefault()
                 document.getElementById(t.href.replace(/^#/, ""))?.scrollIntoView({ behavior: "smooth", block: "start" })
               }}
-              className="flex items-center gap-2.5 rounded-lg px-[11px] py-[9px] text-[13px]"
+              className="flex items-center gap-2.5 rounded-[var(--r-md)] px-[11px] py-[9px] text-[13px]"
               style={{ textDecoration: "none", color: "var(--tx-3)" }}
             >
               <span style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: "var(--tx-7)", width: 16 }}>{t.num}</span>{t.label}
@@ -66,7 +66,7 @@ const GuiaShell = ({ sidebarTitle, badge, eyebrow, title, intro, toc, backTo = "
           ))}
         </nav>
         <div className="mt-auto pt-[18px]" style={{ borderTop: "1px solid var(--bd-faint)" }}>
-          <button onClick={toggleTheme} className="mb-2.5 flex w-full items-center gap-2.5 rounded-[9px] border px-3 py-2.5 text-[13px] font-medium" style={{ borderColor: "var(--bd)", background: "var(--elev)", color: "var(--tx-2)" }}>
+          <button onClick={toggleTheme} className="mb-2.5 flex w-full items-center gap-2.5 rounded-[var(--r-md)] border px-3 py-2.5 text-[13px] font-medium" style={{ borderColor: "var(--bd)", background: "var(--elev)", color: "var(--tx-2)" }}>
             <span className="inline-flex" style={{ color: "var(--ink-lime)" }}>{isDarkMode ? <DarkModeOutlinedIcon sx={{ fontSize: 17 }} /> : <LightModeOutlinedIcon sx={{ fontSize: 18 }} />}</span>
             {isDarkMode ? "Tema oscuro" : "Tema claro"}
           </button>

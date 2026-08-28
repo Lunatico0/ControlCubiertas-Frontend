@@ -15,7 +15,7 @@ const LayoutPreview = ({ type, selected, onSelect }) => {
     const width = isFixed ? "w-20" : dynamicColumns === 2 ? "w-28" : "w-20"
 
     return Array.from({ length: count }).map((_, i) => (
-      <div key={i} className="space-y-1 transition-all duration-300">
+      <div key={i} className="space-y-1 transition-all duration-[var(--t-slow)]">
         <SkeletonLine width={width} />
         <SkeletonLine width={width} />
       </div>
@@ -35,7 +35,7 @@ const LayoutPreview = ({ type, selected, onSelect }) => {
     <div
       onClick={() => onSelect(type)}
       className={clsx(
-        "cursor-pointer border-2 rounded-lg p-3 w-full max-w-xs transition-colors duration-200",
+        "cursor-pointer border-2 rounded-[var(--r-md)] p-3 w-full max-w-xs transition-colors duration-[var(--t-base)]",
         selected === type ? "border-blue-500 text-black bg-slate-300" : "border-gray-100 hover:border-blue-400"
       )}
     >
