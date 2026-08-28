@@ -12,7 +12,7 @@ import UndoRoundedIcon from "@mui/icons-material/UndoRounded"
 import CheckRoundedIcon from "@mui/icons-material/CheckRounded"
 import LocalPrintshopOutlinedIcon from "@mui/icons-material/LocalPrintshopOutlined"
 import { buildAssignPrintData, buildUnassignPrintData, buildFinishRecapPrintData, buildDiscardPrintData, buildUndoPrintData, buildCorrectionPrintData, buildEditTirePrintData } from "@utils/print-data"
-import { metaOf, tint, fmtKm, fmtDate, StateBadge, useStatusCatalog } from "./status"
+import { metaOf, tint, fmtKm, fmtDate, StateBadge, useStatusCatalog, ubicacionDe } from "./status"
 import SelectorPosicion from "./SelectorPosicion"
 import { OpActionBtn } from "./opActions"
 import Field from "@components/common/Field"
@@ -349,7 +349,8 @@ const TireDrawer = ({ tireId, initialAction, initialAssign, onAssigned, onClose 
     { label: "Rodado", value: tire.size || "—", mono: true },
     { label: "Dibujo", value: tire.pattern || "—" },
     { label: "N° de serie", value: tire.serialNumber || "—", mono: true },
-    { label: "Ubicación", value: tire.vehicle?.mobile || "En depósito", accent: tire.vehicle ? "var(--ink-blue)" : undefined },
+    // t144: una cubierta descartada no está guardada en ningún lado. Ver ubicacionDe en ./status.
+    { label: "Ubicación", value: ubicacionDe(tire).label, accent: tire.vehicle || metaOf(tire.status).role === "discard" ? ubicacionDe(tire).color : undefined },
     ...(tire.position ? [{ label: "Posición", value: tire.position, mono: true }] : []),
     { label: "Kilómetros", value: fmtKm(tire.kilometers), mono: true },
     { label: "Fecha de alta", value: fmtDate(tire.createdAt), mono: true },

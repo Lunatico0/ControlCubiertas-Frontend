@@ -30,6 +30,8 @@ const TOAST = {
   warn: { color: "var(--ink-orange)", bg: "rgba(240,133,31,.16)", icon: "warn" },
   info: { color: "var(--ink-blue)", bg: "rgba(110,151,245,.16)", icon: "info" },
 }
+// Toasts que se quedan hasta que alguien los cierra (t136). Ver el registro del handler.
+const PERSISTENTE = new Set(["danger", "warn"])
 const ANIM = {
   pop: "dlgPopIn var(--t-base) var(--t-ease)",
   slide: "dlgSlideIn var(--t-base) var(--t-ease)",
@@ -58,7 +60,11 @@ const DialogHost = () => {
     _registerToast((t) => {
       if (toastTimer.current) clearTimeout(toastTimer.current)
       setToast(t)
-      toastTimer.current = setTimeout(() => setToast(null), 2800)
+      // t136: los errores y las advertencias NO se autodescartan. 2800 ms alcanzan para un
+      // "Cubierta asignada" (no hay nada que releer), pero no para un error: el operario
+      // aprieta, mira la cubierta que tiene en la mano, y cuando vuelve a la pantalla el
+      // único dato que el sistema tenía para darle ya no está. Se cierran a mano.
+      if (!PERSISTENTE.has(t.kind)) toastTimer.current = setTimeout(() => setToast(null), 2800)
     })
     return () => {
       _registerDialog(null)
@@ -74,6 +80,11 @@ const DialogHost = () => {
     })
     const t = lastTrigger.current
     if (t && t.focus) setTimeout(() => { try { t.focus() } catch { /* noop */ } }, 10)
+  }, [])
+
+  const cerrarToast = useCallback(() => {
+    if (toastTimer.current) clearTimeout(toastTimer.current)
+    setToast(null)
   }, [])
 
   // Callback estable para el cierre por Escape (cierra cualquier variante, incluida print).
@@ -202,14 +213,25 @@ const DialogHost = () => {
       {/* Toast (abajo-centro) */}
       {toast && (() => {
         const tv = TOAST[toast.kind] || TOAST.ok
+        const persistente = PERSISTENTE.has(toast.kind)
         return (
           <div style={{ position: "fixed", bottom: 24, left: "50%", transform: "translateX(-50%)", zIndex: 60 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 12, background: "var(--toast)", border: "1px solid var(--bd-strong)", borderRadius: "var(--r-md)", padding: "12px 16px", boxShadow: "var(--elev-1)", minWidth: 280, animation: "dlgToastIn var(--t-base) var(--t-ease)" }}>
+            {/* Un error es una interrupción, no un cambio de estado: role="alert" hace que el
+                lector de pantalla lo lea de inmediato en vez de esperar una pausa. */}
+            <div role={persistente ? "alert" : "status"} aria-live={persistente ? "assertive" : "polite"} style={{ display: "flex", alignItems: "center", gap: 12, background: "var(--toast)", border: `1px solid ${persistente ? tv.color : "var(--bd-strong)"}`, borderRadius: "var(--r-md)", padding: "12px 16px", boxShadow: "var(--elev-1)", minWidth: 280, animation: "dlgToastIn var(--t-base) var(--t-ease)" }}>
               <span style={{ width: 30, height: 30, borderRadius: "var(--r-sm)", background: tv.bg, color: tv.color, display: "flex", alignItems: "center", justifyContent: "center", flex: "none" }}><DlgIcon kind={tv.icon} size={17} /></span>
-              <div style={{ lineHeight: 1.3 }}>
+              <div style={{ lineHeight: 1.3, flex: 1, minWidth: 0 }}>
                 <div style={{ fontSize: 13, fontWeight: 600, color: "var(--tx)" }}>{toast.title}</div>
                 {toast.sub && <div style={{ fontSize: 11.5, color: "var(--tx-5)", fontFamily: "var(--font-mono)" }}>{toast.sub}</div>}
               </div>
+              {/* t136: sin esto, un toast persistente sería una trampa. Va en TODOS, así el
+                  gesto de descartar es el mismo sin importar el tipo de aviso. */}
+              <button
+                type="button"
+                aria-label="Cerrar aviso"
+                onClick={cerrarToast}
+                style={{ flex: "none", width: 26, height: 26, display: "flex", alignItems: "center", justifyContent: "center", border: "none", background: "transparent", color: "var(--tx-5)", borderRadius: "var(--r-sm)", cursor: "pointer" }}
+              ><DlgIcon kind="x" size={14} /></button>
             </div>
           </div>
         )

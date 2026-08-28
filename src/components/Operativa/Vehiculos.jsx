@@ -20,6 +20,7 @@ import ScreenHeader from "@components/UI/ScreenHeader"
 import Pill from "@components/UI/Pill"
 import { useOutletContext, useParams, useNavigate, useLocation } from "react-router-dom"
 import { rutaDeVehiculo, rutaDeSeccion } from "@utils/opRoutes"
+import { SkeletonCards, SkeletonRows } from "@components/common/Skeleton"
 
 // Lista de vehículos (rediseño Claude Design). Dos vistas con toggle (persistido por
 // device): CARDS con el esquema de ejes/posiciones, y TABLA densa. El esquema se deriva
@@ -147,7 +148,10 @@ const Vehiculos = () => {
 
       <div className="px-7 pb-8 pt-5">
         {loading ? (
-          <p className="text-[13px]" style={{ color: "var(--tx-5)" }}>Cargando vehículos…</p>
+          // t143: misma silueta que la vista activa (tabla o tarjetas), no un renglón gris.
+          vview === "table"
+            ? <SkeletonRows count={8} cols={5} label="Cargando vehículos…" />
+            : <SkeletonCards count={8} label="Cargando vehículos…" />
         ) : fleet.length === 0 ? (
           <div className="py-16 text-center">
             <div className="text-[17px] font-semibold" style={{ fontFamily: "var(--font-display)", color: "var(--tx)" }}>Sin resultados</div>

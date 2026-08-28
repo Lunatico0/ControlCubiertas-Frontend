@@ -20,5 +20,19 @@ export const showConfirm = ({
   cancelButtonText = "Cancelar",
 } = {}) => dialog.confirm({ title, text, confirmLabel: confirmButtonText, cancelLabel: cancelButtonText })
 
+// Misma firma que showConfirm, pero por la variante DESTRUCTIVA del diálogo (t103).
+//
+// showConfirm pinta el botón de acción con el lima primario: el mismo de "Crear usuario" y
+// "Guardar cambios". Para desactivar un usuario o dar de baja una cubierta eso borra la única
+// señal que el operador tiene de que la acción no es reversible sola. ART-DIRECTION asigna el
+// rojo a peligro/desactivar; `ack` agrega un checkbox de confirmación cuando hace falta más.
+export const showDanger = ({
+  title = "¿Confirmar la baja?",
+  text = "Esta acción no se puede deshacer",
+  confirmButtonText = "Sí, dar de baja",
+  cancelButtonText = "Cancelar",
+  ack = "",
+} = {}) => dialog.danger({ title, text, confirmLabel: confirmButtonText, cancelLabel: cancelButtonText, ack })
+
 export const showError = (title = "Error", text = "Ha ocurrido un error") =>
   dialog.notice("error", { title, text })

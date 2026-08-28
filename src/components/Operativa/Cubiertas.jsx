@@ -8,7 +8,7 @@ import TuneRoundedIcon from "@mui/icons-material/TuneRounded"
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded"
 import { formatTireCode } from "@utils/tireCode"
 import { clickable } from "@utils/clickable"
-import { metaOf, tint, fmtKm, fmtDate, StateBadge, Pips, useStatusCatalog } from "./status"
+import { metaOf, tint, fmtKm, fmtDate, StateBadge, Pips, useStatusCatalog, ubicacionDe } from "./status"
 import { usePagination } from "@hooks/usePagination"
 import Paginador from "@components/common/Paginador"
 import { OpActionBtn } from "./opActions"
@@ -18,6 +18,7 @@ import ScreenHeader from "@components/UI/ScreenHeader"
 import Pill from "@components/UI/Pill"
 import { useOutletContext, useParams, useNavigate, useSearchParams, useLocation } from "react-router-dom"
 import { intentDesdeQuery, rutaDeCubierta, rutaDeSeccion } from "@utils/opRoutes"
+import { SkeletonCards, SkeletonRows } from "@components/common/Skeleton"
 
 // "Disponibles" va antes que "En stock" a propósito: es lo que el operario busca primero
 // (las que puede montar ahora), no el total del depósito.
@@ -250,7 +251,11 @@ const Cubiertas = () => {
           </div>
         )}
         {loading ? (
-          <p className="text-[13px]" style={{ color: "var(--tx-5)" }}>Cargando cubiertas…</p>
+          // t143: el skeleton copia la silueta de la vista activa, así el contenido real entra
+          // sin que la página salte.
+          view === "grid"
+            ? <SkeletonCards count={8} label="Cargando cubiertas…" />
+            : <SkeletonRows count={8} cols={COLUMNS.length} label="Cargando cubiertas…" />
         ) : filtered.length === 0 ? (
           <div className="py-16 text-center">
             <div className="text-[17px] font-semibold" style={{ fontFamily: "var(--font-display)", color: "var(--tx)" }}>Sin resultados</div>
@@ -277,7 +282,7 @@ const Cubiertas = () => {
                   <div className="flex flex-col gap-[5px] text-[12.5px]">
                     <Row label="Marca" value={t.brand} />
                     <Row label="Rodado" value={t.size} mono />
-                    <Row label="Ubicación" value={t.vehicle?.mobile || "En depósito"} valueColor={t.vehicle ? "var(--ink-blue)" : "var(--tx-4)"} />
+                    <Row label="Ubicación" value={ubicacionDe(t).label} valueColor={ubicacionDe(t).color} />
                     <Row label="Km" value={fmtKm(t.kilometers)} mono strong />
                     <Row label="Actualizada" value={fmtDate(t.updatedAt)} mono />
                   </div>
@@ -325,7 +330,7 @@ const Cubiertas = () => {
                     <div className="text-[13px] font-medium" style={{ color: "var(--tx-2)" }}>{t.brand}</div>
                     <div className="text-[11.5px]" style={{ fontFamily: "var(--font-mono)", color: "var(--tx-5)" }}>{t.size}{t.pattern ? ` · ${t.pattern}` : ""}</div>
                   </div>
-                  <div className="text-[12.5px] font-medium" style={{ color: t.vehicle ? "var(--ink-blue)" : "var(--tx-4)" }}>{t.vehicle?.mobile || "En depósito"}</div>
+                  <div className="text-[12.5px] font-medium" style={{ color: ubicacionDe(t).color }}>{ubicacionDe(t).label}</div>
                   <div className="text-right text-[13px] font-semibold" style={{ fontFamily: "var(--font-mono)", color: "var(--tx)" }}>{fmtKm(t.kilometers)}</div>
                   <div className="text-right text-[12px]" style={{ fontFamily: "var(--font-mono)", color: "var(--tx-5)" }}>{fmtDate(t.updatedAt)}</div>
                   <div className="flex items-center justify-end gap-1.5">

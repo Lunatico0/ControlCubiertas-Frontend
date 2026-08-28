@@ -5,7 +5,7 @@ import ContentCopyOutlinedIcon from "@mui/icons-material/ContentCopyOutlined"
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined"
 import LockResetOutlinedIcon from "@mui/icons-material/LockResetOutlined"
 import RefreshRoundedIcon from "@mui/icons-material/RefreshRounded"
-import { showToast, showConfirm } from "@utils/toast"
+import { showToast, showConfirm, showDanger } from "@utils/toast"
 import { useAuth } from "@context/AuthContext"
 import Modal from "@components/UI/Modal"
 import Button from "@components/UI/Button"
@@ -44,7 +44,10 @@ const Users = () => {
 
   const toggleStatus = async (u) => {
     const next = u.status === "active" ? "inactive" : "active"
-    const ok = await showConfirm({
+    // t103: desactivar deja a una persona afuera del sistema; activar no le saca nada a nadie.
+    // Por eso van por diálogos distintos: el destructivo en rojo, el constructivo en lima.
+    const preguntar = next === "inactive" ? showDanger : showConfirm
+    const ok = await preguntar({
       title: next === "inactive" ? "¿Desactivar usuario?" : "¿Activar usuario?",
       text: next === "inactive" ? `${u.email} no podrá ingresar hasta que lo reactives.` : `${u.email} volverá a poder ingresar.`,
       confirmButtonText: next === "inactive" ? "Sí, desactivar" : "Sí, activar",

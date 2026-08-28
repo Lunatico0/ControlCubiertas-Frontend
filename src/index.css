@@ -210,6 +210,14 @@
 @keyframes opDrawerIn { from { transform: translateX(24px); opacity:.4 } to { transform: translateX(0); opacity:1 } }
 @keyframes opToastIn  { from { transform: translateY(14px); opacity:0 } to { transform: translateY(0); opacity:1 } }
 
+/* Skeletons de carga (components/common/Skeleton.jsx). La animación vive acá y no inline para
+   poder apagarla con prefers-reduced-motion: un latido infinito en media pantalla es
+   exactamente lo que esa preferencia pide evitar. */
+@keyframes skelPulse { 0%,100% { opacity:1 } 50% { opacity:.45 } }
+@media (prefers-reduced-motion: reduce) {
+  [aria-busy="true"] [aria-hidden="true"] { animation: none !important }
+}
+
 /* ============================================================================
    FLOATING FIELD — input/textarea/select con label flotante (patrón del login),
    theme-aware con los tokens del tema. Ver src/components/UI/FloatingField.jsx.

@@ -13,6 +13,7 @@ import CheckRoundedIcon from "@mui/icons-material/CheckRounded"
 import { tint, metaOf, useStatusCatalog } from "./status"
 import { formatTireCode } from "@utils/tireCode"
 import { tituloPantalla } from "@utils/tokens"
+import Skeleton, { SkeletonList } from "@components/common/Skeleton"
 import { useOutletContext } from "react-router-dom"
 
 // Fecha + hora en es-AR, con la primera letra en mayúscula (ej. "Viernes 18 de julio, 14:30").
@@ -29,7 +30,12 @@ const Inicio = () => {
   // onNavigate viaja por el contexto del Outlet: cada sección es su propia ruta y ya no la
   // renderiza el layout con props (ver OperativaLayout / @utils/opRoutes).
   const { onNavigate } = useOutletContext()
-  const { data } = useContext(ApiContext)
+  // `loading` es el mismo flag que ya usan Cubiertas y Vehículos. Sin él, Inicio deriva de
+  // listas vacías y AFIRMA "Todo en orden" mientras el cold start de Atlas todavía responde
+  // (t142). Una pantalla vacía se perdona; una afirmación falsa manda al operario a su casa
+  // con tres cubiertas esperando recapado.
+  const { data, ui } = useContext(ApiContext)
+  const loading = ui?.loading
   const { user } = useAuth()
   const tires = data?.tires || []
   const vehicles = data?.vehicles || []
@@ -76,8 +82,8 @@ const Inicio = () => {
   }, [tires, vehicles, onNavigate, catalogo])
 
   const pending = counts.recapar + vehicles.filter((v) => !new Set(tires.filter((t) => t.vehicle).map((t) => t.vehicle?._id || t.vehicle)).has(v._id)).length
-  const resumen = pending > 0 ? `${pending} ${pending === 1 ? "pendiente" : "pendientes"} para hoy` : "Todo en orden"
-  const resumenColor = pending > 0 ? "var(--ink-orange)" : "var(--ink-teal)"
+  const resumen = loading ? "Cargando tu día…" : pending > 0 ? `${pending} ${pending === 1 ? "pendiente" : "pendientes"} para hoy` : "Todo en orden"
+  const resumenColor = loading ? "var(--tx-5)" : pending > 0 ? "var(--ink-orange)" : "var(--ink-teal)"
 
   const goSearch = () => onNavigate("cubiertas", { query: q.trim() })
 
@@ -228,7 +234,9 @@ const Inicio = () => {
 
       {/* Para hoy: cubiertas/vehículos que requieren acción */}
       <div className="mb-3 mt-[30px] text-[11px] tracking-[.08em]" style={{ fontFamily: "var(--font-mono)", color: "var(--tx-6)" }}>PARA HOY</div>
-      {hoyItems.length === 0 ? (
+      {loading ? (
+        <SkeletonList count={3} label="Cargando lo pendiente para hoy…" />
+      ) : hoyItems.length === 0 ? (
         <div className="flex items-center gap-3 rounded-[var(--r-lg)] p-[18px]" style={{ border: "1px dashed var(--bd)" }}>
           <span className="grid h-10 w-10 flex-none place-items-center rounded-full" style={{ background: "rgba(196,237,43,.10)", color: "var(--ink-lime)" }}>
             <CheckRoundedIcon sx={{ fontSize: 20 }} />
@@ -277,7 +285,10 @@ const Inicio = () => {
               {a.icon}
             </span>
             <span>
-              <span className="block text-[24px] font-bold leading-none" style={{ fontFamily: "var(--font-display)", color: "var(--tx)" }}>{a.count}</span>
+              {/* Un 0 mientras carga es la misma mentira que "Todo en orden": el hueco no. */}
+              {loading
+                ? <Skeleton className="h-[24px] w-[42px]" />
+                : <span className="block text-[24px] font-bold leading-none" style={{ fontFamily: "var(--font-display)", color: "var(--tx)" }}>{a.count}</span>}
               <span className="mt-[3px] block text-[13px]" style={{ color: a.warn ? a.accent : "var(--tx-4)" }}>{a.label}</span>
             </span>
           </button>

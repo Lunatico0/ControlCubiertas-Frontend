@@ -62,6 +62,21 @@ const leerCatalogo = () => _catalog
 export const useStatusCatalog = () => useSyncExternalStore(suscribir, leerCatalogo, leerCatalogo)
 
 export const metaOf = (status) => _catalog[status] || FALLBACK
+
+// Ubicación mostrable de una cubierta (t144).
+//
+// Antes se derivaba SOLO de tire.vehicle: sin vehículo montado, "En depósito". Pero "sin
+// vehículo" no es "en depósito": una cubierta dada de baja tampoco tiene vehículo, y quedaba
+// diciendo "En depósito" al lado de su propio badge rojo "Descartada". Un operario que barre
+// la lista por esa columna sale a buscar al depósito una cubierta que ya no existe.
+//
+// La etiqueta de baja es el NOMBRE configurado del estado con rol `discard` (los estados son
+// por tenant), no un literal: si el tenant lo llamó "Al cementerio", eso se muestra.
+export const ubicacionDe = (tire) => {
+  if (tire?.vehicle) return { label: tire.vehicle.mobile || "—", color: "var(--ink-blue)" }
+  if (metaOf(tire?.status).role === "discard") return { label: tire.status, color: "var(--ink-red)" }
+  return { label: "En depósito", color: "var(--tx-4)" }
+}
 export const tint = (color, pct) => `color-mix(in srgb, ${color} ${pct}%, transparent)`
 export const fmtKm = (n) => `${(n ?? 0).toLocaleString("es-AR")} km`
 export const fmtDate = (d) => (d ? new Date(d).toLocaleDateString("es-AR") : "—")
