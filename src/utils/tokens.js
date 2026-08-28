@@ -1,9 +1,10 @@
-// Tokens del REDISEÑO. Todo lo que está acá es del sistema vigente.
+// Tokens del sistema de diseño. Es la ÚNICA fuente de verdad.
 //
-// La paleta anterior (azul/índigo/gris de Tailwind) vivía en este mismo archivo y era una
-// segunda fuente de verdad contradictoria: cualquiera que importara @utils/tokens tenía a mano
-// un bg-blue-600 y un rounded-xl que el sistema no admite (t119). Se mudó a @utils/legacyTokens
-// y la importan SOLO las pantallas de /legacy/*, que se retiran con ella.
+// Hasta el 2026-08-28 este archivo exportaba además la paleta anterior completa (blue-600,
+// indigo-600, gray-100/800, rounded-xl, shadow-md): una segunda fuente de verdad contradictoria
+// que estaba a un import de distancia de cualquiera, y de la que salían varios de los radios y
+// sombras que rompían la escala (t119). Se aisló primero en @utils/legacyTokens y desapareció
+// con la UI legacy (t78).
 //
 // El resto de los tokens del sistema son variables CSS y viven en index.css: --tx, --card,
 // --bd, --ink-*, --r-*, --t-*. Acá quedan los que necesitan ser una clase de Tailwind.

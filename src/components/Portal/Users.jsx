@@ -9,7 +9,7 @@ import LockResetOutlinedIcon from "@mui/icons-material/LockResetOutlined"
 import RefreshRoundedIcon from "@mui/icons-material/RefreshRounded"
 import { showToast, showConfirm, showDanger } from "@utils/toast"
 import { useAuth } from "@context/AuthContext"
-import Modal from "@components/UI/Modal"
+import Modal from "@components/common/Modal"
 import Button from "@components/common/Button"
 import { listUsers, setUserStatus, resetPassword } from "../../api/admin"
 import UserForm from "./UserForm"
@@ -178,7 +178,7 @@ const Users = () => {
       {editTarget && <UserForm user={editTarget} onClose={() => setEditTarget(null)} onSaved={onSaved} />}
 
       {tempCred && (
-        <Modal title="Usuario creado" onClose={() => setTempCred(null)} maxWidth="md">
+        <Modal title="Usuario creado" onClose={() => setTempCred(null)}>
           <p className="text-sm" style={{ color: "var(--tx-3)" }}>
             Compartile estos datos a <span className="font-medium" style={{ color: "var(--tx)" }}>{tempCred.user.email}</span>. La contraseña es temporal: se la pedirá cambiar en el primer ingreso.
           </p>
@@ -198,7 +198,7 @@ const Users = () => {
       )}
 
       {resetTarget && (
-        <Modal title="Restablecer contraseña" onClose={() => setResetTarget(null)} maxWidth="md">
+        <Modal title="Restablecer contraseña" onClose={() => setResetTarget(null)}>
           <p className="text-sm" style={{ color: "var(--tx-3)" }}>
             Contraseña temporal para <span className="font-medium" style={{ color: "var(--tx)" }}>{resetTarget.user.name || resetTarget.user.email}</span>. Pasásela al usuario: al ingresar, el sistema le pedirá definir una nueva y segura.
           </p>

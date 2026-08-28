@@ -1,5 +1,5 @@
-import { readFileSync } from 'node:fs'
-import { resolve } from 'node:path'
+import { readFileSync, readdirSync } from 'node:fs'
+import { resolve, join, relative, sep } from 'node:path'
 
 // t97 de la auditoría visual: NUEVE sombras distintas para un solo nivel de elevación, todas con
 // negro literal, ninguna tokenizada, ninguna theme-aware. Dos overlays apilados proyectaban
@@ -17,21 +17,22 @@ const leer = (p) => readFileSync(resolve(raiz, p), 'utf8')
 
 const css = leer('src/index.css')
 
-// Componentes del REDISEÑO. La app legacy (/legacy/*: SearchFilter, Forms/, New/, TireDetails/,
-// TireList/, Sidebar/, Help*) queda fuera a propósito: son 32 usos de shadow-* de Tailwind en
-// pantallas que el rediseño reemplaza, y tocarlas es riesgo sin beneficio.
-const REDISENO = [
-  'src/components/dialog/DialogHost.jsx',
-  'src/components/dialog/overlayTokens.js',
-  'src/components/Layout/AppSidebar.jsx',
-  'src/components/Operativa/Inicio.jsx',
-  'src/components/Operativa/OpTour.jsx',
-  'src/components/Portal/Comprobantes.jsx',
-  'src/components/Portal/EditorComprobante.jsx',
-  'src/components/Portal/Reportes.jsx',
-  'src/components/Auth/ChangePassword.jsx',
-  'src/components/Portal/CompanySettings.jsx',
-]
+// Antes esto era una lista de DIEZ archivos escritos a mano, porque la app legacy tenía 32 usos
+// de shadow-* de Tailwind en pantallas que el rediseño reemplazaba y un chequeo global era
+// imposible. Con la UI legacy eliminada (t78, 2026-08-28) el guard cubre TODO el árbol: es
+// justamente el tipo de cosa que se destraba al borrar el código muerto en vez de convivir.
+const REDISENO = (() => {
+  const salida = []
+  const recorrer = (dir) => {
+    for (const e of readdirSync(dir, { withFileTypes: true })) {
+      const p = join(dir, e.name)
+      if (e.isDirectory()) recorrer(p)
+      else if (/\.(jsx|js)$/.test(e.name)) salida.push(relative(raiz, p).split(sep).join('/'))
+    }
+  }
+  recorrer(resolve(raiz, 'src/components'))
+  return salida
+})()
 
 describe('escala de elevación', () => {
   it('los tres niveles están declarados y tienen valor propio en cada tema', () => {

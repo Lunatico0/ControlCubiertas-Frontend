@@ -3,7 +3,7 @@
 //
 // Por qué existe: el proyecto arrancó sin un solo dynamic import, así que TODO viajaba en un
 // chunk único: un operario que sólo usa la operativa se bajaba el panel admin entero, recharts
-// y la UI legacy antes de ver la primera pantalla. El code splitting por rama de ruta lo
+// antes de ver la primera pantalla. El code splitting por rama de ruta lo
 // arregló, pero nada impide que el próximo import estático arriba de App.jsx lo deshaga en
 // silencio. Este check corre en CI después del build y pone un techo explícito.
 //

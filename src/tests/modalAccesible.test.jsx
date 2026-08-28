@@ -1,15 +1,15 @@
 import { render, screen, fireEvent } from '@testing-library/react'
 import { vi } from 'vitest'
 import ModalComun from '@components/common/Modal'
-import ModalUI from '@components/UI/Modal'
 
-// t65: los tres shells (UI/Modal, common/Modal, UI/Drawer) ponían role="dialog" aria-modal="true"
+// t65: los tres shells (UI/Modal, common/Modal, Drawer) ponían role="dialog" aria-modal="true"
 // en el BACKDROP, que además es el que tiene el onClick de cerrar, en vez de en la card. Con
 // aria-modal el lector de pantalla oculta el resto de la página, pero el foco seguía en el fondo
 // inaccesible: ninguno hacía focus trap, foco inicial ni devolución del foco al disparador, y
 // faltaba aria-labelledby.
 //
-// El Drawer ya se resolvió con useFocusTrap al cerrar t133. Acá van los dos modales.
+// El Drawer se resolvió con useFocusTrap al cerrar t133; UI/Modal desapareció con la UI legacy
+// (t78, 2026-08-28). Queda el único modal vivo.
 
 vi.mock('@context/ThemeContext', () => ({ useTheme: () => ({ isDarkMode: true }) }))
 
@@ -23,7 +23,6 @@ const Contenido = () => (
 
 describe.each([
   ['common/Modal', ModalComun],
-  ['UI/Modal', ModalUI],
 ])('%s accesible', (_nombre, Modal) => {
   it('el role va en la card, no en el backdrop que cierra al hacer clic', () => {
     const onClose = vi.fn()

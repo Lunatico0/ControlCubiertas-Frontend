@@ -17,12 +17,13 @@ import TitleBar from '@components/Layout/TitleBar.jsx'
 // CARGA DIFERIDA POR RAMA DE RUTA
 //
 // Todo entraba en un solo chunk: un operario que sólo usa la operativa se bajaba el panel admin
-// entero, los gráficos de recharts y la UI legacy completa antes de ver la primera pantalla.
+// entero y los gráficos de recharts antes de ver la primera pantalla. (La UI legacy también
+// estaba acá; se eliminó por completo el 2026-08-28, ruta /legacy/* incluida.)
 //
 // Se quedan en el bundle de entrada las pantallas del arranque (login, cambio de contraseña) y
 // la operativa, que es la ruta principal y la que abre el 90% de los usuarios: diferirla sólo
 // agregaría un salto en blanco donde hoy no hay ninguno. Se difiere lo que es de una minoría o
-// de uso ocasional: el panel admin (con recharts adentro, en Reportes), las guías y la UI legacy.
+// de uso ocasional: el panel admin (con recharts adentro, en Reportes) y las guías.
 const AdminLayout = lazy(() => import('@components/Portal/AdminLayout.jsx'))
 const Dashboard = lazy(() => import('@components/Portal/Dashboard.jsx'))
 const Users = lazy(() => import('@components/Portal/Users.jsx'))
@@ -32,7 +33,6 @@ const Reportes = lazy(() => import('@components/Portal/Reportes.jsx'))
 const EditorComprobante = lazy(() => import('@components/Portal/EditorComprobante.jsx'))
 const GuiaAdmin = lazy(() => import('@components/Portal/GuiaAdmin.jsx'))
 const GuiaDeUso = lazy(() => import('@components/Operativa/GuiaDeUso.jsx'))
-const Layout = lazy(() => import('@components/Layout/Layout.jsx'))
 
 // En la app instalable (Electron) el index.html se carga por file:// → BrowserRouter
 // (history API) rompe las rutas. HashRouter (#/ruta) funciona sobre file://. En web
@@ -103,18 +103,6 @@ function App() {
             element={
               <RequireAuth>
                 <GuiaDeUso />
-              </RequireAuth>
-            }
-          />
-
-          {/* UI vieja preservada en /legacy un tiempo, por adaptación (se retira más adelante). */}
-          <Route
-            path="/legacy/*"
-            element={
-              <RequireAuth>
-                <ApiProvider>
-                  <Layout />
-                </ApiProvider>
               </RequireAuth>
             }
           />
