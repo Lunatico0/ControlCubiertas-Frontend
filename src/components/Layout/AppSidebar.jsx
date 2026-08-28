@@ -45,7 +45,7 @@ const AppSidebar = ({ nav, belowNav, upd, user, help, onLogout }) => {
           <BrandLogo height={65} />
         </span>
         <span className="block lg:hidden">
-          <BrandLogo height={38} wheel />
+          <BrandLogo height={34} wheel />
         </span>
       </div>
 

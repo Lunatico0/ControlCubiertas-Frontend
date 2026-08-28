@@ -10,14 +10,16 @@ import wheelLight from "@/assets/TireOpsWheelLight.svg"
 // de la app. Los SVG se IMPORTAN (no se referencian por ruta absoluta): Vite resuelve la
 // URL con el base correcto, así funciona en web (cualquier ruta) y en Electron (file://).
 //
-// `wheel` rinde SÓLO la ilustración (la rueda, sin el wordmark). Es lo que va en el rail de
-// 64px al que colapsa el sidebar por debajo de lg.
+// `wheel` rinde el ISOTIPO: la ilustración entera (estelas, cubierta, arco lima y la "T"),
+// sin el wordmark "ireOps". Es lo que va en el rail de 64px al que colapsa el sidebar. Con
+// su relación de aspecto (340x256) un height de 34 es lo que entra en el rail sin tocar los
+// bordes; más grande se come el padding.
 //
 // Los assets TireOpsWheel*.svg están GENERADOS a partir del logo completo, no dibujados: el
-// logo no venía con isotipo. Los TireOpsIcon*.svg parecían serlo pero no lo son — declaran
-// viewBox="0 0 285 256" sobre un dibujo de 746 de ancho, o sea el logo entero con el lienzo
-// cortado a la mitad, y por eso se veían tajeados. Ver el encabezado de los Wheel para cómo
-// se separó la rueda del texto (en la variante Light comparten el mismo path).
+// logo no venía con isotipo. Los TireOpsIcon*.svg NO sirven para esto: declaran
+// viewBox="0 0 285 256" sobre un dibujo que llega hasta x=339, o sea parten la "T" y el arco
+// por la mitad (esa era la medialuna que se veía en el rail). Ver el encabezado de los
+// TireOpsWheel*.svg para el detalle de cómo se separó la ilustración del texto.
 const BrandLogo = ({ variant = "auto", height = 32, wheel = false, className, style, alt = "TireOps" }) => {
   const { isDarkMode } = useTheme()
   const dark = variant === "dark" || (variant === "auto" && isDarkMode)
