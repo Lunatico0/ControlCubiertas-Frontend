@@ -9,6 +9,7 @@ import KeyboardArrowDownRoundedIcon from "@mui/icons-material/KeyboardArrowDownR
 import { renderComprobanteHTML } from "@utils/receipt-template"
 import Button from "@components/UI/Button"
 import FloatingField from "@components/UI/FloatingField"
+import Toggle from "@components/common/Toggle"
 
 // Editor del comprobante impreso (Claude Design). Pantalla dedicada del portal admin:
 // controles a la izquierda + preview A4 en vivo a la derecha. Persiste en el tenant
@@ -35,12 +36,6 @@ const SAMPLE = {
 const FONTS = [["Grotesk", "'Space Grotesk', sans-serif"], ["Plex Sans", "'IBM Plex Sans', sans-serif"], ["Plex Mono", "'IBM Plex Mono', monospace"], ["Serif", "Georgia, serif"]]
 const ACCENTS = ["#1F7A43", "#2358C5", "#334155", "#C2410C", "#6D28D9"]
 
-// Toggle on/off
-const Toggle = ({ on, onClick, w = 38, knob = 16 }) => (
-  <button onClick={onClick} className="relative inline-flex flex-none" style={{ width: w, height: knob + 6, borderRadius: 20, border: "none", background: on ? "var(--ink-lime)" : "var(--bd-strong)", cursor: "pointer" }}>
-    <span className="absolute rounded-full" style={{ top: 3, left: on ? w - knob - 3 : 3, width: knob, height: knob, background: "#fff", boxShadow: "0 1px 2px rgba(0,0,0,.25)", transition: "left .15s" }} />
-  </button>
-)
 // Control segmentado
 const Segmented = ({ options, value, onChange }) => (
   <div className="flex gap-[5px] rounded-[9px] p-1" style={{ border: "1px solid var(--bd-strong)", background: "var(--input)" }}>
@@ -154,7 +149,7 @@ const EditorComprobante = () => {
           <div className="px-[22px] py-5" style={{ borderBottom: "1px solid var(--bd-faint)" }}>
             <div className="mb-[15px] flex items-center">
               <div className="text-[10px] tracking-[.12em]" style={sectionLabelStyle}>ENCABEZADO</div>
-              <div className="ml-auto"><Toggle on={d.showHeader} onClick={() => setDesign({ showHeader: !d.showHeader })} w={42} knob={18} /></div>
+              <div className="ml-auto"><Toggle on={d.showHeader} onChange={(v) => setDesign({ showHeader: v })} label="Mostrar encabezado" w={42} knob={18} /></div>
             </div>
             <div className="flex flex-col gap-[11px]">
               <FloatingField label="Nombre de la empresa" value={empresa} onChange={(e) => setEmpresa(e.target.value)} />
@@ -193,7 +188,7 @@ const EditorComprobante = () => {
                     <button onClick={() => moveSection(i, 1)} className="inline-flex h-4 w-[22px] items-center justify-center p-0" style={{ border: "none", background: "transparent", color: i === d.sections.length - 1 ? "var(--bd-hover)" : "var(--tx-3)", cursor: i === d.sections.length - 1 ? "default" : "pointer" }}><KeyboardArrowDownRoundedIcon sx={{ fontSize: 16 }} /></button>
                   </div>
                   <span className="flex-1 text-[13px] font-medium" style={{ color: s.on ? "var(--tx)" : "var(--tx-6)" }}>{s.label}</span>
-                  <Toggle on={s.on} onClick={() => toggleSection(s.key)} />
+                  <Toggle on={s.on} onChange={() => toggleSection(s.key)} label={`Mostrar ${s.label}`} />
                 </div>
               ))}
             </div>
@@ -240,7 +235,7 @@ const EditorComprobante = () => {
                 <div className="text-[13.5px] font-semibold" style={{ color: "var(--tx)" }}>Imprimir duplicado</div>
                 <div className="mt-0.5 text-[11.5px]" style={{ color: "var(--tx-5)" }}>Original + duplicado en la misma A4, con línea de corte.</div>
               </div>
-              <Toggle on={d.duplicado} onClick={() => setDesign({ duplicado: !d.duplicado })} w={46} knob={20} />
+              <Toggle on={d.duplicado} onChange={(v) => setDesign({ duplicado: v })} label="Imprimir duplicado" w={46} knob={20} />
             </div>
           </div>
         </aside>
