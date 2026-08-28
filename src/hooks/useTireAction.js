@@ -40,22 +40,35 @@ export const useTireAction = ({ printBuilder, apiCall, successMessage }) => {
 
         const receipt = updated.receiptNumber || "0000-00000000"
 
-        // Imprimir comprobante si es necesario
+        // La acción YA está persistida acá arriba. Lo que sigue es un efecto posterior: la
+        // impresión NUNCA condiciona ni revierte la mutación, porque la web no puede informar
+        // si el operario imprimió o canceló el diálogo (ver usePrintEngine). Cualquier regla
+        // que dependa de "se imprimió o no" sería ficción, así que el mensaje dice lo único
+        // que sabemos de verdad: que el comprobante se mandó a imprimir, o que quedó en el
+        // historial listo para reimprimir.
+        let aviso = `${successMessage} · Comprobante ${receipt} enviado a impresión`
+
         if (printBuilder) {
           try {
             const printData = printBuilder(tire, updated, formData, receipt)
+            const resultado = printData ? await print(printData) : null
 
-            if (printData) {
-              const printResult = await print(printData)
+            if (!printData || resultado?.status === "disabled") {
+              aviso = `${successMessage} · Comprobante ${receipt} disponible en el historial`
             }
           } catch (printError) {
             console.error("❌ Error al imprimir:", printError)
-            showToast("warning", "La acción se completó pero hubo un problema al imprimir")
+            showToast(
+              "warning",
+              `${successMessage}, pero no se pudo abrir la impresión. Reimprimí el comprobante ${receipt} desde el historial.`,
+            )
+            aviso = null
           }
+        } else {
+          aviso = `${successMessage} · Comprobante ${receipt} disponible en el historial`
         }
 
-        // Mostrar mensaje de éxito DESPUÉS de la impresión
-        showToast("success", successMessage)
+        if (aviso) showToast("success", aviso)
 
         // Refrescar datos
         if (refresh && typeof refresh === "function") {

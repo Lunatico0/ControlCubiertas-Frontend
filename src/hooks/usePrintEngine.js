@@ -1,9 +1,19 @@
 import { useState, useCallback, useRef, useEffect } from "react"
 
-// Cuánto esperamos como MÁXIMO a que la ventana de impresión avise. Pasado eso damos la
-// impresión por terminada igual: el comprobante siempre se puede reimprimir desde el historial,
-// pero dejar el botón colgado en "Guardando…" sobre una acción YA ejecutada no tiene arreglo
-// desde la UI.
+// LO QUE ESTE MOTOR PUEDE Y NO PUEDE SABER
+//
+// No puede saber si el comprobante SE IMPRIMIÓ. La web no lo expone: `window.print()` no
+// devuelve resultado, `onafterprint` dispara igual cuando el usuario cancela el diálogo, y el
+// `beforeunload` de la ventana llega tanto si imprimió como si la cerró de una. Todo lo que
+// sabemos es que el diálogo se DESPACHÓ.
+//
+// Por eso `printHtml` resuelve `{ dispatched: true }` y nunca un booleano "impreso": un booleano
+// invitaba a construir mensajes y reglas de negocio sobre un dato que no existe. Si no se puede
+// ni abrir la ventana (popup bloqueado), rechaza — eso sí es observable.
+//
+// Cuánto esperamos como MÁXIMO a que la ventana avise. Pasado eso la damos por despachada
+// igual: el comprobante siempre se puede reimprimir desde el historial, pero dejar el botón
+// colgado en "Guardando…" sobre una acción YA ejecutada no tiene arreglo desde la UI.
 const TIMEOUT_MS = 15000
 const POLL_MS = 1000
 
@@ -120,31 +130,32 @@ const usePrintEngine = () => {
           pendingRef.current.delete(limpiar)
         }
 
-        const finish = (printed) => {
+        // `dispatched` significa "el diálogo de impresión llegó a abrirse", NO "se imprimió".
+        const finish = () => {
           if (settled) return
           settled = true
           limpiar()
           setIsPrinting(false)
-          resolve(printed)
+          resolve({ dispatched: true })
         }
 
         function handleMessage(event) {
           // Sólo escuchamos a NUESTRA ventana de impresión: cualquier otra podía resolver la
-          // promesa antes de tiempo y marcar como impreso algo que no lo fue.
+          // promesa antes de tiempo y cerrar el flujo de un comprobante que no era éste.
           if (event.source !== printWindow) return
           if (event.origin !== origen) return
           if (event.data?.printed === undefined) return
-          finish(event.data.printed)
+          finish()
         }
 
         window.addEventListener("message", handleMessage)
         pendingRef.current.add(limpiar)
 
-        fallback = setTimeout(() => finish(true), TIMEOUT_MS)
+        fallback = setTimeout(finish, TIMEOUT_MS)
 
         checkClosed = setInterval(() => {
           // Si el usuario cierra la ventana sin imprimir, el beforeunload puede no llegar.
-          if (printWindow.closed) finish(true)
+          if (printWindow.closed) finish()
         }, POLL_MS)
       } catch (error) {
         console.error("❌ Error imprimiendo:", error)

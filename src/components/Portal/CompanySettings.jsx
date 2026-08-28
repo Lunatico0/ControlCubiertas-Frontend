@@ -11,6 +11,7 @@ import { showToast } from "@utils/toast"
 import Button from "@components/UI/Button"
 import FloatingField from "@components/UI/FloatingField"
 import { tituloPantalla } from "@utils/tokens"
+import Toggle from "@components/common/Toggle"
 
 const inputClass =
   "w-full rounded-[10px] border border-(--bd) bg-(--input) px-3 py-2.5 text-sm text-(--tx) placeholder:text-(--tx-6) outline-none transition focus:border-(--ink-lime)"
@@ -66,6 +67,7 @@ const CompanySettings = () => {
   const [editing, setEditing] = useState(null) // índice del estado en edición (popover)
   const [plateSep, setPlateSep] = useState("") // separador de patente (solo display)
   const [codePrefix, setCodePrefix] = useState("") // prefijo del código interno de cubierta (solo display)
+  const [autoPrint, setAutoPrint] = useState(true) // imprimir el comprobante al confirmar una acción
 
   useEffect(() => {
     Promise.all([getCompany(), getSummary().catch(() => null)])
@@ -77,6 +79,7 @@ const CompanySettings = () => {
         setStatuses(Array.isArray(c.stockStatuses) ? c.stockStatuses : [])
         setPlateSep(c.plateSeparator || "")
         setCodePrefix(c.tireCodePrefix || "")
+        setAutoPrint(c.autoPrint !== false)
         setUsage(s?.cubiertas?.byStatus || {})
         setMeta({ plan: c.plan, status: c.status, dbName: c.dbName })
       })
@@ -116,7 +119,7 @@ const CompanySettings = () => {
 
   const onSubmit = async (data) => {
     try {
-      const updated = await updateCompany({ ...data, stockStatuses: statuses, plateSeparator: plateSep, tireCodePrefix: codePrefix })
+      const updated = await updateCompany({ ...data, stockStatuses: statuses, plateSeparator: plateSep, tireCodePrefix: codePrefix, autoPrint })
       // Invalida la cache de company para que la operativa (/op) tome el nuevo separador/prefijo
       // al entrar, sin necesidad de hard-reload (Ctrl+Shift+R).
       invalidateCompanyCache()
@@ -127,6 +130,7 @@ const CompanySettings = () => {
       setStatuses(Array.isArray(updated.stockStatuses) ? updated.stockStatuses : [])
       setPlateSep(updated.plateSeparator || "")
       setCodePrefix(updated.tireCodePrefix || "")
+      setAutoPrint(updated.autoPrint !== false)
       setEditing(null)
       showToast("success", "Datos de la empresa actualizados")
     } catch (err) {
@@ -237,6 +241,28 @@ const CompanySettings = () => {
           <div className="mt-4 flex items-center gap-2 text-sm text-(--tx-5)">
             Vista previa:
             <span className="rounded-md border border-(--bd) bg-(--input) px-2.5 py-1 font-mono text-[13px] text-(--tx-2)">{codePrefix ? `${codePrefix}12` : "12"}</span>
+          </div>
+        </section>
+
+        {/* Impresión del comprobante */}
+        <section className={cardClass}>
+          <h2 className="font-display text-lg font-semibold text-(--tx)" style={{ fontFamily: "'Space Grotesk'" }}>Impresión</h2>
+          <p className="mt-1 text-sm text-(--tx-4)">
+            Qué pasa con el comprobante cuando el operario confirma un movimiento.
+          </p>
+          <div className="mt-4 flex items-center gap-4 rounded-xl border border-(--bd) bg-(--elev) p-4">
+            <div className="min-w-0 flex-1">
+              <div className="text-sm font-semibold text-(--tx-2)">Imprimir al confirmar</div>
+              <div className="mt-0.5 text-xs text-(--tx-5)">
+                {autoPrint
+                  ? "Al confirmar un movimiento se abre el diálogo de impresión del comprobante."
+                  : "El movimiento se registra sin abrir la impresión. El comprobante se reimprime desde el historial cuando haga falta."}
+              </div>
+              <div className="mt-2 text-xs text-(--tx-6)">
+                El movimiento queda registrado igual: cancelar o cerrar la impresión nunca lo deshace.
+              </div>
+            </div>
+            <Toggle on={autoPrint} onChange={setAutoPrint} label="Imprimir el comprobante al confirmar un movimiento" w={46} knob={20} />
           </div>
         </section>
 
