@@ -15,9 +15,9 @@ import { setVehicleService } from "@api/vehicles"
 import { showToast } from "@utils/toast"
 import { tint } from "./status"
 import Callout from "@components/common/Callout"
-import Drawer from "@components/UI/Drawer"
-import Pill from "@components/UI/Pill"
-import MonoLabel from "@components/UI/MonoLabel"
+import Drawer from "@components/common/Drawer"
+import Pill from "@components/common/Pill"
+import MonoLabel from "@components/common/MonoLabel"
 
 // Detalle del vehículo (rediseño Claude Design "DRAWER VEHÍCULO"): stats + posiciones
 // (ver/montar cubierta) + acciones (reconfigurar ejes, editar datos). Recibe el item ya

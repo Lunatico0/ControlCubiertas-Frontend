@@ -120,7 +120,7 @@ describe("cifras: mono y tabular (t104, t106)", () => {
   it("StatCard muestra el valor en mono, no en la familia de display", () => {
     // ART-DIRECTION es explícito: las cifras van en IBM Plex Mono. El KPI salía en Space
     // Grotesk, así que en la misma tabla convivían mono y proporcional.
-    const statCard = readFileSync(resolve(raiz, "src/components/UI/StatCard.jsx"), "utf8")
+    const statCard = readFileSync(resolve(raiz, "src/components/common/StatCard.jsx"), "utf8")
     expect(statCard).not.toMatch(/--font-display/)
     expect(statCard).toMatch(/--font-mono/)
   })

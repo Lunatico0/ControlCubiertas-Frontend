@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"
 import { etiquetaDeRol } from "@utils/roles"
-import Pill from "@components/UI/Pill"
+import Pill from "@components/common/Pill"
 import { useNavigate, useLocation, Outlet } from "react-router-dom"
 import { useAuth } from "@context/AuthContext"
 import { useTheme } from "@context/ThemeContext"

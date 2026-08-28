@@ -9,7 +9,7 @@ import { getReports, getVehicleReports, getVehicleWearCached } from "@api/admin"
 import { showToast } from "@utils/toast"
 import { downloadCSV } from "@utils/csv"
 import Callout from "@components/common/Callout"
-import StatCard from "@components/UI/StatCard"
+import StatCard from "@components/common/StatCard"
 import { tituloPantalla } from "@utils/tokens"
 import { mensajeDeError } from "@utils/apiError"
 import {

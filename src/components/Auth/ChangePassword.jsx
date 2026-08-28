@@ -5,8 +5,8 @@ import { useAuth } from "@context/AuthContext"
 import { useTheme } from "@context/ThemeContext"
 import { showToast } from "@utils/toast"
 import BrandLogo from "@components/BrandLogo"
-import Button from "@components/UI/Button"
-import FloatingField from "@components/UI/FloatingField"
+import Button from "@components/common/Button"
+import FloatingField from "@components/common/FloatingField"
 import { mensajeDeError } from "@utils/apiError"
 
 // Establecer/cambiar contraseña (rediseño Claude Design "primer ingreso"). Dos modos:

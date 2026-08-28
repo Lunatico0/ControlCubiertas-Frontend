@@ -16,8 +16,8 @@ import { metaOf, tint, fmtKm, fmtDate, StateBadge, useStatusCatalog, ubicacionDe
 import SelectorPosicion from "./SelectorPosicion"
 import { OpActionBtn } from "./opActions"
 import Field from "@components/common/Field"
-import Drawer from "@components/UI/Drawer"
-import FloatingField from "@components/UI/FloatingField"
+import Drawer from "@components/common/Drawer"
+import FloatingField from "@components/common/FloatingField"
 import { formatTireCode } from "@utils/tireCode"
 
 // Botón chico de una entrada del timeline (Reimprimir / Corregir / Deshacer), con hover coloreable.

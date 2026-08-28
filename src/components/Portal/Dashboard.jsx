@@ -14,7 +14,7 @@ import ApartmentOutlinedIcon from "@mui/icons-material/ApartmentOutlined"
 import OpenInNewRoundedIcon from "@mui/icons-material/OpenInNewRounded"
 import TaskAltOutlinedIcon from "@mui/icons-material/TaskAltOutlined"
 import DesktopDownload from "./DesktopDownload"
-import StatCard from "@components/UI/StatCard"
+import StatCard from "@components/common/StatCard"
 import { tituloPantalla } from "@utils/tokens"
 import { mensajeDeError } from "@utils/apiError"
 

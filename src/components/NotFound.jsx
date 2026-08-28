@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom"
 import { useTheme } from "@context/ThemeContext"
 import HomeRoundedIcon from "@mui/icons-material/HomeRounded"
 import BrandLogo from "@components/BrandLogo"
-import Button from "@components/UI/Button"
+import Button from "@components/common/Button"
 import { tituloPantalla } from "@utils/tokens"
 
 // Vista de callejón sin salida. Nació como el 404 de las rutas inexistentes (catch-all `*` en

@@ -1,8 +1,8 @@
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded"
 import AddRoundedIcon from "@mui/icons-material/AddRounded"
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded"
-import Button from "@components/UI/Button"
-import ViewToggle from "@components/UI/ViewToggle"
+import Button from "@components/common/Button"
+import ViewToggle from "@components/common/ViewToggle"
 
 // Atajo de teclado según plataforma (⌘K en Mac/iOS, Ctrl+K en el resto).
 const IS_MAC = typeof navigator !== "undefined" && /Mac|iPhone|iPad|iPod/i.test(navigator.platform || navigator.userAgent || "")

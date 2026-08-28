@@ -4,8 +4,8 @@ import VehicleField from "./fields/VehicleField"
 import TireSearchBox from "./fields/TireSearchBox"
 import SelectedTiresList from "./fields/SelectedTiresList"
 import AddCircleRoundedIcon from '@mui/icons-material/AddCircleRounded';
-import Button from '@components/UI/Button'
-import Spinner from '@components/UI/Spinner'
+import Button from '@components/common/Button'
+import Spinner from '@components/common/Spinner'
 
 
 const VehicleForm = ({

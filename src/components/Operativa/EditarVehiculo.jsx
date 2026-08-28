@@ -4,10 +4,10 @@ import { showToast } from "@utils/toast"
 import { formatPlate, normalizePlate, isValidPlate, describirFormatos } from "@utils/plateFormat"
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded"
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined"
-import Button from "@components/UI/Button"
+import Button from "@components/common/Button"
 import Callout from "@components/common/Callout"
-import Drawer from "@components/UI/Drawer"
-import FloatingField from "@components/UI/FloatingField"
+import Drawer from "@components/common/Drawer"
+import FloatingField from "@components/common/FloatingField"
 
 // Drawer de edición de DATOS de un vehículo (móvil, patente, marca). Usa
 // vehicles.updateData → PUT /vehicles/details/:id (valida duplicados de móvil/patente).

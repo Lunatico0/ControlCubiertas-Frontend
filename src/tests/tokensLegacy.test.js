@@ -34,7 +34,7 @@ const CARPETAS_LEGACY = [
 const ARCHIVOS_LEGACY = [
   'src/components/Help.jsx',
   'src/components/SearchFilter.jsx',
-  'src/components/UI/Button.jsx', // sirve a los dos mundos: expone las variantes legacy por nombre
+  'src/components/common/Button.jsx', // sirve a los dos mundos: expone las variantes legacy por nombre
   'src/components/UI/Modal.jsx',
   'src/components/UI/InfoItem.jsx',
   'src/components/UI/InfoRow.jsx',
@@ -89,7 +89,7 @@ describe('t119 · la paleta vieja solo la alcanza la app legacy', () => {
 
 describe('t119 · el botón del rediseño no cae en el azul anterior', () => {
   it('sin variant, <Button> es lima', () => {
-    const src = leer('src/components/UI/Button.jsx')
+    const src = leer('src/components/common/Button.jsx')
 
     expect(src).toMatch(/variant = "lime"/)
     expect(src).not.toMatch(/\|\| VARIANTES\.primary/)

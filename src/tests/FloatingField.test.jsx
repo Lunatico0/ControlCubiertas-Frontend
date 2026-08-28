@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { useForm } from 'react-hook-form'
-import FloatingField from '@components/UI/FloatingField'
+import FloatingField from '@components/common/FloatingField'
 
 // FloatingField se consume de dos maneras y las dos tienen que funcionar:
 //   - controlado (value/onChange), que es como lo usan los drawers de la operativa

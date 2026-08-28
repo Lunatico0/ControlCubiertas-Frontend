@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react'
-import FloatingField from '@components/UI/FloatingField'
+import FloatingField from '@components/common/FloatingField'
 import Field from '@components/common/Field'
 
 // t153 de la auditoría de QA del operario.

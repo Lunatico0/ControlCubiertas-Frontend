@@ -1,7 +1,7 @@
 import { readFileSync, readdirSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { render, screen } from '@testing-library/react'
-import Pill from '@components/UI/Pill'
+import Pill from '@components/common/Pill'
 
 // t115, t116, t118, t120 y t122 de la auditoría visual. Son hallazgos de FORMA: no hay
 // comportamiento que probar, lo que hay que impedir es que el valor viejo vuelva. Este test

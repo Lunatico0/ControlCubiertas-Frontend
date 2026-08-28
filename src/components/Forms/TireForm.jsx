@@ -2,8 +2,8 @@ import { useState } from "react"
 import { useForm } from "react-hook-form"
 import TireField from "./fields/TireField"
 import { input } from "@utils/legacyTokens"
-import Button from "@components/UI/Button"
-import Spinner from "@components/UI/Spinner"
+import Button from "@components/common/Button"
+import Spinner from "@components/common/Spinner"
 
 // Fecha de HOY en zona local: `toISOString()` ya está en el día siguiente después de las 21:00
 // en GMT-3, así que el campo proponía MAÑANA.

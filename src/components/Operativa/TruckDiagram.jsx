@@ -1,7 +1,7 @@
 import { tint } from "./status"
 import ArrowUpwardRoundedIcon from "@mui/icons-material/ArrowUpwardRounded"
 import TripOriginOutlinedIcon from "@mui/icons-material/TripOriginOutlined"
-import MonoLabel from "@components/UI/MonoLabel"
+import MonoLabel from "@components/common/MonoLabel"
 
 // Preview del esquema de ejes (vista superior del camión), compartido por NuevoVehiculo y
 // ConfigurarEjes: encabezado "ESQUEMA · <tipo>", flecha FRENTE, diagrama de ruedas (una Wheel

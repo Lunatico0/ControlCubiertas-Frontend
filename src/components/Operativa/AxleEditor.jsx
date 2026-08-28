@@ -3,9 +3,9 @@ import { tint } from "./status"
 import AddRoundedIcon from "@mui/icons-material/AddRounded"
 import RemoveRoundedIcon from "@mui/icons-material/RemoveRounded"
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined"
-import Button from "@components/UI/Button"
-import Pill from "@components/UI/Pill"
-import MonoLabel from "@components/UI/MonoLabel"
+import Button from "@components/common/Button"
+import Pill from "@components/common/Pill"
+import MonoLabel from "@components/common/MonoLabel"
 
 // Panel de controles del editor de ejes, compartido por NuevoVehiculo y ConfigurarEjes:
 //  - Sección "TIPO DE VEHÍCULO": grid de presets del catálogo (presets + custom del tenant)

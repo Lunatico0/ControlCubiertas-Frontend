@@ -83,7 +83,7 @@ describe('t149 · cerrar sesión no es un clic al vacío', () => {
 
 describe('t148/t152 · el buscador dice cuántos quedaron y ofrece la salida', () => {
   const raiz = resolve(__dirname, '../..')
-  const header = readFileSync(resolve(raiz, 'src/components/UI/ScreenHeader.jsx'), 'utf8')
+  const header = readFileSync(resolve(raiz, 'src/components/common/ScreenHeader.jsx'), 'utf8')
 
   it('el contador vive en la cabecera, no adentro del panel de Filtros', () => {
     expect(header).toMatch(/\{count\} resultado/)
