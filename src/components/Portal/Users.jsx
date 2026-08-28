@@ -119,7 +119,7 @@ const Users = () => {
         <p className="text-sm" style={{ color: "var(--tx-5)" }}>Todavía no hay usuarios.</p>
       ) : (
         <div className="overflow-hidden rounded-[14px]" style={{ background: "var(--card)", border: "1px solid var(--bd)" }}>
-          <div className="grid gap-3 px-5 py-3 text-[10.5px] font-semibold uppercase tracking-wider" style={{ gridTemplateColumns: COLS, background: "var(--elev)", borderBottom: "1px solid var(--bd)", fontFamily: "'IBM Plex Mono'", color: "var(--tx-6)" }}>
+          <div className="grid gap-3 px-5 py-3 text-[10.5px] font-semibold uppercase tracking-wider" style={{ gridTemplateColumns: COLS, background: "var(--elev)", borderBottom: "1px solid var(--bd)", fontFamily: "var(--font-mono)", color: "var(--tx-6)" }}>
             <div>Usuario</div><div>Rol</div><div>Estado</div><div className="text-right">Acciones</div>
           </div>
           {users.map((u) => {
@@ -129,11 +129,11 @@ const Users = () => {
             return (
               <div key={u._id} className="grid items-center gap-3 px-5 py-3.5" style={{ gridTemplateColumns: COLS, borderBottom: "1px solid var(--bd-faint)", opacity: active ? 1 : 0.6 }}>
                 <div className="flex min-w-0 items-center gap-3">
-                  <div className="flex flex-none items-center justify-center rounded-[9px] text-xs font-bold" style={{ width: 36, height: 36, fontFamily: "'Space Grotesk'", background: isAdmin ? "color-mix(in srgb, var(--ink-lime) 14%, transparent)" : "var(--bd-strong)", color: isAdmin ? "var(--ink-lime)" : "var(--tx-2)" }}>{initialsOf(u)}</div>
+                  <div className="flex flex-none items-center justify-center rounded-[9px] text-xs font-bold" style={{ width: 36, height: 36, fontFamily: "var(--font-display)", background: isAdmin ? "color-mix(in srgb, var(--ink-lime) 14%, transparent)" : "var(--bd-strong)", color: isAdmin ? "var(--ink-lime)" : "var(--tx-2)" }}>{initialsOf(u)}</div>
                   <div className="min-w-0">
                     <div className="flex items-center gap-[7px] text-[13.5px] font-semibold" style={{ color: "var(--tx)" }}>
                       {u.name || "—"}
-                      {isYou && <span className="rounded-full px-[7px] py-px text-[9.5px]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--ink-lime)", background: "color-mix(in srgb, var(--ink-lime) 13%, transparent)" }}>VOS</span>}
+                      {isYou && <span className="rounded-full px-[7px] py-px text-[9.5px]" style={{ fontFamily: "var(--font-mono)", color: "var(--ink-lime)", background: "color-mix(in srgb, var(--ink-lime) 13%, transparent)" }}>VOS</span>}
                     </div>
                     <div className="truncate text-[12px]" style={{ color: "var(--tx-5)" }}>{u.email}</div>
                   </div>

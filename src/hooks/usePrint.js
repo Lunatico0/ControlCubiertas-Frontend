@@ -1,4 +1,5 @@
 import usePrintEngine from "./usePrintEngine"
+import useSettings from "./useSettings"
 import { generateReceiptHTML } from "@utils/receipt-html"
 import { getCompanyCached } from "@api/company"
 
@@ -17,7 +18,9 @@ import { getCompanyCached } from "@api/company"
 // fallidos.
 export const usePrint = () => {
   const { printHtml, isPrinting } = usePrintEngine()
-  const layoutMode = localStorage.getItem("receiptLayout") || "dynamic"
+  // El layout sale del contexto de ajustes, que es la única fuente. Leer localStorage acá
+  // era lo que producía un comprobante distinto al que mostraba la pantalla de Ajustes.
+  const { receiptLayout: layoutMode } = useSettings()
 
   const print = async (data) => {
     const company = await getCompanyCached()
@@ -32,7 +35,7 @@ export const usePrint = () => {
     return { status: "dispatched" }
   }
 
-  return { print, isPrinting }
+  return { print, isPrinting, layoutMode }
 }
 
 export default usePrint

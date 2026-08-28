@@ -6,13 +6,8 @@ import { useOrderValidation } from "@hooks/useOrderValidation"
 import useCreateEntity from "@hooks/useCreateEntity"
 import { buildCreateTirePrintData } from "@utils/print-data"
 import usePrint from "@hooks/usePrint"
+import { todayLocal, dateOnlyToLocalNoon } from "@utils/date"
 
-// Fecha de HOY en zona local. `new Date().toISOString()` ya está en el día siguiente después
-// de las 21:00 en GMT-3, así que el formulario proponía MAÑANA como fecha de alta.
-const todayLocal = () => {
-  const d = new Date()
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`
-}
 
 const NewTire = ({ onClose, onSuccess }) => {
   const { tires, data, orders } = useContext(ApiContext)
@@ -33,7 +28,9 @@ const NewTire = ({ onClose, onSuccess }) => {
       serialNumber: formData.serialNumber,
       size: formData.size,
       brand: formData.brand,
-      createdAt: formData.createdAt || todayLocal(),
+      // El día suelto del input se ancla al mediodía LOCAL: mandarlo crudo lo hacía llegar
+      // como medianoche UTC y la fecha de alta quedaba corrida un día atrás en GMT-3.
+      createdAt: dateOnlyToLocalNoon(formData.createdAt) || dateOnlyToLocalNoon(todayLocal()),
       pattern: formData.pattern,
       kilometers: formData.kilometers || 0,
       vehicle: formData.vehicle || null,

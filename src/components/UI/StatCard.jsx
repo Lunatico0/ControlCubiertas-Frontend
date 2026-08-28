@@ -15,7 +15,7 @@ const StatCard = ({ icon, tint, value, label, sublabel, variant = "stacked", cla
           {icon && <span className="flex flex-none items-center justify-center rounded-[9px]" style={{ width: 32, height: 32, background: mix(tint, 14), color: tint }}>{icon}</span>}
         </div>
         <div>
-          <div className="font-display text-[26px] font-bold" style={{ fontFamily: "'Space Grotesk'", color: "var(--tx)" }}>{value}</div>
+          <div className="font-display text-[26px] font-bold" style={{ fontFamily: "var(--font-display)", color: "var(--tx)" }}>{value}</div>
           {sublabel && <div className="mt-0.5 text-[12px]" style={{ color: "var(--tx-6)" }}>{sublabel}</div>}
         </div>
       </div>
@@ -27,7 +27,7 @@ const StatCard = ({ icon, tint, value, label, sublabel, variant = "stacked", cla
       <div className="flex items-start justify-between">
         <div>
           <p className="text-sm" style={{ color: "var(--tx-4)" }}>{label}</p>
-          <p className="mt-1 font-display text-3xl font-bold" style={{ color: "var(--tx)", fontFamily: "'Space Grotesk'" }}>{value}</p>
+          <p className="mt-1 font-display text-3xl font-bold" style={{ color: "var(--tx)", fontFamily: "var(--font-display)" }}>{value}</p>
         </div>
         {icon && <span className="grid h-11 w-11 place-items-center rounded-lg" style={{ background: mix(tint, 12), color: tint }}>{icon}</span>}
       </div>

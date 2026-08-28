@@ -60,10 +60,10 @@ const VehicleDrawer = ({ item, onClose, onNavigate }) => {
           </span>
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2.5">
-              <span className="text-[24px] font-bold leading-none" style={{ fontFamily: "'Space Grotesk'", color: "var(--tx)" }}>{v.mobile || "—"}</span>
+              <span className="text-[24px] font-bold leading-none" style={{ fontFamily: "var(--font-display)", color: "var(--tx)" }}>{v.mobile || "—"}</span>
               {v.type && <Pill style={{ color: tipoColor, background: tipoBg }}>{v.type}</Pill>}
             </div>
-            <div className="mt-[3px] text-[12px]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-5)" }}>{formatPlate(v.licensePlate, data.plateSep) || "—"} · {v.brand || "—"}</div>
+            <div className="mt-[3px] text-[12px]" style={{ fontFamily: "var(--font-mono)", color: "var(--tx-5)" }}>{formatPlate(v.licensePlate, data.plateSep) || "—"} · {v.brand || "—"}</div>
           </div>
           <button onClick={onClose} title="Cerrar" className="rounded-lg p-1.5" style={{ color: "var(--tx-5)" }}><CloseRoundedIcon sx={{ fontSize: 20 }} /></button>
         </div>
@@ -73,11 +73,11 @@ const VehicleDrawer = ({ item, onClose, onNavigate }) => {
           <div className="mb-[22px] grid grid-cols-2 gap-2.5">
             <div className="rounded-[11px] px-[15px] py-[13px]" style={{ border: "1px solid var(--bd-soft)" }}>
               <div className="text-[11.5px]" style={{ color: "var(--tx-5)" }}>Km del vehículo</div>
-              <div className="mt-[3px] text-[19px] font-semibold" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx)" }}>{kmLabel}</div>
+              <div className="mt-[3px] text-[19px] font-semibold" style={{ fontFamily: "var(--font-mono)", color: "var(--tx)" }}>{kmLabel}</div>
             </div>
             <div className="rounded-[11px] px-[15px] py-[13px]" style={{ border: "1px solid var(--bd-soft)" }}>
               <div className="text-[11.5px]" style={{ color: "var(--tx-5)" }}>Cubiertas montadas</div>
-              <div className="mt-[3px] text-[19px] font-semibold" style={{ fontFamily: "'IBM Plex Mono'", color: countColor }}>{mountedLabel}</div>
+              <div className="mt-[3px] text-[19px] font-semibold" style={{ fontFamily: "var(--font-mono)", color: countColor }}>{mountedLabel}</div>
             </div>
           </div>
 
@@ -88,7 +88,7 @@ const VehicleDrawer = ({ item, onClose, onNavigate }) => {
               <div className="flex flex-col gap-2">
                 {positions.map((p, i) => (
                   <div key={i} className="flex items-center gap-[13px] rounded-[11px] px-3.5 py-3" style={{ border: "1px solid var(--bd-soft)", background: "var(--card)" }}>
-                    <span className="flex h-[38px] w-[38px] flex-none items-center justify-center rounded-[9px] text-[10px] font-semibold" style={{ fontFamily: "'IBM Plex Mono'", background: p.empty ? "var(--input)" : p.bg, border: p.empty ? "1.5px dashed var(--bd-strong)" : "1.5px solid transparent", color: p.empty ? "var(--tx-6)" : p.dot }}>{p.label}</span>
+                    <span className="flex h-[38px] w-[38px] flex-none items-center justify-center rounded-[9px] text-[10px] font-semibold" style={{ fontFamily: "var(--font-mono)", background: p.empty ? "var(--input)" : p.bg, border: p.empty ? "1.5px dashed var(--bd-strong)" : "1.5px solid transparent", color: p.empty ? "var(--tx-6)" : p.dot }}>{p.label}</span>
                     <div className="min-w-0 flex-1">
                       {p.empty ? (
                         <>
@@ -97,7 +97,7 @@ const VehicleDrawer = ({ item, onClose, onNavigate }) => {
                         </>
                       ) : (
                         <div className="flex items-center gap-2">
-                          <span className="text-[15px] font-bold" style={{ fontFamily: "'Space Grotesk'", color: "var(--tx)" }}>#{p.tireCode}</span>
+                          <span className="text-[15px] font-bold" style={{ fontFamily: "var(--font-display)", color: "var(--tx)" }}>#{p.tireCode}</span>
                           <Pill className="gap-[5px] px-[9px] py-[2px] text-[11px] font-semibold" style={{ color: p.dot, background: p.bg }}>
                             <span className="rounded-full" style={{ width: 6, height: 6, background: p.dot }} />{p.status}
                           </Pill>

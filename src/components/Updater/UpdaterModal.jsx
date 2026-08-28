@@ -40,7 +40,7 @@ const UpdaterModal = ({ current, phase, list, dl, installingV, onClose, onRechec
     if (dl.st === "downloading") {
       return (
         <div className="w-full">
-          <div className="mb-1.5 flex items-center justify-between text-[10.5px]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-4)" }}>
+          <div className="mb-1.5 flex items-center justify-between text-[10.5px]" style={{ fontFamily: "var(--font-mono)", color: "var(--tx-4)" }}>
             <span>Descargando…</span>
             <span>{Math.round(dl.pct)} %</span>
           </div>
@@ -95,7 +95,7 @@ const UpdaterModal = ({ current, phase, list, dl, installingV, onClose, onRechec
               <path d="M20 6 9 17l-5-5" />
             </svg>
           </div>
-          <div className="text-[16px] font-semibold" style={{ fontFamily: "'Space Grotesk'", color: "var(--tx)" }}>
+          <div className="text-[16px] font-semibold" style={{ fontFamily: "var(--font-display)", color: "var(--tx)" }}>
             Estás al día
           </div>
           <div className="text-[13px]" style={{ color: "var(--tx-4)" }}>
@@ -110,7 +110,7 @@ const UpdaterModal = ({ current, phase, list, dl, installingV, onClose, onRechec
       {phase === "installing" && (
         <div className="flex flex-col items-center gap-3 py-8 text-center">
           <Spin />
-          <div className="text-[15px] font-semibold" style={{ fontFamily: "'Space Grotesk'", color: "var(--tx)" }}>
+          <div className="text-[15px] font-semibold" style={{ fontFamily: "var(--font-display)", color: "var(--tx)" }}>
             Instalando v{installingV}…
           </div>
           <div className="text-[13px]" style={{ color: "var(--tx-4)" }}>
@@ -133,15 +133,15 @@ const UpdaterModal = ({ current, phase, list, dl, installingV, onClose, onRechec
               <div key={rel.version} className="rounded-[11px]" style={{ border: `1px solid ${isLatest ? "var(--bd-strong)" : "var(--bd)"}`, padding: 13 }}>
                 {/* Encabezado de la fila */}
                 <div className="flex items-center gap-2">
-                  <span className="text-[14px] font-bold" style={{ fontFamily: "'Space Grotesk'", color: "var(--tx)" }}>
+                  <span className="text-[14px] font-bold" style={{ fontFamily: "var(--font-display)", color: "var(--tx)" }}>
                     v{rel.version}
                   </span>
                   {isLatest && (
-                    <span className="rounded-full px-2 py-[3px] text-[9.5px] font-bold tracking-wide" style={{ fontFamily: "'IBM Plex Mono'", background: LIME, color: INK }}>
+                    <span className="rounded-full px-2 py-[3px] text-[9.5px] font-bold tracking-wide" style={{ fontFamily: "var(--font-mono)", background: LIME, color: INK }}>
                       Última
                     </span>
                   )}
-                  <span className="ml-auto flex items-center gap-2.5 text-[10.5px]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-6)" }}>
+                  <span className="ml-auto flex items-center gap-2.5 text-[10.5px]" style={{ fontFamily: "var(--font-mono)", color: "var(--tx-6)" }}>
                     {rel.date && <span>{fmtDate(rel.date)}</span>}
                     {rel.size ? <span>{fmtSize(rel.size)}</span> : null}
                   </span>

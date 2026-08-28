@@ -151,7 +151,7 @@ const CompanySettings = () => {
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6" noValidate>
         {/* Datos generales */}
         <section className={cardClass}>
-          <h2 className="mb-4 font-display text-lg font-semibold text-(--tx)" style={{ fontFamily: "'Space Grotesk'" }}>Datos generales</h2>
+          <h2 className="mb-4 font-display text-lg font-semibold text-(--tx)" style={{ fontFamily: "var(--font-display)" }}>Datos generales</h2>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="sm:col-span-2">
               <FloatingField label="Nombre de la empresa" {...register("name")} />
@@ -170,7 +170,7 @@ const CompanySettings = () => {
 
         {/* Recibos */}
         <section className={cardClass}>
-          <h2 className="mb-4 font-display text-lg font-semibold text-(--tx)" style={{ fontFamily: "'Space Grotesk'" }}>Recibos</h2>
+          <h2 className="mb-4 font-display text-lg font-semibold text-(--tx)" style={{ fontFamily: "var(--font-display)" }}>Recibos</h2>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <FloatingField label="Prefijo de recibo" {...register("receiptPrefix")} />
@@ -183,7 +183,7 @@ const CompanySettings = () => {
 
         {/* Patentes (separador de display) */}
         <section className={cardClass}>
-          <h2 className="font-display text-lg font-semibold text-(--tx)" style={{ fontFamily: "'Space Grotesk'" }}>Patentes</h2>
+          <h2 className="font-display text-lg font-semibold text-(--tx)" style={{ fontFamily: "var(--font-display)" }}>Patentes</h2>
           <p className="mt-1 text-sm text-(--tx-4)">
             Separador para <span className="font-medium text-(--tx-3)">mostrar</span> las patentes. Es solo visual: la patente se guarda sin separadores.
           </p>
@@ -221,7 +221,7 @@ const CompanySettings = () => {
 
         {/* Cubiertas (prefijo del código interno · solo display) */}
         <section className={cardClass}>
-          <h2 className="font-display text-lg font-semibold text-(--tx)" style={{ fontFamily: "'Space Grotesk'" }}>Cubiertas</h2>
+          <h2 className="font-display text-lg font-semibold text-(--tx)" style={{ fontFamily: "var(--font-display)" }}>Cubiertas</h2>
           <p className="mt-1 text-sm text-(--tx-4)">
             Prefijo para <span className="font-medium text-(--tx-3)">mostrar</span> el código interno de las cubiertas. Es solo visual: el código se guarda como un número correlativo.
           </p>
@@ -246,7 +246,7 @@ const CompanySettings = () => {
 
         {/* Impresión del comprobante */}
         <section className={cardClass}>
-          <h2 className="font-display text-lg font-semibold text-(--tx)" style={{ fontFamily: "'Space Grotesk'" }}>Impresión</h2>
+          <h2 className="font-display text-lg font-semibold text-(--tx)" style={{ fontFamily: "var(--font-display)" }}>Impresión</h2>
           <p className="mt-1 text-sm text-(--tx-4)">
             Qué pasa con el comprobante cuando el operario confirma un movimiento.
           </p>
@@ -268,7 +268,7 @@ const CompanySettings = () => {
 
         {/* Estados de stock (ciclo de vida configurable) */}
         <section className={cardClass}>
-          <h2 className="font-display text-lg font-semibold text-(--tx)" style={{ fontFamily: "'Space Grotesk'" }}>Estados de stock</h2>
+          <h2 className="font-display text-lg font-semibold text-(--tx)" style={{ fontFamily: "var(--font-display)" }}>Estados de stock</h2>
           <p className="mt-1 text-sm text-(--tx-4)">
             El ciclo tiene estados fijos que siempre existen; podés ajustar su nombre y color. La cantidad de recapados define cuántos estados intermedios hay.
           </p>
@@ -284,7 +284,7 @@ const CompanySettings = () => {
                 className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-(--bd-strong) text-(--tx-3) transition hover:bg-(--hover) disabled:cursor-not-allowed disabled:opacity-40">
                 <RemoveRoundedIcon sx={{ fontSize: 17 }} />
               </button>
-              <div className="w-12 text-center font-display text-2xl font-bold text-(--tx)" style={{ fontFamily: "'Space Grotesk'" }}>{recapCount}</div>
+              <div className="w-12 text-center font-display text-2xl font-bold text-(--tx)" style={{ fontFamily: "var(--font-display)" }}>{recapCount}</div>
               <button type="button" onClick={addRecap} disabled={recapCount >= 10} title="Más"
                 className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-(--bd-strong) text-(--tx-3) transition hover:bg-(--hover) disabled:cursor-not-allowed disabled:opacity-40">
                 <AddRoundedIcon sx={{ fontSize: 17 }} />
@@ -355,7 +355,7 @@ const CompanySettings = () => {
         {/* Info del plan (no editable) */}
         {meta && (
           <section className={cardClass}>
-            <h2 className="mb-4 font-display text-lg font-semibold text-(--tx)" style={{ fontFamily: "'Space Grotesk'" }}>Plan</h2>
+            <h2 className="mb-4 font-display text-lg font-semibold text-(--tx)" style={{ fontFamily: "var(--font-display)" }}>Plan</h2>
             <div className="flex flex-wrap gap-6 text-sm">
               <div><p className="text-(--tx-5)">Plan</p><p className="mt-0.5 font-medium capitalize text-(--tx-2)">{meta.plan || "—"}</p></div>
               <div><p className="text-(--tx-5)">Estado</p><p className="mt-0.5 font-medium capitalize text-(--tx-2)">{meta.status || "—"}</p></div>

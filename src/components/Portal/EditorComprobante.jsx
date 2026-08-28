@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react"
 import { getCompany, updateCompany } from "@api/admin"
 import { showToast } from "@utils/toast"
+import { leerLogoComoDataURL, LOGO_TIPOS } from "@utils/logo"
 import { tint } from "@components/Operativa/status"
 import FileUploadRoundedIcon from "@mui/icons-material/FileUploadRounded"
 import DeleteOutlineRoundedIcon from "@mui/icons-material/DeleteOutlineRounded"
@@ -45,7 +46,7 @@ const Segmented = ({ options, value, onChange }) => (
     })}
   </div>
 )
-const sectionLabelStyle = { fontFamily: "'IBM Plex Mono'", color: "var(--tx-6)" }
+const sectionLabelStyle = { fontFamily: "var(--font-mono)", color: "var(--tx-6)" }
 const fieldLabelCls = "mb-[5px] block text-[11.5px] font-semibold"
 
 const EditorComprobante = () => {
@@ -85,12 +86,17 @@ const EditorComprobante = () => {
   const toggleSection = (key) => setDesign({ sections: d.sections.map((s) => (s.key === key ? { ...s, on: !s.on } : s)) })
 
   const pickLogo = () => fileRef.current?.click()
-  const onLogoFile = (e) => {
+  const onLogoFile = async (e) => {
     const f = e.target.files?.[0]
+    // Se limpia el input SIEMPRE: sin esto, volver a elegir el mismo archivo (después de
+    // corregirlo) no dispara el change y parece que la app se quedó colgada.
+    e.target.value = ""
     if (!f) return
-    const r = new FileReader()
-    r.onload = () => setDesign({ logo: r.result })
-    r.readAsDataURL(f)
+    try {
+      setDesign({ logo: await leerLogoComoDataURL(f) })
+    } catch (err) {
+      showToast("error", err.message)
+    }
   }
 
   const reset = () => {
@@ -127,12 +133,12 @@ const EditorComprobante = () => {
     // data-app-theme propio, y el sidebar + top bar del portal quedan visibles. El margin
     // negativo anula el padding del área de contenido (28/30) y ocupa el alto bajo la top
     // bar (74px), tal como el diseño.
-    <div className="flex flex-col overflow-hidden" style={{ margin: "-28px -30px", height: "calc(100vh - 74px)", background: "var(--bg)", color: "var(--tx)", fontFamily: "'IBM Plex Sans',system-ui,sans-serif" }}>
+    <div className="flex flex-col overflow-hidden" style={{ margin: "-28px -30px", height: "calc(100vh - 74px)", background: "var(--bg)", color: "var(--tx)", fontFamily: "var(--font-sans)" }}>
       {/* TOP BAR del editor */}
       <div className="flex h-[62px] flex-none items-center gap-3.5 px-6" style={{ background: "var(--sidebar)", borderBottom: "1px solid var(--bd-faint)" }}>
         <div style={{ lineHeight: 1.2 }}>
-          <div className="text-[16px] font-bold" style={{ fontFamily: "'Space Grotesk'", color: "var(--tx)" }}>Editor de comprobante</div>
-          <div className="text-[11.5px]" style={{ color: "var(--tx-5)", fontFamily: "'IBM Plex Mono'" }}>Diseño del comprobante impreso · A4</div>
+          <div className="text-[16px] font-bold" style={{ fontFamily: "var(--font-display)", color: "var(--tx)" }}>Editor de comprobante</div>
+          <div className="text-[11.5px]" style={{ color: "var(--tx-5)", fontFamily: "var(--font-mono)" }}>Diseño del comprobante impreso · A4</div>
         </div>
         <div className="ml-auto flex items-center gap-2.5">
           <button onClick={reset} className="h-10 rounded-[9px] px-[15px] text-[13.5px] font-semibold" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--tx)" }}>Restablecer</button>
@@ -143,7 +149,7 @@ const EditorComprobante = () => {
       <div className="flex min-h-0 flex-1">
         {/* CONTROLS */}
         <aside className="w-[384px] flex-none overflow-y-auto" style={{ background: "var(--elev)", borderRight: "1px solid var(--bd)" }}>
-          <input type="file" accept="image/*" ref={fileRef} onChange={onLogoFile} style={{ display: "none" }} />
+          <input type="file" accept={LOGO_TIPOS.join(",")} ref={fileRef} onChange={onLogoFile} style={{ display: "none" }} />
 
           {/* ENCABEZADO */}
           <div className="px-[22px] py-5" style={{ borderBottom: "1px solid var(--bd-faint)" }}>
@@ -154,8 +160,8 @@ const EditorComprobante = () => {
             <div className="flex flex-col gap-[11px]">
               <FloatingField label="Nombre de la empresa" value={empresa} onChange={(e) => setEmpresa(e.target.value)} />
               <div className="grid grid-cols-2 gap-[11px]">
-                <FloatingField label="CUIT" value={cuit} onChange={(e) => setCuit(e.target.value)} style={{ fontFamily: "'IBM Plex Mono'" }} />
-                <FloatingField label="Teléfono" value={telefono} onChange={(e) => setTelefono(e.target.value)} style={{ fontFamily: "'IBM Plex Mono'" }} />
+                <FloatingField label="CUIT" value={cuit} onChange={(e) => setCuit(e.target.value)} style={{ fontFamily: "var(--font-mono)" }} />
+                <FloatingField label="Teléfono" value={telefono} onChange={(e) => setTelefono(e.target.value)} style={{ fontFamily: "var(--font-mono)" }} />
               </div>
               <FloatingField label="Dirección" value={direccion} onChange={(e) => setDireccion(e.target.value)} />
             </div>
@@ -243,7 +249,7 @@ const EditorComprobante = () => {
         {/* PREVIEW */}
         <div className="flex-1 overflow-y-auto px-6 py-[34px]" style={{ background: "var(--hover)" }}>
           <div className="mx-auto" style={{ maxWidth: 520 }}>
-            <div className="mb-3.5 flex items-center gap-2 text-[11px]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-5)" }}>
+            <div className="mb-3.5 flex items-center gap-2 text-[11px]" style={{ fontFamily: "var(--font-mono)", color: "var(--tx-5)" }}>
               <span className="h-[7px] w-[7px] rounded-full" style={{ background: "var(--ink-lime)" }} />VISTA PREVIA · HOJA A4 · {d.duplicado ? "Original + Duplicado" : "Solo original"}
             </div>
             <div style={{ background: "#FFFFFF", borderRadius: 3, boxShadow: "var(--elev-3)", overflow: "hidden" }} dangerouslySetInnerHTML={{ __html: previewHtml }} />

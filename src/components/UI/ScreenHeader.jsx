@@ -25,7 +25,7 @@ const ScreenHeader = ({ title, search, primaryAction, secondaryAction, viewToggl
   return (
     <div className="sticky top-0 z-5 px-7 pb-4 pt-5" style={{ background: "var(--bg)", borderBottom: "1px solid var(--bd-faint)" }}>
       <div className="flex items-center gap-4">
-        <h1 className="text-[24px] font-bold tracking-[-.02em]" style={{ fontFamily: "'Space Grotesk'", color: "var(--tx)" }}>{title}</h1>
+        <h1 className="text-[24px] font-bold tracking-[-.02em]" style={{ fontFamily: "var(--font-display)", color: "var(--tx)" }}>{title}</h1>
         <div className="relative ml-2 flex-1" style={{ maxWidth: SEARCH_MAX }}>
           <span className="absolute left-[15px] top-1/2 -translate-y-1/2" style={{ color: "var(--tx-7)" }}>
             <SearchRoundedIcon sx={{ fontSize: 18 }} />
@@ -41,7 +41,7 @@ const ScreenHeader = ({ title, search, primaryAction, secondaryAction, viewToggl
             onBlur={(e) => (e.target.style.borderColor = "var(--bd)")}
           />
           {showShortcut && (
-            <span className="absolute right-[13px] top-1/2 -translate-y-1/2 rounded-[5px] px-[7px] py-[3px] text-[11px]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-5)", border: "1px solid var(--bd-strong)" }}>
+            <span className="absolute right-[13px] top-1/2 -translate-y-1/2 rounded-[5px] px-[7px] py-[3px] text-[11px]" style={{ fontFamily: "var(--font-mono)", color: "var(--tx-5)", border: "1px solid var(--bd-strong)" }}>
               {SHORTCUT_LABEL}
             </span>
           )}

@@ -4,19 +4,47 @@ import { showToast } from '@utils/toast'
 export const SettingsContext = createContext()
 const DEFAULT_STOCK_STATUSES = ["Nueva", "1er Recapado", "2do Recapado", "3er Recapado"]
 
+// Un único default para el layout del comprobante. Antes convivían dos ("fixed" acá,
+// "dynamic" en usePrint/useReprint), así que el comprobante podía salir con un layout
+// distinto al que mostraba la pantalla de Ajustes.
+export const DEFAULT_RECEIPT_LAYOUT = "fixed"
+
+const leerLocal = (clave, porDefecto) => {
+  try {
+    const guardado = localStorage.getItem(clave)
+    return guardado == null ? porDefecto : guardado
+  } catch {
+    return porDefecto
+  }
+}
+
 export const SettingsProvider = ({ children }) => {
-  const [receiptLayout, setReceiptLayoutState] = useState("fixed")
-  const [stockStatuses, setStockStatusesState] = useState(DEFAULT_STOCK_STATUSES)
+  // Lectura SÍNCRONA en el initializer: hacerlo en un efecto dejaba una ventana en la que
+  // imprimir usaba el default en vez de la preferencia guardada.
+  const [receiptLayout, setReceiptLayoutState] = useState(
+    () => leerLocal("receiptLayout", DEFAULT_RECEIPT_LAYOUT),
+  )
+  const [stockStatuses, setStockStatusesState] = useState(() => {
+    try {
+      const guardado = localStorage.getItem("stockStatuses")
+      return guardado ? JSON.parse(guardado) : DEFAULT_STOCK_STATUSES
+    } catch {
+      return DEFAULT_STOCK_STATUSES
+    }
+  })
 
+  // Persiste los defaults la primera vez, sin volver a tocar el estado.
   useEffect(() => {
-    const savedLayout = localStorage.getItem("receiptLayout")
-    const savedStatuses = localStorage.getItem("stockStatuses")
-
-    if (savedLayout) setReceiptLayoutState(savedLayout)
-    else localStorage.setItem("receiptLayout", "fixed")
-
-    if (savedStatuses) setStockStatusesState(JSON.parse(savedStatuses))
-    else localStorage.setItem("stockStatuses", JSON.stringify(DEFAULT_STOCK_STATUSES))
+    try {
+      if (localStorage.getItem("receiptLayout") == null) {
+        localStorage.setItem("receiptLayout", DEFAULT_RECEIPT_LAYOUT)
+      }
+      if (localStorage.getItem("stockStatuses") == null) {
+        localStorage.setItem("stockStatuses", JSON.stringify(DEFAULT_STOCK_STATUSES))
+      }
+    } catch {
+      // localStorage bloqueado (modo privado): los defaults en memoria alcanzan.
+    }
   }, [])
 
   const setReceiptLayout = (layout) => {

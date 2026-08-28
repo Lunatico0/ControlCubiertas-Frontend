@@ -70,13 +70,13 @@ const Login = () => {
   const onKey = (ev) => { if (ev.key === "Enter") doLogin() }
 
   return (
-    <div data-app-theme="dark" style={{ width: "100%", height: "100%", display: "flex", background: "#0A0C0D", color: "#fff", overflow: "hidden", textAlign: "left", fontFamily: "'IBM Plex Sans',system-ui,sans-serif" }}>
+    <div data-app-theme="dark" style={{ width: "100%", height: "100%", display: "flex", background: "#0A0C0D", color: "#fff", overflow: "hidden", textAlign: "left", fontFamily: "var(--font-sans)" }}>
       {/* Panel de marca — oculto en pantallas chicas */}
       <div className="hidden lg:flex" style={{ flex: 1.1, position: "relative", overflow: "hidden", background: "#070809", borderRight: "1px solid #181C1E", flexDirection: "column", padding: "44px 48px" }}>
         <div style={{ position: "relative", zIndex: 1 }}><BrandLogo variant="dark" height={50} /></div>
         <img src={tireOpsDark} alt="" style={{ position: "absolute", right: -180, top: "50%", transform: "translateY(-50%)", width: 640, height: "auto", opacity: 0.05, pointerEvents: "none" }} />
         <div style={{ position: "relative", zIndex: 1, flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", maxWidth: 420 }}>
-          <div style={{ fontFamily: "'Space Grotesk'", fontSize: 30, fontWeight: 700, lineHeight: 1.2, letterSpacing: "-.01em" }}>Cada cubierta,<br />bajo control.</div>
+          <div style={{ fontFamily: "var(--font-display)", fontSize: 30, fontWeight: 700, lineHeight: 1.2, letterSpacing: "-.01em" }}>Cada cubierta,<br />bajo control.</div>
           <div style={{ fontSize: "14.5px", color: "#8B9197", lineHeight: 1.6, marginTop: 12 }}>Trazabilidad completa del ciclo de vida: alta, montaje, recapados y descarte, con comprobante de cada movimiento.</div>
           <div style={{ display: "flex", gap: 18, marginTop: 26 }}>
             {[["Inventario vivo", "#C4ED2B"], ["Recapados", "#1FD0B4"], ["Flota completa", "#6E97F5"]].map(([label, dot]) => (
@@ -86,7 +86,7 @@ const Login = () => {
             ))}
           </div>
         </div>
-        {isElectron() && <div style={{ position: "relative", zIndex: 1, fontFamily: "'IBM Plex Mono'", fontSize: 11, color: "#5E646A" }}>{ver ? `v${ver} · ` : ""}TireOps</div>}
+        {isElectron() && <div style={{ position: "relative", zIndex: 1, fontFamily: "var(--font-mono)", fontSize: 11, color: "#5E646A" }}>{ver ? `v${ver} · ` : ""}TireOps</div>}
       </div>
 
       {/* Panel de formulario */}
@@ -95,7 +95,7 @@ const Login = () => {
           {step === "login" ? (
             <>
               <div style={{ marginBottom: 28 }}>
-                <h1 style={{ margin: 0, fontFamily: "'Space Grotesk'", fontSize: 26, fontWeight: 700 }}>Iniciar sesión</h1>
+                <h1 style={{ margin: 0, fontFamily: "var(--font-display)", fontSize: 26, fontWeight: 700 }}>Iniciar sesión</h1>
                 <p style={{ margin: "7px 0 0 0", fontSize: 14, color: "#8B9197" }}>Ingresá con tu cuenta de la empresa.</p>
               </div>
 
@@ -145,7 +145,7 @@ const Login = () => {
                   </div>
                 </div>
 
-                <button onClick={doLogin} disabled={loggingIn} style={{ width: "100%", height: 50, border: "none", background: LIME, color: "#0A0C0D", borderRadius: 13, fontSize: 15, fontWeight: 700, fontFamily: "'IBM Plex Sans'", cursor: loggingIn ? "default" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 10, marginTop: 4, opacity: loggingIn ? 0.75 : 1 }}>
+                <button onClick={doLogin} disabled={loggingIn} style={{ width: "100%", height: 50, border: "none", background: LIME, color: "#0A0C0D", borderRadius: 13, fontSize: 15, fontWeight: 700, fontFamily: "var(--font-sans)", cursor: loggingIn ? "default" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 10, marginTop: 4, opacity: loggingIn ? 0.75 : 1 }}>
                   {loggingIn && <span className="animate-spin" style={{ width: 17, height: 17, borderRadius: "50%", border: "2.5px solid rgba(10,12,13,.25)", borderTopColor: "#0A0C0D" }} />}
                   {loggingIn ? "Ingresando…" : "Ingresar"}
                 </button>
@@ -154,7 +154,7 @@ const Login = () => {
           ) : (
             <>
               <div style={{ marginBottom: 20 }}>
-                <h1 style={{ margin: 0, fontFamily: "'Space Grotesk'", fontSize: 24, fontWeight: 700 }}>Recuperar acceso</h1>
+                <h1 style={{ margin: 0, fontFamily: "var(--font-display)", fontSize: 24, fontWeight: 700 }}>Recuperar acceso</h1>
                 <p style={{ margin: "7px 0 0 0", fontSize: "13.5px", color: "#8B9197", lineHeight: 1.6 }}>Las contraseñas las gestiona el administrador de tu empresa.</p>
               </div>
               <div style={{ display: "flex", gap: 10, padding: "13px 15px", border: "1px solid #2A3033", borderRadius: 11, background: "#0C0E0F", marginBottom: 18 }}>
@@ -163,7 +163,7 @@ const Login = () => {
                 </span>
                 <span style={{ fontSize: 13, color: "#9AA0A4", lineHeight: 1.6 }}>Pedile a tu administrador que te genere una nueva desde <b style={{ color: "#D6D9D5" }}>Usuarios</b>. Te va a dar una contraseña temporal para tu próximo ingreso.</span>
               </div>
-              <button onClick={() => setStep("login")} style={{ width: "100%", height: 48, border: "1px solid #2A3033", background: "transparent", color: "#D6D9D5", borderRadius: 12, fontSize: "13.5px", fontWeight: 600, fontFamily: "'IBM Plex Sans'", cursor: "pointer" }}>Volver a iniciar sesión</button>
+              <button onClick={() => setStep("login")} style={{ width: "100%", height: 48, border: "1px solid #2A3033", background: "transparent", color: "#D6D9D5", borderRadius: 12, fontSize: "13.5px", fontWeight: 600, fontFamily: "var(--font-sans)", cursor: "pointer" }}>Volver a iniciar sesión</button>
             </>
           )}
         </div>

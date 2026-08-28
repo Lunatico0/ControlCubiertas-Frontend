@@ -107,7 +107,7 @@ const ConfigurarEjes = ({ onClose, vehicle }) => {
   }
 
   return (
-    <div data-app-theme={isDarkMode ? "dark" : "light"} className="fixed bottom-0 right-0 left-64 z-60 flex flex-col" style={{ top: isElectron() ? 38 : 0, background: "var(--bg)", color: "var(--tx)", fontFamily: "'IBM Plex Sans',system-ui,sans-serif", borderLeft: "1px solid var(--bd-faint)" }}>
+    <div data-app-theme={isDarkMode ? "dark" : "light"} className="fixed bottom-0 right-0 left-64 z-60 flex flex-col" style={{ top: isElectron() ? 38 : 0, background: "var(--bg)", color: "var(--tx)", fontFamily: "var(--font-sans)", borderLeft: "1px solid var(--bd-faint)" }}>
       {view === "list" ? (
         /* ===================== LISTA DE PENDIENTES ===================== */
         <>
@@ -117,7 +117,7 @@ const ConfigurarEjes = ({ onClose, vehicle }) => {
                 <ArrowBackRoundedIcon sx={{ fontSize: 18 }} />
               </button>
               <div>
-                <h1 className="m-0 text-[21px] font-bold" style={{ fontFamily: "'Space Grotesk'", color: "var(--tx)" }}>Configurar ejes</h1>
+                <h1 className="m-0 text-[21px] font-bold" style={{ fontFamily: "var(--font-display)", color: "var(--tx)" }}>Configurar ejes</h1>
                 <p className="mt-1 text-[13px]" style={{ color: "var(--tx-4)" }}>Vehículos sin esquema de ejes. Definí su configuración para habilitar el montaje de cubiertas.</p>
               </div>
               {pending.length > 0 && (
@@ -134,7 +134,7 @@ const ConfigurarEjes = ({ onClose, vehicle }) => {
                 <div className="mx-auto mb-4 flex h-[58px] w-[58px] items-center justify-center rounded-[14px]" style={{ background: tint("var(--ink-teal)", 14), color: "var(--ink-teal)" }}>
                   <CheckRoundedIcon sx={{ fontSize: 28 }} />
                 </div>
-                <div className="text-[18px] font-semibold" style={{ fontFamily: "'Space Grotesk'", color: "var(--tx)" }}>Todo configurado</div>
+                <div className="text-[18px] font-semibold" style={{ fontFamily: "var(--font-display)", color: "var(--tx)" }}>Todo configurado</div>
                 <div className="mt-1.5 text-[13px]" style={{ color: "var(--tx-4)" }}>No quedan vehículos pendientes de configuración de ejes.</div>
               </div>
             ) : (
@@ -144,8 +144,8 @@ const ConfigurarEjes = ({ onClose, vehicle }) => {
                     <div className="flex items-start gap-3">
                       <span className="flex h-[42px] w-[42px] flex-none items-center justify-center rounded-[11px]" style={{ background: tint("var(--ink-blue)", 16), color: "var(--ink-blue)" }}><LocalShippingOutlinedIcon sx={{ fontSize: 22 }} /></span>
                       <div className="min-w-0 flex-1">
-                        <div className="text-[18px] font-bold" style={{ fontFamily: "'Space Grotesk'", color: "var(--tx)" }}>{v.mobile || "—"}</div>
-                        <div className="mt-0.5 text-[12px]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-5)" }}>{v.licensePlate || "—"} · {v.brand || "—"}</div>
+                        <div className="text-[18px] font-bold" style={{ fontFamily: "var(--font-display)", color: "var(--tx)" }}>{v.mobile || "—"}</div>
+                        <div className="mt-0.5 text-[12px]" style={{ fontFamily: "var(--font-mono)", color: "var(--tx-5)" }}>{v.licensePlate || "—"} · {v.brand || "—"}</div>
                       </div>
                     </div>
                     <Callout Icon={ReportProblemOutlinedIcon} tone="var(--ink-orange)" dashed className="">
@@ -155,7 +155,7 @@ const ConfigurarEjes = ({ onClose, vehicle }) => {
                       <span className="inline-flex items-center gap-[7px] text-[12.5px] font-semibold" style={{ color: v.cubiertas === 0 ? "var(--ink-orange)" : "var(--ink-teal)" }}>
                         <TripOriginOutlinedIcon sx={{ fontSize: 15 }} />{v.cubiertas} {v.cubiertas === 1 ? "cubierta" : "cubiertas"}
                       </span>
-                      <span className="text-[12.5px]" style={{ color: "var(--tx-5)", fontFamily: "'IBM Plex Mono'" }}>{fmtKm(v.kilometers)}</span>
+                      <span className="text-[12.5px]" style={{ color: "var(--tx-5)", fontFamily: "var(--font-mono)" }}>{fmtKm(v.kilometers)}</span>
                       <Button variant="lime" onClick={() => openEditor(v)} className="ml-auto h-10 text-[13.5px]" style={{ background: "#C4ED2B", color: "#0A0C0D" }}>
                         Configurar ejes <ArrowForwardRoundedIcon sx={{ fontSize: 15 }} />
                       </Button>
@@ -174,8 +174,8 @@ const ConfigurarEjes = ({ onClose, vehicle }) => {
               <ArrowBackRoundedIcon sx={{ fontSize: 18 }} />
             </button>
             <div style={{ lineHeight: 1.2 }}>
-              <div className="text-[17px] font-bold" style={{ fontFamily: "'Space Grotesk'", color: "var(--tx)" }}>Configurar ejes · {sel?.mobile}</div>
-              <div className="text-[11.5px]" style={{ color: "var(--tx-5)", fontFamily: "'IBM Plex Mono'" }}>{sel?.licensePlate} · {sel?.brand}</div>
+              <div className="text-[17px] font-bold" style={{ fontFamily: "var(--font-display)", color: "var(--tx)" }}>Configurar ejes · {sel?.mobile}</div>
+              <div className="text-[11.5px]" style={{ color: "var(--tx-5)", fontFamily: "var(--font-mono)" }}>{sel?.licensePlate} · {sel?.brand}</div>
             </div>
             <div className="ml-auto flex items-center gap-2.5">
               <button onClick={backToList} className="h-10 rounded-[9px] px-[15px] text-[13.5px] font-semibold" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--tx)" }}>Cancelar</button>

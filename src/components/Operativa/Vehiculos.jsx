@@ -145,26 +145,26 @@ const Vehiculos = ({ onNavigate, intent }) => {
           <p className="text-[13px]" style={{ color: "var(--tx-5)" }}>Cargando vehículos…</p>
         ) : fleet.length === 0 ? (
           <div className="py-16 text-center">
-            <div className="text-[17px] font-semibold" style={{ fontFamily: "'Space Grotesk'", color: "var(--tx)" }}>Sin resultados</div>
+            <div className="text-[17px] font-semibold" style={{ fontFamily: "var(--font-display)", color: "var(--tx)" }}>Sin resultados</div>
             <div className="mt-1.5 text-[13px]" style={{ color: "var(--tx-5)" }}>No hay vehículos que coincidan.</div>
           </div>
         ) : vview === "table" ? (
           /* ===== TABLA ===== */
           <div className="overflow-hidden rounded-[13px]" style={{ border: "1px solid var(--bd)", background: "var(--card)" }}>
-            <div className="grid gap-3 px-[18px] py-3 text-[10.5px] font-semibold uppercase tracking-wider" style={{ gridTemplateColumns: TABLE_COLS, fontFamily: "'IBM Plex Mono'", background: "var(--elev)", borderBottom: "1px solid var(--bd)", color: "var(--tx-6)" }}>
+            <div className="grid gap-3 px-[18px] py-3 text-[10.5px] font-semibold uppercase tracking-wider" style={{ gridTemplateColumns: TABLE_COLS, fontFamily: "var(--font-mono)", background: "var(--elev)", borderBottom: "1px solid var(--bd)", color: "var(--tx-6)" }}>
               <div>Móvil</div><div>Patente</div><div>Tipo</div><div>Cubiertas</div><div className="text-right">Km</div>
             </div>
             {pag.currentItems.map(({ v, countLabel, countColor, tipoColor, tipoBg, kmLabel }) => (
               <div key={v._id} {...clickable(() => open(v))} aria-label={`Vehículo ${v.mobile}`} className="grid cursor-pointer items-center gap-3 px-[18px] py-[13px]" style={{ gridTemplateColumns: TABLE_COLS, borderBottom: "1px solid var(--bd-faint)" }}>
                 <div className="flex min-w-0 items-center gap-[11px]">
                   <span className="flex h-8 w-8 flex-none items-center justify-center rounded-lg" style={{ background: tipoBg, color: tipoColor }}><VehTypeIcon size={17} /></span>
-                  <span className="text-[14.5px] font-bold" style={{ fontFamily: "'Space Grotesk'", color: "var(--tx)" }}>{v.mobile || "—"}</span>
+                  <span className="text-[14.5px] font-bold" style={{ fontFamily: "var(--font-display)", color: "var(--tx)" }}>{v.mobile || "—"}</span>
                 </div>
-                <div className="text-[13px]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-2)" }}>{formatPlate(v.licensePlate, data.plateSep) || "—"}</div>
+                <div className="text-[13px]" style={{ fontFamily: "var(--font-mono)", color: "var(--tx-2)" }}>{formatPlate(v.licensePlate, data.plateSep) || "—"}</div>
                 <div>{v.type && <Pill style={{ color: tipoColor, background: tipoBg }}>{v.type}</Pill>}</div>
                 <div className="flex items-center gap-[7px] text-[13px] font-semibold" style={{ color: countColor }}><TripOriginOutlinedIcon sx={{ fontSize: 14 }} />{countLabel}</div>
                 <div className="flex items-center justify-end">
-                  <span className="text-[13px] font-semibold" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx)" }}>{kmLabel}</span>
+                  <span className="text-[13px] font-semibold" style={{ fontFamily: "var(--font-mono)", color: "var(--tx)" }}>{kmLabel}</span>
                 </div>
               </div>
             ))}
@@ -179,10 +179,10 @@ const Vehiculos = ({ onNavigate, intent }) => {
                   <span className="flex h-[42px] w-[42px] flex-none items-center justify-center rounded-[11px]" style={{ background: tipoBg, color: tipoColor }}><VehTypeIcon /></span>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
-                      <span className="text-[18px] font-bold" style={{ fontFamily: "'Space Grotesk'", color: "var(--tx)" }}>{v.mobile || "—"}</span>
+                      <span className="text-[18px] font-bold" style={{ fontFamily: "var(--font-display)", color: "var(--tx)" }}>{v.mobile || "—"}</span>
                       {v.type && <Pill className="px-[9px] py-[2px] text-[10.5px] font-semibold" style={{ color: tipoColor, background: tipoBg }}>{v.type}</Pill>}
                     </div>
-                    <div className="mt-0.5 text-[12px]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-5)" }}>{formatPlate(v.licensePlate, data.plateSep) || "—"} · {v.brand || "—"}</div>
+                    <div className="mt-0.5 text-[12px]" style={{ fontFamily: "var(--font-mono)", color: "var(--tx-5)" }}>{formatPlate(v.licensePlate, data.plateSep) || "—"} · {v.brand || "—"}</div>
                   </div>
                   <span className="inline-flex flex-none" style={{ color: "var(--tx-6)" }}><ChevronRightRoundedIcon sx={{ fontSize: 18 }} /></span>
                 </div>
@@ -195,7 +195,7 @@ const Vehiculos = ({ onNavigate, intent }) => {
                         <div className="flex h-[30px] w-full items-center justify-center rounded-[7px]" style={{ background: p.empty ? "var(--input)" : p.bg, border: p.empty ? "1.5px dashed var(--bd-strong)" : "1.5px solid transparent" }}>
                           <span className="rounded-full" style={{ width: 9, height: 9, background: p.empty ? "transparent" : p.dot, border: p.empty ? "1.5px solid var(--bd-strong)" : "none" }} />
                         </div>
-                        <span className="text-[9px]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-6)" }}>{p.label}</span>
+                        <span className="text-[9px]" style={{ fontFamily: "var(--font-mono)", color: "var(--tx-6)" }}>{p.label}</span>
                       </div>
                     ))}
                   </div>
@@ -208,7 +208,7 @@ const Vehiculos = ({ onNavigate, intent }) => {
                 {/* footer — pineado al fondo (mt-auto): el espacio sobrante queda entre las cubiertas y el divider */}
                 <div className="mt-auto flex items-center gap-[14px] border-t pt-[13px] text-[12.5px]" style={{ borderColor: "var(--bd-soft)" }}>
                   <span className="inline-flex items-center gap-[7px] font-semibold" style={{ color: countColor }}><TripOriginOutlinedIcon sx={{ fontSize: 15 }} />{countLabel}</span>
-                  <span className="ml-auto" style={{ color: "var(--tx-5)", fontFamily: "'IBM Plex Mono'" }}>{kmLabel}</span>
+                  <span className="ml-auto" style={{ color: "var(--tx-5)", fontFamily: "var(--font-mono)" }}>{kmLabel}</span>
                 </div>
               </div>
             ))}

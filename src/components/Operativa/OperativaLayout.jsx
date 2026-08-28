@@ -61,7 +61,7 @@ const OperativaLayout = () => {
     <div
       data-app-theme={isDarkMode ? "dark" : "light"}
       className="flex h-full w-full overflow-hidden text-left"
-      style={{ background: "var(--bg)", color: "var(--tx)", fontFamily: "'IBM Plex Sans',system-ui,sans-serif" }}
+      style={{ background: "var(--bg)", color: "var(--tx)", fontFamily: "var(--font-sans)" }}
     >
       {/* ============ SIDEBAR ============ */}
       <AppSidebar
@@ -116,7 +116,7 @@ const OperativaLayout = () => {
             <Vehiculos onNavigate={navigate} intent={intent} />
           ) : (
             <div className="mx-auto flex h-full max-w-[900px] flex-col items-center justify-center gap-3 p-8 text-center">
-              <div className="text-[22px] font-bold" style={{ fontFamily: "'Space Grotesk'", color: "var(--tx)" }}>
+              <div className="text-[22px] font-bold" style={{ fontFamily: "var(--font-display)", color: "var(--tx)" }}>
                 {NAV.find((n) => n.key === active)?.label}
               </div>
               <p style={{ color: "var(--tx-4)" }}>Pantalla en construcción — próximo hito del rediseño.</p>

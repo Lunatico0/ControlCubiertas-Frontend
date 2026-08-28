@@ -57,8 +57,8 @@ const EditarVehiculo = ({ vehicle, onClose, onSaved }) => {
     <Drawer onClose={onClose} maxWidth="440px" onSubmit={() => !submitting && submit()}>
         <div className="flex items-center justify-between gap-3 p-5" style={{ borderBottom: "1px solid var(--bd-soft)" }}>
           <div>
-            <h2 className="text-[20px] font-bold" style={{ fontFamily: "'Space Grotesk'", color: "var(--tx)" }}>Editar vehículo</h2>
-            <div className="mt-0.5 text-[11.5px]" style={{ color: "var(--tx-5)", fontFamily: "'IBM Plex Mono'" }}>Datos · los ejes se editan aparte</div>
+            <h2 className="text-[20px] font-bold" style={{ fontFamily: "var(--font-display)", color: "var(--tx)" }}>Editar vehículo</h2>
+            <div className="mt-0.5 text-[11.5px]" style={{ color: "var(--tx-5)", fontFamily: "var(--font-mono)" }}>Datos · los ejes se editan aparte</div>
           </div>
           <button onClick={onClose} className="rounded-[7px] p-2" style={{ color: "var(--tx-5)" }} title="Cerrar">
             <CloseRoundedIcon sx={{ fontSize: 20 }} />
@@ -68,7 +68,7 @@ const EditarVehiculo = ({ vehicle, onClose, onSaved }) => {
         <div className="flex-1 overflow-auto p-5">
           <div className="mb-3 flex flex-col gap-3.5">
             <FloatingField label="Móvil / Identificador" required error={errors.mobile} value={form.mobile} onChange={set("mobile")} />
-            <FloatingField label="Patente" required error={errors.licensePlate} value={formatPlate(form.licensePlate, data.plateSep)} onChange={set("licensePlate")} style={{ fontFamily: "'IBM Plex Mono'", textTransform: "uppercase" }} />
+            <FloatingField label="Patente" required error={errors.licensePlate} value={formatPlate(form.licensePlate, data.plateSep)} onChange={set("licensePlate")} style={{ fontFamily: "var(--font-mono)", textTransform: "uppercase" }} />
             <FloatingField label="Marca" value={form.brand} onChange={set("brand")} />
           </div>
           <Callout Icon={InfoOutlinedIcon} tone="var(--ink-blue)" className="mb-3">

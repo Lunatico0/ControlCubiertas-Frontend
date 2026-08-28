@@ -15,14 +15,14 @@ const NotFound = () => {
     <div
       data-app-theme={isDarkMode ? "dark" : "light"}
       className="flex h-full w-full flex-col items-center justify-center gap-6 px-8 text-center"
-      style={{ background: "var(--bg)", color: "var(--tx)", fontFamily: "'IBM Plex Sans',system-ui,sans-serif" }}
+      style={{ background: "var(--bg)", color: "var(--tx)", fontFamily: "var(--font-sans)" }}
     >
       <BrandLogo height={64} />
 
       <div className="flex flex-col items-center gap-2">
         <div
           className="text-[88px] font-bold leading-none"
-          style={{ fontFamily: "'Space Grotesk'", color: "var(--ink-lime)" }}
+          style={{ fontFamily: "var(--font-display)", color: "var(--ink-lime)" }}
         >
           404
         </div>

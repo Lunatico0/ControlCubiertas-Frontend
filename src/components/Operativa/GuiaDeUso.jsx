@@ -107,7 +107,7 @@ const GuiaDeUso = () => (
     <div className="mt-3.5 flex flex-col gap-2">
       {[["Ctrl + K", "Ir al buscador de cubiertas"], ["Esc", "Cerrar paneles y ventanas abiertas"]].map(([k, d]) => (
         <div key={k} className="flex items-center gap-3.5 rounded-[9px] px-3.5 py-[11px]" style={{ border: "1px solid var(--bd)", background: "var(--card)" }}>
-          <span style={{ fontFamily: "'IBM Plex Mono'", fontSize: 13, background: "var(--input)", border: "1px solid var(--bd-strong)", borderRadius: 6, padding: "3px 11px", color: "var(--ink-lime)" }}>{k}</span>
+          <span style={{ fontFamily: "var(--font-mono)", fontSize: 13, background: "var(--input)", border: "1px solid var(--bd-strong)", borderRadius: 6, padding: "3px 11px", color: "var(--ink-lime)" }}>{k}</span>
           <span className="text-[14px]" style={{ color: "var(--tx-2)" }}>{d}</span>
         </div>
       ))}

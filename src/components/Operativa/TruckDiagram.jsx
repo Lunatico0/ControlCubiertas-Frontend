@@ -12,7 +12,7 @@ import MonoLabel from "@components/UI/MonoLabel"
 const Wheel = ({ label }) => (
   <div className="relative" style={{ width: 17, height: 34 }}>
     <div className="h-[34px] w-[17px] rounded-[5px]" style={{ border: "2px solid var(--bd-hover)", background: "var(--elev)" }} />
-    {label && <span className="absolute left-1/2 -translate-x-1/2 text-[8px]" style={{ top: 38, fontFamily: "'IBM Plex Mono'", color: "var(--tx-7)" }}>{label}</span>}
+    {label && <span className="absolute left-1/2 -translate-x-1/2 text-[8px]" style={{ top: 38, fontFamily: "var(--font-mono)", color: "var(--tx-7)" }}>{label}</span>}
   </div>
 )
 
@@ -70,12 +70,12 @@ const TruckDiagram = ({
     <div className={`${statsMarginClass} flex items-center gap-2.5 rounded-[11px] px-4 py-[11px]`} style={{ border: "1px solid var(--bd)", background: "var(--elev)" }}>
       <span className="flex h-[30px] w-[30px] flex-none items-center justify-center rounded-lg" style={{ background: tint("var(--ink-lime)", 13), color: "var(--ink-lime)" }}><TripOriginOutlinedIcon sx={{ fontSize: 17 }} /></span>
       <div style={{ lineHeight: 1.2 }}>
-        <div className="text-[18px] font-bold" style={{ fontFamily: "'Space Grotesk'", color: "var(--tx)" }}>{total}</div>
+        <div className="text-[18px] font-bold" style={{ fontFamily: "var(--font-display)", color: "var(--tx)" }}>{total}</div>
         <div className="text-[11.5px]" style={{ color: "var(--tx-4)" }}>{positionsLabel}</div>
       </div>
       <div className="mx-1 h-[30px] w-px" style={{ background: "var(--bd)" }} />
       <div style={{ lineHeight: 1.2 }}>
-        <div className="text-[18px] font-bold" style={{ fontFamily: "'Space Grotesk'", color: "var(--tx)" }}>{axles.length}</div>
+        <div className="text-[18px] font-bold" style={{ fontFamily: "var(--font-display)", color: "var(--tx)" }}>{axles.length}</div>
         <div className="text-[11.5px]" style={{ color: "var(--tx-4)" }}>ejes</div>
       </div>
     </div>

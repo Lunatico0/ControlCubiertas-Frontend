@@ -1,7 +1,6 @@
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 import TireField from "./fields/TireField"
-import { formatOrderNumber } from "@utils/orderNumber"
 import { input } from "@utils/tokens"
 import Button from "@components/UI/Button"
 import Spinner from "@components/UI/Spinner"
@@ -83,10 +82,8 @@ const TireForm = ({
   // Función para manejar el envío del formulario
   const handleFormSubmit = async (data) => {
     try {
-      // Si hay orderNumber, formatearlo antes de enviar
-      if (data.orderNumber) {
-        data.orderNumber = formatOrderNumber(data.orderNumber)
-      }
+      // El formateo del número de orden vive en la capa de API (@api/tires): así lo aplican
+      // TODOS los caminos, incluida la operativa /op, y no sólo este formulario.
       await onSubmit(data)
     } catch (error) {
       console.error("Error en envío del formulario:", error)

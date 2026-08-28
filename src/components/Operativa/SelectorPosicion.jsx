@@ -45,7 +45,7 @@ const Rueda = ({ pos, seleccionada, onSelect }) => {
           border: `2px solid ${borde}`, background: fondo,
           cursor: ocupada ? "not-allowed" : "pointer",
           display: "flex", alignItems: "center", justifyContent: "center",
-          fontFamily: "'IBM Plex Mono'", fontSize: 9, fontWeight: 600,
+          fontFamily: "var(--font-mono)", fontSize: 9, fontWeight: 600,
           color: seleccionada ? "var(--ink-lime)" : ocupada ? "var(--tx-7)" : "var(--tx-4)",
           padding: 0,
         }}
@@ -54,7 +54,7 @@ const Rueda = ({ pos, seleccionada, onSelect }) => {
       </button>
       {/* La cubierta que ocupa el lugar: era lo mejor de la versión vieja y se mantiene. */}
       {ocupada && (
-        <span className="text-[8.5px]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-7)" }}>#{pos.tire.code}</span>
+        <span className="text-[8.5px]" style={{ fontFamily: "var(--font-mono)", color: "var(--tx-7)" }}>#{pos.tire.code}</span>
       )}
     </div>
   )
@@ -70,7 +70,7 @@ const SelectorPosicion = ({ positions = [], value, onChange }) => {
   return (
     <div className="rounded-[11px] px-3 py-3.5" style={{ border: "1px solid var(--bd)", background: "var(--input)" }}>
       <div className="mb-2 flex flex-col items-center gap-0.5">
-        <span className="text-[9.5px] tracking-[.14em]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-6)" }}>FRENTE</span>
+        <span className="text-[9.5px] tracking-[.14em]" style={{ fontFamily: "var(--font-mono)", color: "var(--tx-6)" }}>FRENTE</span>
         <ArrowUpwardRoundedIcon sx={{ fontSize: 14 }} style={{ color: "var(--tx-7)" }} />
       </div>
 
@@ -86,7 +86,7 @@ const SelectorPosicion = ({ positions = [], value, onChange }) => {
               {/* El eje: la barra que une las dos mitades, con su número */}
               <div className="mt-[19px] flex items-center">
                 <div style={{ height: 5, width: 30, background: "var(--bd-strong)", borderRadius: 3 }} />
-                <span className="px-1 text-[9px]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-7)" }}>E{n}</span>
+                <span className="px-1 text-[9px]" style={{ fontFamily: "var(--font-mono)", color: "var(--tx-7)" }}>E{n}</span>
                 <div style={{ height: 5, width: 30, background: "var(--bd-strong)", borderRadius: 3 }} />
               </div>
               <div className="flex gap-1">{der.map((p) => <Rueda key={p.code} pos={p} seleccionada={p.code === value} onSelect={onChange} />)}</div>
@@ -97,7 +97,7 @@ const SelectorPosicion = ({ positions = [], value, onChange }) => {
 
       <div className="mt-3.5 border-t pt-2.5 text-center text-[11.5px]" style={{ borderColor: "var(--bd-soft)", color: "var(--tx-5)" }}>
         {elegida ? (
-          <>Elegiste <b style={{ fontFamily: "'IBM Plex Mono'", color: "var(--ink-lime)" }}>{elegida.code}</b> · {elegida.label || "posición libre"}</>
+          <>Elegiste <b style={{ fontFamily: "var(--font-mono)", color: "var(--ink-lime)" }}>{elegida.code}</b> · {elegida.label || "posición libre"}</>
         ) : (
           <>Tocá una rueda libre para elegir la posición · {libres} {libres === 1 ? "libre" : "libres"}</>
         )}

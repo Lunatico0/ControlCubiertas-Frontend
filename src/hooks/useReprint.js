@@ -1,13 +1,15 @@
 import { useCallback } from "react"
 import { showToast } from "@utils/toast"
 import usePrintEngine from "./usePrintEngine"
+import useSettings from "./useSettings"
 import { buildReprintData } from "@utils/print-data"
 import { generateReceiptHTML } from "@utils/receipt-html"
 import { getCompanyCached } from "@api/company"
 
 export const useReprint = () => {
   const { printHtml, isPrinting } = usePrintEngine()
-  const layoutMode = localStorage.getItem("receiptLayout") || "dynamic";
+  // Misma fuente que usePrint: el contexto de ajustes.
+  const { receiptLayout: layoutMode } = useSettings()
 
 
   const execute = useCallback(
@@ -34,5 +36,5 @@ export const useReprint = () => {
     [printHtml],
   )
 
-  return { execute, isPrinting }
+  return { execute, isPrinting, layoutMode }
 }

@@ -42,11 +42,11 @@ const AxleEditor = ({
           const on = matchedKey === k
           return (
             <button key={k} onClick={applyPreset(k)} className="flex min-w-[104px] flex-col items-start gap-0.5 rounded-[10px] px-[13px] py-2.5" style={{ border: `1px solid ${on ? "var(--ink-lime)" : "var(--bd)"}`, background: on ? tint("var(--ink-lime)", 8) : "var(--input)" }}>
-              <span className="flex items-center gap-1.5 text-[13px] font-bold" style={{ fontFamily: "'Space Grotesk'", color: on ? "var(--ink-lime)" : "var(--tx)" }}>
+              <span className="flex items-center gap-1.5 text-[13px] font-bold" style={{ fontFamily: "var(--font-display)", color: on ? "var(--ink-lime)" : "var(--tx)" }}>
                 {p.label}
-                {p.custom && <Pill className="px-1.5 py-px text-[8.5px] font-semibold" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--ink-purple)", background: tint("var(--ink-purple)", 16) }}>CUSTOM</Pill>}
+                {p.custom && <Pill className="px-1.5 py-px text-[8.5px] font-semibold" style={{ fontFamily: "var(--font-mono)", color: "var(--ink-purple)", background: tint("var(--ink-purple)", 16) }}>CUSTOM</Pill>}
               </span>
-              <span className="text-[10.5px]" style={{ fontFamily: "'IBM Plex Mono'", color: on ? "var(--ink-lime)" : "var(--tx-5)" }}>{tiresOf(p.axles)} cubiertas</span>
+              <span className="text-[10.5px]" style={{ fontFamily: "var(--font-mono)", color: on ? "var(--ink-lime)" : "var(--tx-5)" }}>{tiresOf(p.axles)} cubiertas</span>
             </button>
           )
         })}
@@ -68,7 +68,7 @@ const AxleEditor = ({
     <div className="px-6 pb-7 pt-[22px]">
       <div className="mb-3.5 flex items-center">
         <MonoLabel className="text-[10px] tracking-[.12em]" style={{ color: "var(--tx-6)" }}>EJES ({axles.length})</MonoLabel>
-        <span className="ml-auto text-[11.5px]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--ink-lime)" }}>{total} cubiertas</span>
+        <span className="ml-auto text-[11.5px]" style={{ fontFamily: "var(--font-mono)", color: "var(--ink-lime)" }}>{total} cubiertas</span>
       </div>
       <div className="flex flex-col gap-[9px]">
         {axles.map((t, i) => {
@@ -80,7 +80,7 @@ const AxleEditor = ({
           const sub = (i === 0 ? "Dirección · " : "") + (moto ? "Rueda única (1 cubierta)" : dual ? "Dual (4 cubiertas)" : "Simple (2 cubiertas)")
           return (
             <div key={i} className="flex items-center gap-[11px] rounded-[10px] px-[13px] py-[11px]" style={{ border: `1px solid ${locked ? tint("var(--ink-orange)", 35) : "var(--bd)"}`, background: locked ? tint("var(--ink-orange)", 7) : "var(--input)" }}>
-              <span className="flex h-[30px] w-[30px] flex-none items-center justify-center rounded-[7px] text-[12px] font-semibold" style={{ background: "var(--bd-2)", fontFamily: "'IBM Plex Mono'", color: "var(--tx-2)" }}>{i + 1}</span>
+              <span className="flex h-[30px] w-[30px] flex-none items-center justify-center rounded-[7px] text-[12px] font-semibold" style={{ background: "var(--bd-2)", fontFamily: "var(--font-mono)", color: "var(--tx-2)" }}>{i + 1}</span>
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-1.5 text-[13px] font-semibold" style={{ color: "var(--tx)" }}>Eje {i + 1}{locked && <LockOutlinedIcon sx={{ fontSize: 13, color: "var(--ink-orange)" }} />}</div>
                 <div className="text-[11px]" style={{ color: locked ? "var(--ink-orange)" : "var(--tx-5)" }}>{locked ? "Cubierta montada — desasigná para reconfigurar" : sub}</div>

@@ -1,4 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from "react"
+import { FUENTES_CSS } from "@utils/fonts"
 
 // LO QUE ESTE MOTOR PUEDE Y NO PUEDE SABER
 //
@@ -47,9 +48,9 @@ const usePrintEngine = () => {
               <title>${title}</title>
               <meta charset="UTF-8" />
               <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-              <link rel="preconnect" href="https://fonts.googleapis.com" />
-              <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-              <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+              <!-- Fuentes del BUNDLE, no del CDN: el comprobante tiene que salir igual sin
+                   internet (ver @utils/fonts). -->
+              <style>${FUENTES_CSS}</style>
             </head>
             <body>
               <div id="print-root"><div class="receipt-container">${htmlContent}</div></div>

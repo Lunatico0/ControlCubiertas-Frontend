@@ -58,7 +58,7 @@ const DesktopDownload = () => {
 
   return (
     <section className="mt-6">
-      <h2 className="mb-3 font-display text-lg font-semibold" style={{ color: "var(--tx)", fontFamily: "'Space Grotesk'" }}>App de escritorio</h2>
+      <h2 className="mb-3 font-display text-lg font-semibold" style={{ color: "var(--tx)", fontFamily: "var(--font-display)" }}>App de escritorio</h2>
       <div className="flex flex-col items-start gap-4 rounded-xl p-5 sm:flex-row sm:items-center" style={{ background: "var(--card)", border: "1px solid var(--bd)" }}>
         <span className="grid h-11 w-11 shrink-0 place-items-center rounded-lg" style={{ background: tintBg("var(--ink-lime)", 12), color: "var(--ink-lime)" }}>
           <DesktopWindowsOutlinedIcon />

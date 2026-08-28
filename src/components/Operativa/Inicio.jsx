@@ -160,7 +160,7 @@ const Inicio = ({ onNavigate }) => {
           onFocus={(e) => (e.target.style.borderColor = "var(--ink-lime)")}
           onBlur={(e) => { e.target.style.borderColor = "var(--bd)"; setAbierto(false) }}
         />
-        <span className="pointer-events-none absolute right-[18px] top-1/2 -translate-y-1/2 rounded-md px-2 py-1 text-[12px]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-5)", border: "1px solid var(--bd-strong)" }}>Ctrl K</span>
+        <span className="pointer-events-none absolute right-[18px] top-1/2 -translate-y-1/2 rounded-md px-2 py-1 text-[12px]" style={{ fontFamily: "var(--font-mono)", color: "var(--tx-5)", border: "1px solid var(--bd-strong)" }}>Ctrl K</span>
 
         {desplegado && (
           <ul
@@ -184,7 +184,7 @@ const Inicio = ({ onNavigate }) => {
                     className="flex w-full items-center gap-3 px-5 py-2.5 text-left text-[15px] transition"
                     style={{ background: i === activo ? "var(--bg-2)" : "transparent", color: "var(--tx)" }}
                   >
-                    <span style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-4)" }}>
+                    <span style={{ fontFamily: "var(--font-mono)", color: "var(--tx-4)" }}>
                       #{formatTireCode(t.code, data?.tireCodePrefix)}
                     </span>
                     <span className="truncate">{t.brand || "Sin marca"}</span>
@@ -215,7 +215,7 @@ const Inicio = ({ onNavigate }) => {
               {t.icon}
             </span>
             <span>
-              <span className="block text-[16px] font-bold" style={{ fontFamily: "'Space Grotesk'" }}>{t.title}</span>
+              <span className="block text-[16px] font-bold" style={{ fontFamily: "var(--font-display)" }}>{t.title}</span>
               <span className="mt-0.5 block text-[12.5px]" style={{ color: t.primary ? "rgba(10,12,13,.7)" : "var(--tx-4)" }}>{t.sub}</span>
             </span>
           </button>
@@ -223,14 +223,14 @@ const Inicio = ({ onNavigate }) => {
       </div>
 
       {/* Para hoy: cubiertas/vehículos que requieren acción */}
-      <div className="mb-3 mt-[30px] text-[11px] tracking-[.08em]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-6)" }}>PARA HOY</div>
+      <div className="mb-3 mt-[30px] text-[11px] tracking-[.08em]" style={{ fontFamily: "var(--font-mono)", color: "var(--tx-6)" }}>PARA HOY</div>
       {hoyItems.length === 0 ? (
         <div className="flex items-center gap-3 rounded-[13px] p-[18px]" style={{ border: "1px dashed var(--bd)" }}>
           <span className="grid h-10 w-10 flex-none place-items-center rounded-full" style={{ background: "rgba(196,237,43,.10)", color: "var(--ink-lime)" }}>
             <CheckRoundedIcon sx={{ fontSize: 20 }} />
           </span>
           <div>
-            <div className="text-[14px] font-bold" style={{ fontFamily: "'Space Grotesk'", color: "var(--tx)" }}>Todo en orden</div>
+            <div className="text-[14px] font-bold" style={{ fontFamily: "var(--font-display)", color: "var(--tx)" }}>Todo en orden</div>
             <div className="mt-0.5 text-[12.5px]" style={{ color: "var(--tx-4)" }}>No hay cubiertas ni posiciones pendientes de acción.</div>
           </div>
         </div>
@@ -247,7 +247,7 @@ const Inicio = ({ onNavigate }) => {
                 {h.isTire ? <TripOriginOutlinedIcon sx={{ fontSize: 19 }} /> : <LocalShippingOutlinedIcon sx={{ fontSize: 19 }} />}
               </span>
               <span className="min-w-0 flex-1">
-                <span className="block text-[14px] font-bold" style={{ fontFamily: "'Space Grotesk'", color: "var(--tx)" }}>{h.title}</span>
+                <span className="block text-[14px] font-bold" style={{ fontFamily: "var(--font-display)", color: "var(--tx)" }}>{h.title}</span>
                 <span className="mt-px block text-[12.5px]" style={{ color: "var(--tx-4)" }}>{h.desc}</span>
               </span>
               <span className="inline-flex flex-none items-center gap-1.5 rounded-lg px-3 text-[12px] font-semibold" style={{ height: 32, border: "1px solid var(--bd-strong)", background: "var(--elev)", color: h.color }}>
@@ -260,7 +260,7 @@ const Inicio = ({ onNavigate }) => {
       )}
 
       {/* Accesos rápidos por estado */}
-      <div className="mb-3 mt-[30px] text-[11px] tracking-[.08em]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-6)" }}>ACCESO RÁPIDO</div>
+      <div className="mb-3 mt-[30px] text-[11px] tracking-[.08em]" style={{ fontFamily: "var(--font-mono)", color: "var(--tx-6)" }}>ACCESO RÁPIDO</div>
       <div className="grid grid-cols-3 gap-[14px]">
         {ACCESS.map((a) => (
           <button
@@ -273,7 +273,7 @@ const Inicio = ({ onNavigate }) => {
               {a.icon}
             </span>
             <span>
-              <span className="block text-[24px] font-bold leading-none" style={{ fontFamily: "'Space Grotesk'", color: "var(--tx)" }}>{a.count}</span>
+              <span className="block text-[24px] font-bold leading-none" style={{ fontFamily: "var(--font-display)", color: "var(--tx)" }}>{a.count}</span>
               <span className="mt-[3px] block text-[13px]" style={{ color: a.warn ? a.accent : "var(--tx-4)" }}>{a.label}</span>
             </span>
           </button>

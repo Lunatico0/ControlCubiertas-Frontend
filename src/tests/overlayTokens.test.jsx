@@ -15,7 +15,9 @@ import { OVERLAY, dialogCard, neutralBtn, primaryBtn } from '@components/dialog/
 describe('tokens compartidos del overlay', () => {
   it('hay un solo velo y una sola tipografía para los dos sistemas', () => {
     expect(OVERLAY.backdrop).toBe('rgba(4,5,6,.62)')
-    expect(OVERLAY.fontFamily).toContain('IBM Plex Sans')
+    // La familia sale del token de index.css, que trae el fallback stack: escribirla a mano
+    // dejaba el overlay sin fallback si la fuente no cargaba (t76).
+    expect(OVERLAY.fontFamily).toBe('var(--font-sans)')
   })
 
   it('la card tiene un solo radio y una sola sombra', () => {

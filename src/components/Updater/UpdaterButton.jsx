@@ -22,7 +22,7 @@ const UpdaterButton = ({ current, bip, onClick }) => (
     <span className="text-[13px] font-medium" style={{ color: "var(--tx-2)" }}>
       Actualizar
     </span>
-    <span className="ml-auto text-[10.5px]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-6)" }}>
+    <span className="ml-auto text-[10.5px]" style={{ fontFamily: "var(--font-mono)", color: "var(--tx-6)" }}>
       v{current}
     </span>
   </button>

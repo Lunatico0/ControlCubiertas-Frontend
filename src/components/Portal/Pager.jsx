@@ -31,10 +31,10 @@ const Pager = ({ page, totalPages, onChange }) => {
       <NavBtn disabled={page <= 1} onClick={() => go(page - 1)} title="Anterior"><KeyboardArrowLeftRoundedIcon sx={{ fontSize: 18 }} /></NavBtn>
       {pageList(page, totalPages).map((p, i) =>
         p === "…" ? (
-          <span key={`e${i}`} style={{ width: 22, textAlign: "center", color: "var(--tx-6)", fontFamily: "'IBM Plex Mono'", fontSize: 13 }}>…</span>
+          <span key={`e${i}`} style={{ width: 22, textAlign: "center", color: "var(--tx-6)", fontFamily: "var(--font-mono)", fontSize: 13 }}>…</span>
         ) : (
           <button key={p} onClick={() => go(p)}
-            style={{ minWidth: 32, height: 32, padding: "0 8px", borderRadius: 8, fontSize: 12.5, fontWeight: 600, fontFamily: "'IBM Plex Sans'", cursor: "pointer",
+            style={{ minWidth: 32, height: 32, padding: "0 8px", borderRadius: 8, fontSize: 12.5, fontWeight: 600, fontFamily: "var(--font-sans)", cursor: "pointer",
               border: `1px solid ${p === page ? "var(--tx)" : "var(--bd)"}`,
               background: p === page ? "var(--tx)" : "var(--card)",
               color: p === page ? "var(--bg)" : "var(--tx-3)" }}>{p}</button>

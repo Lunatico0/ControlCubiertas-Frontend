@@ -25,7 +25,7 @@ const TimelineBtn = ({ onClick, disabled, icon, label, hover }) => (
   <button
     type="button" onClick={onClick} disabled={disabled}
     className="inline-flex items-center gap-1.5 rounded-[7px] px-[11px] py-[5px] text-[11.5px] font-semibold"
-    style={{ border: "1px solid var(--bd-strong)", background: "var(--card)", color: "var(--tx-2)", fontFamily: "'IBM Plex Sans'", cursor: disabled ? "default" : "pointer", opacity: disabled ? 0.5 : 1 }}
+    style={{ border: "1px solid var(--bd-strong)", background: "var(--card)", color: "var(--tx-2)", fontFamily: "var(--font-sans)", cursor: disabled ? "default" : "pointer", opacity: disabled ? 0.5 : 1 }}
     onMouseEnter={(e) => { if (hover && !disabled) { e.currentTarget.style.borderColor = hover; e.currentTarget.style.color = hover } }}
     onMouseLeave={(e) => { e.currentTarget.style.borderColor = "var(--bd-strong)"; e.currentTarget.style.color = "var(--tx-2)" }}
   >
@@ -410,9 +410,9 @@ const TireDrawer = ({ tireId, initialAction, initialAssign, onAssigned, onClose 
                   </button>
                 )}
                 <div>
-                  <div className="text-[11px]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-6)" }}>{tire.serialNumber || "—"}</div>
+                  <div className="text-[11px]" style={{ fontFamily: "var(--font-mono)", color: "var(--tx-6)" }}>{tire.serialNumber || "—"}</div>
                   <div className="flex items-center gap-3">
-                    <span className="text-[26px] font-bold leading-none" style={{ fontFamily: "'Space Grotesk'", color: "var(--tx)" }}>#{formatTireCode(tire.code, data?.tireCodePrefix)}</span>
+                    <span className="text-[26px] font-bold leading-none" style={{ fontFamily: "var(--font-display)", color: "var(--tx)" }}>#{formatTireCode(tire.code, data?.tireCodePrefix)}</span>
                     <StateBadge status={tire.status} />
                   </div>
                 </div>
@@ -425,7 +425,7 @@ const TireDrawer = ({ tireId, initialAction, initialAssign, onAssigned, onClose 
             {action ? (
               /* ---------- Formulario de acción (inline, sin apilar modales) ---------- */
               <div className="flex-1 overflow-auto p-5">
-                <h3 className="mb-4 text-[15px] font-semibold" style={{ fontFamily: "'Space Grotesk'", color: "var(--tx)" }}>{ACTION_TITLES[action]}</h3>
+                <h3 className="mb-4 text-[15px] font-semibold" style={{ fontFamily: "var(--font-display)", color: "var(--tx)" }}>{ACTION_TITLES[action]}</h3>
 
                 <div className="flex flex-col gap-3.5">
                 {action === "assign" && (
@@ -553,7 +553,7 @@ const TireDrawer = ({ tireId, initialAction, initialAssign, onAssigned, onClose 
               /* ---------- Vista de detalle · sidePanel (Claude Design) ---------- */
               <div className="flex-1 overflow-auto" style={{ padding: "22px 24px" }}>
                 {/* Lifecycle stepper */}
-                <div className="mb-4 text-[10.5px] tracking-[.06em]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-6)" }}>CICLO DE VIDA</div>
+                <div className="mb-4 text-[10.5px] tracking-[.06em]" style={{ fontFamily: "var(--font-mono)", color: "var(--tx-6)" }}>CICLO DE VIDA</div>
                 <div className="mb-6 flex items-start">
                   {steps.map((st, i) => {
                     const S = STEP_STYLE[st.kind]
@@ -579,7 +579,7 @@ const TireDrawer = ({ tireId, initialAction, initialAssign, onAssigned, onClose 
                   {infoItems.map((it) => (
                     <div key={it.label}>
                       <div className="mb-[3px] text-[11px] font-medium" style={{ color: "var(--tx-5)" }}>{it.label}</div>
-                      <div className="text-[14px] font-semibold" style={{ color: it.accent || "var(--tx)", fontFamily: it.mono ? "'IBM Plex Mono'" : undefined }}>{it.value}</div>
+                      <div className="text-[14px] font-semibold" style={{ color: it.accent || "var(--tx)", fontFamily: it.mono ? "var(--font-mono)" : undefined }}>{it.value}</div>
                     </div>
                   ))}
                 </div>
@@ -597,8 +597,8 @@ const TireDrawer = ({ tireId, initialAction, initialAssign, onAssigned, onClose 
 
                 {/* Timeline del historial */}
                 <div className="mb-4 flex items-center justify-between">
-                  <div className="text-[10.5px] tracking-[.06em]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-6)" }}>HISTORIAL DE MOVIMIENTOS</div>
-                  <span className="rounded-full px-2.5 py-[3px] text-[11px] font-semibold" style={{ fontFamily: "'IBM Plex Mono'", background: "var(--bd-soft)", color: "var(--tx-4)" }}>{history.length}</span>
+                  <div className="text-[10.5px] tracking-[.06em]" style={{ fontFamily: "var(--font-mono)", color: "var(--tx-6)" }}>HISTORIAL DE MOVIMIENTOS</div>
+                  <span className="rounded-full px-2.5 py-[3px] text-[11px] font-semibold" style={{ fontFamily: "var(--font-mono)", background: "var(--bd-soft)", color: "var(--tx-4)" }}>{history.length}</span>
                 </div>
                 {history.length === 0 ? (
                   <p className="text-[13px]" style={{ color: "var(--tx-5)" }}>Esta cubierta todavía no tiene movimientos registrados.</p>
@@ -618,8 +618,8 @@ const TireDrawer = ({ tireId, initialAction, initialAssign, onAssigned, onClose 
                           </div>
                           <div className="min-w-0 flex-1 pb-[18px]">
                             <div className="flex items-baseline justify-between gap-2.5">
-                              <span className="text-[14px] font-semibold" style={{ color, fontFamily: "'Space Grotesk'" }}>{h.type || "Movimiento"}</span>
-                              <span className="flex-none text-[11.5px]" style={{ color: "var(--tx-6)", fontFamily: "'IBM Plex Mono'" }}>{fmtDate(h.date)}</span>
+                              <span className="text-[14px] font-semibold" style={{ color, fontFamily: "var(--font-display)" }}>{h.type || "Movimiento"}</span>
+                              <span className="flex-none text-[11.5px]" style={{ color: "var(--tx-6)", fontFamily: "var(--font-mono)" }}>{fmtDate(h.date)}</span>
                             </div>
                             <div className="mt-[3px] text-[12.5px]" style={{ color: "var(--tx-4)" }}>{histDetail(h)}</div>
                             {histBits(h).length > 0 && (
@@ -627,7 +627,7 @@ const TireDrawer = ({ tireId, initialAction, initialAssign, onAssigned, onClose 
                                 {histBits(h).map((bit, bi) => (
                                   <span key={bi} className="rounded-md px-[9px] py-[2px] text-[11px]" style={{ background: "var(--hover)", border: "1px solid var(--bd)" }}>
                                     <span style={{ color: "var(--tx-6)" }}>{bit.k} </span>
-                                    <span style={{ fontFamily: "'IBM Plex Mono'", fontWeight: 600, color: "var(--tx-2)" }}>{bit.val}</span>
+                                    <span style={{ fontFamily: "var(--font-mono)", fontWeight: 600, color: "var(--tx-2)" }}>{bit.val}</span>
                                   </span>
                                 ))}
                               </div>

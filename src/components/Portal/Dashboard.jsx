@@ -100,13 +100,13 @@ const Dashboard = () => {
       <div className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-2">
         {/* Estado de cubiertas */}
         <section className="rounded-xl p-6" style={card}>
-          <h2 className="font-display text-lg font-semibold" style={{ color: "var(--tx)", fontFamily: "'Space Grotesk'" }}>Estado de cubiertas</h2>
+          <h2 className="font-display text-lg font-semibold" style={{ color: "var(--tx)", fontFamily: "var(--font-display)" }}>Estado de cubiertas</h2>
           <div className="mt-4 flex flex-col items-center gap-6 sm:flex-row">
             <div className="relative shrink-0">
               <Donut segments={segments} />
               <div className="absolute inset-0 grid place-items-center">
                 <div className="text-center">
-                  <div className="font-display text-2xl font-bold" style={{ color: "var(--tx)", fontFamily: "'Space Grotesk'" }}>{cubiertas.total}</div>
+                  <div className="font-display text-2xl font-bold" style={{ color: "var(--tx)", fontFamily: "var(--font-display)" }}>{cubiertas.total}</div>
                   <div className="text-xs" style={{ color: "var(--tx-6)" }}>cubiertas</div>
                 </div>
               </div>
@@ -135,7 +135,7 @@ const Dashboard = () => {
 
         {/* Atención requerida */}
         <section className="rounded-xl p-6" style={card}>
-          <h2 className="font-display text-lg font-semibold" style={{ color: "var(--tx)", fontFamily: "'Space Grotesk'" }}>Atención requerida</h2>
+          <h2 className="font-display text-lg font-semibold" style={{ color: "var(--tx)", fontFamily: "var(--font-display)" }}>Atención requerida</h2>
           <div className="mt-4 space-y-3">
             {senales.aRecapar === 0 && senales.vehiculosSinCubiertas === 0 ? (
               /* Sin acciones pendientes → estado positivo */
@@ -176,7 +176,7 @@ const Dashboard = () => {
 
       {/* Acciones rápidas */}
       <section className="mt-6">
-        <h2 className="mb-3 font-display text-lg font-semibold" style={{ color: "var(--tx)", fontFamily: "'Space Grotesk'" }}>Acciones rápidas</h2>
+        <h2 className="mb-3 font-display text-lg font-semibold" style={{ color: "var(--tx)", fontFamily: "var(--font-display)" }}>Acciones rápidas</h2>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <QuickAction icon={<OpenInNewRoundedIcon />} tint="var(--ink-lime)" title="Abrir operación" subtitle="Ir a la aplicación operativa" onClick={() => navigate("/")} />
           <QuickAction icon={<GroupOutlinedIcon />} tint="var(--ink-teal)" title="Gestionar usuarios" subtitle="Administrar el equipo" onClick={() => navigate("/admin/usuarios")} />

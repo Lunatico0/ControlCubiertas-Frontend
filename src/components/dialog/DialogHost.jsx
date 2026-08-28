@@ -151,7 +151,7 @@ const DialogHost = () => {
                 <button
                   onClick={() => { if (!o.ack || ack) close(true) }}
                   disabled={o.ack && !ack}
-                  style={{ height: 44, padding: "0 20px", border: "none", borderRadius: 9, fontSize: 14, fontWeight: 700, fontFamily: "'IBM Plex Sans'", background: !o.ack || ack ? "#E04434" : "var(--elev)", color: !o.ack || ack ? "#fff" : "var(--tx-6)", cursor: !o.ack || ack ? "pointer" : "not-allowed" }}
+                  style={{ height: 44, padding: "0 20px", border: "none", borderRadius: 9, fontSize: 14, fontWeight: 700, fontFamily: "var(--font-sans)", background: !o.ack || ack ? "#E04434" : "var(--elev)", color: !o.ack || ack ? "#fff" : "var(--tx-6)", cursor: !o.ack || ack ? "pointer" : "not-allowed" }}
                 >{o.confirmLabel || "Sí, dar de baja"}</button>
               </div>
             </div>
@@ -178,7 +178,7 @@ const DialogHost = () => {
               <div style={{ flex: "none", padding: "18px 22px", borderBottom: "1px solid var(--bd-soft)", display: "flex", alignItems: "center", gap: 12 }}>
                 <span style={{ width: 38, height: 38, borderRadius: 10, background: "rgba(196,237,43,.13)", color: "var(--ink-lime)", display: "flex", alignItems: "center", justifyContent: "center", flex: "none" }}><DlgIcon kind="printer" size={19} /></span>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontFamily: "'Space Grotesk'", fontSize: 16, fontWeight: 600, color: "var(--tx)" }}>{o.title || "Comprobante"}</div>
+                  <div style={{ fontFamily: "var(--font-display)", fontSize: 16, fontWeight: 600, color: "var(--tx)" }}>{o.title || "Comprobante"}</div>
                   <div style={{ fontSize: 12, color: "var(--tx-5)", marginTop: 1 }}>{o.subtitle || "Revisalo antes de confirmar el movimiento"}</div>
                 </div>
                 <button type="button" className="dlg-x" onClick={() => close(false)} aria-label="Cerrar" style={{ color: "var(--tx-5)", cursor: "pointer", display: "inline-flex", padding: 5, borderRadius: 7, border: "none", background: "transparent" }}><DlgIcon kind="x" size={18} /></button>
@@ -188,7 +188,7 @@ const DialogHost = () => {
                   ? o.receipt
                   : o.receiptHtml
                     ? <div style={{ maxWidth: 340, margin: "0 auto" }} dangerouslySetInnerHTML={{ __html: o.receiptHtml }} />
-                    : <div style={{ textAlign: "center", color: "var(--tx-6)", fontSize: 12.5, padding: "30px 0", fontFamily: "'IBM Plex Mono'" }}>Vista previa del comprobante</div>}
+                    : <div style={{ textAlign: "center", color: "var(--tx-6)", fontSize: 12.5, padding: "30px 0", fontFamily: "var(--font-mono)" }}>Vista previa del comprobante</div>}
               </div>
               <div style={{ flex: "none", padding: "15px 22px", borderTop: "1px solid var(--bd-soft)", display: "flex", gap: 10, justifyContent: "flex-end" }}>
                 <button className="dlg-btn-neutral" onClick={() => close(false)} style={neutralBtn}>{o.cancelLabel || "Cancelar"}</button>
@@ -208,7 +208,7 @@ const DialogHost = () => {
               <span style={{ width: 30, height: 30, borderRadius: 8, background: tv.bg, color: tv.color, display: "flex", alignItems: "center", justifyContent: "center", flex: "none" }}><DlgIcon kind={tv.icon} size={17} /></span>
               <div style={{ lineHeight: 1.3 }}>
                 <div style={{ fontSize: 13, fontWeight: 600, color: "var(--tx)" }}>{toast.title}</div>
-                {toast.sub && <div style={{ fontSize: 11.5, color: "var(--tx-5)", fontFamily: "'IBM Plex Mono'" }}>{toast.sub}</div>}
+                {toast.sub && <div style={{ fontSize: 11.5, color: "var(--tx-5)", fontFamily: "var(--font-mono)" }}>{toast.sub}</div>}
               </div>
             </div>
           </div>

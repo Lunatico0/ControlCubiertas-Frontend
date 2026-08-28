@@ -91,8 +91,8 @@ const NuevoVehiculo = ({ onClose, onCreated }) => {
           <ArrowBackRoundedIcon sx={{ fontSize: 18 }} />
         </button>
         <div style={{ lineHeight: 1.2 }}>
-          <div className="text-[17px] font-bold" style={{ fontFamily: "'Space Grotesk'", color: "var(--tx)" }}>Nuevo vehículo</div>
-          <div className="text-[11.5px]" style={{ color: "var(--tx-5)", fontFamily: "'IBM Plex Mono'" }}>Vehículos · Alta</div>
+          <div className="text-[17px] font-bold" style={{ fontFamily: "var(--font-display)", color: "var(--tx)" }}>Nuevo vehículo</div>
+          <div className="text-[11.5px]" style={{ color: "var(--tx-5)", fontFamily: "var(--font-mono)" }}>Vehículos · Alta</div>
         </div>
         <div className="ml-auto flex items-center gap-2.5">
           <button onClick={onClose} className="h-10 rounded-[9px] px-[15px] text-[13.5px] font-semibold" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--tx)" }}>Cancelar</button>
@@ -110,9 +110,9 @@ const NuevoVehiculo = ({ onClose, onCreated }) => {
             <MonoLabel className="mb-4 text-[10px] tracking-[.12em]" style={{ color: "var(--tx-6)" }}>DATOS DEL VEHÍCULO</MonoLabel>
             <div className="grid grid-cols-2 gap-[13px]">
               <FloatingField label="Móvil / Identificador" required error={fieldError("movil")} value={form.movil} onChange={set("movil")} />
-              <FloatingField label="Patente" required error={fieldError("patente")} value={formatPlate(form.patente, data.plateSep)} onChange={set("patente")} style={{ fontFamily: "'IBM Plex Mono'", textTransform: "uppercase" }} />
+              <FloatingField label="Patente" required error={fieldError("patente")} value={formatPlate(form.patente, data.plateSep)} onChange={set("patente")} style={{ fontFamily: "var(--font-mono)", textTransform: "uppercase" }} />
               <FloatingField label="Marca" value={form.marca} onChange={set("marca")} />
-              <FloatingField label="Kilometraje actual" type="number" min="0" value={form.km} onChange={set("km")} style={{ fontFamily: "'IBM Plex Mono'" }} />
+              <FloatingField label="Kilometraje actual" type="number" min="0" value={form.km} onChange={set("km")} style={{ fontFamily: "var(--font-mono)" }} />
             </div>
           </div>
 

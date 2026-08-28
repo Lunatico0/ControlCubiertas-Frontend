@@ -151,7 +151,7 @@ const Comprobantes = () => {
 
       {/* Tabla */}
       <div className="overflow-hidden rounded-[13px]" style={{ background: "var(--card)", border: "1px solid var(--bd)" }}>
-        <div className="grid gap-3 px-5 py-3 text-[10.5px] font-semibold uppercase tracking-wider" style={{ gridTemplateColumns: COLS, background: "var(--elev)", borderBottom: "1px solid var(--bd)", fontFamily: "'IBM Plex Mono'", color: "var(--tx-6)" }}>
+        <div className="grid gap-3 px-5 py-3 text-[10.5px] font-semibold uppercase tracking-wider" style={{ gridTemplateColumns: COLS, background: "var(--elev)", borderBottom: "1px solid var(--bd)", fontFamily: "var(--font-mono)", color: "var(--tx-6)" }}>
           <div>N° / Fecha</div><div>Tipo</div><div>Cubierta</div><div>Detalle</div><div>Usuario</div><div className="text-right">Acción</div>
         </div>
 
@@ -165,18 +165,18 @@ const Comprobantes = () => {
             return (
               <div key={c.id} className="grid items-center gap-3 px-5 py-[13px]" style={{ gridTemplateColumns: COLS, borderBottom: "1px solid var(--bd-faint)" }}>
                 <div>
-                  <div className="text-[13px] font-semibold" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx)" }}>{c.numero}</div>
-                  <div className="text-[11px]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-6)" }}>{fmtDate(c.fecha)}</div>
+                  <div className="text-[13px] font-semibold" style={{ fontFamily: "var(--font-mono)", color: "var(--tx)" }}>{c.numero}</div>
+                  <div className="text-[11px]" style={{ fontFamily: "var(--font-mono)", color: "var(--tx-6)" }}>{fmtDate(c.fecha)}</div>
                 </div>
                 <div>
                   <span className="inline-flex items-center gap-[6px] rounded-full px-[10px] py-[3px] text-[11.5px] font-semibold" style={{ color: col, background: tint(col, 14) }}>
                     <span className="rounded-full" style={{ width: 6, height: 6, background: col }} />{c.tipo}
                   </span>
                 </div>
-                <div className="font-display text-[14px] font-bold" style={{ fontFamily: "'Space Grotesk'", color: "var(--tx)" }}>{c.cubierta ? `#${c.cubierta.code}` : "—"}</div>
+                <div className="font-display text-[14px] font-bold" style={{ fontFamily: "var(--font-display)", color: "var(--tx)" }}>{c.cubierta ? `#${c.cubierta.code}` : "—"}</div>
                 <div className="truncate text-[12.5px]" style={{ color: "var(--tx-3)" }} title={detalle(c)}>{detalle(c)}</div>
                 <div className="flex min-w-0 items-center gap-2">
-                  <span className="flex flex-none items-center justify-center rounded-full text-[9.5px] font-bold" style={{ width: 24, height: 24, background: "var(--bd-strong)", color: "var(--tx-2)", fontFamily: "'Space Grotesk'" }}>{initialsOf(c.usuario)}</span>
+                  <span className="flex flex-none items-center justify-center rounded-full text-[9.5px] font-bold" style={{ width: 24, height: 24, background: "var(--bd-strong)", color: "var(--tx-2)", fontFamily: "var(--font-display)" }}>{initialsOf(c.usuario)}</span>
                   <span className="truncate text-[12.5px]" style={{ color: "var(--tx-2)" }}>{c.usuario || "—"}</span>
                 </div>
                 <div className="flex items-center justify-end gap-1.5">

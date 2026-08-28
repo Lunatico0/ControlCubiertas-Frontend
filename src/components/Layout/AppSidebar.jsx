@@ -102,7 +102,7 @@ const AppSidebar = ({ nav, belowNav, upd, user, help, onLogout }) => {
       <div className="relative flex items-center gap-[11px] p-3" style={{ borderTop: "1px solid var(--bd-faint)" }}>
         <div
           className="flex h-9 w-9 flex-none items-center justify-center rounded-full text-[12px] font-bold"
-          style={{ background: user.avatarBg, color: user.avatarColor, fontFamily: "'Space Grotesk'" }}
+          style={{ background: user.avatarBg, color: user.avatarColor, fontFamily: "var(--font-display)" }}
         >
           {user.initials}
         </div>
@@ -132,7 +132,7 @@ const AppSidebar = ({ nav, belowNav, upd, user, help, onLogout }) => {
           <>
             <div className="fixed inset-0 z-35" onClick={() => setHelpMenu(false)} />
             <div className="absolute z-40 overflow-hidden rounded-xl" style={{ bottom: 58, right: 12, left: 12, background: "var(--card)", border: "1px solid var(--bd-strong)", boxShadow: "var(--elev-1)" }}>
-              <div className="px-3.5 py-[11px] text-[10px] tracking-[.08em]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-6)", borderBottom: "1px solid var(--bd-soft)" }}>AYUDA</div>
+              <div className="px-3.5 py-[11px] text-[10px] tracking-[.08em]" style={{ fontFamily: "var(--font-mono)", color: "var(--tx-6)", borderBottom: "1px solid var(--bd-soft)" }}>AYUDA</div>
               <button onClick={() => { setHelpMenu(false); help.onStartTour() }} className="flex w-full items-center gap-[11px] px-3.5 py-3 text-left">
                 <span className="flex h-[30px] w-[30px] flex-none items-center justify-center rounded-lg" style={{ background: "color-mix(in srgb, var(--ink-lime) 13%, transparent)", color: "var(--ink-lime)" }}><PlayArrowOutlinedIcon sx={{ fontSize: 16 }} /></span>
                 <span style={{ lineHeight: 1.25 }}>

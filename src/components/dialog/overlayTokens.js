@@ -16,7 +16,7 @@ export const OVERLAY = {
   shadow: "var(--elev-3)",
   radius: 14,
   padding: 22, // padding horizontal del header, del cuerpo y del pie
-  fontFamily: "'IBM Plex Sans',system-ui,sans-serif",
+  fontFamily: "var(--font-sans)",
   titleFont: "'Space Grotesk'",
   titleSize: 17,
   maxWidth: 440, // ancho por defecto de la card

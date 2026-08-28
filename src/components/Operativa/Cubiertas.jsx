@@ -163,7 +163,7 @@ const Cubiertas = ({ intent, onNavigate }) => {
                 <button key={f.key} onClick={() => setTab(f.key)} className="inline-flex h-[38px] items-center gap-2 rounded-[9px] px-[15px] text-[13.5px] font-semibold"
                   style={{ border: `1px solid ${on ? "var(--ink-lime)" : "var(--bd)"}`, background: on ? tint("var(--ink-lime)", 12) : "var(--card)", color: on ? "var(--tx)" : "var(--tx-3)" }}>
                   {f.label}
-                  <Pill className="px-[7px] py-px text-[11.5px]" style={{ fontFamily: "'IBM Plex Mono'", background: "var(--elev)", color: "var(--tx-5)" }}>{counts[f.key]}</Pill>
+                  <Pill className="px-[7px] py-px text-[11.5px]" style={{ fontFamily: "var(--font-mono)", background: "var(--elev)", color: "var(--tx-5)" }}>{counts[f.key]}</Pill>
                 </button>
               )
             })}
@@ -171,7 +171,7 @@ const Cubiertas = ({ intent, onNavigate }) => {
           <button onClick={() => setShowFilters((v) => !v)} className="ml-auto inline-flex h-[38px] items-center gap-2 rounded-[9px] px-[14px] text-[13.5px] font-semibold"
             style={{ border: `1px solid ${showFilters || activeFilters ? "var(--ink-lime)" : "var(--bd)"}`, background: showFilters || activeFilters ? tint("var(--ink-lime)", 12) : "var(--card)", color: showFilters || activeFilters ? "var(--tx)" : "var(--tx-3)" }}>
             <TuneRoundedIcon sx={{ fontSize: 16 }} /> Filtros
-            {activeFilters > 0 && <Pill className="px-[7px] py-px text-[11px]" style={{ fontFamily: "'IBM Plex Mono'", background: "var(--ink-lime)", color: "var(--bg)" }}>{activeFilters}</Pill>}
+            {activeFilters > 0 && <Pill className="px-[7px] py-px text-[11px]" style={{ fontFamily: "var(--font-mono)", background: "var(--ink-lime)", color: "var(--bg)" }}>{activeFilters}</Pill>}
           </button>
         </div>
 
@@ -193,18 +193,18 @@ const Cubiertas = ({ intent, onNavigate }) => {
             </label>
             <label className="flex flex-col gap-1.5">
               <span className="text-[11px] font-semibold" style={{ color: "var(--tx-4)" }}>Km desde</span>
-              <input type="number" min="0" value={fKmMin} onChange={(e) => setFKmMin(e.target.value)} placeholder="0" className="h-[38px] w-[120px] rounded-lg px-2.5 text-[13px] outline-none" style={{ ...inputStyle, fontFamily: "'IBM Plex Mono'" }} />
+              <input type="number" min="0" value={fKmMin} onChange={(e) => setFKmMin(e.target.value)} placeholder="0" className="h-[38px] w-[120px] rounded-lg px-2.5 text-[13px] outline-none" style={{ ...inputStyle, fontFamily: "var(--font-mono)" }} />
             </label>
             <label className="flex flex-col gap-1.5">
               <span className="text-[11px] font-semibold" style={{ color: "var(--tx-4)" }}>Km hasta</span>
-              <input type="number" min="0" value={fKmMax} onChange={(e) => setFKmMax(e.target.value)} placeholder="—" className="h-[38px] w-[120px] rounded-lg px-2.5 text-[13px] outline-none" style={{ ...inputStyle, fontFamily: "'IBM Plex Mono'" }} />
+              <input type="number" min="0" value={fKmMax} onChange={(e) => setFKmMax(e.target.value)} placeholder="—" className="h-[38px] w-[120px] rounded-lg px-2.5 text-[13px] outline-none" style={{ ...inputStyle, fontFamily: "var(--font-mono)" }} />
             </label>
             {activeFilters > 0 && (
               <button onClick={clearFilters} className="inline-flex h-[38px] items-center gap-1.5 rounded-lg px-3 text-[12.5px] font-semibold" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--tx-3)" }}>
                 <CloseRoundedIcon sx={{ fontSize: 15 }} /> Limpiar
               </button>
             )}
-            <span className="ml-auto self-center text-[12px]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-5)" }}>{filtered.length} resultado{filtered.length === 1 ? "" : "s"}</span>
+            <span className="ml-auto self-center text-[12px]" style={{ fontFamily: "var(--font-mono)", color: "var(--tx-5)" }}>{filtered.length} resultado{filtered.length === 1 ? "" : "s"}</span>
           </div>
         )}
       </ScreenHeader>
@@ -214,7 +214,7 @@ const Cubiertas = ({ intent, onNavigate }) => {
           <div className="mb-4 flex items-center gap-3 rounded-[11px] px-4 py-3" style={{ border: `1px solid ${tint("var(--ink-lime)", 40)}`, background: tint("var(--ink-lime)", 8) }}>
             <span className="inline-flex flex-none" style={{ color: "var(--ink-lime)" }}><AddRoundedIcon sx={{ fontSize: 18 }} /></span>
             <span className="flex-1 text-[13px]" style={{ color: "var(--tx-2)" }}>
-              Montando en <b style={{ color: "var(--tx)" }}>{assignTo.mobile}</b> · posición <b style={{ color: "var(--tx)", fontFamily: "'IBM Plex Mono'" }}>{assignTo.position}</b> — elegí una cubierta disponible y tocá <b>Asignar</b>.
+              Montando en <b style={{ color: "var(--tx)" }}>{assignTo.mobile}</b> · posición <b style={{ color: "var(--tx)", fontFamily: "var(--font-mono)" }}>{assignTo.position}</b> — elegí una cubierta disponible y tocá <b>Asignar</b>.
             </span>
             <button onClick={() => setAssignTo(null)} className="inline-flex flex-none items-center gap-1 rounded-lg px-2.5 py-1.5 text-[12px] font-semibold" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--tx-3)" }}>
               <CloseRoundedIcon sx={{ fontSize: 14 }} /> Cancelar montaje
@@ -225,7 +225,7 @@ const Cubiertas = ({ intent, onNavigate }) => {
           <p className="text-[13px]" style={{ color: "var(--tx-5)" }}>Cargando cubiertas…</p>
         ) : filtered.length === 0 ? (
           <div className="py-16 text-center">
-            <div className="text-[17px] font-semibold" style={{ fontFamily: "'Space Grotesk'", color: "var(--tx)" }}>Sin resultados</div>
+            <div className="text-[17px] font-semibold" style={{ fontFamily: "var(--font-display)", color: "var(--tx)" }}>Sin resultados</div>
             <div className="mt-1.5 text-[13px]" style={{ color: "var(--tx-5)" }}>No hay cubiertas que coincidan con tu búsqueda o filtro.</div>
           </div>
         ) : view === "grid" ? (
@@ -237,13 +237,13 @@ const Cubiertas = ({ intent, onNavigate }) => {
                 <div key={t._id} {...clickable(openDrawer(t._id))} aria-label={`Cubierta ${formatTireCode(t.code, tireCodePrefix)}`} className="flex cursor-pointer flex-col gap-[13px] rounded-[13px] p-4" style={{ border: "1px solid var(--bd)", background: "var(--card)" }}>
                   <div className="flex items-start justify-between gap-2.5">
                     <div>
-                      <div className="text-[11px]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-6)" }}>{t.serialNumber || "—"}</div>
-                      <div className="text-[22px] font-bold leading-[1.05]" style={{ fontFamily: "'Space Grotesk'", color: "var(--tx)" }}>#{formatTireCode(t.code, tireCodePrefix)}</div>
+                      <div className="text-[11px]" style={{ fontFamily: "var(--font-mono)", color: "var(--tx-6)" }}>{t.serialNumber || "—"}</div>
+                      <div className="text-[22px] font-bold leading-[1.05]" style={{ fontFamily: "var(--font-display)", color: "var(--tx)" }}>#{formatTireCode(t.code, tireCodePrefix)}</div>
                     </div>
                     <StateBadge status={t.status} />
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-[10px] tracking-wider" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-6)" }}>RECAPADOS</span>
+                    <span className="text-[10px] tracking-wider" style={{ fontFamily: "var(--font-mono)", color: "var(--tx-6)" }}>RECAPADOS</span>
                     <Pips level={t.recapLevel ?? m.level} />
                   </div>
                   <div className="flex flex-col gap-[5px] text-[12.5px]">
@@ -266,7 +266,7 @@ const Cubiertas = ({ intent, onNavigate }) => {
         ) : (
           /* ---------- TABLA ---------- */
           <div className="overflow-hidden rounded-[13px]" style={{ border: "1px solid var(--bd)", background: "var(--card)" }}>
-            <div className="grid gap-3 px-[18px] py-3 text-[10.5px] font-semibold uppercase tracking-wider" style={{ gridTemplateColumns: GRID_COLS, fontFamily: "'IBM Plex Mono'", background: "var(--elev)", borderBottom: "1px solid var(--bd)", color: "var(--tx-6)" }}>
+            <div className="grid gap-3 px-[18px] py-3 text-[10.5px] font-semibold uppercase tracking-wider" style={{ gridTemplateColumns: GRID_COLS, fontFamily: "var(--font-mono)", background: "var(--elev)", borderBottom: "1px solid var(--bd)", color: "var(--tx-6)" }}>
               {COLUMNS.map((c) => {
                 const active = sortBy === c.key
                 return (
@@ -289,17 +289,17 @@ const Cubiertas = ({ intent, onNavigate }) => {
               return (
                 <div key={t._id} className="grid items-center gap-3 py-3 pl-[14px] pr-[18px]" style={{ gridTemplateColumns: GRID_COLS, borderLeft: `4px solid ${m.color}`, borderBottom: "1px solid var(--bd-faint)" }}>
                   <div className="cursor-pointer" {...clickable(openDrawer(t._id))} aria-label={`Cubierta ${formatTireCode(t.code, tireCodePrefix)}`}>
-                    <div className="text-[15px] font-bold" style={{ fontFamily: "'Space Grotesk'", color: "var(--tx)" }}>#{formatTireCode(t.code, tireCodePrefix)}</div>
-                    <div className="text-[10.5px]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-6)" }}>{t.serialNumber || "—"}</div>
+                    <div className="text-[15px] font-bold" style={{ fontFamily: "var(--font-display)", color: "var(--tx)" }}>#{formatTireCode(t.code, tireCodePrefix)}</div>
+                    <div className="text-[10.5px]" style={{ fontFamily: "var(--font-mono)", color: "var(--tx-6)" }}>{t.serialNumber || "—"}</div>
                   </div>
                   <div className="min-w-0"><StateBadge status={t.status} small truncate /></div>
                   <div className="min-w-0">
                     <div className="text-[13px] font-medium" style={{ color: "var(--tx-2)" }}>{t.brand}</div>
-                    <div className="text-[11.5px]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-5)" }}>{t.size}{t.pattern ? ` · ${t.pattern}` : ""}</div>
+                    <div className="text-[11.5px]" style={{ fontFamily: "var(--font-mono)", color: "var(--tx-5)" }}>{t.size}{t.pattern ? ` · ${t.pattern}` : ""}</div>
                   </div>
                   <div className="text-[12.5px] font-medium" style={{ color: t.vehicle ? "var(--ink-blue)" : "var(--tx-4)" }}>{t.vehicle?.mobile || "En depósito"}</div>
-                  <div className="text-right text-[13px] font-semibold" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx)" }}>{fmtKm(t.kilometers)}</div>
-                  <div className="text-right text-[12px]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-5)" }}>{fmtDate(t.updatedAt)}</div>
+                  <div className="text-right text-[13px] font-semibold" style={{ fontFamily: "var(--font-mono)", color: "var(--tx)" }}>{fmtKm(t.kilometers)}</div>
+                  <div className="text-right text-[12px]" style={{ fontFamily: "var(--font-mono)", color: "var(--tx-5)" }}>{fmtDate(t.updatedAt)}</div>
                   <div className="flex items-center justify-end gap-1.5">
                     {!t.vehicle && !["discard", "recap"].includes(metaOf(t.status).role) && <OpActionBtn type="assign" square size={36} onClick={openDrawer(t._id, "assign")} />}
                     {t.vehicle && <OpActionBtn type="unassign" square size={36} onClick={openDrawer(t._id, "unassign")} />}
@@ -338,7 +338,7 @@ const Cubiertas = ({ intent, onNavigate }) => {
 const Row = ({ label, value, valueColor, mono, strong }) => (
   <div className="flex justify-between">
     <span style={{ color: "var(--tx-5)" }}>{label}</span>
-    <span style={{ color: valueColor || "var(--tx-2)", fontWeight: strong ? 600 : 500, fontFamily: mono ? "'IBM Plex Mono'" : undefined }}>{value}</span>
+    <span style={{ color: valueColor || "var(--tx-2)", fontWeight: strong ? 600 : 500, fontFamily: mono ? "var(--font-mono)" : undefined }}>{value}</span>
   </div>
 )
 

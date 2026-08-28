@@ -3,6 +3,7 @@ import ApiContext from "@context/apiContext"
 import { showToast } from "@utils/toast"
 import { buildCreateTirePrintData } from "@utils/print-data"
 import usePrint from "@hooks/usePrint"
+import { todayLocal, dateOnlyToLocalNoon } from "@utils/date"
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded"
 import Button from "@components/UI/Button"
 import Drawer from "@components/UI/Drawer"
@@ -15,11 +16,6 @@ import FloatingField from "@components/UI/FloatingField"
 // operario lo vea marcado en rojo en vez de comerse un error después de mandar el formulario.
 const KM_MAX = 1_500_000
 
-const todayLocal = () => {
-  const d = new Date()
-  // YYYY-MM-DD en hora local (no UTC), para el value del input date.
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`
-}
 
 const AltaDrawer = ({ onClose, onCreated }) => {
   const { tires, data, orders } = useContext(ApiContext)
@@ -66,9 +62,9 @@ const AltaDrawer = ({ onClose, onCreated }) => {
     setErrors({})
     setSubmitting(true)
     try {
-      // Bug 2 (Fase 04): anclar la fecha a mediodía LOCAL para que no se corra de día
-      // al serializar a UTC (input date da "YYYY-MM-DD" = medianoche UTC → -1 día en GMT-3).
-      const createdAt = form.createdAt ? `${form.createdAt}T12:00:00` : new Date().toISOString()
+      // Bug 2: el día suelto se ancla a mediodía LOCAL (ver @utils/date) para que no se
+      // corra al serializar a UTC.
+      const createdAt = dateOnlyToLocalNoon(form.createdAt) || dateOnlyToLocalNoon(todayLocal())
       // El N° de comprobante lo reserva el BACKEND dentro del alta y vuelve en la respuesta.
       // Pedirlo antes quemaba el número cuando el alta se rechazaba (código duplicado, estado
       // inválido), y dejaba huecos inexplicables en el correlativo.
@@ -116,7 +112,7 @@ const AltaDrawer = ({ onClose, onCreated }) => {
   return (
     <Drawer onClose={onClose} onSubmit={() => !submitting && submit()}>
         <div className="flex items-center justify-between gap-3 p-5" style={{ borderBottom: "1px solid var(--bd-soft)" }}>
-          <h2 className="text-[20px] font-bold" style={{ fontFamily: "'Space Grotesk'", color: "var(--tx)" }}>Nueva cubierta</h2>
+          <h2 className="text-[20px] font-bold" style={{ fontFamily: "var(--font-display)", color: "var(--tx)" }}>Nueva cubierta</h2>
           <button onClick={onClose} className="rounded-[7px] p-2" style={{ color: "var(--tx-5)" }} title="Cerrar">
             <CloseRoundedIcon sx={{ fontSize: 20 }} />
           </button>
