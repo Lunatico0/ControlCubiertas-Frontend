@@ -1,6 +1,7 @@
 import { useState, useCallback } from "react"
 import { showToast } from "@utils/toast"
 import { usePrint } from "./usePrint"
+import { mensajeDeError } from "@utils/apiError"
 
 export const useTireAction = ({ printBuilder, apiCall, successMessage }) => {
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -8,10 +9,9 @@ export const useTireAction = ({ printBuilder, apiCall, successMessage }) => {
 
   const execute = useCallback(
     async ({ tire, entry, formData, refresh, close }) => {
-      if (isSubmitting) {
-        console.log("⚠️ Ya hay una operación en curso")
-        return
-      }
+      // Guard de doble submit. Silencioso a propósito: el usuario ya ve el botón
+      // deshabilitado, y un log por cada doble clic sólo ensucia la consola.
+      if (isSubmitting) return
 
       try {
         setIsSubmitting(true)
@@ -27,7 +27,7 @@ export const useTireAction = ({ printBuilder, apiCall, successMessage }) => {
         // siguiente salió con el 283 sin que nadie pudiera explicar el salto. Ahora lo reserva el
         // backend DENTRO de la mutación y lo devuelve en la respuesta.
         let updated
-        const { getReceiptNumber, ...cleanFormData } = formData // getReceiptNumber ya no se usa
+        const {...cleanFormData } = formData // getReceiptNumber ya no se usa
         if (entry) {
           updated = await apiCall(tire._id, cleanFormData, entry)
         } else {
@@ -87,7 +87,7 @@ export const useTireAction = ({ printBuilder, apiCall, successMessage }) => {
         return updated
       } catch (error) {
         console.error("❌ Error en la acción:", error)
-        showToast("error", error.message || "Error desconocido")
+        showToast("error", mensajeDeError(error, "Error desconocido"))
         throw error
       } finally {
         setIsSubmitting(false)

@@ -4,10 +4,9 @@ import useTooltip from "@hooks/useTooltip";
 import useContextMenu from "@hooks/useContextMenu";
 import { useReprint } from "@hooks/useReprint.js";
 import UndoHistoryEntryModal from "@components/actions/modals/UndoHistoryEntryModal";
-import { buildReprintData } from "@utils/print-data";
 import { formatTireCode } from "@utils/tireCode";
 import { getRowStyle, dictionary } from "@utils/historyStyles";
-import { colors, text, button, utility } from "@utils/tokens";
+import {text, button, utility } from "@utils/tokens";
 
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import MoreVertRoundedIcon from '@mui/icons-material/MoreVertRounded';

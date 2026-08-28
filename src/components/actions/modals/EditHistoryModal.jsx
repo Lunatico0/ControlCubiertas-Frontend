@@ -7,7 +7,7 @@ import Modal from "@components/UI/Modal"
 import { useOrderValidation } from "@hooks/useOrderValidation"
 import { text, button, colors } from '@utils/tokens'
 
-const EditHistoryModal = ({ tire, entry, onClose, refreshTire }) => {
+const EditHistoryModal = ({ tire, entry, onClose}) => {
   const {
     tires,
     data,
@@ -19,10 +19,6 @@ const EditHistoryModal = ({ tire, entry, onClose, refreshTire }) => {
   const type = entry.type || "estado";
   const isCorrection = type.startsWith("correccion");
   const baseType = type.replace("correccion-", "");
-  const defaultVehicle = entry.vehicle
-    ? { value: entry.vehicle._id, label: entry.vehicle.licensePlate }
-    : null;
-
   const { execute, isSubmitting } = useTireAction({
     apiCall: tires.updateHistory,
     printBuilder: buildCorrectionPrintData,

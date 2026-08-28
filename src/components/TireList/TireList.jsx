@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react"
+import { useContext, useState } from "react"
 import ApiContext from "@context/apiContext"
 import TireCard from "./TireCard"
 import TireDetails from "@components/TireDetails/TireDetails"
@@ -16,7 +16,6 @@ const TireList = ({ onTireSelect }) => {
     data,
     ui,
     tires,
-    state
   } = useContext(ApiContext)
 
   const {

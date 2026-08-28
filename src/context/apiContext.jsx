@@ -20,6 +20,7 @@ import { fetchAllVehicles, fetchVehicleById, createVehicle, updateVehicle, updat
 import { checkOrderNumber } from "../api/orders"
 import { getCompanyCached } from "../api/company"
 import { buildStatusMeta, setStatusCatalog } from "../components/Operativa/status"
+import { mensajeDeError } from "@utils/apiError"
 
 const ApiContext = createContext()
 
@@ -115,7 +116,7 @@ export const ApiProvider = ({ children }) => {
       setSuggestedCode(getSuggestedCode(result))
     } catch (err) {
       console.error("Error cargando cubiertas:", err)
-      setError("Error al obtener las cubiertas: " + err.message)
+      setError(mensajeDeError(err, "Error al obtener las cubiertas"))
     } finally {
       setLoading(false)
     }
@@ -128,7 +129,7 @@ export const ApiProvider = ({ children }) => {
       setVehicles(result)
     } catch (err) {
       console.error("Error cargando vehículos:", err)
-      setError("Error al obtener vehículos: " + err.message)
+      setError(mensajeDeError(err, "Error al obtener vehículos"))
     }
   }, [])
 
@@ -146,7 +147,7 @@ export const ApiProvider = ({ children }) => {
         return result
       } catch (err) {
         console.error("Error cargando cubierta por ID:", err)
-        setError("Error al obtener la cubierta: " + err.message)
+        setError(mensajeDeError(err, "Error al obtener la cubierta"))
         throw err
       } finally {
         setSelectedLoading(false)
@@ -164,7 +165,7 @@ export const ApiProvider = ({ children }) => {
       return result
     } catch (err) {
       console.error("Error cargando vehículo por ID:", err)
-      setError("Error al obtener el vehículo: " + err.message)
+      setError(mensajeDeError(err, "Error al obtener el vehículo"))
       throw err
     } finally {
       setSelectedLoading(false)
@@ -182,7 +183,7 @@ export const ApiProvider = ({ children }) => {
         return result
       } catch (err) {
         console.error("❌ Contexto: Error creando cubierta:", err)
-        setError("Error al crear cubierta: " + err.message)
+        setError(mensajeDeError(err, "Error al crear cubierta"))
         throw err
       }
     },
@@ -202,7 +203,7 @@ export const ApiProvider = ({ children }) => {
         return result
       } catch (err) {
         console.error("❌ Contexto: Error actualizando estado:", err)
-        setError("Error al actualizar estado: " + err.message)
+        setError(mensajeDeError(err, "Error al actualizar estado"))
         throw err
       }
     },
@@ -222,7 +223,7 @@ export const ApiProvider = ({ children }) => {
         return result
       } catch (err) {
         console.error("❌ Contexto: Error asignando cubierta:", err)
-        setError("Error al asignar cubierta: " + err.message)
+        setError(mensajeDeError(err, "Error al asignar cubierta"))
         throw err
       }
     },
@@ -242,7 +243,7 @@ export const ApiProvider = ({ children }) => {
         return result
       } catch (err) {
         console.error("Error desasignando cubierta:", err)
-        setError("Error al desasignar cubierta: " + err.message)
+        setError(mensajeDeError(err, "Error al desasignar cubierta"))
         throw err
       }
     },
@@ -262,7 +263,7 @@ export const ApiProvider = ({ children }) => {
         return result
       } catch (err) {
         console.error("Error corrigiendo cubierta:", err)
-        setError("Error al corregir cubierta: " + err.message)
+        setError(mensajeDeError(err, "Error al corregir cubierta"))
         throw err
       }
     },
@@ -282,7 +283,7 @@ export const ApiProvider = ({ children }) => {
         return result
       } catch (err) {
         console.error("Error deshaciendo entrada:", err)
-        setError("Error al deshacer entrada: " + err.message)
+        setError(mensajeDeError(err, "Error al deshacer entrada"))
         throw err
       }
     },
@@ -302,7 +303,7 @@ export const ApiProvider = ({ children }) => {
         return result
       } catch (err) {
         console.error("Error actualizando historial:", err)
-        setError("Error al actualizar historial: " + err.message)
+        setError(mensajeDeError(err, "Error al actualizar historial"))
         throw err
       }
     },
@@ -320,7 +321,7 @@ export const ApiProvider = ({ children }) => {
         return result
       } catch (err) {
         console.error("Error creando vehículo:", err)
-        setError("Error al crear vehículo: " + err.message)
+        setError(mensajeDeError(err, "Error al crear vehículo"))
         throw err
       }
     },
@@ -336,7 +337,7 @@ export const ApiProvider = ({ children }) => {
         return result
       } catch (err) {
         console.error("Error actualizando vehículo:", err)
-        setError("Error al actualizar vehículo: " + err.message)
+        setError(mensajeDeError(err, "Error al actualizar vehículo"))
         throw err
       }
     },
@@ -352,7 +353,7 @@ export const ApiProvider = ({ children }) => {
         return result
       } catch (err) {
         console.error("Error actualizando datos del vehículo:", err)
-        setError("Error al actualizar datos del vehículo: " + err.message)
+        setError(mensajeDeError(err, "Error al actualizar datos del vehículo"))
         throw err
       }
     },
@@ -368,7 +369,7 @@ export const ApiProvider = ({ children }) => {
         return result
       } catch (err) {
         console.error("Error configurando ejes del vehículo:", err)
-        setError("Error al configurar ejes: " + err.message)
+        setError(mensajeDeError(err, "Error al configurar ejes"))
         throw err
       }
     },
@@ -384,7 +385,7 @@ export const ApiProvider = ({ children }) => {
       return result
     } catch (err) {
       console.error("Error verificando número de orden:", err)
-      setError("Error al verificar número de orden: " + err.message)
+      setError(mensajeDeError(err, "Error al verificar número de orden"))
       throw err
     }
   }, [])

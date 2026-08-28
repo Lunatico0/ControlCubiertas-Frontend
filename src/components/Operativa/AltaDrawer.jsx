@@ -8,6 +8,7 @@ import CloseRoundedIcon from "@mui/icons-material/CloseRounded"
 import Button from "@components/UI/Button"
 import Drawer from "@components/UI/Drawer"
 import FloatingField from "@components/UI/FloatingField"
+import { mensajeDeError } from "@utils/apiError"
 
 // Drawer de alta de cubierta nueva. Crea en depósito (status "Nueva"); la asignación
 // a vehículo es una acción aparte. Reutiliza tires.create (refresca la lista sola).
@@ -18,7 +19,7 @@ const KM_MAX = 1_500_000
 
 
 const AltaDrawer = ({ onClose, onCreated }) => {
-  const { tires, data, orders } = useContext(ApiContext)
+  const { tires, data} = useContext(ApiContext)
   const { print } = usePrint()
   const initialStatus = data?.initialStatus || "Nueva" // estado de alta configurable del tenant
   const [form, setForm] = useState({
@@ -103,7 +104,7 @@ const AltaDrawer = ({ onClose, onCreated }) => {
       onCreated?.()
       onClose()
     } catch (e) {
-      showToast("error", e.message || "No se pudo crear la cubierta")
+      showToast("error", mensajeDeError(e, "No se pudo crear la cubierta"))
     } finally {
       setSubmitting(false)
     }

@@ -15,7 +15,9 @@
     "test:watch": "vitest",
     "electron:start": "electron .",
     "check:case": "node scripts/check-import-case.mjs src",
-    "check:bundle": "node scripts/check-bundle.mjs dist"
+    "check:bundle": "node scripts/check-bundle.mjs dist",
+    "check:dead": "node scripts/check-dead-code.mjs src",
+    "lint": "eslint src"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",

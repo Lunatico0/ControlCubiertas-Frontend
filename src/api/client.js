@@ -1,6 +1,7 @@
 import axios from "axios"
 import { getAccessToken, getRefreshToken, setTokens, clearTokens } from "./tokenStore"
 import isElectron from "@utils/isElectron"
+import * as Sentry from '@sentry/react'
 
 const BASE_URL = import.meta.env.VITE_API_URL
 
@@ -89,9 +90,25 @@ export const createAPI = (path) => {
       const message = data?.message || error.message || "Error desconocido"
       // Re-lanzamos un Error plano (la UI consume .message), pero preservamos datos útiles:
       // `field` (qué campo marcar en rojo) y `status` (código HTTP) para el manejo en el componente.
+      //
+      // El `.message` que viaja acá es el CRUDO. La UI no lo muestra tal cual: pasa por
+      // mensajeDeError (@utils/apiError), que sólo deja pasar los 4xx (mensajes de negocio) y
+      // reemplaza el resto por un texto por status. Sin eso, un 5xx le mostraba al operario el
+      // texto de axios ("Request failed with status code 500") o estructura interna de Mongo.
       const err = new Error(message)
       if (data?.field) err.field = data.field
       if (status) err.status = status
+
+      // Los 5xx y los errores de red son fallas reales: van a Sentry con el detalle técnico
+      // completo, que es justamente lo que NO se le muestra al operario. Los 4xx no: son
+      // errores de negocio esperados y ensuciarían el proyecto.
+      if (!status || status >= 500) {
+        Sentry.captureException(error, {
+          tags: { api: path, http_status: status || 'network' },
+          extra: { url, method: original?.method, backendMessage: data?.message },
+        })
+      }
+
       return Promise.reject(err)
     },
   )

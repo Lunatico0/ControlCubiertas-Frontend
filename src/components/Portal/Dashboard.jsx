@@ -16,6 +16,7 @@ import TaskAltOutlinedIcon from "@mui/icons-material/TaskAltOutlined"
 import DesktopDownload from "./DesktopDownload"
 import StatCard from "@components/UI/StatCard"
 import { tituloPantalla } from "@utils/tokens"
+import { mensajeDeError } from "@utils/apiError"
 
 // Paleta de estados del design system (coherente entre donut y barras).
 const STATUS_COLORS = {
@@ -72,7 +73,7 @@ const Dashboard = () => {
   const [error, setError] = useState("")
 
   useEffect(() => {
-    getSummary().then(setData).catch((e) => setError(e.message || "No se pudo cargar el resumen")).finally(() => setLoading(false))
+    getSummary().then(setData).catch((e) => setError(mensajeDeError(e, "No se pudo cargar el resumen"))).finally(() => setLoading(false))
   }, [])
 
   const displayName = user?.name || user?.email?.split("@")[0] || "admin"

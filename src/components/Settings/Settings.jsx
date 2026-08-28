@@ -1,4 +1,3 @@
-import React from 'react'
 import { text } from '@utils/tokens'
 import ReceiptSettings from './ReceiptSettings'
 import UpdateSettings from './UpdateSettings'

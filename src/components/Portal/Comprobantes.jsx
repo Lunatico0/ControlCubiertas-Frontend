@@ -12,6 +12,7 @@ import { showToast } from "@utils/toast"
 import { downloadCSV } from "@utils/csv"
 import Pager from "./Pager"
 import { tituloPantalla } from "@utils/tokens"
+import { mensajeDeError } from "@utils/apiError"
 
 const COLS = "1.15fr 0.85fr 0.75fr 1.35fr 0.9fr 0.75fr"
 const LIMIT = 15
@@ -73,7 +74,7 @@ const Comprobantes = () => {
       setRows(data.items || [])
       setTotal(data.total || 0)
     } catch (err) {
-      showToast("error", err.message || "No se pudieron cargar los comprobantes")
+      showToast("error", mensajeDeError(err, "No se pudieron cargar los comprobantes"))
     } finally {
       setLoading(false)
     }

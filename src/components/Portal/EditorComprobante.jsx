@@ -11,6 +11,7 @@ import { renderComprobanteHTML } from "@utils/receipt-template"
 import Button from "@components/UI/Button"
 import FloatingField from "@components/UI/FloatingField"
 import Toggle from "@components/common/Toggle"
+import { mensajeDeError } from "@utils/apiError"
 
 // Editor del comprobante impreso (Claude Design). Pantalla dedicada del portal admin:
 // controles a la izquierda + preview A4 en vivo a la derecha. Persiste en el tenant
@@ -112,7 +113,7 @@ const EditorComprobante = () => {
       })
       showToast("success", "Diseño del comprobante guardado")
     } catch (e) {
-      showToast("error", e.message || "No se pudo guardar")
+      showToast("error", mensajeDeError(e, "No se pudo guardar"))
     } finally {
       setSaving(false)
     }

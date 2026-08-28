@@ -1,5 +1,6 @@
 import { useState, useCallback } from "react"
 import { showToast } from "@utils/toast"
+import { mensajeDeError } from "@utils/apiError"
 
 const useCreateEntity = (
   createFunction,
@@ -34,7 +35,7 @@ const useCreateEntity = (
         return response
       } catch (err) {
         setError(err)
-        if (showToasts) showToast("error", err.message || errorMessage)
+        if (showToasts) showToast("error", mensajeDeError(err, errorMessage))
         onError?.(err)
         throw err
       } finally {
@@ -60,7 +61,7 @@ const useCreateEntity = (
         return response
       } catch (err) {
         setError(err)
-        if (showToasts) showToast("error", err.message || updateErrorMessage)
+        if (showToasts) showToast("error", mensajeDeError(err, updateErrorMessage))
         onError?.(err)
         throw err
       } finally {

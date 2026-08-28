@@ -56,7 +56,7 @@ const Modal = ({ children, title, onClose, overflow = 'auto' , maxWidth = "md", 
         className={`
           ${colors.surface} ${colors.shadow} text-gray-900 dark:text-gray-100
           rounded-xl ${paddingClasses[padding] || 'p-0'} w-full ${maxWidthClasses[maxWidth] || "max-w-md"}
-          overflow-auto relative ${maxHeight ? `max-h-${maxHeight}` : "max-h-[90dvh]"} ${overflowClasses[overflow] || "overflow-auto"}
+          overflow-auto relative max-h-[90dvh] ${overflowClasses[overflow] || "overflow-auto"}
         `}
         style={{ maxHeight }}
         ref={cardRef}

@@ -1,4 +1,4 @@
-import { input, colors } from "@utils/tokens"
+import { input} from "@utils/tokens"
 
 const TireSearchBox = ({ availableTires = [], onAddTire = () => { }, query = "", setQuery = () => { } }) => (
   <div className="relative">

@@ -1,4 +1,3 @@
-import React from 'react';
 import NavigateNextRoundedIcon from '@mui/icons-material/NavigateNextRounded';
 import NavigateBeforeRoundedIcon from '@mui/icons-material/NavigateBeforeRounded';
 import KeyboardDoubleArrowRightRoundedIcon from '@mui/icons-material/KeyboardDoubleArrowRightRounded';
@@ -14,7 +13,6 @@ const PaginationControls = ({
   if (totalPages <= 1) return null
 
   const renderPageNumbers = () => {
-    const pages = []
     const delta = 2 // Cuántas páginas visibles antes/después del actual
     const range = []
 

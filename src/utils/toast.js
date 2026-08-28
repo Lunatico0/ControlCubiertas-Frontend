@@ -11,12 +11,11 @@ export const showToast = (type = "success", message = "Operación realizada") =>
   pushToast(message, { kind: TOAST_KIND[type] || "ok" })
 }
 
-// Devuelve Promise<boolean> (antes result.isConfirmed). El icon queda por compatibilidad
-// de firma; el diálogo propio deriva su estilo de la variante confirm.
+// Devuelve Promise<boolean> (antes result.isConfirmed). El diálogo propio deriva su estilo
+// de la variante confirm; el `icon` de SweetAlert ya no existe y se ignora si llega.
 export const showConfirm = ({
   title = "¿Estás seguro?",
   text = "Esta acción no se puede deshacer",
-  icon,
   confirmButtonText = "Sí, continuar",
   cancelButtonText = "Cancelar",
 } = {}) => dialog.confirm({ title, text, confirmLabel: confirmButtonText, cancelLabel: cancelButtonText })

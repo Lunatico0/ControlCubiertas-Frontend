@@ -7,7 +7,7 @@ import Modal from "@components/UI/Modal"
 import { useOrderValidation } from "@hooks/useOrderValidation"
 import { Label, input } from "@utils/tokens"
 
-const FinishRecapModal = ({ tire, onClose, refreshTire }) => {
+const FinishRecapModal = ({ tire, onClose}) => {
   const {
     tires,
     orders

@@ -25,6 +25,15 @@ jobs:
       - name: Case de los imports
         run: node scripts/check-import-case.mjs src
 
+      # Código que ya no se alcanza desde main.jsx: la auditoría encontró módulos y barrels
+      # enteros que se seguían manteniendo sin que ninguna pantalla los importara.
+      - name: Código muerto
+        run: node scripts/check-dead-code.mjs src
+
+      # eslint sin react/prop-types: pasó de 1034 errores (685 de ruido) a cero.
+      - name: Lint
+        run: npx eslint src --max-warnings 40
+
       - run: npm test
 
       # El build es parte del contrato: un test verde con un build roto no sirve de nada.

@@ -11,6 +11,7 @@ import { downloadCSV } from "@utils/csv"
 import Callout from "@components/common/Callout"
 import StatCard from "@components/UI/StatCard"
 import { tituloPantalla } from "@utils/tokens"
+import { mensajeDeError } from "@utils/apiError"
 import {
   ResponsiveContainer, BarChart, Bar, LineChart, Line, AreaChart, Area,
   PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ScatterChart, Scatter,
@@ -275,7 +276,7 @@ const Reportes = () => {
       setData(d)
       setVehicles(v?.vehicles || [])
     } catch (err) {
-      showToast("error", err.message || "No se pudieron cargar los reportes")
+      showToast("error", mensajeDeError(err, "No se pudieron cargar los reportes"))
     } finally {
       setLoading(false)
     }

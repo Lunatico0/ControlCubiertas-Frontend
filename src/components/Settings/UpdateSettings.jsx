@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { getUpdateRules } from '@constants/settingsRules'
 import { showToast } from '@utils/toast'
 

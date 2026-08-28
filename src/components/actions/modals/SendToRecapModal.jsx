@@ -6,7 +6,7 @@ import TireForm from "@components/Forms/TireForm"
 import Modal from "@components/UI/Modal"
 import { useOrderValidation } from "@hooks/useOrderValidation"
 
-const SendToRecapModal = ({ tire, onClose, refreshTire }) => {
+const SendToRecapModal = ({ tire, onClose}) => {
   const {
     tires,
     orders

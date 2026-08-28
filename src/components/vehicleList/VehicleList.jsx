@@ -1,31 +1,25 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import ApiContext from "@context/apiContext";
-import { colors, text, button } from "@utils/tokens";
+import { colors, text} from "@utils/tokens";
 import VehicleCard from "./VehicleCard";
 import NewVehicle from "@components/New/NewVehicle";
 import EmptyState from "@components/TireList/EmptyState";
 import LoadingGrid from "@components/TireList/LoadingGrid";
-import AddCircleRoundedIcon from "@mui/icons-material/AddCircleRounded";
 
 const VehicleList = ({ setActive }) => {
-  const { data, ui, vehicles, state } = useContext(ApiContext);
-  const [isNewVehicleOpen, setIsNewVehicleOpen] = useState(false);
+  const { data, ui} = useContext(ApiContext);
   const [vehicleToEdit, setVehicleToEdit] = useState(null)
 
   // Sin efecto de carga propio: el ApiProvider ya carga al montar y recarga con
   // refreshTrigger. Tenerlo acá disparaba DOS peticiones concurrentes, con carrera entre
   // respuestas (ganaba la última en llegar, no la más nueva).
 
-  const handleNewVehicle = () => setIsNewVehicleOpen(true);
   const handleVehicleFilter = (vehicle) => {
     ui.setPresetVehicleFilter(vehicle.mobile)
     setActive("tires")
   }
 
-  const handleCloseModal = () => {
-    setIsNewVehicleOpen(false)
-    setVehicleToEdit(null)
-  }
+  const handleCloseModal = () => setVehicleToEdit(null)
 
   const handleEditVehicle = (id) => {
     const vehicle = data.vehicles.find((v) => v._id === id)
@@ -57,7 +51,7 @@ const VehicleList = ({ setActive }) => {
         ))}
       </div>
 
-      {(isNewVehicleOpen || vehicleToEdit) && (
+      {vehicleToEdit && (
         <NewVehicle
           onClose={handleCloseModal}
           onSuccess={handleCloseModal}

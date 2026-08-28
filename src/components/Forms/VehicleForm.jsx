@@ -115,7 +115,6 @@ const VehicleForm = ({
         <Button
           type="submit"
           disabled={isSubmitting}
-          onClick={()=> console.log('Actualizando')}
           className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold px-6 py-2 rounded-md transition flex items-center gap-2"
         >
           {isSubmitting && <Spinner size={4} />}

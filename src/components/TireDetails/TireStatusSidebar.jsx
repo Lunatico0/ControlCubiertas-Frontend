@@ -3,9 +3,6 @@ import ApiContext from "@context/apiContext";
 import { statusStyles } from "@utils/statusStyle";
 import { formatTireCode } from "@utils/tireCode";
 import QuickActions from "@components/actions/QuickActions";
-import { button } from "@utils/tokens";
-import EditNoteRoundedIcon from '@mui/icons-material/EditNoteRounded';
-import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 
 const SidebarInfoItem = ({ label, value, className = "" }) => (
   <div className="flex justify-between">
@@ -14,7 +11,7 @@ const SidebarInfoItem = ({ label, value, className = "" }) => (
   </div>
 );
 
-const TireStatusSidebar = ({ tire, onEdit, onClose, refreshTire }) => {
+const TireStatusSidebar = ({ tire, refreshTire }) => {
   const { data } = useContext(ApiContext);
   const tireCodePrefix = data?.tireCodePrefix || "";
 

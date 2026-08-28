@@ -7,6 +7,7 @@ import Callout from "@components/common/Callout"
 import FloatingField from "@components/UI/FloatingField"
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined"
 import { createUser, updateUser } from "../../api/admin"
+import { mensajeDeError } from "@utils/apiError"
 
 // Roles como cards seleccionables (ceñido al diseño Panel Admin). Los títulos siguen la
 // nomenclatura del resto del panel (Operario / Administrador); la descripción es la del diseño.
@@ -40,7 +41,7 @@ const UserForm = ({ user, onClose, onCreated, onSaved }) => {
       }
       onClose()
     } catch (err) {
-      showToast("error", err.message || (isEdit ? "No se pudo actualizar el usuario" : "No se pudo crear el usuario"))
+      showToast("error", mensajeDeError(err, (isEdit ? "No se pudo actualizar el usuario" : "No se pudo crear el usuario")))
     }
   }
 

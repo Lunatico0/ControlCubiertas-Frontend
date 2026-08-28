@@ -12,6 +12,7 @@ import Button from "@components/UI/Button"
 import { listUsers, setUserStatus, resetPassword } from "../../api/admin"
 import UserForm from "./UserForm"
 import { tituloPantalla } from "@utils/tokens"
+import { mensajeDeError } from "@utils/apiError"
 
 const roleLabel = { "tenant-admin": "Administrador", operator: "Operario" }
 const initialsOf = (u) => (u.name || u.email || "?").slice(0, 2).toUpperCase()
@@ -33,7 +34,7 @@ const Users = () => {
     try {
       setUsers(await listUsers())
     } catch (err) {
-      showToast("error", err.message || "No se pudieron cargar los usuarios")
+      showToast("error", mensajeDeError(err, "No se pudieron cargar los usuarios"))
     } finally {
       setLoading(false)
     }
@@ -54,7 +55,7 @@ const Users = () => {
       setUsers((prev) => prev.map((x) => (x._id === updated._id ? updated : x)))
       showToast("success", "Estado actualizado")
     } catch (err) {
-      showToast("error", err.message || "No se pudo cambiar el estado")
+      showToast("error", mensajeDeError(err, "No se pudo cambiar el estado"))
     }
   }
 
@@ -82,7 +83,7 @@ const Users = () => {
       const { tempPassword } = await resetPassword(u._id)
       setResetTarget({ user: u, tempPassword })
     } catch (err) {
-      showToast("error", err.message || "No se pudo restablecer la contraseña")
+      showToast("error", mensajeDeError(err, "No se pudo restablecer la contraseña"))
     } finally {
       setResetting(false)
     }
@@ -93,7 +94,7 @@ const Users = () => {
       setResetTarget((p) => ({ ...p, tempPassword }))
       showToast("info", "Se generó otra contraseña temporal")
     } catch (err) {
-      showToast("error", err.message || "No se pudo regenerar")
+      showToast("error", mensajeDeError(err, "No se pudo regenerar"))
     }
   }
   const copyReset = async () => {

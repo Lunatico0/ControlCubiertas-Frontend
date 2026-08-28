@@ -7,6 +7,7 @@ import { showToast } from "@utils/toast"
 import BrandLogo from "@components/BrandLogo"
 import Button from "@components/UI/Button"
 import FloatingField from "@components/UI/FloatingField"
+import { mensajeDeError } from "@utils/apiError"
 
 // Establecer/cambiar contraseña (rediseño Claude Design "primer ingreso"). Dos modos:
 //  - mustChangePassword (primer ingreso / tras un reset): solo pide la nueva; el backend
@@ -35,7 +36,7 @@ const ChangePassword = () => {
         navigate(-1)
       }
     } catch (err) {
-      setServerError(err.message || "No pudimos cambiar la contraseña")
+      setServerError(mensajeDeError(err, "No pudimos cambiar la contraseña"))
     }
   }
 

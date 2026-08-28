@@ -2,7 +2,7 @@ import { useContext } from "react";
 import ApiContext from "@context/apiContext";
 import { statusStyles } from "@utils/statusStyle";
 import { formatTireCode } from "@utils/tireCode";
-import { colors, text } from "@utils/tokens";
+import {text } from "@utils/tokens";
 import InfoItem from "@components/UI/InfoItem";
 import cubierta from "@/assets/Cubierta.png"
 

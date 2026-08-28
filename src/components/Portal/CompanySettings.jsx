@@ -12,6 +12,7 @@ import Button from "@components/UI/Button"
 import FloatingField from "@components/UI/FloatingField"
 import { tituloPantalla } from "@utils/tokens"
 import Toggle from "@components/common/Toggle"
+import { mensajeDeError } from "@utils/apiError"
 
 const inputClass =
   "w-full rounded-[10px] border border-(--bd) bg-(--input) px-3 py-2.5 text-sm text-(--tx) placeholder:text-(--tx-6) outline-none transition focus:border-(--ink-lime)"
@@ -83,7 +84,7 @@ const CompanySettings = () => {
         setUsage(s?.cubiertas?.byStatus || {})
         setMeta({ plan: c.plan, status: c.status, dbName: c.dbName })
       })
-      .catch((e) => setError(e.message || "No se pudo cargar la empresa"))
+      .catch((e) => setError(mensajeDeError(e, "No se pudo cargar la empresa")))
       .finally(() => setLoading(false))
   }, [reset])
 
@@ -134,7 +135,7 @@ const CompanySettings = () => {
       setEditing(null)
       showToast("success", "Datos de la empresa actualizados")
     } catch (err) {
-      showToast("error", err.message || "No se pudieron guardar los cambios")
+      showToast("error", mensajeDeError(err, "No se pudieron guardar los cambios"))
     }
   }
 

@@ -6,7 +6,7 @@ import TireForm from "@components/Forms/TireForm"
 import Modal from "@components/UI/Modal"
 import { useOrderValidation } from "@hooks/useOrderValidation"
 
-const UndoHistoryEntryModal = ({ tire, entry, onClose, refreshTire }) => {
+const UndoHistoryEntryModal = ({ tire, entry, onClose}) => {
   const {
     orders,
     tires
