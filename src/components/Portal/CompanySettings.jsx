@@ -10,6 +10,7 @@ import { invalidateCompanyCache } from "@api/company"
 import { showToast } from "@utils/toast"
 import Button from "@components/UI/Button"
 import FloatingField from "@components/UI/FloatingField"
+import { formatPlate } from "@utils/plateFormat"
 import { tituloPantalla } from "@utils/tokens"
 import Toggle from "@components/common/Toggle"
 import { mensajeDeError } from "@utils/apiError"
@@ -58,6 +59,15 @@ const PLATE_SEPS = [
 ]
 const isPresetSep = (v) => PLATE_SEPS.some((p) => p.v === v)
 
+// Formatos de patente ofrecidos (t138). La máscara se escribe con A (letra) y 0 (dígito) y se
+// valida sobre la patente normalizada, así que el separador de display no la afecta.
+const PLATE_FORMAT_PRESETS = [
+  { mask: "AAA000", label: "Auto, dominio viejo" },
+  { mask: "AA000AA", label: "Auto, Mercosur" },
+  { mask: "A000AAA", label: "Moto, Mercosur" },
+  { mask: "000AAA", label: "Moto, dominio viejo" },
+]
+
 const CompanySettings = () => {
   const { register, handleSubmit, reset, formState: { isSubmitting } } = useForm()
   const [loading, setLoading] = useState(true)
@@ -67,6 +77,9 @@ const CompanySettings = () => {
   const [usage, setUsage] = useState({}) // { nombreEstado: cantidadDeCubiertas }
   const [editing, setEditing] = useState(null) // índice del estado en edición (popover)
   const [plateSep, setPlateSep] = useState("") // separador de patente (solo display)
+  // t138: formatos ACEPTADOS de patente. Máscaras con A (letra) y 0 (dígito); la lista vacía
+  // apaga la validación, que es la salida para una flota con chapas extranjeras.
+  const [plateFormats, setPlateFormats] = useState([])
   const [codePrefix, setCodePrefix] = useState("") // prefijo del código interno de cubierta (solo display)
   const [autoPrint, setAutoPrint] = useState(true) // imprimir el comprobante al confirmar una acción
 
@@ -79,6 +92,7 @@ const CompanySettings = () => {
         })
         setStatuses(Array.isArray(c.stockStatuses) ? c.stockStatuses : [])
         setPlateSep(c.plateSeparator || "")
+        setPlateFormats(Array.isArray(c.plateFormats) ? c.plateFormats : [])
         setCodePrefix(c.tireCodePrefix || "")
         setAutoPrint(c.autoPrint !== false)
         setUsage(s?.cubiertas?.byStatus || {})
@@ -120,7 +134,7 @@ const CompanySettings = () => {
 
   const onSubmit = async (data) => {
     try {
-      const updated = await updateCompany({ ...data, stockStatuses: statuses, plateSeparator: plateSep, tireCodePrefix: codePrefix, autoPrint })
+      const updated = await updateCompany({ ...data, stockStatuses: statuses, plateSeparator: plateSep, plateFormats, tireCodePrefix: codePrefix, autoPrint })
       // Invalida la cache de company para que la operativa (/op) tome el nuevo separador/prefijo
       // al entrar, sin necesidad de hard-reload (Ctrl+Shift+R).
       invalidateCompanyCache()
@@ -130,6 +144,7 @@ const CompanySettings = () => {
       })
       setStatuses(Array.isArray(updated.stockStatuses) ? updated.stockStatuses : [])
       setPlateSep(updated.plateSeparator || "")
+      setPlateFormats(Array.isArray(updated.plateFormats) ? updated.plateFormats : [])
       setCodePrefix(updated.tireCodePrefix || "")
       setAutoPrint(updated.autoPrint !== false)
       setEditing(null)
@@ -217,6 +232,37 @@ const CompanySettings = () => {
           <div className="mt-4 flex items-center gap-2 text-sm text-(--tx-5)">
             Vista previa:
             <span className="rounded-[var(--r-sm)] border border-(--bd) bg-(--input) px-2.5 py-1 font-mono text-[13px] text-(--tx-2)">{plateSep ? `EEQ${plateSep}541` : "EEQ541"}</span>
+          </div>
+
+          {/* t138: formatos aceptados. Sin esto se cargaba "ABC1234XYZ" sin que nadie chistara. */}
+          <div className="mt-6 border-t border-(--bd-faint) pt-5">
+            <h3 className="text-[13.5px] font-semibold text-(--tx)">Formatos aceptados</h3>
+            <p className="mt-1 text-sm text-(--tx-4)">
+              Qué patentes se pueden cargar. Si no marcás ninguno, se acepta cualquier cosa: elegilo así solo si tu flota tiene chapas que no entran en ningún formato de acá.
+            </p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {PLATE_FORMAT_PRESETS.map((f) => {
+                const sel = plateFormats.includes(f.mask)
+                return (
+                  <button key={f.mask} type="button"
+                    onClick={() => setPlateFormats((prev) => (sel ? prev.filter((m) => m !== f.mask) : [...prev, f.mask]))}
+                    className="rounded-[var(--r-md)] border px-3.5 py-2 text-left text-[12.5px] font-semibold transition"
+                    style={{
+                      borderColor: sel ? "var(--ink-lime)" : "var(--bd)",
+                      background: sel ? "color-mix(in srgb, var(--ink-lime) 14%, transparent)" : "var(--elev)",
+                      color: sel ? "var(--tx)" : "var(--tx-3)",
+                    }}>
+                    <span className="block font-mono text-[13px]">{formatPlate(f.mask, plateSep)}</span>
+                    <span className="mt-0.5 block text-[11px] font-normal text-(--tx-5)">{f.label}</span>
+                  </button>
+                )
+              })}
+            </div>
+            {plateFormats.length === 0 && (
+              <p className="mt-3 text-[12.5px]" style={{ color: "var(--ink-orange)" }}>
+                Sin formatos marcados no se valida la patente: un error de tipeo entra a la base tal cual.
+              </p>
+            )}
           </div>
         </section>
 

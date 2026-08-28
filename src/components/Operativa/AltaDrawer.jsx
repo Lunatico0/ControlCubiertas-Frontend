@@ -8,6 +8,7 @@ import CloseRoundedIcon from "@mui/icons-material/CloseRounded"
 import Button from "@components/UI/Button"
 import Drawer from "@components/UI/Drawer"
 import FloatingField from "@components/UI/FloatingField"
+import { normalizarTexto, sugerenciasDe } from "@utils/catalogoLibre"
 import { mensajeDeError } from "@utils/apiError"
 
 // Drawer de alta de cubierta nueva. Crea en depósito (status "Nueva"); la asignación
@@ -39,6 +40,18 @@ const AltaDrawer = ({ onClose, onCreated }) => {
     setForm((f) => ({ ...f, [k]: e.target.value }))
     setErrors((p) => (p[k] ? { ...p, [k]: false } : p))
   }
+
+  // t137: marca, rodado y dibujo eran texto libre puro y el catálogo se llenaba de variantes
+  // del mismo valor ("michelin" y "Michelin" como dos marcas en el filtro). Dos medidas que
+  // se complementan: el <datalist> con lo YA cargado en el tenant (elegir en vez de tipear)
+  // y la normalización al salir del campo (trim + capitalización), que absorbe lo tipeado.
+  const catalogo = data?.tires || []
+  const sugerencias = {
+    brand: sugerenciasDe(catalogo, "brand"),
+    size: sugerenciasDe(catalogo, "size"),
+    pattern: sugerenciasDe(catalogo, "pattern"),
+  }
+  const normalizarAlSalir = (k) => () => setForm((f) => ({ ...f, [k]: normalizarTexto(f[k]) }))
 
   const submit = async () => {
     // Validación por campo: en vez de un toast genérico, marcamos en rojo los faltantes.
@@ -73,9 +86,9 @@ const AltaDrawer = ({ onClose, onCreated }) => {
         status: initialStatus,
         code: Number(form.code), // el input es editable (string) pero el code se guarda como Number
         serialNumber: form.serialNumber,
-        brand: form.brand,
-        size: form.size,
-        pattern: form.pattern,
+        brand: normalizarTexto(form.brand),
+        size: normalizarTexto(form.size),
+        pattern: normalizarTexto(form.pattern),
         kilometers: Number(form.kilometers) || 0,
         createdAt,
         orderNumber: form.orderNumber,
@@ -87,9 +100,9 @@ const AltaDrawer = ({ onClose, onCreated }) => {
         const printData = buildCreateTirePrintData({
           code: form.code || created?.code || created?.tire?.code || "",
           serialNumber: form.serialNumber,
-          brand: form.brand,
-          size: form.size,
-          pattern: form.pattern,
+          brand: normalizarTexto(form.brand),
+          size: normalizarTexto(form.size),
+          pattern: normalizarTexto(form.pattern),
           kilometers: Number(form.kilometers) || 0,
           status: initialStatus,
           orderNumber: form.orderNumber,
@@ -129,10 +142,10 @@ const AltaDrawer = ({ onClose, onCreated }) => {
               <FloatingField label="Código interno" type="number" min="1" required error={errors.code} value={form.code} onChange={set("code")} />
               <FloatingField label="N° de serie" required error={errors.serialNumber} value={form.serialNumber} onChange={set("serialNumber")} />
             </div>
-            <FloatingField label="Marca" required error={errors.brand} value={form.brand} onChange={set("brand")} />
+            <FloatingField label="Marca" required error={errors.brand} value={form.brand} onChange={set("brand")} onBlur={normalizarAlSalir("brand")} suggestions={sugerencias.brand} />
             <div className="grid grid-cols-2 gap-3">
-              <FloatingField label="Rodado" required error={errors.size} value={form.size} onChange={set("size")} />
-              <FloatingField label="Dibujo" required error={errors.pattern} value={form.pattern} onChange={set("pattern")} />
+              <FloatingField label="Rodado" required error={errors.size} value={form.size} onChange={set("size")} onBlur={normalizarAlSalir("size")} suggestions={sugerencias.size} />
+              <FloatingField label="Dibujo" required error={errors.pattern} value={form.pattern} onChange={set("pattern")} onBlur={normalizarAlSalir("pattern")} suggestions={sugerencias.pattern} />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <FloatingField label="Kilómetros" type="number" min="0" max={KM_MAX} error={errors.kilometers} value={form.kilometers} onChange={set("kilometers")} />

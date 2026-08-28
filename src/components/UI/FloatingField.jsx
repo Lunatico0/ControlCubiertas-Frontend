@@ -23,7 +23,10 @@ import { useId, forwardRef } from "react"
 // detecte si hay valor. No pases un placeholder propio: el label ES el placeholder.
 const ALWAYS_UP = new Set(["date", "time", "datetime-local", "month", "week", "color"])
 
-const FloatingField = forwardRef(({ label, as = "input", type = "text", required = false, error = false, className = "", children, id, rightAddon, ...rest }, ref) => {
+//   suggestions — array de strings: rinde un <datalist> y lo conecta al input. Es autocompletado
+//                 SIN cerrar el campo: el operario puede elegir de lo ya cargado o escribir algo
+//                 nuevo. Es lo que evita que "michelin" y "Michelin" convivan (t137).
+const FloatingField = forwardRef(({ label, as = "input", type = "text", required = false, error = false, className = "", children, id, rightAddon, suggestions, ...rest }, ref) => {
   const autoId = useId()
   const fieldId = id || autoId
   const isSelect = as === "select"
@@ -32,12 +35,13 @@ const FloatingField = forwardRef(({ label, as = "input", type = "text", required
   const errMsg = typeof error === "string" ? error : ""
 
   const cls = `ff-control ${className}`.trim()
+  const listId = Array.isArray(suggestions) && suggestions.length ? `${fieldId}-sug` : undefined
   const control = isSelect ? (
     <select ref={ref} id={fieldId} className={cls} {...rest}>{children}</select>
   ) : isTextarea ? (
     <textarea ref={ref} id={fieldId} className={cls} placeholder=" " {...rest} />
   ) : (
-    <input ref={ref} id={fieldId} type={type} className={cls} placeholder=" " {...rest} />
+    <input ref={ref} id={fieldId} type={type} className={cls} placeholder=" " list={listId} {...rest} />
   )
 
   return (
@@ -46,6 +50,7 @@ const FloatingField = forwardRef(({ label, as = "input", type = "text", required
       <label htmlFor={fieldId} className="ff-label">
         {label}{required && <span className="ff-req" aria-hidden="true">*</span>}
       </label>
+      {listId && <datalist id={listId}>{suggestions.map((s) => <option key={s} value={s} />)}</datalist>}
       {rightAddon}
       {errMsg && <div className="ff-error-msg">{errMsg}</div>}
     </div>

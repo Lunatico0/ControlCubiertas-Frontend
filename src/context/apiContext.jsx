@@ -71,6 +71,9 @@ export const ApiProvider = ({ children }) => {
     [statuses],
   )
   const [plateSep, setPlateSep] = useState("") // separador de patente configurable (solo display)
+  // Formatos de patente ACEPTADOS por el tenant (t138). Máscaras con A/0; lista vacía = no
+  // validar. El backend es la autoridad; esto es para frenar el error de tipeo antes del viaje.
+  const [plateFormats, setPlateFormats] = useState([])
   const [tireCodePrefix, setTireCodePrefix] = useState("") // prefijo del código interno (solo display)
 
   // Estados de control
@@ -411,6 +414,7 @@ export const ApiProvider = ({ children }) => {
         .then((c) => {
           if (cancelled) return
           setPlateSep(c?.plateSeparator || "") // separador de patente configurable (solo display)
+          setPlateFormats(Array.isArray(c?.plateFormats) ? c.plateFormats : [])
           setTireCodePrefix(c?.tireCodePrefix || "") // prefijo del código interno (solo display)
           const st = Array.isArray(c?.stockStatuses) ? c.stockStatuses : []
           if (!st.length && attempt < 3) {
@@ -537,6 +541,7 @@ export const ApiProvider = ({ children }) => {
     return {
       statuses,
       plateSep,
+      plateFormats,
       tireCodePrefix,
       statusMeta: buildStatusMeta(statuses),
       initialStatus: byRole("initial"),
@@ -545,7 +550,7 @@ export const ApiProvider = ({ children }) => {
       stockScale: statuses.filter((s) => s.role === "initial" || s.role === "stock").map((s) => s.name),
       stateOrder,
     }
-  }, [statuses, stateOrder, plateSep, tireCodePrefix])
+  }, [statuses, stateOrder, plateSep, plateFormats, tireCodePrefix])
 
   // Valor del contexto memoizado
   const contextValue = useMemo(() => ({

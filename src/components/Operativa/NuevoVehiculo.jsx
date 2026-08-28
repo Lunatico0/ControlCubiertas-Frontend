@@ -3,7 +3,7 @@ import ApiContext from "@context/apiContext"
 import { useModalEscape } from "@hooks/useModalStack"
 import isElectron from "@utils/isElectron"
 import { showToast } from "@utils/toast"
-import { formatPlate, normalizePlate } from "@utils/plateFormat"
+import { formatPlate, normalizePlate, isValidPlate, describirFormatos } from "@utils/plateFormat"
 import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded"
 import Button from "@components/UI/Button"
 import MonoLabel from "@components/UI/MonoLabel"
@@ -52,6 +52,13 @@ const NuevoVehiculo = ({ onClose, onCreated }) => {
     if (!form.movil.trim()) e.movil = true
     if (!form.patente.trim()) e.patente = true
     if (Object.keys(e).length) { setErrors(e); showToast("warning", "Completá los campos obligatorios"); return }
+    // t138: el formato se chequea ACÁ además del backend. No es una validación duplicada por
+    // desconfianza: es para que el error aparezca al lado del campo en vez de volver como un
+    // 400 y un toast, después de un viaje entero por un error de tipeo.
+    if (!isValidPlate(form.patente, data.plateFormats)) {
+      setErrors({ patente: `Formato de patente inválido. Se espera: ${describirFormatos(data.plateFormats, data.plateSep)}` })
+      return
+    }
     setErrors({})
     setSubmitting(true)
     try {

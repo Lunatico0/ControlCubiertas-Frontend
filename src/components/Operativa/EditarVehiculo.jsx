@@ -1,7 +1,7 @@
 import { useState, useContext } from "react"
 import ApiContext from "@context/apiContext"
 import { showToast } from "@utils/toast"
-import { formatPlate, normalizePlate } from "@utils/plateFormat"
+import { formatPlate, normalizePlate, isValidPlate, describirFormatos } from "@utils/plateFormat"
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded"
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined"
 import Button from "@components/UI/Button"
@@ -35,6 +35,12 @@ const EditarVehiculo = ({ vehicle, onClose, onSaved }) => {
     if (!form.mobile.trim()) e.mobile = true
     if (!form.licensePlate.trim()) e.licensePlate = true
     if (Object.keys(e).length) { setErrors(e); showToast("warning", "Completá los campos obligatorios"); return }
+    // t138: mismo guard que en el alta. Editar una patente a una forma inválida es igual de
+    // dañino que crearla así, y el error tiene que llegar al campo, no como toast.
+    if (!isValidPlate(form.licensePlate, data.plateFormats)) {
+      setErrors({ licensePlate: `Formato de patente inválido. Se espera: ${describirFormatos(data.plateFormats, data.plateSep)}` })
+      return
+    }
     setErrors({})
     setSubmitting(true)
     try {
