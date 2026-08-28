@@ -35,10 +35,17 @@ const AppSidebar = ({ nav, belowNav, upd, user, help, onLogout }) => {
     // elementos con right > 768 a los que el usuario no podía llegar de ninguna manera.
     // Colapsado quedan iconos con su `title` como etiqueta accesible.
     <aside className="group/rail flex w-16 flex-none flex-col lg:w-64" style={{ background: "var(--sidebar)", borderRight: "1px solid var(--bd-faint)" }}>
-      {/* Logo — sólo el isotipo cuando el rail está colapsado */}
+      {/* Logo — wordmark completo con el sidebar abierto, sólo el isotipo en el rail.
+          La visibilidad va en un <span> que ENVUELVE al logo y no en el propio <img>: BrandLogo
+          fija `display: block` por style inline, y un style inline le gana a la clase `hidden`
+          de Tailwind, así que puestos ahí los dos logos se veían a la vez. */}
       <div className="flex items-center justify-center px-2 pb-5 pt-[22px] lg:justify-start lg:px-5">
-        <BrandLogo height={65} className="hidden lg:block" />
-        <BrandLogo height={30} icon className="lg:hidden" />
+        <span className="hidden lg:block">
+          <BrandLogo height={65} />
+        </span>
+        <span className="block lg:hidden">
+          <BrandLogo height={30} icon />
+        </span>
       </div>
 
       {/* Navegación

@@ -1,4 +1,4 @@
-import { useState, useMemo, useContext, useEffect, useRef } from "react"
+import { useState, useMemo, useContext } from "react"
 import ApiContext from "@context/apiContext"
 import { usePersistedState } from "@hooks/usePersistedState"
 import { useHotkeyFocus } from "@hooks/useHotkeyFocus"
@@ -18,6 +18,8 @@ import ConfigurarEjes from "./ConfigurarEjes"
 import VehicleDrawer from "./VehicleDrawer"
 import ScreenHeader from "@components/UI/ScreenHeader"
 import Pill from "@components/UI/Pill"
+import { useOutletContext, useParams, useNavigate, useLocation } from "react-router-dom"
+import { rutaDeVehiculo, rutaDeSeccion } from "@utils/opRoutes"
 
 // Lista de vehículos (rediseño Claude Design). Dos vistas con toggle (persistido por
 // device): CARDS con el esquema de ejes/posiciones, y TABLA densa. El esquema se deriva
@@ -27,7 +29,13 @@ const TABLE_COLS = "1.4fr 1fr 1fr 1.4fr 0.7fr"
 
 const VehTypeIcon = ({ size = 22 }) => <LocalShippingOutlinedIcon sx={{ fontSize: size }} />
 
-const Vehiculos = ({ onNavigate, intent }) => {
+const Vehiculos = () => {
+  // Misma idea que en Cubiertas: `onNavigate` por el contexto del Outlet, el intent por la
+  // query y el vehículo abierto por el parámetro :id de la ruta anidada. Ver @utils/opRoutes.
+  const { onNavigate } = useOutletContext()
+  const { id: idEnRuta } = useParams()
+  const irA = useNavigate()
+  const { search } = useLocation() // se conserva al abrir/cerrar el drawer
   useStatusCatalog() // el color de las cubiertas montadas sale del catálogo del tenant
   const { data, ui } = useContext(ApiContext)
   const vehicles = data?.vehicles || []
@@ -36,7 +44,6 @@ const Vehiculos = ({ onNavigate, intent }) => {
   const [query, setQuery] = useState("")
   const [showAlta, setShowAlta] = useState(false)
   const [showConfigEjes, setShowConfigEjes] = useState(false)
-  const [detailVeh, setDetailVeh] = useState(null)
   const [fType, setFType] = useState("")
   const types = useMemo(() => [...new Set(vehicles.map((v) => v.type).filter(Boolean))].sort((a, b) => a.localeCompare(b, "es")), [vehicles])
   const pendingAxles = vehicles.filter((v) => !(v.axles && v.axles.length)).length
@@ -92,18 +99,16 @@ const Vehiculos = ({ onNavigate, intent }) => {
   // el diagrama de ejes, así que pesan más que las de cubierta.
   const pag = usePagination(fleet, 24)
 
-  // Click en un vehículo → abre su drawer de detalle (no navega directo al inventario).
-  const open = (v) => setDetailVeh(fleet.find((it) => String(it.v._id) === String(v._id)) || null)
+  // El vehículo abierto sale de la RUTA (:id): el drawer es una URL compartible y el botón
+  // Atrás lo cierra. Ya no hace falta el efecto que lo auto-abría desde un intent en memoria
+  // (volver de montar una cubierta ahora es, simplemente, navegar a /vehiculos/:id).
+  const detailVeh = useMemo(
+    () => (idEnRuta ? fleet.find((it) => String(it.v._id) === String(idEnRuta)) || null : null),
+    [idEnRuta, fleet],
+  )
 
-  // Auto-abrir un vehículo cuando llega por intent (ej. tras montar una cubierta, se vuelve a
-  // su detalle). Una vez por intent (ref) para no re-abrir en cada refresh de datos.
-  const handledIntentRef = useRef(null)
-  useEffect(() => {
-    if (intent && intent !== handledIntentRef.current && intent.openVehicle) {
-      const it = fleet.find((x) => String(x.v._id) === String(intent.openVehicle))
-      if (it) { setDetailVeh(it); handledIntentRef.current = intent }
-    }
-  }, [intent, fleet])
+  // Click en un vehículo → abre su drawer de detalle (no navega directo al inventario).
+  const open = (v) => irA(rutaDeVehiculo(v._id) + search)
 
   return (
     <div>
@@ -220,7 +225,7 @@ const Vehiculos = ({ onNavigate, intent }) => {
 
       {showAlta && <NuevoVehiculo onClose={() => setShowAlta(false)} />}
       {showConfigEjes && <ConfigurarEjes onClose={() => setShowConfigEjes(false)} />}
-      {detailVeh && <VehicleDrawer item={detailVeh} onClose={() => setDetailVeh(null)} onNavigate={onNavigate} />}
+      {detailVeh && <VehicleDrawer item={detailVeh} onClose={() => irA(rutaDeSeccion("vehiculos") + search)} onNavigate={onNavigate} />}
     </div>
   )
 }

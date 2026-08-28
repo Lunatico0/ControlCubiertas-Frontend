@@ -35,13 +35,16 @@ const ScreenHeader = ({ title, search, primaryAction, secondaryAction, viewToggl
             value={value}
             onChange={onChange}
             placeholder={placeholder}
-            className={`h-[46px] w-full rounded-[var(--r-md)] pl-[42px] ${showShortcut ? "pr-[58px]" : "pr-4"} text-[14.5px] outline-none`}
+            className={`h-[46px] w-full rounded-[var(--r-md)] pl-[42px] ${showShortcut ? "pr-4 lg:pr-[58px]" : "pr-4"} text-[14.5px] outline-none`}
             style={inputStyle}
             onFocus={(e) => (e.target.style.borderColor = "var(--ink-lime)")}
             onBlur={(e) => (e.target.style.borderColor = "var(--bd)")}
           />
           {showShortcut && (
-            <span className="absolute right-[13px] top-1/2 -translate-y-1/2 rounded-[var(--r-sm)] px-[7px] py-[3px] text-[11px]" style={{ fontFamily: "var(--font-mono)", color: "var(--tx-5)", border: "1px solid var(--bd-strong)" }}>
+            // El badge del atajo se esconde por debajo de lg: ahí la barra ya está apretada
+            // (título + buscador + acción + toggle) y los 58px que reserva dejan el placeholder
+            // cortado justo contra él. El atajo sigue funcionando, sólo deja de anunciarse.
+            <span className="absolute right-[13px] top-1/2 hidden -translate-y-1/2 rounded-[var(--r-sm)] px-[7px] py-[3px] text-[11px] lg:inline-block" style={{ fontFamily: "var(--font-mono)", color: "var(--tx-5)", border: "1px solid var(--bd-strong)" }}>
               {SHORTCUT_LABEL}
             </span>
           )}

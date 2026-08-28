@@ -131,3 +131,20 @@ describe("cifras: mono y tabular (t104, t106)", () => {
     expect(cabecera).toBeNull() // tiene que llevar text-right
   })
 })
+
+describe("visibilidad responsive vs style inline", () => {
+  it("BrandLogo nunca lleva las clases hidden/lg:hidden encima", () => {
+    // BrandLogo fija `display: block` por style INLINE, y un style inline le gana a la clase
+    // `hidden` de Tailwind. Ponerle esa clase al propio logo hacía que el wordmark y el
+    // isotipo se vieran LOS DOS a la vez en el sidebar. La visibilidad va en un elemento que
+    // lo envuelva, nunca en el logo.
+    const sidebar = readFileSync(resolve(raiz, "src/components/Layout/AppSidebar.jsx"), "utf8")
+    expect(sidebar).not.toMatch(/<BrandLogo[^>]*className="[^"]*hidden/)
+    expect(sidebar).not.toMatch(/<BrandLogo[^>]*className="[^"]*lg:hidden/)
+  })
+
+  it("BrandLogo sigue fijando el display inline (que es el motivo de la regla de arriba)", () => {
+    const logo = readFileSync(resolve(raiz, "src/components/BrandLogo.jsx"), "utf8")
+    expect(logo).toMatch(/display:\s*"block"/)
+  })
+})

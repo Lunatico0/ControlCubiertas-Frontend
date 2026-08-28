@@ -1,6 +1,6 @@
 import './App.css'
 import { lazy, Suspense } from "react"
-import { BrowserRouter, HashRouter, Routes, Route } from "react-router-dom"
+import { BrowserRouter, HashRouter, Routes, Route, Navigate } from "react-router-dom"
 import isElectron from "@utils/isElectron"
 import ContextProvider from '@context/ContextProvider.jsx'
 import { ApiProvider } from '@context/apiContext'
@@ -8,6 +8,9 @@ import Login from '@components/Auth/Login.jsx'
 import ChangePassword from '@components/Auth/ChangePassword.jsx'
 import RequireAuth from '@components/Auth/RequireAuth.jsx'
 import OperativaLayout from '@components/Operativa/OperativaLayout.jsx'
+import Inicio from '@components/Operativa/Inicio.jsx'
+import Cubiertas from '@components/Operativa/Cubiertas.jsx'
+import Vehiculos from '@components/Operativa/Vehiculos.jsx'
 import NotFound from '@components/NotFound.jsx'
 import TitleBar from '@components/Layout/TitleBar.jsx'
 
@@ -116,8 +119,12 @@ function App() {
             }
           />
 
-          {/* Operación (rediseño): la interfaz PRINCIPAL, en /. La navegación interna es por
-              sección (estado), no por URL, así que vive solo en la raíz. */}
+          {/* Operación (rediseño): la interfaz PRINCIPAL.
+              Cada sección y cada detalle tienen su URL. Antes todo vivía en "/" con la sección
+              en un useState, así que el botón Atrás salía de la app en vez de cerrar el drawer,
+              no se podía compartir el link de una cubierta y un F5 devolvía al Inicio.
+              Los detalles son rutas ANIDADAS: el drawer se monta sobre la lista, que sigue
+              detrás, y cerrarlo es simplemente volver a la ruta padre. */}
           <Route
             path="/"
             element={
@@ -127,7 +134,14 @@ function App() {
                 </ApiProvider>
               </RequireAuth>
             }
-          />
+          >
+            <Route index element={<Navigate to="/inicio" replace />} />
+            <Route path="inicio" element={<Inicio />} />
+            <Route path="cubiertas" element={<Cubiertas />} />
+            <Route path="cubiertas/:code" element={<Cubiertas />} />
+            <Route path="vehiculos" element={<Vehiculos />} />
+            <Route path="vehiculos/:id" element={<Vehiculos />} />
+          </Route>
 
           {/* Catch-all: cualquier ruta inexistente cae en el 404 (no en la operativa). */}
           <Route path="*" element={<NotFound />} />

@@ -13,6 +13,7 @@ import CheckRoundedIcon from "@mui/icons-material/CheckRounded"
 import { tint, metaOf, useStatusCatalog } from "./status"
 import { formatTireCode } from "@utils/tireCode"
 import { tituloPantalla } from "@utils/tokens"
+import { useOutletContext } from "react-router-dom"
 
 // Fecha + hora en es-AR, con la primera letra en mayúscula (ej. "Viernes 18 de julio, 14:30").
 const fmtFechaHora = (d) => {
@@ -24,7 +25,10 @@ const fmtFechaHora = (d) => {
 // Pantalla de Inicio del operario: saludo + buscador grande + accesos directos.
 // onNavigate(section, intent) lo provee el OperativaLayout para saltar al inventario
 // (opcionalmente con una búsqueda o un filtro ya aplicado).
-const Inicio = ({ onNavigate }) => {
+const Inicio = () => {
+  // onNavigate viaja por el contexto del Outlet: cada sección es su propia ruta y ya no la
+  // renderiza el layout con props (ver OperativaLayout / @utils/opRoutes).
+  const { onNavigate } = useOutletContext()
   const { data } = useContext(ApiContext)
   const { user } = useAuth()
   const tires = data?.tires || []

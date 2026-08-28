@@ -16,6 +16,8 @@ import TireDrawer from "./TireDrawer"
 import AltaDrawer from "./AltaDrawer"
 import ScreenHeader from "@components/UI/ScreenHeader"
 import Pill from "@components/UI/Pill"
+import { useOutletContext, useParams, useNavigate, useSearchParams, useLocation } from "react-router-dom"
+import { intentDesdeQuery, rutaDeCubierta, rutaDeSeccion } from "@utils/opRoutes"
 
 // "Disponibles" va antes que "En stock" a propósito: es lo que el operario busca primero
 // (las que puede montar ahora), no el total del depósito.
@@ -47,7 +49,17 @@ const COLUMNS = [
 ]
 const GRID_COLS = "0.8fr 1fr 1.2fr 0.9fr 0.6fr 0.8fr 1.1fr"
 
-const Cubiertas = ({ intent, onNavigate }) => {
+const Cubiertas = () => {
+  // La sección es su propia ruta: `onNavigate` llega por el contexto del Outlet, el intent
+  // (búsqueda, pestaña, alta, montaje dirigido) por la QUERY y la cubierta abierta por el
+  // parámetro :code de la ruta anidada. Con todo en la URL, un F5 o un link compartido
+  // reconstruyen la pantalla exacta. Ver @utils/opRoutes.
+  const { onNavigate } = useOutletContext()
+  const { code: codeEnRuta } = useParams()
+  const irA = useNavigate()
+  const [searchParams] = useSearchParams()
+  const { search } = useLocation() // se conserva al abrir/cerrar el drawer: filtros y búsqueda no se pierden
+  const intent = useMemo(() => intentDesdeQuery(searchParams), [searchParams])
   const { data, ui } = useContext(ApiContext)
   const tires = data?.tires || []
   const loading = ui?.loading
@@ -56,7 +68,6 @@ const Cubiertas = ({ intent, onNavigate }) => {
   const [query, setQuery] = useState("")
   const [tab, setTab] = useState("todas")
   const [view, setView] = usePersistedState("op_tireview", "grid")
-  const [selectedId, setSelectedId] = useState(null)
   const [pendingAction, setPendingAction] = useState(null)
   const [showAlta, setShowAlta] = useState(false)
   const [assignTo, setAssignTo] = useState(null) // montaje dirigido desde una posición de vehículo: { vehicleId, mobile, position }
@@ -69,6 +80,14 @@ const Cubiertas = ({ intent, onNavigate }) => {
   const [fKmMin, setFKmMin] = useState("")
   const [fKmMax, setFKmMax] = useState("")
   const searchRef = useHotkeyFocus()
+
+  // La cubierta abierta sale de la RUTA (:code), no de un estado: es lo que hace que el link
+  // se pueda compartir y que Atrás cierre el drawer. Se resuelve a _id contra la lista cargada.
+  const selectedId = useMemo(() => {
+    if (!codeEnRuta) return null
+    const t = tires.find((x) => String(x.code) === String(codeEnRuta))
+    return t?._id || null
+  }, [codeEnRuta, tires])
 
   const brands = useMemo(() => [...new Set(tires.map((t) => t.brand).filter(Boolean))].sort((a, b) => a.localeCompare(b, "es")), [tires])
   const activeFilters = (fBrand ? 1 : 0) + (fStatus ? 1 : 0) + (fKmMin || fKmMax ? 1 : 0)
@@ -135,8 +154,17 @@ const Cubiertas = ({ intent, onNavigate }) => {
     else { setSortBy(key); setSortDir("asc") }
   }
 
-  const openDrawer = (id, action = null) => () => { setSelectedId(id); setPendingAction(action) }
-  const closeDrawer = () => { setSelectedId(null); setPendingAction(null) }
+  // Abrir y cerrar el drawer es NAVEGAR: el botón Atrás lo cierra, que es lo que el usuario
+  // espera, y la cubierta abierta se puede compartir por link.
+  const openDrawer = (id, action = null) => () => {
+    const t = tires.find((x) => String(x._id) === String(id))
+    setPendingAction(action)
+    irA(rutaDeCubierta(t?.code ?? id) + search)
+  }
+  const closeDrawer = () => {
+    setPendingAction(null)
+    irA(rutaDeSeccion("cubiertas") + search)
+  }
 
   const inputStyle = { background: "var(--card)", border: "1.5px solid var(--bd)", color: "var(--tx)" }
 
