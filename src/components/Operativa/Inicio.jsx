@@ -66,7 +66,11 @@ const Inicio = () => {
   const hoyItems = useMemo(() => {
     const recapTires = tires.filter((t) => metaOf(t.status).role === "recap")
     const mountedVehIds = new Set(tires.filter((t) => t.vehicle).map((t) => t.vehicle?._id || t.vehicle))
-    const vehiclesSinCub = vehicles.filter((v) => !mountedVehIds.has(v._id))
+    // t145: un vehículo marcado FUERA DE SERVICIO no es una tarea pendiente. Antes, un acoplado
+    // de temporada o un móvil parado quedaba clavado en "PARA HOY" todos los días, sin forma de
+    // sacarlo; la lista perdía credibilidad y el operario dejaba de mirarla — y con ella dejaba
+    // de ver lo que sí importa.
+    const vehiclesSinCub = vehicles.filter((v) => !v.outOfService && !mountedVehIds.has(v._id))
     return [
       ...recapTires.map((t) => ({
         key: `t${t._id}`, isTire: true, color: "var(--ink-orange)", iconBg: "rgba(240,133,31,.14)",
@@ -81,7 +85,15 @@ const Inicio = () => {
     ].slice(0, 6)
   }, [tires, vehicles, onNavigate, catalogo])
 
-  const pending = counts.recapar + vehicles.filter((v) => !new Set(tires.filter((t) => t.vehicle).map((t) => t.vehicle?._id || t.vehicle)).has(v._id)).length
+  // Vehículos que cuentan como pendientes (misma regla que hoyItems, sin el cap de 6).
+  const hoyVehiculos = useMemo(() => {
+    const mountedVehIds = new Set(tires.filter((t) => t.vehicle).map((t) => t.vehicle?._id || t.vehicle))
+    return vehicles.filter((v) => !v.outOfService && !mountedVehIds.has(v._id)).length
+  }, [tires, vehicles])
+
+  // El contador del saludo tiene que contar EXACTAMENTE lo mismo que la lista: si dice
+  // "3 pendientes" y abajo hay 2, el que sobra es el número.
+  const pending = counts.recapar + hoyVehiculos
   const resumen = loading ? "Cargando tu día…" : pending > 0 ? `${pending} ${pending === 1 ? "pendiente" : "pendientes"} para hoy` : "Todo en orden"
   const resumenColor = loading ? "var(--tx-5)" : pending > 0 ? "var(--ink-orange)" : "var(--ink-teal)"
 
@@ -132,11 +144,11 @@ const Inicio = () => {
   const TILES = [
     { key: "alta", title: "Alta de cubierta", sub: "Registrar una nueva", icon: <AddRoundedIcon />, primary: true, onClick: () => onNavigate("cubiertas", { alta: true }) },
     { key: "buscar", title: "Buscar cubierta", sub: "Ver el inventario", icon: <TripOriginOutlinedIcon />, accent: "var(--ink-lime)", onClick: () => onNavigate("cubiertas") },
-    { key: "asignar", title: "Asignar a vehículo", sub: "Montar una cubierta", icon: <LocalShippingOutlinedIcon />, accent: "var(--ink-blue)", onClick: () => onNavigate("cubiertas", { tab: "stock" }) },
+    { key: "asignar", title: "Asignar a vehículo", sub: "Montar una cubierta", icon: <LocalShippingOutlinedIcon />, accent: "var(--ink-blue)", onClick: () => onNavigate("cubiertas", { tab: "disponibles" }) }, // t147: el que va a montar quiere las montables, no el depósito entero
   ]
 
   const ACCESS = [
-    { label: "En stock", count: counts.stock, icon: <Inventory2OutlinedIcon />, accent: "var(--ink-lime)", tab: "stock" },
+    { label: "En depósito", count: counts.stock, icon: <Inventory2OutlinedIcon />, accent: "var(--ink-lime)", tab: "stock" },
     { label: "En circulación", count: counts.circ, icon: <LocalShippingOutlinedIcon />, accent: "var(--ink-blue)", tab: "circulacion" },
     { label: "A recapar · requieren acción", count: counts.recapar, icon: <WarningAmberRoundedIcon />, accent: "var(--ink-orange)", tab: "recapar", warn: true },
   ]

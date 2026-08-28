@@ -8,6 +8,9 @@ export const updateVehicle = async (id, data) => (await vehiclesAPI.put(`/${id}`
 export const updateDetails = async (id, data) => (await vehiclesAPI.put(`/details/${id}`, data)).data
 // Configurar el esquema de ejes de un vehículo existente (migración A4). data: { axles, kilometers? }
 export const updateVehicleAxles = async (id, data) => (await vehiclesAPI.patch(`/${id}/axles`, data)).data
+// t145: marcar el vehículo fuera de servicio (o devolverlo). Anotación, no baja: no toca las
+// cubiertas montadas; solo lo saca de la lista de pendientes del día.
+export const setVehicleService = async (id, outOfService) => (await vehiclesAPI.patch(`/${id}/service`, { outOfService })).data
 // Esquema de posiciones del vehículo + qué cubierta ocupa cada una. Para el selector al montar.
 export const fetchVehiclePositions = async (id) => (await vehiclesAPI.get(`/${id}/positions`)).data
 

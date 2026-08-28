@@ -5,10 +5,15 @@ import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded"
 import AddRoundedIcon from "@mui/icons-material/AddRounded"
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined"
 import SettingsInputComponentOutlinedIcon from "@mui/icons-material/SettingsInputComponentOutlined"
+import PauseCircleOutlineRoundedIcon from "@mui/icons-material/PauseCircleOutlineRounded"
+import PlayCircleOutlineRoundedIcon from "@mui/icons-material/PlayCircleOutlineRounded"
 import LocalShippingOutlinedIcon from "@mui/icons-material/LocalShippingOutlined"
 import EditarVehiculo from "./EditarVehiculo"
 import ConfigurarEjes from "./ConfigurarEjes"
 import { formatPlate } from "@utils/plateFormat"
+import { setVehicleService } from "@api/vehicles"
+import { showToast } from "@utils/toast"
+import { tint } from "./status"
 import Callout from "@components/common/Callout"
 import Drawer from "@components/UI/Drawer"
 import Pill from "@components/UI/Pill"
@@ -18,9 +23,14 @@ import MonoLabel from "@components/UI/MonoLabel"
 // (ver/montar cubierta) + acciones (reconfigurar ejes, editar datos). Recibe el item ya
 // computado por Vehiculos (v + positions derivadas de axles + cubiertas montadas).
 const VehicleDrawer = ({ item, onClose, onNavigate }) => {
-  const { data } = useContext(ApiContext)
+  const { data, utils } = useContext(ApiContext)
   const [showEdit, setShowEdit] = useState(false)
   const [showReconfig, setShowReconfig] = useState(false)
+  // t145: fuera de servicio es un HECHO del vehículo, no una preferencia del dispositivo: si
+  // el acoplado está parado, lo está para todos. El estado local es solo el optimista mientras
+  // vuelve el PATCH; la fuente sigue siendo el vehículo.
+  const [fueraDeServicio, setFueraDeServicio] = useState(!!item.v.outOfService)
+  const [cambiandoServicio, setCambiandoServicio] = useState(false)
   const { v, positions, hasAxles, countLabel, countColor, tipoColor, tipoBg, kmLabel } = item
 
   // Cierre guardado por !showReconfig: mientras está abierto el editor de ejes, Esc/backdrop no
@@ -34,6 +44,25 @@ const VehicleDrawer = ({ item, onClose, onNavigate }) => {
 
   // Ver la cubierta montada → inventario filtrado por su código. Montar en una posición
   // vacía → inventario para asignar. Ambos navegan (Vehiculos se desmonta con el drawer).
+  const toggleServicio = async () => {
+    const siguiente = !fueraDeServicio
+    setCambiandoServicio(true)
+    try {
+      const actualizado = await setVehicleService(v._id, siguiente)
+      setFueraDeServicio(siguiente)
+      // La LISTA tiene que enterarse: si no, el badge de la card y el conteo del Inicio siguen
+      // mostrando el estado viejo hasta el próximo refresco global.
+      utils?.replaceVehicleInList?.(actualizado)
+      showToast("success", siguiente
+        ? `${v.mobile} quedó fuera de servicio: deja de aparecer en los pendientes del día.`
+        : `${v.mobile} vuelve al servicio.`)
+    } catch (e) {
+      showToast("error", e?.message || "No se pudo cambiar el estado de servicio")
+    } finally {
+      setCambiandoServicio(false)
+    }
+  }
+
   const verCubierta = (p) => onNavigate?.("cubiertas", { query: String(p.tireCode) })
   // Montar en ESTA posición: va a Cubiertas (tab Disponibles) con el montaje dirigido; al
   // tocar "Asignar" en una cubierta, el drawer abre con vehículo + posición ya cargados.
@@ -62,10 +91,23 @@ const VehicleDrawer = ({ item, onClose, onNavigate }) => {
             <div className="flex items-center gap-2.5">
               <span className="text-[24px] font-bold leading-none" style={{ fontFamily: "var(--font-display)", color: "var(--tx)" }}>{v.mobile || "—"}</span>
               {v.type && <Pill style={{ color: tipoColor, background: tipoBg }}>{v.type}</Pill>}
+              {fueraDeServicio && <Pill style={{ color: "var(--ink-orange)", background: tint("var(--ink-orange)", 16) }}>FUERA DE SERVICIO</Pill>}
             </div>
             <div className="mt-[3px] text-[12px]" style={{ fontFamily: "var(--font-mono)", color: "var(--tx-5)" }}>{formatPlate(v.licensePlate, data.plateSep) || "—"} · {v.brand || "—"}</div>
           </div>
-          <button onClick={onClose} title="Cerrar" className="rounded-[var(--r-md)] p-1.5" style={{ color: "var(--tx-5)" }}><CloseRoundedIcon sx={{ fontSize: 20 }} /></button>
+          {/* t146: las dos acciones del vehículo viven ACÁ, no al fondo. En un semirremolque de
+              12 posiciones había que scrollear las 12 filas para encontrarlas, sin una sola
+              pista desde arriba de que existían — y corregir un esquema mal cargado es justo
+              lo que se hace apenas se da de alta el vehículo. */}
+          <div className="flex flex-none items-center gap-1.5">
+            <button onClick={() => setShowReconfig(true)} title="Reconfigurar ejes" aria-label="Reconfigurar ejes" className="inline-flex h-9 w-9 items-center justify-center rounded-[var(--r-md)]" style={{ border: "1px solid var(--bd-strong)", background: "var(--card)", color: "var(--tx-3)" }}>
+              <SettingsInputComponentOutlinedIcon sx={{ fontSize: 17 }} />
+            </button>
+            <button onClick={() => setShowEdit(true)} title="Editar datos del vehículo" aria-label="Editar datos del vehículo" className="inline-flex h-9 w-9 items-center justify-center rounded-[var(--r-md)]" style={{ border: "1px solid var(--bd-strong)", background: "var(--card)", color: "var(--tx-3)" }}>
+              <EditOutlinedIcon sx={{ fontSize: 17 }} />
+            </button>
+            <button onClick={onClose} title="Cerrar" className="rounded-[var(--r-md)] p-1.5" style={{ color: "var(--tx-5)" }}><CloseRoundedIcon sx={{ fontSize: 20 }} /></button>
+          </div>
         </div>
 
         <div className="flex-1 overflow-auto px-6 py-[22px]">
@@ -123,7 +165,8 @@ const VehicleDrawer = ({ item, onClose, onNavigate }) => {
             </Callout>
           )}
 
-          {/* Acciones */}
+          {/* Acciones. Se mantienen acá ADEMÁS de en la cabecera (t146): el que ya scrolleó
+              hasta el fondo no tiene que volver arriba, y con rótulo se leen mejor que un ícono. */}
           <div className="mt-5 flex gap-2.5">
             <button onClick={() => setShowReconfig(true)} className="inline-flex h-11 flex-1 items-center justify-center gap-2 rounded-[var(--r-md)] text-[13px] font-semibold" style={{ border: "1px solid var(--bd-strong)", background: "var(--card)", color: "var(--tx)" }}>
               <SettingsInputComponentOutlinedIcon sx={{ fontSize: 16 }} /> Reconfigurar ejes
@@ -131,6 +174,29 @@ const VehicleDrawer = ({ item, onClose, onNavigate }) => {
             <button onClick={() => setShowEdit(true)} className="inline-flex h-11 flex-1 items-center justify-center gap-2 rounded-[var(--r-md)] text-[13px] font-semibold" style={{ border: "1px solid var(--bd-strong)", background: "var(--card)", color: "var(--tx)" }}>
               <EditOutlinedIcon sx={{ fontSize: 16 }} /> Editar datos
             </button>
+          </div>
+
+          {/* t145: la salida para el acoplado de temporada y el móvil parado, que si no quedan
+              clavados en "PARA HOY" todos los días hasta que la lista deja de creerse. */}
+          <button
+            onClick={toggleServicio}
+            disabled={cambiandoServicio}
+            className="mt-2.5 inline-flex h-11 w-full items-center justify-center gap-2 rounded-[var(--r-md)] text-[13px] font-semibold"
+            style={{
+              border: `1px solid ${fueraDeServicio ? tint("var(--ink-teal)", 40) : "var(--bd-strong)"}`,
+              background: fueraDeServicio ? tint("var(--ink-teal)", 10) : "var(--card)",
+              color: fueraDeServicio ? "var(--ink-teal)" : "var(--tx-3)",
+              opacity: cambiandoServicio ? 0.6 : 1,
+            }}
+          >
+            {fueraDeServicio
+              ? <><PlayCircleOutlineRoundedIcon sx={{ fontSize: 17 }} /> Volver al servicio</>
+              : <><PauseCircleOutlineRoundedIcon sx={{ fontSize: 17 }} /> Marcar fuera de servicio</>}
+          </button>
+          <div className="mt-1.5 text-center text-[11.5px]" style={{ color: "var(--tx-5)" }}>
+            {fueraDeServicio
+              ? "No cuenta como pendiente. Las cubiertas montadas siguen montadas."
+              : "Un vehículo parado deja de aparecer en los pendientes del día."}
           </div>
         </div>
       </Drawer>

@@ -20,14 +20,20 @@ import { useOutletContext, useParams, useNavigate, useSearchParams, useLocation 
 import { intentDesdeQuery, rutaDeCubierta, rutaDeSeccion } from "@utils/opRoutes"
 import { SkeletonCards, SkeletonRows } from "@components/common/Skeleton"
 
-// "Disponibles" va antes que "En stock" a propósito: es lo que el operario busca primero
-// (las que puede montar ahora), no el total del depósito.
+// "Listas para montar" va antes que "En depósito" a propósito: es lo que el operario busca
+// primero (las que puede montar ahora), no el total del depósito.
+//
+// t147: antes se llamaban "Disponibles" y "En stock", y nada explicaba la diferencia. "En
+// stock" es TODA cubierta sin vehículo, descartadas incluidas; "Disponibles" son las que
+// realmente se pueden montar. El operario que buscaba una para montar tocaba "En stock", que
+// es el nombre más obvio, y le aparecían cubiertas dadas de baja. Las CLAVES no cambian:
+// viajan en la URL y en los intents del Inicio, y renombrarlas rompería los links compartidos.
 const TABS = [
-  { key: "todas", label: "Todas" },
-  { key: "disponibles", label: "Disponibles" },
-  { key: "stock", label: "En stock" },
-  { key: "circulacion", label: "En circulación" },
-  { key: "recapar", label: "A recapar" },
+  { key: "todas", label: "Todas", hint: "Todo el inventario, en cualquier estado." },
+  { key: "disponibles", label: "Listas para montar", hint: "Sin vehículo y en un estado que permite montarlas." },
+  { key: "stock", label: "En depósito", hint: "Todas las que no están montadas, incluidas las que están a recapar y las dadas de baja." },
+  { key: "circulacion", label: "En circulación", hint: "Montadas hoy en un vehículo." },
+  { key: "recapar", label: "A recapar", hint: "Marcadas para mandar a recapar." },
 ]
 
 // Rank de estado para ordenar de forma significativa (no alfabética): escalera por nivel,
@@ -189,7 +195,7 @@ const Cubiertas = () => {
             {TABS.map((f) => {
               const on = tab === f.key
               return (
-                <button key={f.key} onClick={() => setTab(f.key)} className="inline-flex h-[38px] items-center gap-2 rounded-[var(--r-md)] px-[15px] text-[13.5px] font-semibold"
+                <button key={f.key} onClick={() => setTab(f.key)} title={f.hint} className="inline-flex h-[38px] items-center gap-2 rounded-[var(--r-md)] px-[15px] text-[13.5px] font-semibold"
                   style={{ border: `1px solid ${on ? "var(--ink-lime)" : "var(--bd)"}`, background: on ? tint("var(--ink-lime)", 12) : "var(--card)", color: on ? "var(--tx)" : "var(--tx-3)" }}>
                   {f.label}
                   <Pill className="px-[7px] py-px text-[11.5px]" style={{ fontFamily: "var(--font-mono)", background: "var(--elev)", color: "var(--tx-5)" }}>{counts[f.key]}</Pill>

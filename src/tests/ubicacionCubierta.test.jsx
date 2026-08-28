@@ -76,10 +76,12 @@ describe('t144 · las tres vistas usan el helper, no el literal', () => {
   it.each([
     'src/components/Operativa/Cubiertas.jsx',
     'src/components/Operativa/TireDrawer.jsx',
-  ])('%s ya no hardcodea "En depósito"', (archivo) => {
+  ])('%s ya no deriva la ubicación de la ausencia de vehículo', (archivo) => {
     const src = leer(archivo)
 
-    expect(src).not.toMatch(/En depósito/)
+    // El patrón exacto del bug: caer al depósito por no haber vehículo montado. El literal
+    // suelto sigue siendo legítimo en otros lados (el rótulo del filtro, por ejemplo, t147).
+    expect(src).not.toMatch(/\|\|\s*"En depósito"/)
     expect(src).toMatch(/ubicacionDe/)
   })
 })

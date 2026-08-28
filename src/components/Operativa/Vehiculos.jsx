@@ -170,7 +170,11 @@ const Vehiculos = () => {
                   <span className="text-[14.5px] font-bold" style={{ fontFamily: "var(--font-display)", color: "var(--tx)" }}>{v.mobile || "—"}</span>
                 </div>
                 <div className="text-[13px]" style={{ fontFamily: "var(--font-mono)", color: "var(--tx-2)" }}>{formatPlate(v.licensePlate, data.plateSep) || "—"}</div>
-                <div>{v.type && <Pill style={{ color: tipoColor, background: tipoBg }}>{v.type}</Pill>}</div>
+                <div className="flex flex-wrap items-center gap-1.5">
+                  {v.type && <Pill style={{ color: tipoColor, background: tipoBg }}>{v.type}</Pill>}
+                  {/* t145: un vehículo parado no es un pendiente, y tiene que verse desde la lista. */}
+                  {v.outOfService && <Pill style={{ color: "var(--ink-orange)", background: tint("var(--ink-orange)", 16) }}>PARADO</Pill>}
+                </div>
                 <div className="flex items-center gap-[7px] text-[13px] font-semibold" style={{ color: countColor }}><TripOriginOutlinedIcon sx={{ fontSize: 14 }} />{countLabel}</div>
                 <div className="flex items-center justify-end">
                   <span className="text-[13px] font-semibold" style={{ fontFamily: "var(--font-mono)", color: "var(--tx)" }}>{kmLabel}</span>
