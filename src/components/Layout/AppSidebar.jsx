@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { useTheme } from "@context/ThemeContext"
+import { showDanger } from "@utils/toast"
 import { externalPageProps } from "@utils/isElectron"
 import BrandLogo from "@components/BrandLogo"
 import UpdaterButton from "@components/Updater/UpdaterButton"
@@ -28,6 +29,17 @@ import MenuBookOutlinedIcon from "@mui/icons-material/MenuBookOutlined"
 const AppSidebar = ({ nav, belowNav, upd, user, help, onLogout }) => {
   const { isDarkMode, toggleTheme } = useTheme()
   const [helpMenu, setHelpMenu] = useState(false) // popover de ayuda en el perfil
+
+  // t149: cerrar sesión es irreversible dentro de la sesión (hay que volver a loguearse y lo
+  // tipeado se pierde), y el botón está pegado al de Ayuda. Va por el diálogo destructivo.
+  const confirmarLogout = async () => {
+    const ok = await showDanger({
+      title: "¿Cerrar sesión?",
+      text: "Si tenés un formulario a medio llenar, lo que escribiste se pierde.",
+      confirmButtonText: "Sí, cerrar sesión",
+    })
+    if (ok) onLogout()
+  }
 
   return (
     // RAIL bajo lg (1024px). Con 256px fijos, a 768px quedaban 512px de contenido y las
@@ -128,15 +140,21 @@ const AppSidebar = ({ nav, belowNav, upd, user, help, onLogout }) => {
         <button
           data-tour={help.dataTour}
           title="Ayuda"
+          aria-label="Ayuda"
           onClick={() => setHelpMenu((v) => !v)}
           className="inline-flex cursor-pointer rounded-[var(--r-sm)] p-[7px]"
           style={{ color: helpMenu ? "var(--ink-lime)" : "var(--tx-6)", background: helpMenu ? "color-mix(in srgb, var(--ink-lime) 12%, transparent)" : "transparent" }}
         >
           <HelpOutlineRoundedIcon sx={{ fontSize: 17 }} />
         </button>
+        {/* t149: era un ícono sin etiqueta, del mismo tamaño y a centímetros del de Ayuda, y un
+            solo clic cerraba la sesión al instante. Con guantes o en pantalla táctil, un
+            misclick cuesta volver a loguearse y perder lo que estabas tipeando. Ahora confirma
+            (variante destructiva) y tiene nombre accesible. */}
         <button
           title="Cerrar sesión"
-          onClick={onLogout}
+          aria-label="Cerrar sesión"
+          onClick={confirmarLogout}
           className="inline-flex cursor-pointer rounded-[var(--r-sm)] p-[7px]"
           style={{ color: "var(--tx-6)" }}
         >

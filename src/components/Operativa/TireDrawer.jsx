@@ -201,7 +201,10 @@ const TireDrawer = ({ tireId, initialAction, initialAssign, onAssigned, onClose 
     setActionEntry(entry)
     setErrors({})
     setForm(a === "editHist"
-      ? { status: entry.status || tire.status, kmAlta: entry.kmAlta ?? "", kmBaja: entry.kmBaja ?? "", vehicle: entry.vehicle?._id || "", reason: `Corrección de Orden N°${entry.orderNumber || ""}`, orderNumber: "" }
+      // t150: `reason` venía precargado con "Corrección de Orden N°…", un texto genérico que
+      // el operario aceptaba sin tocar. Eso anulaba el valor de auditoría del campo: quedaba
+      // registrado QUE hubo una corrección, nunca POR QUÉ. Arranca vacío, con placeholder.
+      ? { status: entry.status || tire.status, kmAlta: entry.kmAlta ?? "", kmBaja: entry.kmBaja ?? "", vehicle: entry.vehicle?._id || "", reason: "", orderNumber: "" }
       : {})
     setAction(a)
   }
@@ -509,7 +512,7 @@ const TireDrawer = ({ tireId, initialAction, initialAssign, onAssigned, onClose 
                     <FloatingField label="Marca" required error={errors.brand} value={form.brand || ""} onChange={set("brand")} />
                     <FloatingField label="Rodado" required error={errors.size} value={form.size || ""} onChange={set("size")} />
                     <FloatingField label="Dibujo" required error={errors.pattern} value={form.pattern || ""} onChange={set("pattern")} />
-                    <FloatingField label="Motivo de la corrección" required error={errors.reason} value={form.reason || ""} onChange={set("reason")} />
+                    <FloatingField label="Motivo de la corrección" required error={errors.reason} value={form.reason || ""} onChange={set("reason")} title="Ej.: se cargó el odómetro del móvil equivocado" />
                   </>
                 )}
 
@@ -535,9 +538,23 @@ const TireDrawer = ({ tireId, initialAction, initialAssign, onAssigned, onClose 
 
                 {action === "editHist" && (
                   <>
+                    {/* t150: corregir era a ciegas. El formulario pedía re-elegir TODO sin
+                        mostrar los valores originales, así que arreglar un odómetro mal
+                        tipeado exponía a cambiar el estado sin querer. Acá está lo que dice
+                        hoy el movimiento; lo que quede distinto abajo es lo que se corrige. */}
+                    <div className="rounded-[var(--r-md)] px-3.5 py-3 text-[12px]" style={{ background: "var(--input)", border: "1px solid var(--bd-strong)", color: "var(--tx-4)" }}>
+                      <div className="mb-1.5 text-[10.5px] tracking-[.08em]" style={{ fontFamily: "var(--font-mono)", color: "var(--tx-6)" }}>VALORES ACTUALES DEL MOVIMIENTO</div>
+                      <div className="flex flex-wrap gap-x-4 gap-y-1">
+                        {actionEntry?.status && <span>Estado: <b style={{ color: "var(--tx-2)" }}>{actionEntry.status}</b></span>}
+                        {actionEntry?.vehicle?.mobile && <span>Vehículo: <b style={{ color: "var(--tx-2)" }}>{actionEntry.vehicle.mobile}</b></span>}
+                        {actionEntry?.kmAlta != null && <span>Odóm. al montar: <b style={{ color: "var(--tx-2)", fontFamily: "var(--font-mono)" }}>{fmtKm(actionEntry.kmAlta)}</b></span>}
+                        {actionEntry?.kmBaja != null && <span>Odóm. al desmontar: <b style={{ color: "var(--tx-2)", fontFamily: "var(--font-mono)" }}>{fmtKm(actionEntry.kmBaja)}</b></span>}
+                        {actionEntry?.orderNumber && <span>Orden: <b style={{ color: "var(--tx-2)", fontFamily: "var(--font-mono)" }}>{actionEntry.orderNumber}</b></span>}
+                      </div>
+                    </div>
                     <FloatingField as="select" label="Estado" required error={errors.status} value={form.status || ""} onChange={set("status")}>
                       <option value="">Seleccionar estado…</option>
-                      {statuses.map((s) => <option key={s.name} value={s.name}>{s.name}</option>)}
+                      {statuses.map((s) => <option key={s.name} value={s.name}>{s.name}{s.name === actionEntry?.status ? " — actual" : ""}</option>)}
                     </FloatingField>
                     {editBaseType(actionEntry) === "Asignación" && (
                       <>
@@ -551,7 +568,7 @@ const TireDrawer = ({ tireId, initialAction, initialAssign, onAssigned, onClose 
                     {editBaseType(actionEntry) === "Desasignación" && (
                       <FloatingField label="Odómetro del móvil al desmontar (km)" type="number" min="0" required error={errors.kmBaja} value={form.kmBaja ?? ""} onChange={set("kmBaja")} />
                     )}
-                    <FloatingField label="Motivo de la corrección" required error={errors.reason} value={form.reason || ""} onChange={set("reason")} />
+                    <FloatingField label="Motivo de la corrección" required error={errors.reason} value={form.reason || ""} onChange={set("reason")} title="Ej.: se cargó el odómetro del móvil equivocado" />
                   </>
                 )}
 

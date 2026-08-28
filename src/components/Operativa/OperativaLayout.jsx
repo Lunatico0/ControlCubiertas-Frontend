@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { etiquetaDeRol } from "@utils/roles"
 import { useNavigate, useLocation, Outlet } from "react-router-dom"
 import { seccionDeRuta, rutaDeSeccion, rutaDeVehiculo, rutaDeCubierta, queryDesdeIntent } from "@utils/opRoutes"
 import { useTheme } from "@context/ThemeContext"
@@ -95,7 +96,7 @@ const OperativaLayout = () => {
           ) : null
         }
         upd={upd}
-        user={{ name: displayName, roleLabel: "Operativo", initials, avatarBg: "#18B89E", avatarColor: "#04201B" }}
+        user={{ name: displayName, roleLabel: etiquetaDeRol(user?.role), initials, avatarBg: "#18B89E", avatarColor: "#04201B" }}
         help={{ dataTour: "help-btn", onStartTour: () => { navigate("inicio"); setTourOpen(true) }, guideHref: "/guia", guideLabel: "Guía de uso completa", guideSubtitle: "Manual detallado · pestaña nueva" }}
         onLogout={logout}
       />

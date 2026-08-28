@@ -100,6 +100,15 @@ const Cubiertas = () => {
   const activeFilters = (fBrand ? 1 : 0) + (fStatus ? 1 : 0) + (fKmMin || fKmMax ? 1 : 0)
   const clearFilters = () => { setFBrand(""); setFStatus(""); setFKmMin(""); setFKmMax("") }
 
+  // t148: qué le está escondiendo las cubiertas, en castellano, y un botón que lo desarma todo
+  // de una — incluidos la pestaña y el texto tipeado, que clearFilters no tocaba.
+  const escondidoPor = [
+    query.trim() && `la búsqueda “${query.trim()}”`,
+    tab !== "todas" && `la pestaña “${TABS.find((t) => t.key === tab)?.label}”`,
+    activeFilters > 0 && (activeFilters === 1 ? "un filtro avanzado" : `${activeFilters} filtros avanzados`),
+  ].filter(Boolean)
+  const limpiarTodo = () => { setQuery(""); setTab("todas"); clearFilters() }
+
   // Aplica la intención de navegación que llega desde Inicio (búsqueda o filtro).
   useEffect(() => {
     if (!intent) return
@@ -180,12 +189,14 @@ const Cubiertas = () => {
       {/* Toolbar sticky */}
       <ScreenHeader
         title="Cubiertas"
+        count={filtered.length}
         search={{
           value: query,
           onChange: (e) => setQuery(e.target.value),
           placeholder: "Buscar código, marca, N° de serie…",
           showShortcut: true,
           inputRef: searchRef,
+          onClear: () => setQuery(""),
         }}
         primaryAction={{ label: "Alta de cubierta", onClick: () => setShowAlta(true), tour: "cub-alta" }}
         viewToggle={{ value: view, onChange: setView, tour: "cub-viewtoggle" }}
@@ -239,7 +250,6 @@ const Cubiertas = () => {
                 <CloseRoundedIcon sx={{ fontSize: 15 }} /> Limpiar
               </button>
             )}
-            <span className="ml-auto self-center text-[12px]" style={{ fontFamily: "var(--font-mono)", color: "var(--tx-5)" }}>{filtered.length} resultado{filtered.length === 1 ? "" : "s"}</span>
           </div>
         )}
       </ScreenHeader>
@@ -265,7 +275,23 @@ const Cubiertas = () => {
         ) : filtered.length === 0 ? (
           <div className="py-16 text-center">
             <div className="text-[17px] font-semibold" style={{ fontFamily: "var(--font-display)", color: "var(--tx)" }}>Sin resultados</div>
-            <div className="mt-1.5 text-[13px]" style={{ color: "var(--tx-5)" }}>No hay cubiertas que coincidan con tu búsqueda o filtro.</div>
+            <div className="mt-1.5 text-[13px]" style={{ color: "var(--tx-5)" }}>
+              {/* t148: el estado vacío decía QUÉ pasaba pero no QUÉ lo estaba causando. Con un
+                  filtro de estado y un texto activos a la vez, el operario no tiene forma de
+                  saber cuál de los dos le esconde la cubierta que sabe que existe. */}
+              {escondidoPor.length
+                ? <>Está filtrado por {escondidoPor.join(" y ")}.</>
+                : <>No hay cubiertas que coincidan con tu búsqueda o filtro.</>}
+            </div>
+            {escondidoPor.length > 0 && (
+              <button
+                onClick={limpiarTodo}
+                className="mt-4 inline-flex h-[38px] items-center gap-1.5 rounded-[var(--r-md)] px-[15px] text-[13px] font-semibold"
+                style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--tx-2)" }}
+              >
+                <CloseRoundedIcon sx={{ fontSize: 15 }} /> Limpiar búsqueda y filtros
+              </button>
+            )}
           </div>
         ) : view === "grid" ? (
           /* ---------- GRID ---------- */

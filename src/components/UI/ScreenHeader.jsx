@@ -1,5 +1,6 @@
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded"
 import AddRoundedIcon from "@mui/icons-material/AddRounded"
+import CloseRoundedIcon from "@mui/icons-material/CloseRounded"
 import Button from "@components/UI/Button"
 import ViewToggle from "@components/UI/ViewToggle"
 
@@ -20,12 +21,20 @@ const inputStyle = { background: "var(--card)", border: "1.5px solid var(--bd)",
 //   - children: fila secundaria (tabs/filtros de Cubiertas, chips de Vehículos), con su propio espaciado
 // El ancho del buscador (SEARCH_MAX) es FIJO para que el header se vea idéntico en todas las pantallas.
 const SEARCH_MAX = 460
-const ScreenHeader = ({ title, search, primaryAction, secondaryAction, viewToggle, children }) => {
-  const { value, onChange, placeholder, showShortcut = false, inputRef } = search || {}
+// `count` (t152): el conteo de resultados vivía SOLO adentro del panel de Filtros. Con el
+// panel cerrado, buscando un código, no había ningún número que dijera cuántas quedaron.
+// `onClear` (t148): la x del input, para no tener que borrar a mano lo tipeado.
+const ScreenHeader = ({ title, count, search, primaryAction, secondaryAction, viewToggle, children }) => {
+  const { value, onChange, placeholder, showShortcut = false, inputRef, onClear } = search || {}
   return (
     <div className="sticky top-0 z-5 px-7 pb-4 pt-5" style={{ background: "var(--bg)", borderBottom: "1px solid var(--bd-faint)" }}>
       <div className="flex items-center gap-4">
         <h1 className="text-[24px] font-bold tracking-[-.02em]" style={{ fontFamily: "var(--font-display)", color: "var(--tx)" }}>{title}</h1>
+        {count != null && (
+          <span className="flex-none text-[12.5px]" style={{ fontFamily: "var(--font-mono)", color: "var(--tx-5)" }}>
+            {count} resultado{count === 1 ? "" : "s"}
+          </span>
+        )}
         <div className="relative ml-2 flex-1" style={{ maxWidth: SEARCH_MAX }}>
           <span className="absolute left-[15px] top-1/2 -translate-y-1/2" style={{ color: "var(--tx-7)" }}>
             <SearchRoundedIcon sx={{ fontSize: 18 }} />
@@ -40,6 +49,21 @@ const ScreenHeader = ({ title, search, primaryAction, secondaryAction, viewToggl
             onFocus={(e) => (e.target.style.borderColor = "var(--ink-lime)")}
             onBlur={(e) => (e.target.style.borderColor = "var(--bd)")}
           />
+          {/* t148: la x del buscador. Con un filtro de estado y un texto activos a la vez, el
+              operario no siempre entiende qué le está escondiendo las cubiertas; borrar lo
+              tipeado tenía que ser un gesto, no un viaje al input a apretar backspace. */}
+          {onClear && value && (
+            <button
+              type="button"
+              onClick={onClear}
+              aria-label="Limpiar la búsqueda"
+              title="Limpiar la búsqueda"
+              className={`absolute top-1/2 -translate-y-1/2 inline-flex h-6 w-6 items-center justify-center rounded-[var(--r-sm)] ${showShortcut ? "right-[13px] lg:right-[62px]" : "right-[13px]"}`}
+              style={{ color: "var(--tx-5)", border: "none", background: "transparent" }}
+            >
+              <CloseRoundedIcon sx={{ fontSize: 16 }} />
+            </button>
+          )}
           {showShortcut && (
             // El badge del atajo se esconde por debajo de lg: ahí la barra ya está apretada
             // (título + buscador + acción + toggle) y los 58px que reserva dejan el placeholder

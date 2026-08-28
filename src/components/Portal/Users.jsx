@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react"
+import { etiquetaDeRol } from "@utils/roles"
 import { useNavigate } from "react-router-dom"
 import PersonAddAltOutlinedIcon from "@mui/icons-material/PersonAddAltOutlined"
 import ContentCopyOutlinedIcon from "@mui/icons-material/ContentCopyOutlined"
@@ -14,7 +15,6 @@ import UserForm from "./UserForm"
 import { tituloPantalla } from "@utils/tokens"
 import { mensajeDeError } from "@utils/apiError"
 
-const roleLabel = { "tenant-admin": "Administrador", operator: "Operario" }
 const initialsOf = (u) => (u.name || u.email || "?").slice(0, 2).toUpperCase()
 const COLS = "2.2fr 1fr 0.9fr 1.3fr"
 
@@ -143,7 +143,7 @@ const Users = () => {
                   </div>
                 </div>
                 <div>
-                  <span className="inline-flex items-center rounded-full px-[11px] py-[3px] text-[11.5px] font-semibold" style={{ color: isAdmin ? "var(--ink-lime)" : "var(--tx-3)", background: isAdmin ? "color-mix(in srgb, var(--ink-lime) 13%, transparent)" : "var(--bd-strong)" }}>{roleLabel[u.role] || u.role}</span>
+                  <span className="inline-flex items-center rounded-full px-[11px] py-[3px] text-[11.5px] font-semibold" style={{ color: isAdmin ? "var(--ink-lime)" : "var(--tx-3)", background: isAdmin ? "color-mix(in srgb, var(--ink-lime) 13%, transparent)" : "var(--bd-strong)" }}>{etiquetaDeRol(u.role)}</span>
                 </div>
                 <div>
                   <span className="inline-flex items-center gap-[7px] text-[12px] font-medium" style={{ color: active ? "var(--ink-teal)" : "var(--tx-5)" }}>

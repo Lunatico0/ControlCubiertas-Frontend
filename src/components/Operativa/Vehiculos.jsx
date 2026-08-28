@@ -51,6 +51,12 @@ const Vehiculos = () => {
   const [vview, setView] = usePersistedState("op_vehview", "grid")
   const searchRef = useHotkeyFocus() // Ctrl/⌘+K enfoca el buscador (igual que Cubiertas)
 
+  // t148: qué está escondiendo los vehículos, para que el estado vacío no sea un callejón.
+  const escondidoPor = [
+    query.trim() && `la búsqueda “${query.trim()}”`,
+    fType && `el tipo “${fType}”`,
+  ].filter(Boolean)
+
   // Cubiertas montadas indexadas por vehículo → { byPos: {E1-I: tire}, count }
   const mountedByVeh = useMemo(() => {
     const m = {}
@@ -116,12 +122,14 @@ const Vehiculos = () => {
       {/* ===== TOOLBAR ===== */}
       <ScreenHeader
         title="Vehículos"
+        count={fleet.length}
         search={{
           value: query,
           onChange: (e) => setQuery(e.target.value),
           placeholder: "Buscar móvil, patente o marca…",
           showShortcut: true,
           inputRef: searchRef,
+          onClear: () => setQuery(""),
         }}
         secondaryAction={pendingAxles > 0 ? (
           <button onClick={() => setShowConfigEjes(true)} title="Configurar ejes de vehículos migrados" className="inline-flex h-[46px] items-center gap-2 rounded-[var(--r-md)] px-4 text-[13.5px] font-semibold" style={{ color: "var(--ink-orange)", background: tint("var(--ink-orange)", 12), border: `1px solid ${tint("var(--ink-orange)", 30)}` }}>
@@ -155,7 +163,19 @@ const Vehiculos = () => {
         ) : fleet.length === 0 ? (
           <div className="py-16 text-center">
             <div className="text-[17px] font-semibold" style={{ fontFamily: "var(--font-display)", color: "var(--tx)" }}>Sin resultados</div>
-            <div className="mt-1.5 text-[13px]" style={{ color: "var(--tx-5)" }}>No hay vehículos que coincidan.</div>
+            <div className="mt-1.5 text-[13px]" style={{ color: "var(--tx-5)" }}>
+              {/* t148: mismo criterio que en Cubiertas — decir qué lo está escondiendo y dar la salida. */}
+              {escondidoPor.length ? <>Está filtrado por {escondidoPor.join(" y ")}.</> : <>No hay vehículos que coincidan.</>}
+            </div>
+            {escondidoPor.length > 0 && (
+              <button
+                onClick={() => { setQuery(""); setFType("") }}
+                className="mt-4 inline-flex h-[38px] items-center gap-1.5 rounded-[var(--r-md)] px-[15px] text-[13px] font-semibold"
+                style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--tx-2)" }}
+              >
+                Limpiar búsqueda y filtros
+              </button>
+            )}
           </div>
         ) : vview === "table" ? (
           /* ===== TABLA ===== */

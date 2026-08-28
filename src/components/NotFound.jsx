@@ -5,9 +5,16 @@ import BrandLogo from "@components/BrandLogo"
 import Button from "@components/UI/Button"
 import { tituloPantalla } from "@utils/tokens"
 
-// Vista 404 para rutas inexistentes (catch-all `*` en App.jsx). Theme-aware vía
-// data-app-theme (los tokens var(--x) del design system viven en ese scope) + marca TireOps.
-const NotFound = () => {
+// Vista de callejón sin salida. Nació como el 404 de las rutas inexistentes (catch-all `*` en
+// App.jsx) y se parametrizó para cubrir también el 403 (t151): entrar a /admin con sesión de
+// operario redirigía a la raíz EN SILENCIO, y un redirect mudo se lee como "se colgó", no como
+// "no tenés permiso" — justo al lado de un 404 propio prolijo, con botón de volver.
+// Theme-aware vía data-app-theme (los tokens var(--x) del design system viven en ese scope).
+const NotFound = ({
+  codigo = "404",
+  titulo = "Página no encontrada",
+  mensaje = "La dirección a la que intentaste entrar no existe o se movió. Volvé al inicio para seguir operando.",
+}) => {
   const navigate = useNavigate()
   const { isDarkMode } = useTheme()
 
@@ -24,13 +31,13 @@ const NotFound = () => {
           className="text-[88px] font-bold leading-none"
           style={{ fontFamily: "var(--font-display)", color: "var(--ink-lime)" }}
         >
-          404
+          {codigo}
         </div>
         <h1 className={tituloPantalla} style={{ color: "var(--tx)" }}>
-          Página no encontrada
+          {titulo}
         </h1>
         <p className="max-w-[420px] text-[14.5px]" style={{ color: "var(--tx-4)" }}>
-          La dirección a la que intentaste entrar no existe o se movió. Volvé al inicio para seguir operando.
+          {mensaje}
         </p>
       </div>
 

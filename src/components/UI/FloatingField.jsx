@@ -35,13 +35,22 @@ const FloatingField = forwardRef(({ label, as = "input", type = "text", required
   const errMsg = typeof error === "string" ? error : ""
 
   const cls = `ff-control ${className}`.trim()
+  // t153: el borde rojo era la ÚNICA marca de error. El color no es información para todo el
+  // mundo: sin aria-invalid, un lector de pantalla (y cualquier validación automatizada) ve un
+  // campo perfectamente válido. Y el mensaje, cuando lo había, quedaba suelto en el DOM en vez
+  // de colgar del campo.
+  const errId = errMsg ? `${fieldId}-err` : undefined
+  const a11y = {
+    ...(error ? { "aria-invalid": "true" } : {}),
+    ...(errId ? { "aria-describedby": errId } : {}),
+  }
   const listId = Array.isArray(suggestions) && suggestions.length ? `${fieldId}-sug` : undefined
   const control = isSelect ? (
-    <select ref={ref} id={fieldId} className={cls} {...rest}>{children}</select>
+    <select ref={ref} id={fieldId} className={cls} {...a11y} {...rest}>{children}</select>
   ) : isTextarea ? (
-    <textarea ref={ref} id={fieldId} className={cls} placeholder=" " {...rest} />
+    <textarea ref={ref} id={fieldId} className={cls} placeholder=" " {...a11y} {...rest} />
   ) : (
-    <input ref={ref} id={fieldId} type={type} className={cls} placeholder=" " list={listId} {...rest} />
+    <input ref={ref} id={fieldId} type={type} className={cls} placeholder=" " list={listId} {...a11y} {...rest} />
   )
 
   return (
@@ -52,7 +61,7 @@ const FloatingField = forwardRef(({ label, as = "input", type = "text", required
       </label>
       {listId && <datalist id={listId}>{suggestions.map((s) => <option key={s} value={s} />)}</datalist>}
       {rightAddon}
-      {errMsg && <div className="ff-error-msg">{errMsg}</div>}
+      {errMsg && <div id={errId} role="alert" className="ff-error-msg">{errMsg}</div>}
     </div>
   )
 })

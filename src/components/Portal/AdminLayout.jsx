@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react"
+import { etiquetaDeRol } from "@utils/roles"
 import { useNavigate, useLocation, Outlet } from "react-router-dom"
 import { useAuth } from "@context/AuthContext"
 import { useTheme } from "@context/ThemeContext"
@@ -91,7 +92,7 @@ const AdminLayout = () => {
           </>
         }
         upd={upd}
-        user={{ name: displayName, roleLabel: "Tenant Admin", initials, avatarBg: "var(--ink-lime)", avatarColor: "var(--bg)" }}
+        user={{ name: displayName, roleLabel: etiquetaDeRol(user?.role), initials, avatarBg: "var(--ink-lime)", avatarColor: "var(--bg)" }}
         help={{ dataTour: "a-help", onStartTour: () => { navigate("/admin"); setTourOpen(true) }, guideHref: "/admin/guia", guideLabel: "Guía del administrador", guideSubtitle: "Manual detallado · pestaña nueva" }}
         onLogout={logout}
       />
@@ -119,7 +120,7 @@ const AdminLayout = () => {
               <span className="flex flex-none items-center justify-center rounded-full text-[11.5px] font-bold" style={{ width: 30, height: 30, background: "var(--ink-lime)", color: "var(--bg)", fontFamily: "var(--font-display)" }}>{initials}</span>
               <span className="hidden sm:block" style={{ lineHeight: 1.25 }}>
                 <span className="block text-[13px] font-semibold" style={{ color: "var(--tx)" }}>{displayName}</span>
-                <span className="block text-[11px]" style={{ color: "var(--tx-5)" }}>Tenant Admin</span>
+                <span className="block text-[11px]" style={{ color: "var(--tx-5)" }}>{etiquetaDeRol(user?.role)}</span>
               </span>
             </div>
           </div>
