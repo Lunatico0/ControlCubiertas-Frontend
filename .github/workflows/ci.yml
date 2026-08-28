@@ -1,0 +1,32 @@
+# CI del frontend. Corre en Linux a propósito: es el entorno del build de Vercel, donde el
+# gotcha de mayúsculas (UI/ vs common/) sí rompe. Ver scripts/check-import-case.mjs.
+name: CI
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      # Los imports con el case equivocado pasan en Windows y rompen acá. Va antes que el resto
+      # para que el error sea el primero que se ve, no uno enterrado en el log del build.
+      - name: Case de los imports
+        run: node scripts/check-import-case.mjs src
+
+      - run: npm test
+
+      # El build es parte del contrato: un test verde con un build roto no sirve de nada.
+      - name: Build web
+        run: npm run build:web

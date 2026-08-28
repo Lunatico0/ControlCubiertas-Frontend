@@ -13,7 +13,8 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
-    "electron:start": "electron ."
+    "electron:start": "electron .",
+    "check:case": "node scripts/check-import-case.mjs src"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
