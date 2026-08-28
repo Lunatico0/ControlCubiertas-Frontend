@@ -30,3 +30,8 @@ jobs:
       # El build es parte del contrato: un test verde con un build roto no sirve de nada.
       - name: Build web
         run: npm run build:web
+
+      # Reporta el peso de cada chunk y falla si el bundle de entrada vuelve a crecer o si el
+      # code splitting por rama de ruta se rompió. Ver scripts/check-bundle.mjs.
+      - name: Peso del bundle
+        run: node scripts/check-bundle.mjs dist

@@ -1,29 +1,48 @@
 import './App.css'
+import { lazy, Suspense } from "react"
 import { BrowserRouter, HashRouter, Routes, Route } from "react-router-dom"
 import isElectron from "@utils/isElectron"
-import Layout from '@components/Layout/Layout.jsx'
 import ContextProvider from '@context/ContextProvider.jsx'
 import { ApiProvider } from '@context/apiContext'
 import Login from '@components/Auth/Login.jsx'
 import ChangePassword from '@components/Auth/ChangePassword.jsx'
 import RequireAuth from '@components/Auth/RequireAuth.jsx'
-import AdminLayout from '@components/Portal/AdminLayout.jsx'
-import Dashboard from '@components/Portal/Dashboard.jsx'
-import Users from '@components/Portal/Users.jsx'
-import CompanySettings from '@components/Portal/CompanySettings.jsx'
-import Comprobantes from '@components/Portal/Comprobantes.jsx'
-import Reportes from '@components/Portal/Reportes.jsx'
-import EditorComprobante from '@components/Portal/EditorComprobante.jsx'
-import GuiaAdmin from '@components/Portal/GuiaAdmin.jsx'
 import OperativaLayout from '@components/Operativa/OperativaLayout.jsx'
-import GuiaDeUso from '@components/Operativa/GuiaDeUso.jsx'
 import NotFound from '@components/NotFound.jsx'
 import TitleBar from '@components/Layout/TitleBar.jsx'
+
+// CARGA DIFERIDA POR RAMA DE RUTA
+//
+// Todo entraba en un solo chunk: un operario que sólo usa la operativa se bajaba el panel admin
+// entero, los gráficos de recharts y la UI legacy completa antes de ver la primera pantalla.
+//
+// Se quedan en el bundle de entrada las pantallas del arranque (login, cambio de contraseña) y
+// la operativa, que es la ruta principal y la que abre el 90% de los usuarios: diferirla sólo
+// agregaría un salto en blanco donde hoy no hay ninguno. Se difiere lo que es de una minoría o
+// de uso ocasional: el panel admin (con recharts adentro, en Reportes), las guías y la UI legacy.
+const AdminLayout = lazy(() => import('@components/Portal/AdminLayout.jsx'))
+const Dashboard = lazy(() => import('@components/Portal/Dashboard.jsx'))
+const Users = lazy(() => import('@components/Portal/Users.jsx'))
+const CompanySettings = lazy(() => import('@components/Portal/CompanySettings.jsx'))
+const Comprobantes = lazy(() => import('@components/Portal/Comprobantes.jsx'))
+const Reportes = lazy(() => import('@components/Portal/Reportes.jsx'))
+const EditorComprobante = lazy(() => import('@components/Portal/EditorComprobante.jsx'))
+const GuiaAdmin = lazy(() => import('@components/Portal/GuiaAdmin.jsx'))
+const GuiaDeUso = lazy(() => import('@components/Operativa/GuiaDeUso.jsx'))
+const Layout = lazy(() => import('@components/Layout/Layout.jsx'))
 
 // En la app instalable (Electron) el index.html se carga por file:// → BrowserRouter
 // (history API) rompe las rutas. HashRouter (#/ruta) funciona sobre file://. En web
 // seguimos con BrowserRouter (URLs limpias). Se resuelve una sola vez al arrancar.
 const Router = isElectron() ? HashRouter : BrowserRouter
+
+// Lo que se ve mientras baja el chunk de una rama diferida. En Electron los chunks salen del
+// disco y esto ni parpadea; en web es cuestión de milisegundos sobre una conexión normal.
+const Cargando = () => (
+  <div className="flex h-full items-center justify-center p-8 text-sm text-(--tx-5)" role="status" aria-live="polite">
+    Cargando…
+  </div>
+)
 
 function App() {
   return (
@@ -34,7 +53,10 @@ function App() {
         <div style={{ display: "flex", flexDirection: "column", height: "100vh" }}>
           <TitleBar />
           <div style={{ flex: 1, minHeight: 0 }}>
-            <Routes>
+            {/* Un solo Suspense envuelve todas las rutas: las ramas diferidas comparten el mismo
+                fallback y las que no lo son nunca lo activan. */}
+            <Suspense fallback={<Cargando />}>
+              <Routes>
           <Route path="/login" element={<Login />} />
           <Route
             path="/cambiar-password"
@@ -109,7 +131,8 @@ function App() {
 
           {/* Catch-all: cualquier ruta inexistente cae en el 404 (no en la operativa). */}
           <Route path="*" element={<NotFound />} />
-            </Routes>
+              </Routes>
+            </Suspense>
           </div>
         </div>
       </Router>
