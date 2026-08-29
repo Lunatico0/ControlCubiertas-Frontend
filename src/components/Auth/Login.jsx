@@ -4,6 +4,7 @@ import { useAuth } from "@context/AuthContext"
 import BrandLogo from "@components/BrandLogo"
 import FloatingField from "@components/common/FloatingField"
 import Pill from "@components/common/Pill"
+import { entroPorLaDemo } from "@utils/demoEntry"
 import tireOpsDark from "@/assets/TireOpsDark.svg"
 import isElectron from "@utils/isElectron"
 import { useTheme } from "@context/ThemeContext"
@@ -32,15 +33,15 @@ const LIME_FILL = "var(--brand)"
 const LIME_TEXTO = "var(--ink-lime)"
 const BAD = "var(--ink-red)"
 
-// El recuadro de la demo va detrás de una variable de entorno y APAGADO por default: un taller
-// que compró TireOps no puede ver credenciales de prueba en su pantalla de login. Se enciende
-// sólo en el deploy de la demo pública (VITE_DEMO_LOGIN=true).
+// El recuadro de la demo necesita DOS llaves (ver @utils/demoEntry): que el deploy lo permita
+// (VITE_DEMO_LOGIN, de build, así que el escritorio nunca la tiene) y que el visitante haya
+// llegado por el botón de la landing. La segunda existe porque el deploy web es UNO SOLO y lo
+// comparten la demo pública y los clientes que entran por navegador.
 //
 // La leyenda dice lo que el backend realmente hace: al ingresar con estas credenciales se
 // clona un tenant descartable y la sesión va contra ese (ver backend/src/services/demo.service.js).
 // La versión anterior prometía que lo cargado "no se guarda en la base, queda solo en este
 // equipo": eso describía un sandbox en el navegador que nunca existió.
-const demoActiva = () => import.meta.env.VITE_DEMO_LOGIN === "true"
 
 const Login = () => {
   const { login, isAuthenticated, mustChangePassword } = useAuth()
@@ -49,6 +50,9 @@ const Login = () => {
   const location = useLocation()
   const from = location.state?.from?.pathname || "/"
 
+  // Se resuelve UNA vez, al montar: la llamada consume el parámetro de la URL, así que el
+  // link que el visitante podría marcar como favorito ya no arrastra la demo.
+  const [mostrarDemo] = useState(entroPorLaDemo)
   const [step, setStep] = useState("login") // "login" | "forgot"
   const [email, setEmail] = useState("")
   const [pwd, setPwd] = useState("")
@@ -173,7 +177,7 @@ const Login = () => {
                   {loggingIn ? "Ingresando…" : "Ingresar"}
                 </button>
 
-                {demoActiva() && (
+                {mostrarDemo && (
                   <div
                     data-testid="demo-box"
                     style={{ marginTop: 20, padding: "13px 15px", border: "1px dashed var(--bd-strong)", borderRadius: "var(--r-lg)", fontSize: 12, color: "var(--tx-5)", lineHeight: 1.6 }}
