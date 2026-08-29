@@ -3,6 +3,7 @@ import { useNavigate, useLocation, Navigate } from "react-router-dom"
 import { useAuth } from "@context/AuthContext"
 import BrandLogo from "@components/BrandLogo"
 import FloatingField from "@components/common/FloatingField"
+import Pill from "@components/common/Pill"
 import tireOpsDark from "@/assets/TireOpsDark.svg"
 import isElectron from "@utils/isElectron"
 import { useTheme } from "@context/ThemeContext"
@@ -30,6 +31,16 @@ import { useTheme } from "@context/ThemeContext"
 const LIME_FILL = "var(--brand)"
 const LIME_TEXTO = "var(--ink-lime)"
 const BAD = "var(--ink-red)"
+
+// El recuadro de la demo va detrás de una variable de entorno y APAGADO por default: un taller
+// que compró TireOps no puede ver credenciales de prueba en su pantalla de login. Se enciende
+// sólo en el deploy de la demo pública (VITE_DEMO_LOGIN=true).
+//
+// La leyenda dice lo que el backend realmente hace: al ingresar con estas credenciales se
+// clona un tenant descartable y la sesión va contra ese (ver backend/src/services/demo.service.js).
+// La versión anterior prometía que lo cargado "no se guarda en la base, queda solo en este
+// equipo": eso describía un sandbox en el navegador que nunca existió.
+const demoActiva = () => import.meta.env.VITE_DEMO_LOGIN === "true"
 
 const Login = () => {
   const { login, isAuthenticated, mustChangePassword } = useAuth()
@@ -161,6 +172,22 @@ const Login = () => {
                   {loggingIn && <span className="animate-spin" style={{ width: 17, height: 17, borderRadius: "50%", border: "2.5px solid color-mix(in srgb, var(--brand-ink) 25%, transparent)", borderTopColor: "var(--brand-ink)" }} />}
                   {loggingIn ? "Ingresando…" : "Ingresar"}
                 </button>
+
+                {demoActiva() && (
+                  <div
+                    data-testid="demo-box"
+                    style={{ marginTop: 20, padding: "13px 15px", border: "1px dashed var(--bd-strong)", borderRadius: "var(--r-lg)", fontSize: 12, color: "var(--tx-5)", lineHeight: 1.6 }}
+                  >
+                    <div>
+                      <Pill size="tag" style={{ color: "var(--ink-purple)", background: "color-mix(in srgb, var(--ink-purple) 16%, transparent)", marginRight: 8 }}>DEMO · ANDES CARGO</Pill>
+                      admin@andescargo.com / operario@andescargo.com · contraseña:{" "}
+                      <span style={{ fontFamily: "var(--font-mono)", color: "var(--tx-3)" }}>tireops</span>
+                    </div>
+                    <div style={{ marginTop: 9 }}>
+                      Entorno de prueba: al ingresar se crea una <b style={{ color: "var(--tx-3)" }}>copia privada</b> de los datos de Andes Cargo, sólo para vos. Lo que cargues no lo ve nadie más y se borra a las <b style={{ color: "var(--tx-3)" }}>48 horas</b>.
+                    </div>
+                  </div>
+                )}
               </div>
             </>
           ) : (
