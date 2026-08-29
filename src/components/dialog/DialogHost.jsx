@@ -30,10 +30,12 @@ const TOAST = {
   warn: { color: "var(--ink-orange)", bg: "rgba(240,133,31,.16)", icon: "warn" },
   info: { color: "var(--ink-blue)", bg: "rgba(110,151,245,.16)", icon: "info" },
 }
+// Toasts que se quedan hasta que alguien los cierra (t136). Ver el registro del handler.
+const PERSISTENTE = new Set(["danger", "warn"])
 const ANIM = {
-  pop: "dlgPopIn .2s cubic-bezier(.22,1,.36,1)",
-  slide: "dlgSlideIn .24s cubic-bezier(.22,1,.36,1)",
-  fade: "dlgFadeIn .18s ease",
+  pop: "dlgPopIn var(--t-base) var(--t-ease)",
+  slide: "dlgSlideIn var(--t-base) var(--t-ease)",
+  fade: "dlgFadeIn var(--t-fast) var(--t-ease)",
 }
 
 // Los botones y la card salen de overlayTokens: los comparte con common/Modal, que es el otro
@@ -58,7 +60,11 @@ const DialogHost = () => {
     _registerToast((t) => {
       if (toastTimer.current) clearTimeout(toastTimer.current)
       setToast(t)
-      toastTimer.current = setTimeout(() => setToast(null), 2800)
+      // t136: los errores y las advertencias NO se autodescartan. 2800 ms alcanzan para un
+      // "Cubierta asignada" (no hay nada que releer), pero no para un error: el operario
+      // aprieta, mira la cubierta que tiene en la mano, y cuando vuelve a la pantalla el
+      // único dato que el sistema tenía para darle ya no está. Se cierran a mano.
+      if (!PERSISTENTE.has(t.kind)) toastTimer.current = setTimeout(() => setToast(null), 2800)
     })
     return () => {
       _registerDialog(null)
@@ -74,6 +80,11 @@ const DialogHost = () => {
     })
     const t = lastTrigger.current
     if (t && t.focus) setTimeout(() => { try { t.focus() } catch { /* noop */ } }, 10)
+  }, [])
+
+  const cerrarToast = useCallback(() => {
+    if (toastTimer.current) clearTimeout(toastTimer.current)
+    setToast(null)
   }, [])
 
   // Callback estable para el cierre por Escape (cierra cualquier variante, incluida print).
@@ -111,13 +122,13 @@ const DialogHost = () => {
     <div data-app-theme={isDarkMode ? "dark" : "light"} style={{ fontFamily: OVERLAY.fontFamily }}>
       {active && <DialogEscape onEscape={closeOnEscape} />}
       {active && (
-        <div onClick={onBackdrop} style={{ position: "fixed", inset: 0, background: OVERLAY.backdrop, backdropFilter, zIndex: OVERLAY.zIndex, display: "flex", alignItems: "center", justifyContent: "center", padding: 24, animation: "dlgBackdropIn .16s ease" }}>
+        <div onClick={onBackdrop} style={{ position: "fixed", inset: 0, background: OVERLAY.backdrop, backdropFilter, zIndex: OVERLAY.zIndex, display: "flex", alignItems: "center", justifyContent: "center", padding: 24, animation: "dlgBackdropIn var(--t-fast) var(--t-ease)" }}>
 
           {/* Confirmación simple */}
           {active.type === "confirm" && (
             <div {...dlgProps} role="dialog" aria-modal="true" style={{ ...cardBase, maxWidth: OVERLAY.maxWidth, border: "1px solid var(--bd-strong)", animation: anim }}>
               <div style={{ padding: "22px 22px 0 22px", display: "flex", gap: 14 }}>
-                <span style={{ width: 42, height: 42, borderRadius: 11, background: "rgba(110,151,245,.14)", color: "var(--ink-blue)", display: "flex", alignItems: "center", justifyContent: "center", flex: "none" }}><DlgIcon kind="ask" size={21} /></span>
+                <span style={{ width: 42, height: 42, borderRadius: "var(--r-md)", background: "rgba(110,151,245,.14)", color: "var(--ink-blue)", display: "flex", alignItems: "center", justifyContent: "center", flex: "none" }}><DlgIcon kind="ask" size={21} /></span>
                 <div style={{ minWidth: 0, paddingTop: 2 }}>
                   <div style={{ fontFamily: OVERLAY.titleFont, fontSize: OVERLAY.titleSize, fontWeight: 600, color: "var(--tx)" }}>{o.title || "¿Confirmar la acción?"}</div>
                   {o.text && <div style={{ fontSize: 13, color: "var(--tx-4)", marginTop: 6, lineHeight: 1.55 }}>{o.text}</div>}
@@ -134,14 +145,14 @@ const DialogHost = () => {
           {active.type === "danger" && (
             <div {...dlgProps} role="dialog" aria-modal="true" style={{ ...cardBase, maxWidth: OVERLAY.maxWidth, border: "1px solid rgba(240,86,74,.38)", boxShadow: OVERLAY.shadow + ",0 0 0 4px rgba(240,86,74,.07)", animation: anim }}>
               <div style={{ padding: "22px 22px 0 22px", display: "flex", gap: 14 }}>
-                <span style={{ width: 42, height: 42, borderRadius: 11, background: "rgba(240,90,75,.14)", color: "var(--ink-red)", display: "flex", alignItems: "center", justifyContent: "center", flex: "none" }}><DlgIcon kind="trash" size={20} /></span>
+                <span style={{ width: 42, height: 42, borderRadius: "var(--r-md)", background: "rgba(240,90,75,.14)", color: "var(--ink-red)", display: "flex", alignItems: "center", justifyContent: "center", flex: "none" }}><DlgIcon kind="trash" size={20} /></span>
                 <div style={{ minWidth: 0, paddingTop: 2 }}>
                   <div style={{ fontFamily: OVERLAY.titleFont, fontSize: OVERLAY.titleSize, fontWeight: 600, color: "var(--tx)" }}>{o.title || "¿Confirmar la baja?"}</div>
                   {o.text && <div style={{ fontSize: 13, color: "var(--tx-4)", marginTop: 6, lineHeight: 1.55 }}>{o.text}</div>}
                 </div>
               </div>
               {o.ack && (
-                <label style={{ display: "flex", alignItems: "flex-start", gap: 10, margin: "16px 22px 0 22px", padding: "12px 13px", border: "1px solid var(--bd-strong)", borderRadius: 10, background: "var(--elev)", cursor: "pointer", userSelect: "none" }}>
+                <label style={{ display: "flex", alignItems: "flex-start", gap: 10, margin: "16px 22px 0 22px", padding: "12px 13px", border: "1px solid var(--bd-strong)", borderRadius: "var(--r-md)", background: "var(--elev)", cursor: "pointer", userSelect: "none" }}>
                   <input type="checkbox" checked={ack} onChange={(e) => setAck(e.target.checked)} style={{ width: 16, height: 16, margin: "1px 0 0 0", accentColor: "var(--st-red)", cursor: "pointer" }} />
                   <span style={{ fontSize: 12.5, color: "var(--tx-3)", lineHeight: 1.5 }}>{o.ack}</span>
                 </label>
@@ -151,7 +162,7 @@ const DialogHost = () => {
                 <button
                   onClick={() => { if (!o.ack || ack) close(true) }}
                   disabled={o.ack && !ack}
-                  style={{ height: 44, padding: "0 20px", border: "none", borderRadius: 9, fontSize: 14, fontWeight: 700, fontFamily: "'IBM Plex Sans'", background: !o.ack || ack ? "#E04434" : "var(--elev)", color: !o.ack || ack ? "#fff" : "var(--tx-6)", cursor: !o.ack || ack ? "pointer" : "not-allowed" }}
+                  style={{ height: 44, padding: "0 20px", border: "none", borderRadius: "var(--r-md)", fontSize: 14, fontWeight: 700, fontFamily: "var(--font-sans)", background: !o.ack || ack ? "#E04434" : "var(--elev)", color: !o.ack || ack ? "#fff" : "var(--tx-6)", cursor: !o.ack || ack ? "pointer" : "not-allowed" }}
                 >{o.confirmLabel || "Sí, dar de baja"}</button>
               </div>
             </div>
@@ -162,7 +173,7 @@ const DialogHost = () => {
             const nv = NOTICE[o.kind] || NOTICE.info
             return (
               <div {...dlgProps} role="alertdialog" aria-modal="true" style={{ ...cardBase, maxWidth: OVERLAY.maxWidth, border: "1px solid var(--bd-strong)", textAlign: "center", padding: "28px 26px 22px 26px", animation: anim }}>
-                <span style={{ width: 54, height: 54, borderRadius: 15, background: nv.bg, color: nv.color, display: "inline-flex", alignItems: "center", justifyContent: "center" }}><DlgIcon kind={nv.icon} size={24} /></span>
+                <span style={{ width: 54, height: 54, borderRadius: "var(--r-lg)", background: nv.bg, color: nv.color, display: "inline-flex", alignItems: "center", justifyContent: "center" }}><DlgIcon kind={nv.icon} size={24} /></span>
                 <div style={{ fontFamily: OVERLAY.titleFont, fontSize: OVERLAY.titleSize, fontWeight: 600, color: "var(--tx)", marginTop: 15 }}>{o.title || ""}</div>
                 {o.text && <div style={{ fontSize: 13, color: "var(--tx-4)", marginTop: 7, lineHeight: 1.55 }}>{o.text}</div>}
                 <button className="dlg-btn-primary" onClick={() => close(true)} style={{ ...primaryBtn, marginTop: 20, width: "100%" }}>{o.confirmLabel || "Entendido"}</button>
@@ -176,19 +187,19 @@ const DialogHost = () => {
             <div {...dlgProps} role="dialog" aria-modal="true"
               style={{ ...cardBase, maxWidth: 460, border: "1px solid var(--bd-strong)", display: "flex", flexDirection: "column", maxHeight: "92vh", animation: anim }}>
               <div style={{ flex: "none", padding: "18px 22px", borderBottom: "1px solid var(--bd-soft)", display: "flex", alignItems: "center", gap: 12 }}>
-                <span style={{ width: 38, height: 38, borderRadius: 10, background: "rgba(196,237,43,.13)", color: "var(--ink-lime)", display: "flex", alignItems: "center", justifyContent: "center", flex: "none" }}><DlgIcon kind="printer" size={19} /></span>
+                <span style={{ width: 38, height: 38, borderRadius: "var(--r-md)", background: "rgba(196,237,43,.13)", color: "var(--ink-lime)", display: "flex", alignItems: "center", justifyContent: "center", flex: "none" }}><DlgIcon kind="printer" size={19} /></span>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontFamily: "'Space Grotesk'", fontSize: 16, fontWeight: 600, color: "var(--tx)" }}>{o.title || "Comprobante"}</div>
+                  <div style={{ fontFamily: "var(--font-display)", fontSize: 16, fontWeight: 600, color: "var(--tx)" }}>{o.title || "Comprobante"}</div>
                   <div style={{ fontSize: 12, color: "var(--tx-5)", marginTop: 1 }}>{o.subtitle || "Revisalo antes de confirmar el movimiento"}</div>
                 </div>
-                <button type="button" className="dlg-x" onClick={() => close(false)} aria-label="Cerrar" style={{ color: "var(--tx-5)", cursor: "pointer", display: "inline-flex", padding: 5, borderRadius: 7, border: "none", background: "transparent" }}><DlgIcon kind="x" size={18} /></button>
+                <button type="button" className="dlg-x" onClick={() => close(false)} aria-label="Cerrar" style={{ color: "var(--tx-5)", cursor: "pointer", display: "inline-flex", padding: 5, borderRadius: "var(--r-sm)", border: "none", background: "transparent" }}><DlgIcon kind="x" size={18} /></button>
               </div>
               <div style={{ flex: 1, overflowY: "auto", padding: "20px 22px", background: "var(--elev)" }}>
                 {o.receipt
                   ? o.receipt
                   : o.receiptHtml
                     ? <div style={{ maxWidth: 340, margin: "0 auto" }} dangerouslySetInnerHTML={{ __html: o.receiptHtml }} />
-                    : <div style={{ textAlign: "center", color: "var(--tx-6)", fontSize: 12.5, padding: "30px 0", fontFamily: "'IBM Plex Mono'" }}>Vista previa del comprobante</div>}
+                    : <div style={{ textAlign: "center", color: "var(--tx-6)", fontSize: 12.5, padding: "30px 0", fontFamily: "var(--font-mono)" }}>Vista previa del comprobante</div>}
               </div>
               <div style={{ flex: "none", padding: "15px 22px", borderTop: "1px solid var(--bd-soft)", display: "flex", gap: 10, justifyContent: "flex-end" }}>
                 <button className="dlg-btn-neutral" onClick={() => close(false)} style={neutralBtn}>{o.cancelLabel || "Cancelar"}</button>
@@ -202,14 +213,25 @@ const DialogHost = () => {
       {/* Toast (abajo-centro) */}
       {toast && (() => {
         const tv = TOAST[toast.kind] || TOAST.ok
+        const persistente = PERSISTENTE.has(toast.kind)
         return (
           <div style={{ position: "fixed", bottom: 24, left: "50%", transform: "translateX(-50%)", zIndex: 60 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 12, background: "var(--toast)", border: "1px solid var(--bd-strong)", borderRadius: 12, padding: "12px 16px", boxShadow: "var(--elev-1)", minWidth: 280, animation: "dlgToastIn .22s ease" }}>
-              <span style={{ width: 30, height: 30, borderRadius: 8, background: tv.bg, color: tv.color, display: "flex", alignItems: "center", justifyContent: "center", flex: "none" }}><DlgIcon kind={tv.icon} size={17} /></span>
-              <div style={{ lineHeight: 1.3 }}>
+            {/* Un error es una interrupción, no un cambio de estado: role="alert" hace que el
+                lector de pantalla lo lea de inmediato en vez de esperar una pausa. */}
+            <div role={persistente ? "alert" : "status"} aria-live={persistente ? "assertive" : "polite"} style={{ display: "flex", alignItems: "center", gap: 12, background: "var(--toast)", border: `1px solid ${persistente ? tv.color : "var(--bd-strong)"}`, borderRadius: "var(--r-md)", padding: "12px 16px", boxShadow: "var(--elev-1)", minWidth: 280, animation: "dlgToastIn var(--t-base) var(--t-ease)" }}>
+              <span style={{ width: 30, height: 30, borderRadius: "var(--r-sm)", background: tv.bg, color: tv.color, display: "flex", alignItems: "center", justifyContent: "center", flex: "none" }}><DlgIcon kind={tv.icon} size={17} /></span>
+              <div style={{ lineHeight: 1.3, flex: 1, minWidth: 0 }}>
                 <div style={{ fontSize: 13, fontWeight: 600, color: "var(--tx)" }}>{toast.title}</div>
-                {toast.sub && <div style={{ fontSize: 11.5, color: "var(--tx-5)", fontFamily: "'IBM Plex Mono'" }}>{toast.sub}</div>}
+                {toast.sub && <div style={{ fontSize: 11.5, color: "var(--tx-5)", fontFamily: "var(--font-mono)" }}>{toast.sub}</div>}
               </div>
+              {/* t136: sin esto, un toast persistente sería una trampa. Va en TODOS, así el
+                  gesto de descartar es el mismo sin importar el tipo de aviso. */}
+              <button
+                type="button"
+                aria-label="Cerrar aviso"
+                onClick={cerrarToast}
+                style={{ flex: "none", width: 26, height: 26, display: "flex", alignItems: "center", justifyContent: "center", border: "none", background: "transparent", color: "var(--tx-5)", borderRadius: "var(--r-sm)", cursor: "pointer" }}
+              ><DlgIcon kind="x" size={14} /></button>
             </div>
           </div>
         )

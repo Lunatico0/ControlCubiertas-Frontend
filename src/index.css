@@ -6,48 +6,87 @@
 /* ============================================================================
    TOKENS DEL TEMA — ÚNICO lugar para colores, fuentes y tamaños.
    Cambiar un token acá se propaga a toda la app.
-   Uso: --color-brand-500  ->  className="bg-brand-500 text-brand-500 border-brand-500"
-        --font-display      ->  className="font-display"
+   Uso: --font-display  ->  className="font-display"
    ============================================================================ */
 @theme {
-  /* --- MARCA / primario -----------------------------------------------------
-     Dirección "logística limpia con carácter" (ver ART-DIRECTION.md): verde lima
-     vibrante. OJO: el lima es brillante → los fills sólidos (bg-brand-500/600) van
-     con texto OSCURO (text-slate-900), no blanco. Para cambiar el primario de TODA
-     la app, editá esta escala. */
-  --color-brand-50:  #f7fee7;
-  --color-brand-100: #ecfccb;
-  --color-brand-200: #d9f99d;
-  --color-brand-300: #bef264;
-  --color-brand-400: #a3e635;
-  --color-brand-500: #84cc16; /* primario */
-  --color-brand-600: #65a30d; /* hover */
-  --color-brand-700: #4d7c0f;
-  --color-brand-800: #3f6212;
-  --color-brand-900: #365314;
-
   /* --- TIPOGRAFÍA -----------------------------------------------------------
      Fuentes del ART-DIRECTION. El cuerpo pasó de Inter a IBM Plex Sans con el rediseño:
      los shells fijan IBM Plex por style inline, pero los modales se portalean a <body>,
      fuera de ese árbol, y heredaban de acá. Se veían TRES familias a la vez en la misma
      pantalla: título en Space Grotesk, labels e inputs del modal en Inter, y la lista de
      atrás en IBM Plex. Con la variable alineada, todo lo que caiga fuera de un shell
-     hereda la tipografía correcta. */
+     hereda la tipografía correcta.
+
+     Las tres se bundlean como assets (@fontsource, ver src/main.jsx): TireOps se instala
+     en talleres sin internet, y pedirlas al CDN dejaba toda la UI en la fuente del sistema. */
   --font-sans: "IBM Plex Sans", system-ui, Avenir, Helvetica, Arial, sans-serif;
   --font-display: "Space Grotesk", system-ui, sans-serif; /* títulos */
   --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, monospace; /* cifras/datos */
 
-  /* --- COLORES DEL CICLO DE CUBIERTA ----------------------------------------
-     Valores ACTUALES preservados (mismos nombres de clase: bg-nueva, etc.).
-     Se ajustarán a la paleta nueva en el rediseño visual. */
-  --color-nueva: #0000ff;
-  --color-primer-recap: #1db51d;
-  --color-segundo-recap: #ffff00;
-  --color-tercer-recap: #ff8000;
-  --color-recap: #666666;
-  --color-descartada: #ef2222;
-  --color-vehiculo: #b2f2bb;
-  --color-cubierta: #a5d8ff;
+  /* Default de las utilidades `transition*` de Tailwind. Sin esto conviven sus 150ms con los
+     120/180 del sistema en la misma pantalla. Los valores viven en :root (ver más abajo);
+     acá sólo se enganchan, porque @theme corre antes. */
+  --default-transition-duration: 120ms;
+  --default-transition-timing-function: cubic-bezier(.2, 0, .2, 1);
+}
+
+/* ============================================================================
+   ESCALAS DEL SISTEMA — radio, espaciado, transición y capas.
+   NO son colores: no cambian con el tema, así que viven fuera de los bloques
+   [data-app-theme] y se declaran una sola vez.
+
+   Existen porque medir el panel devolvía DIECISÉIS radios distintos, veinte
+   combinaciones de padding y ocho duraciones de transición. En el mismo panel de
+   controles convivían un switch r20, un segmento r6, un input r10 y un botón r9:
+   nada rimaba con nada, y cada ajuste posterior era a ojo.
+
+   Uso: style={{ borderRadius: "var(--r-md)" }} o border-radius: var(--r-md).
+   ============================================================================ */
+:root {
+  /* RADIO — cuatro pasos, uno por rol.
+       sm   controles chicos: chips, badges, botones de icono
+       md   controles: inputs, botones, selects
+       lg   superficies: cards, paneles, modales
+       pill circular: pills de estado y avatares */
+  --r-sm: 6px;
+  --r-md: 10px;
+  --r-lg: 14px;
+  --r-pill: 999px;
+
+  /* ESPACIADO — múltiplos de 4. Todo padding/gap redondea al paso más cercano; sin esto
+     ningún elemento comparte ritmo vertical con el de al lado. */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 20px;
+  --sp-6: 24px;
+
+  /* TRANSICIÓN — tres duraciones con UNA curva. Había .15s, .16s, .18s, .2s, .22s, 200ms,
+     300ms y 500ms: .15 y .16 son indistinguibles pero obligan a mantener dos valores, y
+     300ms al lado de 150ms en la misma pantalla sí se nota (unos elementos "pesan" más).
+       fast  micro-feedback: hover, foco, color
+       base  cambios de estado visibles: apertura de un panel, un acordeón
+       slow  entradas y salidas grandes: drawer, modal, toast */
+  --t-fast: 120ms;
+  --t-base: 180ms;
+  --t-slow: 300ms;
+  --t-ease: cubic-bezier(.2, 0, .2, 1);
+
+  /* MARCA — el lima del fill de las acciones primarias y el oscuro que va ENCIMA.
+     Va acá y no en los bloques de tema porque es FIJO: el botón primario es el mismo lima
+     en claro y en oscuro, igual que el logo. Es distinto de --ink-lime, que es "el lima que
+     se lee como TEXTO" y sí cambia (en tema claro tiene que oscurecerse para pasar 4.5:1).
+     Antes estaba escrito a mano en 16 archivos: cambiar el primario obligaba a tocarlos todos. */
+  --brand: #C4ED2B;
+  --brand-ink: #0A0C0D;
+
+  /* CAPAS — una por rol, en vez de z-10/20/50/60/70 repartidos a ojo. El orden es el que
+     el usuario espera: un toast tapa un modal, un modal tapa un drawer. */
+  --z-sticky: 10;
+  --z-drawer: 40;
+  --z-modal: 60;
+  --z-toast: 80;
 }
 
 /* Base mínima. (Se quitó el fondo oscuro #242424 que traía el template de Vite
@@ -109,6 +148,33 @@
 /* --scroll estaba definido en los dos temas y tenia CERO usos. */
 * { scrollbar-color: var(--scroll) transparent; scrollbar-width: thin; }
 
+/* ─── Cifras tabulares ──────────────────────────────────────────────────────────────────────
+   Toda cifra escrita en la familia mono va TABULAR. Sin esto los dígitos tienen anchos
+   distintos y las columnas de números no alinean por dígito, que es la única razón para usar
+   mono en una tabla: el ojo compara magnitudes por el borde derecho de la cifra.
+
+   El primer selector engancha el style inline, que es como está escrito en los ~90 call sites
+   (fontFamily: "var(--font-mono)"), así que no hay que tocarlos uno por uno. */
+[style*="--font-mono"],
+.font-mono,
+.num { font-variant-numeric: tabular-nums; font-feature-settings: "tnum" 1; }
+
+/* Celda de número: mono, tabular y alineada a la derecha. Para columnas de tabla. */
+.num { font-family: var(--font-mono); }
+.num-col { text-align: right; }
+
+/* ─── Contenido más ancho que su columna ────────────────────────────────────────────────────
+   Envolver toda tabla, gráfico o fila de controles que no pueda comprimirse más. Sin esto el
+   contenido se RECORTA y no hay forma de llegar a él: medido a 768px, el selector Barras/Línea
+   de Reportes llegaba a 822px y el bloque "N° de serie" del editor a 886px, con la página sin
+   scroll horizontal (scrollWidth === clientWidth). No es texto apretado: es contenido
+   inalcanzable.
+
+   El ancho mínimo va en el HIJO y no acá: si se lo pone a todos los hijos por separado (con
+   `.scroll-x > *`), cada fila de una tabla calcula el suyo y las columnas dejan de alinear
+   entre filas. Uso: <div class="scroll-x"><div style="min-width:640px">…</div></div> */
+.scroll-x { overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; }
+
 /* Rampa de texto en DOS ZONAS. No entran siete pasos perceptiblemente distintos que TODOS
    pasen 4.5:1 sobre un fondo claro: forzarlo colapsa tx-4, tx-5 y tx-6 al mismo color y la
    jerarquia se muere. Entonces se declara para que sirve cada paso, medido contra --bg, que
@@ -144,6 +210,14 @@
 @keyframes opDrawerIn { from { transform: translateX(24px); opacity:.4 } to { transform: translateX(0); opacity:1 } }
 @keyframes opToastIn  { from { transform: translateY(14px); opacity:0 } to { transform: translateY(0); opacity:1 } }
 
+/* Skeletons de carga (components/common/Skeleton.jsx). La animación vive acá y no inline para
+   poder apagarla con prefers-reduced-motion: un latido infinito en media pantalla es
+   exactamente lo que esa preferencia pide evitar. */
+@keyframes skelPulse { 0%,100% { opacity:1 } 50% { opacity:.45 } }
+@media (prefers-reduced-motion: reduce) {
+  [aria-busy="true"] [aria-hidden="true"] { animation: none !important }
+}
+
 /* ============================================================================
    FLOATING FIELD — input/textarea/select con label flotante (patrón del login),
    theme-aware con los tokens del tema. Ver src/components/UI/FloatingField.jsx.
@@ -152,17 +226,21 @@
    ============================================================================ */
 .ff { position: relative; }
 .ff-control {
-  width: 100%; height: 46px; padding: 0 13px; border-radius: 10px;
-  background: var(--input); border: 1.5px solid var(--bd-strong); color: var(--tx);
-  font-size: 14.5px; font-family: inherit; outline: none; transition: border-color .16s ease;
+  width: 100%; height: 46px; padding: 0 13px; border-radius: var(--r-md);
+  /* t122: era 1.5px. getComputedStyle devuelve 1px con devicePixelRatio 1 y 1.5px en un
+     monitor 2x: el MISMO input se veía con distinto peso de borde según el equipo, y el
+     énfasis que se buscaba con el 1.5 no llegaba a la mayoría de las máquinas de escritorio.
+     Se resuelve en 1px, que es el peso del resto de los bordes del sistema. */
+  background: var(--input); border: 1px solid var(--bd-strong); color: var(--tx);
+  font-size: 14.5px; font-family: inherit; outline: none; transition: border-color var(--t-fast) var(--t-ease);
 }
 textarea.ff-control { height: auto; min-height: 84px; padding: 11px 13px; line-height: 1.5; resize: vertical; }
 .ff-control:focus { border-color: var(--ink-lime); }
 .ff-control:disabled { opacity: .55; cursor: not-allowed; }
 .ff-label {
   position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
-  font-size: 14.5px; color: var(--tx-5); background: transparent; padding: 0 6px; border-radius: 7px;
-  pointer-events: none; transition: all .16s ease;
+  font-size: 14.5px; color: var(--tx-5); background: transparent; padding: 0 6px; border-radius: var(--r-sm);
+  pointer-events: none; transition: all var(--t-fast) var(--t-ease);
   max-width: calc(100% - 20px); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 textarea.ff-control ~ .ff-label { top: 12px; transform: none; }

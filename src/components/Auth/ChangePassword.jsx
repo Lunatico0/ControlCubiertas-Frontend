@@ -5,8 +5,9 @@ import { useAuth } from "@context/AuthContext"
 import { useTheme } from "@context/ThemeContext"
 import { showToast } from "@utils/toast"
 import BrandLogo from "@components/BrandLogo"
-import Button from "@components/UI/Button"
-import FloatingField from "@components/UI/FloatingField"
+import Button from "@components/common/Button"
+import FloatingField from "@components/common/FloatingField"
+import { mensajeDeError } from "@utils/apiError"
 
 // Establecer/cambiar contraseña (rediseño Claude Design "primer ingreso"). Dos modos:
 //  - mustChangePassword (primer ingreso / tras un reset): solo pide la nueva; el backend
@@ -35,22 +36,22 @@ const ChangePassword = () => {
         navigate(-1)
       }
     } catch (err) {
-      setServerError(err.message || "No pudimos cambiar la contraseña")
+      setServerError(mensajeDeError(err, "No pudimos cambiar la contraseña"))
     }
   }
 
   return (
-    <div data-app-theme={isDarkMode ? "dark" : "light"} className="flex h-full items-center justify-center p-6" style={{ background: "var(--sidebar)", color: "var(--tx)", fontFamily: "'IBM Plex Sans',system-ui,sans-serif" }}>
+    <div data-app-theme={isDarkMode ? "dark" : "light"} className="flex h-full items-center justify-center p-6" style={{ background: "var(--sidebar)", color: "var(--tx)", fontFamily: "var(--font-sans)" }}>
       <div className="w-full" style={{ maxWidth: 408 }}>
         <div className="mb-6 flex items-center justify-center">
           <BrandLogo height={38} />
         </div>
 
-        <div className="rounded-[14px] p-8" style={{ background: "var(--card)", border: "1px solid var(--bd)", boxShadow: "var(--elev-2)" }}>
-          <div className="mb-[15px] inline-flex items-center gap-[7px] rounded-[7px] px-2.5 py-1 text-[10.5px] font-semibold" style={{ fontFamily: "'IBM Plex Mono'", letterSpacing: ".05em", color: "var(--ink-lime)", background: "color-mix(in srgb, var(--ink-lime) 12%, transparent)" }}>
+        <div className="rounded-[var(--r-lg)] p-8" style={{ background: "var(--card)", border: "1px solid var(--bd)", boxShadow: "var(--elev-2)" }}>
+          <div className="mb-[15px] inline-flex items-center gap-[7px] rounded-[var(--r-sm)] px-2.5 py-1 text-[10.5px] font-semibold" style={{ fontFamily: "var(--font-mono)", letterSpacing: ".05em", color: "var(--ink-lime)", background: "color-mix(in srgb, var(--ink-lime) 12%, transparent)" }}>
             <KeyIcon /> {mustChangePassword ? "PRIMER INGRESO" : "SEGURIDAD"}
           </div>
-          <h1 className="text-[21px] font-semibold" style={{ fontFamily: "'Space Grotesk'", letterSpacing: "-.01em", color: "var(--tx)" }}>
+          <h1 className="text-[21px] font-semibold" style={{ fontFamily: "var(--font-display)", letterSpacing: "-.01em", color: "var(--tx)" }}>
             {mustChangePassword ? "Cambiá tu contraseña temporal" : "Cambiar contraseña"}
           </h1>
           <p className="mb-[22px] mt-[7px] text-[13.5px]" style={{ color: "var(--tx-4)" }}>
@@ -59,7 +60,7 @@ const ChangePassword = () => {
 
           <form onSubmit={handleSubmit(onSubmit)} noValidate>
             {serverError && (
-              <div role="alert" className="mb-4 rounded-[9px] px-4 py-3 text-[13px]" style={{ border: "1px solid color-mix(in srgb, var(--ink-red) 40%, transparent)", background: "color-mix(in srgb, var(--ink-red) 10%, transparent)", color: "var(--ink-red)" }}>
+              <div role="alert" className="mb-4 rounded-[var(--r-md)] px-4 py-3 text-[13px]" style={{ border: "1px solid color-mix(in srgb, var(--ink-red) 40%, transparent)", background: "color-mix(in srgb, var(--ink-red) 10%, transparent)", color: "var(--ink-red)" }}>
                 {serverError}
               </div>
             )}
@@ -99,7 +100,7 @@ const ChangePassword = () => {
               />
             </div>
 
-            <Button type="submit" variant="lime" disabled={isSubmitting} className="w-full text-[15px]" style={{ background: "#C4ED2B", color: "#0A0C0D", opacity: isSubmitting ? 0.6 : 1 }}>
+            <Button type="submit" variant="lime" disabled={isSubmitting} className="w-full text-[15px]" style={{ background: "var(--brand)", color: "var(--brand-ink)", opacity: isSubmitting ? 0.6 : 1 }}>
               {isSubmitting ? "Guardando…" : mustChangePassword ? "Guardar y entrar" : "Guardar"}
             </Button>
             <button type="button" onClick={mustChangePassword ? logout : () => navigate(-1)} className="mt-3 w-full text-center text-[13px]" style={{ color: "var(--tx-5)", background: "none", border: "none", cursor: "pointer" }}>

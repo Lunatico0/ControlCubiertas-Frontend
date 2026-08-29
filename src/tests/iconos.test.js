@@ -15,7 +15,9 @@ import { resolve, join } from 'node:path'
 // diferencia en pantalla.
 
 const raiz = resolve(__dirname, '../..')
-const REDISENO = ['Portal', 'Layout', 'Operativa', 'dialog', 'Auth', 'Updater']
+// Con la UI legacy eliminada (t78) ya no hay carpetas que excluir: el guard cubre
+// src/components entero, incluido common/, que antes quedaba afuera de la lista.
+const REDISENO = ['Portal', 'Layout', 'Operativa', 'dialog', 'Auth', 'Updater', 'common']
 
 // Recorre los directorios del rediseño y devuelve sus .jsx con el contenido.
 const archivos = () => {

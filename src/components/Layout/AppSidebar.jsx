@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { useTheme } from "@context/ThemeContext"
+import { showDanger } from "@utils/toast"
 import { externalPageProps } from "@utils/isElectron"
 import BrandLogo from "@components/BrandLogo"
 import UpdaterButton from "@components/Updater/UpdaterButton"
@@ -29,11 +30,35 @@ const AppSidebar = ({ nav, belowNav, upd, user, help, onLogout }) => {
   const { isDarkMode, toggleTheme } = useTheme()
   const [helpMenu, setHelpMenu] = useState(false) // popover de ayuda en el perfil
 
+  // t149: cerrar sesión es irreversible dentro de la sesión (hay que volver a loguearse y lo
+  // tipeado se pierde), y el botón está pegado al de Ayuda. Va por el diálogo destructivo.
+  const confirmarLogout = async () => {
+    const ok = await showDanger({
+      title: "¿Cerrar sesión?",
+      text: "Si tenés un formulario a medio llenar, lo que escribiste se pierde.",
+      confirmButtonText: "Sí, cerrar sesión",
+    })
+    if (ok) onLogout()
+  }
+
   return (
-    <aside className="flex w-64 flex-none flex-col" style={{ background: "var(--sidebar)", borderRight: "1px solid var(--bd-faint)" }}>
-      {/* Logo */}
-      <div className="flex items-center px-5 pb-5 pt-[22px]">
-        <BrandLogo height={65} />
+    // RAIL bajo lg (1024px). Con 256px fijos, a 768px quedaban 512px de contenido y las
+    // pantallas anchas (Reportes, Editor de comprobante) se recortaban SIN scroll: había
+    // elementos con right > 768 a los que el usuario no podía llegar de ninguna manera.
+    // Colapsado quedan iconos con su `title` como etiqueta accesible.
+    <aside className="group/rail flex w-16 flex-none flex-col lg:w-64" style={{ background: "var(--sidebar)", borderRight: "1px solid var(--bd-faint)" }}>
+      {/* Logo — completo con el sidebar abierto, sólo la ilustración (la rueda) en el rail.
+
+          La visibilidad va en un <span> que ENVUELVE al logo y no en el propio <img>: BrandLogo
+          fija `display: block` por style inline, y un style inline le gana a la clase `hidden`
+          de Tailwind, así que puestas ahí las dos versiones se veían a la vez. */}
+      <div className="flex items-center justify-center px-2 pb-5 pt-[22px] lg:justify-start lg:px-5">
+        <span className="hidden lg:block">
+          <BrandLogo height={65} />
+        </span>
+        <span className="block lg:hidden">
+          <BrandLogo height={34} wheel />
+        </span>
       </div>
 
       {/* Navegación
@@ -50,7 +75,8 @@ const AppSidebar = ({ nav, belowNav, upd, user, help, onLogout }) => {
             data-tour={item.dataTour}
             onClick={item.onClick}
             aria-current={item.active ? "page" : undefined}
-            className="flex w-full cursor-pointer items-center gap-[13px] rounded-[9px] px-[13px] py-[11px] text-left text-[14px] transition-colors"
+            title={item.label}
+            className="flex w-full cursor-pointer items-center justify-center gap-[13px] rounded-[var(--r-md)] px-[13px] py-[11px] text-left text-[14px] transition-colors lg:justify-start"
             style={{
               fontWeight: item.active ? 600 : 500,
               color: item.active ? "var(--ink-lime)" : "var(--tx-4)",
@@ -73,56 +99,63 @@ const AppSidebar = ({ nav, belowNav, upd, user, help, onLogout }) => {
             }}
           >
             <span className="inline-flex h-5 w-5 flex-none items-center justify-center">{item.icon}</span>
-            <span>{item.label}</span>
+            <span className="hidden lg:inline">{item.label}</span>
           </button>
         ))}
       </nav>
 
       {/* Contenido opcional debajo del nav (acceso admin / chip de cuenta) */}
-      {belowNav && <div className="px-3">{belowNav}</div>}
+      {belowNav && <div className="hidden px-3 lg:block">{belowNav}</div>}
 
       {/* Updater (solo desktop) + toggle de tema, pegados al fondo */}
       <div className="mt-auto flex flex-col gap-2 px-3 pt-2 pb-3">
         {upd.isDesktop && <UpdaterButton current={upd.current} bip={upd.bip} onClick={upd.openModal} />}
         <button
           onClick={toggleTheme}
-          className="flex w-full items-center gap-[11px] rounded-[9px] border px-3 py-[10px]"
+          title={isDarkMode ? "Tema oscuro" : "Tema claro"}
+          className="flex w-full items-center justify-center gap-[11px] rounded-[var(--r-md)] border px-3 py-[10px] lg:justify-start"
           style={{ borderColor: "var(--bd)", background: "var(--elev)" }}
         >
           <span className="inline-flex h-5 w-5 flex-none items-center" style={{ color: "var(--ink-lime)" }}>
             {isDarkMode ? <DarkModeOutlinedIcon sx={{ fontSize: 18 }} /> : <LightModeOutlinedIcon sx={{ fontSize: 19 }} />}
           </span>
-          <span className="text-[13px] font-medium" style={{ color: "var(--tx-2)" }}>
+          <span className="hidden text-[13px] font-medium lg:inline" style={{ color: "var(--tx-2)" }}>
             {isDarkMode ? "Tema oscuro" : "Tema claro"}
           </span>
         </button>
       </div>
 
       {/* Perfil + ayuda + logout */}
-      <div className="relative flex items-center gap-[11px] p-3" style={{ borderTop: "1px solid var(--bd-faint)" }}>
+      <div className="relative flex flex-col items-center gap-[11px] p-3 lg:flex-row" style={{ borderTop: "1px solid var(--bd-faint)" }}>
         <div
           className="flex h-9 w-9 flex-none items-center justify-center rounded-full text-[12px] font-bold"
-          style={{ background: user.avatarBg, color: user.avatarColor, fontFamily: "'Space Grotesk'" }}
+          style={{ background: user.avatarBg, color: user.avatarColor, fontFamily: "var(--font-display)" }}
         >
           {user.initials}
         </div>
-        <div className="min-w-0 flex-1" style={{ lineHeight: 1.3 }}>
+        <div className="hidden min-w-0 flex-1 lg:block" style={{ lineHeight: 1.3 }}>
           <div className="truncate text-[13px] font-semibold" style={{ color: "var(--tx)" }}>{user.name}</div>
           <div className="text-[11px]" style={{ color: "var(--tx-5)" }}>{user.roleLabel}</div>
         </div>
         <button
           data-tour={help.dataTour}
           title="Ayuda"
+          aria-label="Ayuda"
           onClick={() => setHelpMenu((v) => !v)}
-          className="inline-flex cursor-pointer rounded-[7px] p-[7px]"
+          className="inline-flex cursor-pointer rounded-[var(--r-sm)] p-[7px]"
           style={{ color: helpMenu ? "var(--ink-lime)" : "var(--tx-6)", background: helpMenu ? "color-mix(in srgb, var(--ink-lime) 12%, transparent)" : "transparent" }}
         >
           <HelpOutlineRoundedIcon sx={{ fontSize: 17 }} />
         </button>
+        {/* t149: era un ícono sin etiqueta, del mismo tamaño y a centímetros del de Ayuda, y un
+            solo clic cerraba la sesión al instante. Con guantes o en pantalla táctil, un
+            misclick cuesta volver a loguearse y perder lo que estabas tipeando. Ahora confirma
+            (variante destructiva) y tiene nombre accesible. */}
         <button
           title="Cerrar sesión"
-          onClick={onLogout}
-          className="inline-flex cursor-pointer rounded-[7px] p-[7px]"
+          aria-label="Cerrar sesión"
+          onClick={confirmarLogout}
+          className="inline-flex cursor-pointer rounded-[var(--r-sm)] p-[7px]"
           style={{ color: "var(--tx-6)" }}
         >
           <LogoutOutlinedIcon sx={{ fontSize: 17 }} />
@@ -131,17 +164,17 @@ const AppSidebar = ({ nav, belowNav, upd, user, help, onLogout }) => {
         {helpMenu && (
           <>
             <div className="fixed inset-0 z-35" onClick={() => setHelpMenu(false)} />
-            <div className="absolute z-40 overflow-hidden rounded-xl" style={{ bottom: 58, right: 12, left: 12, background: "var(--card)", border: "1px solid var(--bd-strong)", boxShadow: "var(--elev-1)" }}>
-              <div className="px-3.5 py-[11px] text-[10px] tracking-[.08em]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-6)", borderBottom: "1px solid var(--bd-soft)" }}>AYUDA</div>
+            <div className="absolute z-40 overflow-hidden rounded-[var(--r-lg)]" style={{ bottom: 58, right: 12, left: 12, background: "var(--card)", border: "1px solid var(--bd-strong)", boxShadow: "var(--elev-1)" }}>
+              <div className="px-3.5 py-[11px] text-[10px] tracking-[.08em]" style={{ fontFamily: "var(--font-mono)", color: "var(--tx-6)", borderBottom: "1px solid var(--bd-soft)" }}>AYUDA</div>
               <button onClick={() => { setHelpMenu(false); help.onStartTour() }} className="flex w-full items-center gap-[11px] px-3.5 py-3 text-left">
-                <span className="flex h-[30px] w-[30px] flex-none items-center justify-center rounded-lg" style={{ background: "color-mix(in srgb, var(--ink-lime) 13%, transparent)", color: "var(--ink-lime)" }}><PlayArrowOutlinedIcon sx={{ fontSize: 16 }} /></span>
+                <span className="flex h-[30px] w-[30px] flex-none items-center justify-center rounded-[var(--r-md)]" style={{ background: "color-mix(in srgb, var(--ink-lime) 13%, transparent)", color: "var(--ink-lime)" }}><PlayArrowOutlinedIcon sx={{ fontSize: 16 }} /></span>
                 <span style={{ lineHeight: 1.25 }}>
                   <span className="block text-[13px] font-semibold" style={{ color: "var(--tx)" }}>Ver guía interactiva</span>
                   <span className="block text-[11px]" style={{ color: "var(--tx-5)" }}>Tour rápido por la app</span>
                 </span>
               </button>
               <a {...externalPageProps(help.guideHref)} onClick={() => setHelpMenu(false)} className="flex items-center gap-[11px] px-3.5 py-3" style={{ textDecoration: "none", borderTop: "1px solid var(--bd-soft)" }}>
-                <span className="flex h-[30px] w-[30px] flex-none items-center justify-center rounded-lg" style={{ background: "color-mix(in srgb, var(--ink-blue) 16%, transparent)", color: "var(--ink-blue)" }}><MenuBookOutlinedIcon sx={{ fontSize: 16 }} /></span>
+                <span className="flex h-[30px] w-[30px] flex-none items-center justify-center rounded-[var(--r-md)]" style={{ background: "color-mix(in srgb, var(--ink-blue) 16%, transparent)", color: "var(--ink-blue)" }}><MenuBookOutlinedIcon sx={{ fontSize: 16 }} /></span>
                 <span style={{ lineHeight: 1.25 }}>
                   <span className="block text-[13px] font-semibold" style={{ color: "var(--tx)" }}>{help.guideLabel}</span>
                   <span className="block text-[11px]" style={{ color: "var(--tx-5)" }}>{help.guideSubtitle}</span>

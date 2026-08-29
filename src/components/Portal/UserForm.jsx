@@ -4,9 +4,10 @@ import { showToast } from "@utils/toast"
 import Modal from "@components/common/Modal"
 import { neutralBtn, primaryBtn } from "@components/dialog/overlayTokens"
 import Callout from "@components/common/Callout"
-import FloatingField from "@components/UI/FloatingField"
+import FloatingField from "@components/common/FloatingField"
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined"
 import { createUser, updateUser } from "../../api/admin"
+import { mensajeDeError } from "@utils/apiError"
 
 // Roles como cards seleccionables (ceñido al diseño Panel Admin). Los títulos siguen la
 // nomenclatura del resto del panel (Operario / Administrador); la descripción es la del diseño.
@@ -40,7 +41,7 @@ const UserForm = ({ user, onClose, onCreated, onSaved }) => {
       }
       onClose()
     } catch (err) {
-      showToast("error", err.message || (isEdit ? "No se pudo actualizar el usuario" : "No se pudo crear el usuario"))
+      showToast("error", mensajeDeError(err, (isEdit ? "No se pudo actualizar el usuario" : "No se pudo crear el usuario")))
     }
   }
 
@@ -90,7 +91,7 @@ const UserForm = ({ user, onClose, onCreated, onSaved }) => {
                 type="button"
                 key={r.value}
                 onClick={() => setRole(r.value)}
-                className="flex-1 rounded-[10px] px-[13px] py-3 text-left transition-colors"
+                className="flex-1 rounded-[var(--r-md)] px-[13px] py-3 text-left transition-colors"
                 style={{ border: `1.5px solid ${on ? "var(--ink-lime)" : "var(--bd-strong)"}`, background: on ? "rgba(196,237,43,.08)" : "var(--input)" }}
               >
                 <div className="text-[13.5px] font-semibold" style={{ color: on ? "var(--ink-lime)" : "var(--tx)" }}>{r.title}</div>

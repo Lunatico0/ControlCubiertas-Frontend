@@ -21,7 +21,7 @@ const Pager = ({ page, totalPages, onChange }) => {
   const go = (p) => { if (p >= 1 && p <= totalPages && p !== page) onChange(p) }
   const NavBtn = ({ disabled, onClick, title, children }) => (
     <button title={title} onClick={onClick} disabled={disabled}
-      style={{ width: 32, height: 32, display: "inline-flex", alignItems: "center", justifyContent: "center", borderRadius: 8, border: "1px solid var(--bd)", background: "var(--card)", color: "var(--tx-4)", cursor: disabled ? "not-allowed" : "pointer", opacity: disabled ? 0.4 : 1 }}>
+      style={{ width: 32, height: 32, display: "inline-flex", alignItems: "center", justifyContent: "center", borderRadius: "var(--r-sm)", border: "1px solid var(--bd)", background: "var(--card)", color: "var(--tx-4)", cursor: disabled ? "not-allowed" : "pointer", opacity: disabled ? 0.4 : 1 }}>
       {children}
     </button>
   )
@@ -31,10 +31,10 @@ const Pager = ({ page, totalPages, onChange }) => {
       <NavBtn disabled={page <= 1} onClick={() => go(page - 1)} title="Anterior"><KeyboardArrowLeftRoundedIcon sx={{ fontSize: 18 }} /></NavBtn>
       {pageList(page, totalPages).map((p, i) =>
         p === "…" ? (
-          <span key={`e${i}`} style={{ width: 22, textAlign: "center", color: "var(--tx-6)", fontFamily: "'IBM Plex Mono'", fontSize: 13 }}>…</span>
+          <span key={`e${i}`} style={{ width: 22, textAlign: "center", color: "var(--tx-6)", fontFamily: "var(--font-mono)", fontSize: 13 }}>…</span>
         ) : (
           <button key={p} onClick={() => go(p)}
-            style={{ minWidth: 32, height: 32, padding: "0 8px", borderRadius: 8, fontSize: 12.5, fontWeight: 600, fontFamily: "'IBM Plex Sans'", cursor: "pointer",
+            style={{ minWidth: 32, height: 32, padding: "0 8px", borderRadius: "var(--r-sm)", fontSize: 12.5, fontWeight: 600, fontFamily: "var(--font-sans)", cursor: "pointer",
               border: `1px solid ${p === page ? "var(--tx)" : "var(--bd)"}`,
               background: p === page ? "var(--tx)" : "var(--card)",
               color: p === page ? "var(--bg)" : "var(--tx-3)" }}>{p}</button>

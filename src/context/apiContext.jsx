@@ -20,6 +20,7 @@ import { fetchAllVehicles, fetchVehicleById, createVehicle, updateVehicle, updat
 import { checkOrderNumber } from "../api/orders"
 import { getCompanyCached } from "../api/company"
 import { buildStatusMeta, setStatusCatalog } from "../components/Operativa/status"
+import { mensajeDeError } from "@utils/apiError"
 
 const ApiContext = createContext()
 
@@ -70,6 +71,9 @@ export const ApiProvider = ({ children }) => {
     [statuses],
   )
   const [plateSep, setPlateSep] = useState("") // separador de patente configurable (solo display)
+  // Formatos de patente ACEPTADOS por el tenant (t138). Máscaras con A/0; lista vacía = no
+  // validar. El backend es la autoridad; esto es para frenar el error de tipeo antes del viaje.
+  const [plateFormats, setPlateFormats] = useState([])
   const [tireCodePrefix, setTireCodePrefix] = useState("") // prefijo del código interno (solo display)
 
   // Estados de control
@@ -115,7 +119,7 @@ export const ApiProvider = ({ children }) => {
       setSuggestedCode(getSuggestedCode(result))
     } catch (err) {
       console.error("Error cargando cubiertas:", err)
-      setError("Error al obtener las cubiertas: " + err.message)
+      setError(mensajeDeError(err, "Error al obtener las cubiertas"))
     } finally {
       setLoading(false)
     }
@@ -128,7 +132,7 @@ export const ApiProvider = ({ children }) => {
       setVehicles(result)
     } catch (err) {
       console.error("Error cargando vehículos:", err)
-      setError("Error al obtener vehículos: " + err.message)
+      setError(mensajeDeError(err, "Error al obtener vehículos"))
     }
   }, [])
 
@@ -146,7 +150,7 @@ export const ApiProvider = ({ children }) => {
         return result
       } catch (err) {
         console.error("Error cargando cubierta por ID:", err)
-        setError("Error al obtener la cubierta: " + err.message)
+        setError(mensajeDeError(err, "Error al obtener la cubierta"))
         throw err
       } finally {
         setSelectedLoading(false)
@@ -164,7 +168,7 @@ export const ApiProvider = ({ children }) => {
       return result
     } catch (err) {
       console.error("Error cargando vehículo por ID:", err)
-      setError("Error al obtener el vehículo: " + err.message)
+      setError(mensajeDeError(err, "Error al obtener el vehículo"))
       throw err
     } finally {
       setSelectedLoading(false)
@@ -182,7 +186,7 @@ export const ApiProvider = ({ children }) => {
         return result
       } catch (err) {
         console.error("❌ Contexto: Error creando cubierta:", err)
-        setError("Error al crear cubierta: " + err.message)
+        setError(mensajeDeError(err, "Error al crear cubierta"))
         throw err
       }
     },
@@ -202,7 +206,7 @@ export const ApiProvider = ({ children }) => {
         return result
       } catch (err) {
         console.error("❌ Contexto: Error actualizando estado:", err)
-        setError("Error al actualizar estado: " + err.message)
+        setError(mensajeDeError(err, "Error al actualizar estado"))
         throw err
       }
     },
@@ -222,7 +226,7 @@ export const ApiProvider = ({ children }) => {
         return result
       } catch (err) {
         console.error("❌ Contexto: Error asignando cubierta:", err)
-        setError("Error al asignar cubierta: " + err.message)
+        setError(mensajeDeError(err, "Error al asignar cubierta"))
         throw err
       }
     },
@@ -242,7 +246,7 @@ export const ApiProvider = ({ children }) => {
         return result
       } catch (err) {
         console.error("Error desasignando cubierta:", err)
-        setError("Error al desasignar cubierta: " + err.message)
+        setError(mensajeDeError(err, "Error al desasignar cubierta"))
         throw err
       }
     },
@@ -262,7 +266,7 @@ export const ApiProvider = ({ children }) => {
         return result
       } catch (err) {
         console.error("Error corrigiendo cubierta:", err)
-        setError("Error al corregir cubierta: " + err.message)
+        setError(mensajeDeError(err, "Error al corregir cubierta"))
         throw err
       }
     },
@@ -282,7 +286,7 @@ export const ApiProvider = ({ children }) => {
         return result
       } catch (err) {
         console.error("Error deshaciendo entrada:", err)
-        setError("Error al deshacer entrada: " + err.message)
+        setError(mensajeDeError(err, "Error al deshacer entrada"))
         throw err
       }
     },
@@ -302,7 +306,7 @@ export const ApiProvider = ({ children }) => {
         return result
       } catch (err) {
         console.error("Error actualizando historial:", err)
-        setError("Error al actualizar historial: " + err.message)
+        setError(mensajeDeError(err, "Error al actualizar historial"))
         throw err
       }
     },
@@ -320,7 +324,7 @@ export const ApiProvider = ({ children }) => {
         return result
       } catch (err) {
         console.error("Error creando vehículo:", err)
-        setError("Error al crear vehículo: " + err.message)
+        setError(mensajeDeError(err, "Error al crear vehículo"))
         throw err
       }
     },
@@ -336,7 +340,7 @@ export const ApiProvider = ({ children }) => {
         return result
       } catch (err) {
         console.error("Error actualizando vehículo:", err)
-        setError("Error al actualizar vehículo: " + err.message)
+        setError(mensajeDeError(err, "Error al actualizar vehículo"))
         throw err
       }
     },
@@ -352,7 +356,7 @@ export const ApiProvider = ({ children }) => {
         return result
       } catch (err) {
         console.error("Error actualizando datos del vehículo:", err)
-        setError("Error al actualizar datos del vehículo: " + err.message)
+        setError(mensajeDeError(err, "Error al actualizar datos del vehículo"))
         throw err
       }
     },
@@ -368,7 +372,7 @@ export const ApiProvider = ({ children }) => {
         return result
       } catch (err) {
         console.error("Error configurando ejes del vehículo:", err)
-        setError("Error al configurar ejes: " + err.message)
+        setError(mensajeDeError(err, "Error al configurar ejes"))
         throw err
       }
     },
@@ -384,7 +388,7 @@ export const ApiProvider = ({ children }) => {
       return result
     } catch (err) {
       console.error("Error verificando número de orden:", err)
-      setError("Error al verificar número de orden: " + err.message)
+      setError(mensajeDeError(err, "Error al verificar número de orden"))
       throw err
     }
   }, [])
@@ -410,6 +414,7 @@ export const ApiProvider = ({ children }) => {
         .then((c) => {
           if (cancelled) return
           setPlateSep(c?.plateSeparator || "") // separador de patente configurable (solo display)
+          setPlateFormats(Array.isArray(c?.plateFormats) ? c.plateFormats : [])
           setTireCodePrefix(c?.tireCodePrefix || "") // prefijo del código interno (solo display)
           const st = Array.isArray(c?.stockStatuses) ? c.stockStatuses : []
           if (!st.length && attempt < 3) {
@@ -443,10 +448,22 @@ export const ApiProvider = ({ children }) => {
 
     const query = searchQuery.toLowerCase();
 
-    const matchesSearch = (tire) =>
-      tire.code.toString().includes(query) ||
-      Object.values(tire).some((val) => typeof val === "string" && val.toLowerCase().includes(query)) ||
-      tire.vehicle?.mobile?.toLowerCase().includes(query);
+    // t82: esto hacía Object.values(tire).some() sobre CADA campo de CADA cubierta en cada
+    // tecla, o sea que recorría _id, createdAt, updatedAt, __v y el status además de lo que el
+    // operario podía querer buscar. Con inventarios grandes el buscador se sentía pegajoso, y
+    // de paso un texto como un fragmento de ObjectId devolvía resultados sin sentido.
+    // Los campos son los MISMOS que ya usa Cubiertas.jsx, que es el buscador vigente.
+    const matchesSearch = (tire) => {
+      if (!query) return true;
+      return (
+        String(tire.code ?? "").includes(query) ||
+        tire.serialNumber?.toLowerCase().includes(query) ||
+        tire.brand?.toLowerCase().includes(query) ||
+        tire.size?.toLowerCase().includes(query) ||
+        tire.pattern?.toLowerCase().includes(query) ||
+        tire.vehicle?.mobile?.toLowerCase().includes(query)
+      );
+    };
 
     const matchesVehicle = (tire) => {
       const v = filters.vehicle?.toLowerCase();
@@ -536,6 +553,7 @@ export const ApiProvider = ({ children }) => {
     return {
       statuses,
       plateSep,
+      plateFormats,
       tireCodePrefix,
       statusMeta: buildStatusMeta(statuses),
       initialStatus: byRole("initial"),
@@ -544,7 +562,7 @@ export const ApiProvider = ({ children }) => {
       stockScale: statuses.filter((s) => s.role === "initial" || s.role === "stock").map((s) => s.name),
       stateOrder,
     }
-  }, [statuses, stateOrder, plateSep, tireCodePrefix])
+  }, [statuses, stateOrder, plateSep, plateFormats, tireCodePrefix])
 
   // Valor del contexto memoizado
   const contextValue = useMemo(() => ({

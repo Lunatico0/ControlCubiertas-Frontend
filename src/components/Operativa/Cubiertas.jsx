@@ -8,21 +8,32 @@ import TuneRoundedIcon from "@mui/icons-material/TuneRounded"
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded"
 import { formatTireCode } from "@utils/tireCode"
 import { clickable } from "@utils/clickable"
-import { metaOf, tint, fmtKm, fmtDate, StateBadge, Pips, useStatusCatalog } from "./status"
+import { metaOf, tint, fmtKm, fmtDate, StateBadge, Pips, useStatusCatalog, ubicacionDe } from "./status"
 import { usePagination } from "@hooks/usePagination"
 import Paginador from "@components/common/Paginador"
 import { OpActionBtn } from "./opActions"
 import TireDrawer from "./TireDrawer"
 import AltaDrawer from "./AltaDrawer"
-import ScreenHeader from "@components/UI/ScreenHeader"
-import Pill from "@components/UI/Pill"
+import ScreenHeader from "@components/common/ScreenHeader"
+import Pill from "@components/common/Pill"
+import { useOutletContext, useParams, useNavigate, useSearchParams, useLocation } from "react-router-dom"
+import { intentDesdeQuery, rutaDeCubierta, rutaDeSeccion } from "@utils/opRoutes"
+import { SkeletonCards, SkeletonRows } from "@components/common/Skeleton"
 
+// "Listas para montar" va antes que "En depósito" a propósito: es lo que el operario busca
+// primero (las que puede montar ahora), no el total del depósito.
+//
+// t147: antes se llamaban "Disponibles" y "En stock", y nada explicaba la diferencia. "En
+// stock" es TODA cubierta sin vehículo, descartadas incluidas; "Disponibles" son las que
+// realmente se pueden montar. El operario que buscaba una para montar tocaba "En stock", que
+// es el nombre más obvio, y le aparecían cubiertas dadas de baja. Las CLAVES no cambian:
+// viajan en la URL y en los intents del Inicio, y renombrarlas rompería los links compartidos.
 const TABS = [
-  { key: "todas", label: "Todas" },
-  { key: "stock", label: "En stock" },
-  { key: "disponibles", label: "Disponibles" },
-  { key: "circulacion", label: "En circulación" },
-  { key: "recapar", label: "A recapar" },
+  { key: "todas", label: "Todas", hint: "Todo el inventario, en cualquier estado." },
+  { key: "disponibles", label: "Listas para montar", hint: "Sin vehículo y en un estado que permite montarlas." },
+  { key: "stock", label: "En depósito", hint: "Todas las que no están montadas, incluidas las que están a recapar y las dadas de baja." },
+  { key: "circulacion", label: "En circulación", hint: "Montadas hoy en un vehículo." },
+  { key: "recapar", label: "A recapar", hint: "Marcadas para mandar a recapar." },
 ]
 
 // Rank de estado para ordenar de forma significativa (no alfabética): escalera por nivel,
@@ -45,7 +56,17 @@ const COLUMNS = [
 ]
 const GRID_COLS = "0.8fr 1fr 1.2fr 0.9fr 0.6fr 0.8fr 1.1fr"
 
-const Cubiertas = ({ intent, onNavigate }) => {
+const Cubiertas = () => {
+  // La sección es su propia ruta: `onNavigate` llega por el contexto del Outlet, el intent
+  // (búsqueda, pestaña, alta, montaje dirigido) por la QUERY y la cubierta abierta por el
+  // parámetro :code de la ruta anidada. Con todo en la URL, un F5 o un link compartido
+  // reconstruyen la pantalla exacta. Ver @utils/opRoutes.
+  const { onNavigate } = useOutletContext()
+  const { code: codeEnRuta } = useParams()
+  const irA = useNavigate()
+  const [searchParams] = useSearchParams()
+  const { search } = useLocation() // se conserva al abrir/cerrar el drawer: filtros y búsqueda no se pierden
+  const intent = useMemo(() => intentDesdeQuery(searchParams), [searchParams])
   const { data, ui } = useContext(ApiContext)
   const tires = data?.tires || []
   const loading = ui?.loading
@@ -54,7 +75,6 @@ const Cubiertas = ({ intent, onNavigate }) => {
   const [query, setQuery] = useState("")
   const [tab, setTab] = useState("todas")
   const [view, setView] = usePersistedState("op_tireview", "grid")
-  const [selectedId, setSelectedId] = useState(null)
   const [pendingAction, setPendingAction] = useState(null)
   const [showAlta, setShowAlta] = useState(false)
   const [assignTo, setAssignTo] = useState(null) // montaje dirigido desde una posición de vehículo: { vehicleId, mobile, position }
@@ -68,9 +88,26 @@ const Cubiertas = ({ intent, onNavigate }) => {
   const [fKmMax, setFKmMax] = useState("")
   const searchRef = useHotkeyFocus()
 
+  // La cubierta abierta sale de la RUTA (:code), no de un estado: es lo que hace que el link
+  // se pueda compartir y que Atrás cierre el drawer. Se resuelve a _id contra la lista cargada.
+  const selectedId = useMemo(() => {
+    if (!codeEnRuta) return null
+    const t = tires.find((x) => String(x.code) === String(codeEnRuta))
+    return t?._id || null
+  }, [codeEnRuta, tires])
+
   const brands = useMemo(() => [...new Set(tires.map((t) => t.brand).filter(Boolean))].sort((a, b) => a.localeCompare(b, "es")), [tires])
   const activeFilters = (fBrand ? 1 : 0) + (fStatus ? 1 : 0) + (fKmMin || fKmMax ? 1 : 0)
   const clearFilters = () => { setFBrand(""); setFStatus(""); setFKmMin(""); setFKmMax("") }
+
+  // t148: qué le está escondiendo las cubiertas, en castellano, y un botón que lo desarma todo
+  // de una — incluidos la pestaña y el texto tipeado, que clearFilters no tocaba.
+  const escondidoPor = [
+    query.trim() && `la búsqueda “${query.trim()}”`,
+    tab !== "todas" && `la pestaña “${TABS.find((t) => t.key === tab)?.label}”`,
+    activeFilters > 0 && (activeFilters === 1 ? "un filtro avanzado" : `${activeFilters} filtros avanzados`),
+  ].filter(Boolean)
+  const limpiarTodo = () => { setQuery(""); setTab("todas"); clearFilters() }
 
   // Aplica la intención de navegación que llega desde Inicio (búsqueda o filtro).
   useEffect(() => {
@@ -133,8 +170,17 @@ const Cubiertas = ({ intent, onNavigate }) => {
     else { setSortBy(key); setSortDir("asc") }
   }
 
-  const openDrawer = (id, action = null) => () => { setSelectedId(id); setPendingAction(action) }
-  const closeDrawer = () => { setSelectedId(null); setPendingAction(null) }
+  // Abrir y cerrar el drawer es NAVEGAR: el botón Atrás lo cierra, que es lo que el usuario
+  // espera, y la cubierta abierta se puede compartir por link.
+  const openDrawer = (id, action = null) => () => {
+    const t = tires.find((x) => String(x._id) === String(id))
+    setPendingAction(action)
+    irA(rutaDeCubierta(t?.code ?? id) + search)
+  }
+  const closeDrawer = () => {
+    setPendingAction(null)
+    irA(rutaDeSeccion("cubiertas") + search)
+  }
 
   const inputStyle = { background: "var(--card)", border: "1.5px solid var(--bd)", color: "var(--tx)" }
 
@@ -143,12 +189,14 @@ const Cubiertas = ({ intent, onNavigate }) => {
       {/* Toolbar sticky */}
       <ScreenHeader
         title="Cubiertas"
+        count={filtered.length}
         search={{
           value: query,
           onChange: (e) => setQuery(e.target.value),
           placeholder: "Buscar código, marca, N° de serie…",
           showShortcut: true,
           inputRef: searchRef,
+          onClear: () => setQuery(""),
         }}
         primaryAction={{ label: "Alta de cubierta", onClick: () => setShowAlta(true), tour: "cub-alta" }}
         viewToggle={{ value: view, onChange: setView, tour: "cub-viewtoggle" }}
@@ -158,73 +206,92 @@ const Cubiertas = ({ intent, onNavigate }) => {
             {TABS.map((f) => {
               const on = tab === f.key
               return (
-                <button key={f.key} onClick={() => setTab(f.key)} className="inline-flex h-[38px] items-center gap-2 rounded-[9px] px-[15px] text-[13.5px] font-semibold"
+                <button key={f.key} onClick={() => setTab(f.key)} title={f.hint} className="inline-flex h-[38px] items-center gap-2 rounded-[var(--r-md)] px-[15px] text-[13.5px] font-semibold"
                   style={{ border: `1px solid ${on ? "var(--ink-lime)" : "var(--bd)"}`, background: on ? tint("var(--ink-lime)", 12) : "var(--card)", color: on ? "var(--tx)" : "var(--tx-3)" }}>
                   {f.label}
-                  <Pill className="px-[7px] py-px text-[11.5px]" style={{ fontFamily: "'IBM Plex Mono'", background: "var(--elev)", color: "var(--tx-5)" }}>{counts[f.key]}</Pill>
+                  <Pill className="px-[7px] py-px text-[11.5px]" style={{ fontFamily: "var(--font-mono)", background: "var(--elev)", color: "var(--tx-5)" }}>{counts[f.key]}</Pill>
                 </button>
               )
             })}
           </div>
-          <button onClick={() => setShowFilters((v) => !v)} className="ml-auto inline-flex h-[38px] items-center gap-2 rounded-[9px] px-[14px] text-[13.5px] font-semibold"
+          <button onClick={() => setShowFilters((v) => !v)} className="ml-auto inline-flex h-[38px] items-center gap-2 rounded-[var(--r-md)] px-[14px] text-[13.5px] font-semibold"
             style={{ border: `1px solid ${showFilters || activeFilters ? "var(--ink-lime)" : "var(--bd)"}`, background: showFilters || activeFilters ? tint("var(--ink-lime)", 12) : "var(--card)", color: showFilters || activeFilters ? "var(--tx)" : "var(--tx-3)" }}>
             <TuneRoundedIcon sx={{ fontSize: 16 }} /> Filtros
-            {activeFilters > 0 && <Pill className="px-[7px] py-px text-[11px]" style={{ fontFamily: "'IBM Plex Mono'", background: "var(--ink-lime)", color: "var(--bg)" }}>{activeFilters}</Pill>}
+            {activeFilters > 0 && <Pill className="px-[7px] py-px text-[11px]" style={{ fontFamily: "var(--font-mono)", background: "var(--ink-lime)", color: "var(--bg)" }}>{activeFilters}</Pill>}
           </button>
         </div>
 
         {showFilters && (
-          <div className="mt-3 flex flex-wrap items-end gap-3.5 rounded-[11px] p-3.5" style={{ border: "1px solid var(--bd)", background: "var(--card)" }}>
+          <div className="mt-3 flex flex-wrap items-end gap-3.5 rounded-[var(--r-md)] p-3.5" style={{ border: "1px solid var(--bd)", background: "var(--card)" }}>
             <label className="flex flex-col gap-1.5">
               <span className="text-[11px] font-semibold" style={{ color: "var(--tx-4)" }}>Marca</span>
-              <select value={fBrand} onChange={(e) => setFBrand(e.target.value)} className="h-[38px] min-w-[150px] rounded-lg px-2.5 text-[13px] outline-none" style={inputStyle}>
+              <select value={fBrand} onChange={(e) => setFBrand(e.target.value)} className="h-[38px] min-w-[150px] rounded-[var(--r-md)] px-2.5 text-[13px] outline-none" style={inputStyle}>
                 <option value="">Todas</option>
                 {brands.map((b) => <option key={b} value={b}>{b}</option>)}
               </select>
             </label>
             <label className="flex flex-col gap-1.5">
               <span className="text-[11px] font-semibold" style={{ color: "var(--tx-4)" }}>Estado</span>
-              <select value={fStatus} onChange={(e) => setFStatus(e.target.value)} className="h-[38px] min-w-[150px] rounded-lg px-2.5 text-[13px] outline-none" style={inputStyle}>
+              <select value={fStatus} onChange={(e) => setFStatus(e.target.value)} className="h-[38px] min-w-[150px] rounded-[var(--r-md)] px-2.5 text-[13px] outline-none" style={inputStyle}>
                 <option value="">Todos</option>
                 {(data?.stateOrder || []).map((s) => <option key={s} value={s}>{s}</option>)}
               </select>
             </label>
             <label className="flex flex-col gap-1.5">
               <span className="text-[11px] font-semibold" style={{ color: "var(--tx-4)" }}>Km desde</span>
-              <input type="number" min="0" value={fKmMin} onChange={(e) => setFKmMin(e.target.value)} placeholder="0" className="h-[38px] w-[120px] rounded-lg px-2.5 text-[13px] outline-none" style={{ ...inputStyle, fontFamily: "'IBM Plex Mono'" }} />
+              <input type="number" min="0" value={fKmMin} onChange={(e) => setFKmMin(e.target.value)} placeholder="0" className="h-[38px] w-[120px] rounded-[var(--r-md)] px-2.5 text-[13px] outline-none" style={{ ...inputStyle, fontFamily: "var(--font-mono)" }} />
             </label>
             <label className="flex flex-col gap-1.5">
               <span className="text-[11px] font-semibold" style={{ color: "var(--tx-4)" }}>Km hasta</span>
-              <input type="number" min="0" value={fKmMax} onChange={(e) => setFKmMax(e.target.value)} placeholder="—" className="h-[38px] w-[120px] rounded-lg px-2.5 text-[13px] outline-none" style={{ ...inputStyle, fontFamily: "'IBM Plex Mono'" }} />
+              <input type="number" min="0" value={fKmMax} onChange={(e) => setFKmMax(e.target.value)} placeholder="—" className="h-[38px] w-[120px] rounded-[var(--r-md)] px-2.5 text-[13px] outline-none" style={{ ...inputStyle, fontFamily: "var(--font-mono)" }} />
             </label>
             {activeFilters > 0 && (
-              <button onClick={clearFilters} className="inline-flex h-[38px] items-center gap-1.5 rounded-lg px-3 text-[12.5px] font-semibold" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--tx-3)" }}>
+              <button onClick={clearFilters} className="inline-flex h-[38px] items-center gap-1.5 rounded-[var(--r-md)] px-3 text-[12.5px] font-semibold" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--tx-3)" }}>
                 <CloseRoundedIcon sx={{ fontSize: 15 }} /> Limpiar
               </button>
             )}
-            <span className="ml-auto self-center text-[12px]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-5)" }}>{filtered.length} resultado{filtered.length === 1 ? "" : "s"}</span>
           </div>
         )}
       </ScreenHeader>
 
       <div className="px-7 pb-8 pt-5">
         {assignTo && (
-          <div className="mb-4 flex items-center gap-3 rounded-[11px] px-4 py-3" style={{ border: `1px solid ${tint("var(--ink-lime)", 40)}`, background: tint("var(--ink-lime)", 8) }}>
+          <div className="mb-4 flex items-center gap-3 rounded-[var(--r-md)] px-4 py-3" style={{ border: `1px solid ${tint("var(--ink-lime)", 40)}`, background: tint("var(--ink-lime)", 8) }}>
             <span className="inline-flex flex-none" style={{ color: "var(--ink-lime)" }}><AddRoundedIcon sx={{ fontSize: 18 }} /></span>
             <span className="flex-1 text-[13px]" style={{ color: "var(--tx-2)" }}>
-              Montando en <b style={{ color: "var(--tx)" }}>{assignTo.mobile}</b> · posición <b style={{ color: "var(--tx)", fontFamily: "'IBM Plex Mono'" }}>{assignTo.position}</b> — elegí una cubierta disponible y tocá <b>Asignar</b>.
+              Montando en <b style={{ color: "var(--tx)" }}>{assignTo.mobile}</b> · posición <b style={{ color: "var(--tx)", fontFamily: "var(--font-mono)" }}>{assignTo.position}</b> — elegí una cubierta disponible y tocá <b>Asignar</b>.
             </span>
-            <button onClick={() => setAssignTo(null)} className="inline-flex flex-none items-center gap-1 rounded-lg px-2.5 py-1.5 text-[12px] font-semibold" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--tx-3)" }}>
+            <button onClick={() => setAssignTo(null)} className="inline-flex flex-none items-center gap-1 rounded-[var(--r-md)] px-2.5 py-1.5 text-[12px] font-semibold" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--tx-3)" }}>
               <CloseRoundedIcon sx={{ fontSize: 14 }} /> Cancelar montaje
             </button>
           </div>
         )}
         {loading ? (
-          <p className="text-[13px]" style={{ color: "var(--tx-5)" }}>Cargando cubiertas…</p>
+          // t143: el skeleton copia la silueta de la vista activa, así el contenido real entra
+          // sin que la página salte.
+          view === "grid"
+            ? <SkeletonCards count={8} label="Cargando cubiertas…" />
+            : <SkeletonRows count={8} cols={COLUMNS.length} label="Cargando cubiertas…" />
         ) : filtered.length === 0 ? (
           <div className="py-16 text-center">
-            <div className="text-[17px] font-semibold" style={{ fontFamily: "'Space Grotesk'", color: "var(--tx)" }}>Sin resultados</div>
-            <div className="mt-1.5 text-[13px]" style={{ color: "var(--tx-5)" }}>No hay cubiertas que coincidan con tu búsqueda o filtro.</div>
+            <div className="text-[17px] font-semibold" style={{ fontFamily: "var(--font-display)", color: "var(--tx)" }}>Sin resultados</div>
+            <div className="mt-1.5 text-[13px]" style={{ color: "var(--tx-5)" }}>
+              {/* t148: el estado vacío decía QUÉ pasaba pero no QUÉ lo estaba causando. Con un
+                  filtro de estado y un texto activos a la vez, el operario no tiene forma de
+                  saber cuál de los dos le esconde la cubierta que sabe que existe. */}
+              {escondidoPor.length
+                ? <>Está filtrado por {escondidoPor.join(" y ")}.</>
+                : <>No hay cubiertas que coincidan con tu búsqueda o filtro.</>}
+            </div>
+            {escondidoPor.length > 0 && (
+              <button
+                onClick={limpiarTodo}
+                className="mt-4 inline-flex h-[38px] items-center gap-1.5 rounded-[var(--r-md)] px-[15px] text-[13px] font-semibold"
+                style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--tx-2)" }}
+              >
+                <CloseRoundedIcon sx={{ fontSize: 15 }} /> Limpiar búsqueda y filtros
+              </button>
+            )}
           </div>
         ) : view === "grid" ? (
           /* ---------- GRID ---------- */
@@ -232,22 +299,22 @@ const Cubiertas = ({ intent, onNavigate }) => {
             {pag.currentItems.map((t) => {
               const m = metaOf(t.status)
               return (
-                <div key={t._id} {...clickable(openDrawer(t._id))} aria-label={`Cubierta ${formatTireCode(t.code, tireCodePrefix)}`} className="flex cursor-pointer flex-col gap-[13px] rounded-[13px] p-4" style={{ border: "1px solid var(--bd)", background: "var(--card)" }}>
+                <div key={t._id} {...clickable(openDrawer(t._id))} aria-label={`Cubierta ${formatTireCode(t.code, tireCodePrefix)}`} className="flex cursor-pointer flex-col gap-[13px] rounded-[var(--r-lg)] p-4" style={{ border: "1px solid var(--bd)", background: "var(--card)" }}>
                   <div className="flex items-start justify-between gap-2.5">
                     <div>
-                      <div className="text-[11px]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-6)" }}>{t.serialNumber || "—"}</div>
-                      <div className="text-[22px] font-bold leading-[1.05]" style={{ fontFamily: "'Space Grotesk'", color: "var(--tx)" }}>#{formatTireCode(t.code, tireCodePrefix)}</div>
+                      <div className="text-[11px]" style={{ fontFamily: "var(--font-mono)", color: "var(--tx-6)" }}>{t.serialNumber || "—"}</div>
+                      <div className="text-[22px] font-bold leading-[1.05]" style={{ fontFamily: "var(--font-display)", color: "var(--tx)" }}>#{formatTireCode(t.code, tireCodePrefix)}</div>
                     </div>
                     <StateBadge status={t.status} />
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-[10px] tracking-wider" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-6)" }}>RECAPADOS</span>
+                    <span className="text-[10px] tracking-wider" style={{ fontFamily: "var(--font-mono)", color: "var(--tx-6)" }}>RECAPADOS</span>
                     <Pips level={t.recapLevel ?? m.level} />
                   </div>
                   <div className="flex flex-col gap-[5px] text-[12.5px]">
                     <Row label="Marca" value={t.brand} />
                     <Row label="Rodado" value={t.size} mono />
-                    <Row label="Ubicación" value={t.vehicle?.mobile || "En depósito"} valueColor={t.vehicle ? "var(--ink-blue)" : "var(--tx-4)"} />
+                    <Row label="Ubicación" value={ubicacionDe(t).label} valueColor={ubicacionDe(t).color} />
                     <Row label="Km" value={fmtKm(t.kilometers)} mono strong />
                     <Row label="Actualizada" value={fmtDate(t.updatedAt)} mono />
                   </div>
@@ -263,8 +330,8 @@ const Cubiertas = ({ intent, onNavigate }) => {
           </div>
         ) : (
           /* ---------- TABLA ---------- */
-          <div className="overflow-hidden rounded-[13px]" style={{ border: "1px solid var(--bd)", background: "var(--card)" }}>
-            <div className="grid gap-3 px-[18px] py-3 text-[10.5px] font-semibold uppercase tracking-wider" style={{ gridTemplateColumns: GRID_COLS, fontFamily: "'IBM Plex Mono'", background: "var(--elev)", borderBottom: "1px solid var(--bd)", color: "var(--tx-6)" }}>
+          <div className="overflow-hidden rounded-[var(--r-lg)]" style={{ border: "1px solid var(--bd)", background: "var(--card)" }}>
+            <div className="grid gap-3 px-[18px] py-3 text-[10.5px] font-semibold uppercase tracking-wider" style={{ gridTemplateColumns: GRID_COLS, fontFamily: "var(--font-mono)", background: "var(--elev)", borderBottom: "1px solid var(--bd)", color: "var(--tx-6)" }}>
               {COLUMNS.map((c) => {
                 const active = sortBy === c.key
                 return (
@@ -287,17 +354,17 @@ const Cubiertas = ({ intent, onNavigate }) => {
               return (
                 <div key={t._id} className="grid items-center gap-3 py-3 pl-[14px] pr-[18px]" style={{ gridTemplateColumns: GRID_COLS, borderLeft: `4px solid ${m.color}`, borderBottom: "1px solid var(--bd-faint)" }}>
                   <div className="cursor-pointer" {...clickable(openDrawer(t._id))} aria-label={`Cubierta ${formatTireCode(t.code, tireCodePrefix)}`}>
-                    <div className="text-[15px] font-bold" style={{ fontFamily: "'Space Grotesk'", color: "var(--tx)" }}>#{formatTireCode(t.code, tireCodePrefix)}</div>
-                    <div className="text-[10.5px]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-6)" }}>{t.serialNumber || "—"}</div>
+                    <div className="text-[15px] font-bold" style={{ fontFamily: "var(--font-display)", color: "var(--tx)" }}>#{formatTireCode(t.code, tireCodePrefix)}</div>
+                    <div className="text-[10.5px]" style={{ fontFamily: "var(--font-mono)", color: "var(--tx-6)" }}>{t.serialNumber || "—"}</div>
                   </div>
                   <div className="min-w-0"><StateBadge status={t.status} small truncate /></div>
                   <div className="min-w-0">
                     <div className="text-[13px] font-medium" style={{ color: "var(--tx-2)" }}>{t.brand}</div>
-                    <div className="text-[11.5px]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-5)" }}>{t.size}{t.pattern ? ` · ${t.pattern}` : ""}</div>
+                    <div className="text-[11.5px]" style={{ fontFamily: "var(--font-mono)", color: "var(--tx-5)" }}>{t.size}{t.pattern ? ` · ${t.pattern}` : ""}</div>
                   </div>
-                  <div className="text-[12.5px] font-medium" style={{ color: t.vehicle ? "var(--ink-blue)" : "var(--tx-4)" }}>{t.vehicle?.mobile || "En depósito"}</div>
-                  <div className="text-right text-[13px] font-semibold" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx)" }}>{fmtKm(t.kilometers)}</div>
-                  <div className="text-right text-[12px]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-5)" }}>{fmtDate(t.updatedAt)}</div>
+                  <div className="text-[12.5px] font-medium" style={{ color: ubicacionDe(t).color }}>{ubicacionDe(t).label}</div>
+                  <div className="text-right text-[13px] font-semibold" style={{ fontFamily: "var(--font-mono)", color: "var(--tx)" }}>{fmtKm(t.kilometers)}</div>
+                  <div className="text-right text-[12px]" style={{ fontFamily: "var(--font-mono)", color: "var(--tx-5)" }}>{fmtDate(t.updatedAt)}</div>
                   <div className="flex items-center justify-end gap-1.5">
                     {!t.vehicle && !["discard", "recap"].includes(metaOf(t.status).role) && <OpActionBtn type="assign" square size={36} onClick={openDrawer(t._id, "assign")} />}
                     {t.vehicle && <OpActionBtn type="unassign" square size={36} onClick={openDrawer(t._id, "unassign")} />}
@@ -336,7 +403,7 @@ const Cubiertas = ({ intent, onNavigate }) => {
 const Row = ({ label, value, valueColor, mono, strong }) => (
   <div className="flex justify-between">
     <span style={{ color: "var(--tx-5)" }}>{label}</span>
-    <span style={{ color: valueColor || "var(--tx-2)", fontWeight: strong ? 600 : 500, fontFamily: mono ? "'IBM Plex Mono'" : undefined }}>{value}</span>
+    <span style={{ color: valueColor || "var(--tx-2)", fontWeight: strong ? 600 : 500, fontFamily: mono ? "var(--font-mono)" : undefined }}>{value}</span>
   </div>
 )
 

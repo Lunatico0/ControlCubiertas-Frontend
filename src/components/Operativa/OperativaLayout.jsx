@@ -1,5 +1,7 @@
 import { useState } from "react"
-import { useNavigate, useLocation } from "react-router-dom"
+import { etiquetaDeRol } from "@utils/roles"
+import { useNavigate, useLocation, Outlet } from "react-router-dom"
+import { seccionDeRuta, rutaDeSeccion, rutaDeVehiculo, rutaDeCubierta, queryDesdeIntent } from "@utils/opRoutes"
 import { useTheme } from "@context/ThemeContext"
 import { useAuth } from "@context/AuthContext"
 import AdminPanelSettingsOutlinedIcon from "@mui/icons-material/AdminPanelSettingsOutlined"
@@ -10,9 +12,6 @@ import { useCacheTenantLogo } from "@hooks/useCacheTenantLogo"
 import { useUpdater } from "@hooks/useUpdater"
 import AppSidebar from "@components/Layout/AppSidebar"
 import BrandDeco from "@components/common/BrandDeco"
-import Cubiertas from "./Cubiertas"
-import Inicio from "./Inicio"
-import Vehiculos from "./Vehiculos"
 import OpTour from "./OpTour"
 
 // Shell de la app operativa (rediseño Claude Design). Usa el design system de
@@ -41,17 +40,21 @@ const OperativaLayout = () => {
   const { user, logout, isAdmin } = useAuth()
   const upd = useUpdater() // auto-updater (solo desktop): botón sidebar + modal
   useCacheTenantLogo() // cachea el logo del tenant para el splash del desktop (no-op en web)
-  const goToRoute = useNavigate() // navegación de ruta (react-router), distinta del navigate interno por sección
-  // Deep-link desde el panel admin: navigate("/", { state:{ op:{ section, tab } } }) abre la
-  // sección + filtro pedidos (ej. "Requiere acción" → Cubiertas filtradas por A recapar).
-  const initialOp = useLocation().state?.op
-  const [active, setActive] = useState(initialOp?.section || "inicio")
-  const [intent, setIntent] = useState(initialOp?.tab ? { tab: initialOp.tab } : null) // intención de navegación para Cubiertas (query/tab/assignTo)
+  const goToRoute = useNavigate()
+  const { pathname } = useLocation()
+  // La sección sale de la URL, no de un useState: así el botón Atrás, el refresh y un link
+  // compartido llevan al mismo lugar. Ver @utils/opRoutes.
+  const active = seccionDeRuta(pathname)
   const [tourOpen, setTourOpen] = useState(false) // guía interactiva (tour con spotlight)
 
+  // El "intent" (búsqueda, pestaña, alta, montaje dirigido) viaja en la QUERY y no en el state
+  // de react-router: el state no sobrevive a un F5, así que la pantalla no se podía reconstruir.
   const navigate = (section, intentData = null) => {
-    setIntent(intentData)
-    setActive(section)
+    // Un intent que apunta a un elemento concreto va a SU ruta: así el link es compartible y
+    // el botón Atrás cierra el detalle en vez de salir de la app.
+    if (intentData?.openVehicle) return goToRoute(rutaDeVehiculo(intentData.openVehicle))
+    if (intentData?.openTire) return goToRoute(rutaDeCubierta(intentData.openTire))
+    goToRoute(`${rutaDeSeccion(section)}${queryDesdeIntent(intentData)}`)
   }
 
   const displayName = user?.name || user?.email?.split("@")[0] || "Operario"
@@ -61,7 +64,7 @@ const OperativaLayout = () => {
     <div
       data-app-theme={isDarkMode ? "dark" : "light"}
       className="flex h-full w-full overflow-hidden text-left"
-      style={{ background: "var(--bg)", color: "var(--tx)", fontFamily: "'IBM Plex Sans',system-ui,sans-serif" }}
+      style={{ background: "var(--bg)", color: "var(--tx)", fontFamily: "var(--font-sans)" }}
     >
       {/* ============ SIDEBAR ============ */}
       <AppSidebar
@@ -83,7 +86,7 @@ const OperativaLayout = () => {
                 type="button"
                 onClick={() => goToRoute("/admin")}
                 title="Ir al panel administrativo"
-                className="flex w-full cursor-pointer items-center gap-[13px] rounded-[9px] px-[13px] py-3 text-left text-[14.5px] font-semibold transition-colors"
+                className="flex w-full cursor-pointer items-center gap-[13px] rounded-[var(--r-md)] px-[13px] py-3 text-left text-[14.5px] font-semibold transition-colors"
                 style={{ border: "1px solid color-mix(in srgb, var(--ink-lime) 45%, transparent)", background: "color-mix(in srgb, var(--ink-lime) 8%, transparent)", color: "var(--ink-lime)" }}
               >
                 <span className="inline-flex h-[21px] w-[21px] flex-none items-center"><AdminPanelSettingsOutlinedIcon sx={{ fontSize: 20 }} /></span>
@@ -93,8 +96,8 @@ const OperativaLayout = () => {
           ) : null
         }
         upd={upd}
-        user={{ name: displayName, roleLabel: "Operativo", initials, avatarBg: "#18B89E", avatarColor: "#04201B" }}
-        help={{ dataTour: "help-btn", onStartTour: () => { setActive("inicio"); setTourOpen(true) }, guideHref: "/guia", guideLabel: "Guía de uso completa", guideSubtitle: "Manual detallado · pestaña nueva" }}
+        user={{ name: displayName, roleLabel: etiquetaDeRol(user?.role), initials, avatarBg: "#18B89E", avatarColor: "#04201B" }}
+        help={{ dataTour: "help-btn", onStartTour: () => { navigate("inicio"); setTourOpen(true) }, guideHref: "/guia", guideLabel: "Guía de uso completa", guideSubtitle: "Manual detallado · pestaña nueva" }}
         onLogout={logout}
       />
 
@@ -108,20 +111,9 @@ const OperativaLayout = () => {
           </>
         )}
         <div className="relative z-[1] flex-1 overflow-auto">
-          {active === "inicio" ? (
-            <Inicio onNavigate={navigate} />
-          ) : active === "cubiertas" ? (
-            <Cubiertas intent={intent} onNavigate={navigate} />
-          ) : active === "vehiculos" ? (
-            <Vehiculos onNavigate={navigate} intent={intent} />
-          ) : (
-            <div className="mx-auto flex h-full max-w-[900px] flex-col items-center justify-center gap-3 p-8 text-center">
-              <div className="text-[22px] font-bold" style={{ fontFamily: "'Space Grotesk'", color: "var(--tx)" }}>
-                {NAV.find((n) => n.key === active)?.label}
-              </div>
-              <p style={{ color: "var(--tx-4)" }}>Pantalla en construcción — próximo hito del rediseño.</p>
-            </div>
-          )}
+          {/* Cada sección es una ruta anidada (ver App.jsx). `onNavigate` sigue existiendo
+              porque las pantallas se navegan entre sí (montar una cubierta vuelve al vehículo). */}
+          <Outlet context={{ onNavigate: navigate }} />
         </div>
       </main>
 

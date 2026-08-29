@@ -64,22 +64,22 @@ const OpTour = ({ steps, active, onNavigate, onClose }) => {
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 200 }}>
       {r ? (
-        <div style={{ position: "absolute", top: r.top - PAD, left: r.left - PAD, width: r.width + PAD * 2, height: r.height + PAD * 2, borderRadius: 12, boxShadow: "0 0 0 9999px rgba(4,5,6,.74)", border: "2px solid var(--st-lime)", transition: "all .18s ease", pointerEvents: "none" }} />
+        <div style={{ position: "absolute", top: r.top - PAD, left: r.left - PAD, width: r.width + PAD * 2, height: r.height + PAD * 2, borderRadius: "var(--r-md)", boxShadow: "0 0 0 9999px rgba(4,5,6,.74)", border: "2px solid var(--st-lime)", transition: "all var(--t-fast) var(--t-ease)", pointerEvents: "none" }} />
       ) : (
         <div style={{ position: "absolute", inset: 0, background: "rgba(4,5,6,.74)" }} />
       )}
 
-      <div style={{ position: "absolute", top: pos.tipTop, left: pos.tipLeft, width: TIP_W, background: "var(--card)", border: "1px solid var(--bd-strong)", borderRadius: 14, boxShadow: "var(--elev-1)", padding: "19px 20px 16px", transition: "all .18s ease" }}>
+      <div style={{ position: "absolute", top: pos.tipTop, left: pos.tipLeft, width: TIP_W, background: "var(--card)", border: "1px solid var(--bd-strong)", borderRadius: "var(--r-lg)", boxShadow: "var(--elev-1)", padding: "19px 20px 16px", transition: "all var(--t-fast) var(--t-ease)" }}>
         <div className="mb-[9px] flex items-center gap-2">
-          <span className="rounded-full px-[9px] py-[2px] text-[10.5px] font-semibold" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--ink-lime)", background: "color-mix(in srgb, var(--ink-lime) 13%, transparent)" }}>{i + 1} / {steps.length}</span>
+          <span className="rounded-full px-[9px] py-[2px] text-[10.5px] font-semibold" style={{ fontFamily: "var(--font-mono)", color: "var(--ink-lime)", background: "color-mix(in srgb, var(--ink-lime) 13%, transparent)" }}>{i + 1} / {steps.length}</span>
         </div>
-        <div className="mb-1.5 text-[17px] font-bold" style={{ fontFamily: "'Space Grotesk'", color: "var(--tx)" }}>{step.title}</div>
+        <div className="mb-1.5 text-[17px] font-bold" style={{ fontFamily: "var(--font-display)", color: "var(--tx)" }}>{step.title}</div>
         <div className="text-[13px]" style={{ color: "var(--tx-3)", lineHeight: 1.55 }}>{step.body}</div>
         <div className="mt-4 flex items-center gap-2.5">
           <button onClick={onClose} className="text-[12.5px] font-semibold" style={{ color: "var(--tx-5)", background: "none", border: "none", cursor: "pointer" }}>Saltar</button>
           <div className="ml-auto flex gap-2">
-            {i > 0 && <button onClick={prev} className="h-[38px] rounded-[9px] px-3.5 text-[13px] font-semibold" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--tx)" }}>Atrás</button>}
-            <button onClick={next} className="h-[38px] rounded-[9px] px-[18px] text-[13px] font-bold" style={{ border: "none", background: "var(--ink-lime)", color: "var(--card)" }}>{last ? "Finalizar" : "Siguiente"}</button>
+            {i > 0 && <button onClick={prev} className="h-[38px] rounded-[var(--r-md)] px-3.5 text-[13px] font-semibold" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--tx)" }}>Atrás</button>}
+            <button onClick={next} className="h-[38px] rounded-[var(--r-md)] px-[18px] text-[13px] font-bold" style={{ border: "none", background: "var(--ink-lime)", color: "var(--card)" }}>{last ? "Finalizar" : "Siguiente"}</button>
           </div>
         </div>
       </div>

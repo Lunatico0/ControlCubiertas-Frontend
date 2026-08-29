@@ -12,20 +12,20 @@ import UndoRoundedIcon from "@mui/icons-material/UndoRounded"
 import CheckRoundedIcon from "@mui/icons-material/CheckRounded"
 import LocalPrintshopOutlinedIcon from "@mui/icons-material/LocalPrintshopOutlined"
 import { buildAssignPrintData, buildUnassignPrintData, buildFinishRecapPrintData, buildDiscardPrintData, buildUndoPrintData, buildCorrectionPrintData, buildEditTirePrintData } from "@utils/print-data"
-import { metaOf, tint, fmtKm, fmtDate, StateBadge, useStatusCatalog } from "./status"
+import { metaOf, tint, fmtKm, fmtDate, StateBadge, useStatusCatalog, ubicacionDe } from "./status"
 import SelectorPosicion from "./SelectorPosicion"
 import { OpActionBtn } from "./opActions"
 import Field from "@components/common/Field"
-import Drawer from "@components/UI/Drawer"
-import FloatingField from "@components/UI/FloatingField"
+import Drawer from "@components/common/Drawer"
+import FloatingField from "@components/common/FloatingField"
 import { formatTireCode } from "@utils/tireCode"
 
 // Botón chico de una entrada del timeline (Reimprimir / Corregir / Deshacer), con hover coloreable.
 const TimelineBtn = ({ onClick, disabled, icon, label, hover }) => (
   <button
     type="button" onClick={onClick} disabled={disabled}
-    className="inline-flex items-center gap-1.5 rounded-[7px] px-[11px] py-[5px] text-[11.5px] font-semibold"
-    style={{ border: "1px solid var(--bd-strong)", background: "var(--card)", color: "var(--tx-2)", fontFamily: "'IBM Plex Sans'", cursor: disabled ? "default" : "pointer", opacity: disabled ? 0.5 : 1 }}
+    className="inline-flex items-center gap-1.5 rounded-[var(--r-sm)] px-[11px] py-[5px] text-[11.5px] font-semibold"
+    style={{ border: "1px solid var(--bd-strong)", background: "var(--card)", color: "var(--tx-2)", fontFamily: "var(--font-sans)", cursor: disabled ? "default" : "pointer", opacity: disabled ? 0.5 : 1 }}
     onMouseEnter={(e) => { if (hover && !disabled) { e.currentTarget.style.borderColor = hover; e.currentTarget.style.color = hover } }}
     onMouseLeave={(e) => { e.currentTarget.style.borderColor = "var(--bd-strong)"; e.currentTarget.style.color = "var(--tx-2)" }}
   >
@@ -85,9 +85,13 @@ const histDetail = (h) => {
 }
 const histBits = (h) => {
   const bits = []
-  const km = h.km ?? h.kmAlta
-  if (km != null) bits.push({ k: "Km", val: fmtKm(km) })
-  if (h.kmBaja != null) bits.push({ k: "Km baja", val: fmtKm(h.kmBaja) })
+  // t140: la palabra "Km" nombraba tres cosas distintas. h.km son los km que RECORRIÓ la
+  // cubierta en ese tramo; kmAlta y kmBaja son el ODÓMETRO DEL MÓVIL al montar y al desmontar.
+  // Un mismo movimiento mostraba "Km 50.000" y "Km baja 250.000" mientras la cubierta pasaba
+  // de 39.527 a 89.527: tres números que no cerraban entre sí porque medían cosas distintas.
+  if (h.km != null) bits.push({ k: "Recorridos", val: fmtKm(h.km) })
+  if (h.kmAlta != null) bits.push({ k: "Odóm. al montar", val: fmtKm(h.kmAlta) })
+  if (h.kmBaja != null) bits.push({ k: "Odóm. al desmontar", val: fmtKm(h.kmBaja) })
   if (h.orderNumber) bits.push({ k: "Orden", val: h.orderNumber })
   if (h.receiptNumber) bits.push({ k: "Comp.", val: h.receiptNumber })
   return bits
@@ -197,7 +201,10 @@ const TireDrawer = ({ tireId, initialAction, initialAssign, onAssigned, onClose 
     setActionEntry(entry)
     setErrors({})
     setForm(a === "editHist"
-      ? { status: entry.status || tire.status, kmAlta: entry.kmAlta ?? "", kmBaja: entry.kmBaja ?? "", vehicle: entry.vehicle?._id || "", reason: `Corrección de Orden N°${entry.orderNumber || ""}`, orderNumber: "" }
+      // t150: `reason` venía precargado con "Corrección de Orden N°…", un texto genérico que
+      // el operario aceptaba sin tocar. Eso anulaba el valor de auditoría del campo: quedaba
+      // registrado QUE hubo una corrección, nunca POR QUÉ. Arranca vacío, con placeholder.
+      ? { status: entry.status || tire.status, kmAlta: entry.kmAlta ?? "", kmBaja: entry.kmBaja ?? "", vehicle: entry.vehicle?._id || "", reason: "", orderNumber: "" }
       : {})
     setAction(a)
   }
@@ -344,12 +351,20 @@ const TireDrawer = ({ tireId, initialAction, initialAssign, onAssigned, onClose 
   // puede deshacer sin inventar movimientos que nunca pasaron.
   const ultimaEntrada = history[0]
   const steps = tire ? lifecycleSteps(tire, history, stockScale) : []
+
+  // t141: contexto del montaje vigente, para la cabecera de "Desasignar". El formulario era
+  // sólo "Kilometraje final" + "N° de orden": no decía de qué móvil ni de qué posición se
+  // estaba bajando la cubierta, ni contra qué odómetro se iba a validar. El operario tenía
+  // que cerrar el modal, ir al historial, anotar el número y volver.
+  const montajeVigente = history.find((h) => /^asign/i.test(h.type || ""))
+  const odometroAlMontar = montajeVigente?.kmAlta ?? montajeVigente?.km
   const infoItems = tire ? [
     { label: "Marca", value: tire.brand || "—" },
     { label: "Rodado", value: tire.size || "—", mono: true },
     { label: "Dibujo", value: tire.pattern || "—" },
     { label: "N° de serie", value: tire.serialNumber || "—", mono: true },
-    { label: "Ubicación", value: tire.vehicle?.mobile || "En depósito", accent: tire.vehicle ? "var(--ink-blue)" : undefined },
+    // t144: una cubierta descartada no está guardada en ningún lado. Ver ubicacionDe en ./status.
+    { label: "Ubicación", value: ubicacionDe(tire).label, accent: tire.vehicle || metaOf(tire.status).role === "discard" ? ubicacionDe(tire).color : undefined },
     ...(tire.position ? [{ label: "Posición", value: tire.position, mono: true }] : []),
     { label: "Kilómetros", value: fmtKm(tire.kilometers), mono: true },
     { label: "Fecha de alta", value: fmtDate(tire.createdAt), mono: true },
@@ -405,19 +420,19 @@ const TireDrawer = ({ tireId, initialAction, initialAssign, onAssigned, onClose 
             <div className="flex items-start justify-between gap-3 p-5" style={{ borderBottom: "1px solid var(--bd-soft)" }}>
               <div className="flex items-center gap-3">
                 {action && (
-                  <button onClick={closeAction} className="rounded-[7px] p-1" style={{ color: "var(--tx-4)" }} title="Volver">
+                  <button onClick={closeAction} className="rounded-[var(--r-sm)] p-1" style={{ color: "var(--tx-4)" }} title="Volver">
                     <ArrowBackRoundedIcon sx={{ fontSize: 20 }} />
                   </button>
                 )}
                 <div>
-                  <div className="text-[11px]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-6)" }}>{tire.serialNumber || "—"}</div>
+                  <div className="text-[11px]" style={{ fontFamily: "var(--font-mono)", color: "var(--tx-6)" }}>{tire.serialNumber || "—"}</div>
                   <div className="flex items-center gap-3">
-                    <span className="text-[26px] font-bold leading-none" style={{ fontFamily: "'Space Grotesk'", color: "var(--tx)" }}>#{formatTireCode(tire.code, data?.tireCodePrefix)}</span>
+                    <span className="text-[26px] font-bold leading-none" style={{ fontFamily: "var(--font-display)", color: "var(--tx)" }}>#{formatTireCode(tire.code, data?.tireCodePrefix)}</span>
                     <StateBadge status={tire.status} />
                   </div>
                 </div>
               </div>
-              <button onClick={handleClose} className="rounded-[7px] p-2" style={{ color: "var(--tx-5)" }} title="Cerrar">
+              <button onClick={handleClose} className="rounded-[var(--r-sm)] p-2" style={{ color: "var(--tx-5)" }} title="Cerrar">
                 <CloseRoundedIcon sx={{ fontSize: 20 }} />
               </button>
             </div>
@@ -425,7 +440,7 @@ const TireDrawer = ({ tireId, initialAction, initialAssign, onAssigned, onClose 
             {action ? (
               /* ---------- Formulario de acción (inline, sin apilar modales) ---------- */
               <div className="flex-1 overflow-auto p-5">
-                <h3 className="mb-4 text-[15px] font-semibold" style={{ fontFamily: "'Space Grotesk'", color: "var(--tx)" }}>{ACTION_TITLES[action]}</h3>
+                <h3 className="mb-4 text-[15px] font-semibold" style={{ fontFamily: "var(--font-display)", color: "var(--tx)" }}>{ACTION_TITLES[action]}</h3>
 
                 <div className="flex flex-col gap-3.5">
                 {action === "assign" && (
@@ -439,7 +454,7 @@ const TireDrawer = ({ tireId, initialAction, initialAssign, onAssigned, onClose 
 
                     {form.vehicle && positions && (
                       positions.length === 0 ? (
-                        <div className="rounded-[9px] px-3 py-2.5 text-[12.5px]" style={{ background: "var(--input)", border: "1px dashed var(--bd-strong)", color: "var(--tx-5)" }}>
+                        <div className="rounded-[var(--r-md)] px-3 py-2.5 text-[12.5px]" style={{ background: "var(--input)", border: "1px dashed var(--bd-strong)", color: "var(--tx-5)" }}>
                           Este vehículo no tiene ejes configurados — se asignará sin posición.
                         </div>
                       ) : (
@@ -453,12 +468,23 @@ const TireDrawer = ({ tireId, initialAction, initialAssign, onAssigned, onClose 
                       )
                     )}
 
-                    <FloatingField label="Kilometraje inicial" type="number" min="0" required error={errors.kmAlta} value={form.kmAlta || ""} onChange={set("kmAlta")} />
+                    <FloatingField label="Odómetro del móvil al montar (km)" type="number" min="0" required error={errors.kmAlta} value={form.kmAlta || ""} onChange={set("kmAlta")} />
                   </>
                 )}
 
                 {action === "unassign" && (
-                  <FloatingField label="Kilometraje final" type="number" min="0" required error={errors.kmBaja} value={form.kmBaja || ""} onChange={set("kmBaja")} />
+                  <>
+                    <div className="rounded-[var(--r-md)] px-3.5 py-3 text-[12.5px]" style={{ background: tint("var(--ink-orange)", 8), border: `1px solid ${tint("var(--ink-orange)", 30)}`, color: "var(--tx-2)" }}>
+                      Bajando de <b style={{ color: "var(--tx)" }}>{tire.vehicle?.mobile || "el vehículo"}</b>
+                      {tire.position && <> · posición <b style={{ color: "var(--tx)", fontFamily: "var(--font-mono)" }}>{tire.position}</b></>}
+                      {odometroAlMontar != null && (
+                        <div className="mt-1" style={{ color: "var(--tx-4)" }}>
+                          Se montó con el odómetro en <b style={{ color: "var(--tx-2)", fontFamily: "var(--font-mono)" }}>{fmtKm(odometroAlMontar)}</b>: el valor de abajo no puede ser menor.
+                        </div>
+                      )}
+                    </div>
+                    <FloatingField label="Odómetro del móvil al desmontar (km)" type="number" min="0" required error={errors.kmBaja} value={form.kmBaja || ""} onChange={set("kmBaja")} />
+                  </>
                 )}
 
                 {action === "recap" && (
@@ -472,7 +498,7 @@ const TireDrawer = ({ tireId, initialAction, initialAssign, onAssigned, onClose 
                       ))}
                     </FloatingField>
                     {!siguienteRecap && (
-                      <div className="rounded-[9px] px-3 py-2.5 text-[12.5px]" style={{ background: tint("var(--ink-orange)", 8), border: "1px solid " + tint("var(--ink-orange)", 35), color: "var(--ink-orange)" }}>
+                      <div className="rounded-[var(--r-md)] px-3 py-2.5 text-[12.5px]" style={{ background: tint("var(--ink-orange)", 8), border: "1px solid " + tint("var(--ink-orange)", 35), color: "var(--ink-orange)" }}>
                         Esta cubierta ya recorrió toda la escalera de recapados del tenant. El paso que sigue es descartarla.
                       </div>
                     )}
@@ -486,24 +512,24 @@ const TireDrawer = ({ tireId, initialAction, initialAssign, onAssigned, onClose 
                     <FloatingField label="Marca" required error={errors.brand} value={form.brand || ""} onChange={set("brand")} />
                     <FloatingField label="Rodado" required error={errors.size} value={form.size || ""} onChange={set("size")} />
                     <FloatingField label="Dibujo" required error={errors.pattern} value={form.pattern || ""} onChange={set("pattern")} />
-                    <FloatingField label="Motivo de la corrección" required error={errors.reason} value={form.reason || ""} onChange={set("reason")} />
+                    <FloatingField label="Motivo de la corrección" required error={errors.reason} value={form.reason || ""} onChange={set("reason")} title="Ej.: se cargó el odómetro del móvil equivocado" />
                   </>
                 )}
 
                 {action === "sendRecap" && (
-                  <div className="rounded-[9px] px-3 py-2.5 text-[12.5px]" style={{ background: tint("var(--ink-orange)", 8), border: "1px solid " + tint("var(--ink-orange)", 35), color: "var(--ink-orange)" }}>
+                  <div className="rounded-[var(--r-md)] px-3 py-2.5 text-[12.5px]" style={{ background: tint("var(--ink-orange)", 8), border: "1px solid " + tint("var(--ink-orange)", 35), color: "var(--ink-orange)" }}>
                     Vas a marcar esta cubierta (#{formatTireCode(tire.code, data?.tireCodePrefix)}) como gastada: pasa a «{recapStatus}» y queda a la espera del recapado. Mientras tanto no se puede montar en un vehículo.
                   </div>
                 )}
 
                 {action === "discard" && (
-                  <div className="rounded-[9px] px-3 py-2.5 text-[12.5px]" style={{ background: tint("var(--ink-red)", 8), border: "1px solid " + tint("var(--ink-red)", 35), color: "var(--ink-red)" }}>
+                  <div className="rounded-[var(--r-md)] px-3 py-2.5 text-[12.5px]" style={{ background: tint("var(--ink-red)", 8), border: "1px solid " + tint("var(--ink-red)", 35), color: "var(--ink-red)" }}>
                     Vas a dar de baja definitiva esta cubierta (#{formatTireCode(tire.code, data?.tireCodePrefix)}). Queda registrado en el historial con su comprobante.
                   </div>
                 )}
 
                 {action === "undo" && (
-                  <div className="rounded-[9px] px-3 py-2.5 text-[12.5px]" style={{ background: "var(--input)", border: "1px solid var(--bd-strong)", color: "var(--tx-4)" }}>
+                  <div className="rounded-[var(--r-md)] px-3 py-2.5 text-[12.5px]" style={{ background: "var(--input)", border: "1px solid var(--bd-strong)", color: "var(--tx-4)" }}>
                     Vas a revertir el movimiento «<b style={{ color: "var(--tx-2)" }}>{actionEntry?.type}</b>» del {fmtDate(actionEntry?.date)}.
                     {" "}<b style={{ color: "var(--tx-2)" }}>{efectoDelUndo(actionEntry, tire)}</b>
                     {" "}La reversión queda registrada con su comprobante.
@@ -512,9 +538,23 @@ const TireDrawer = ({ tireId, initialAction, initialAssign, onAssigned, onClose 
 
                 {action === "editHist" && (
                   <>
+                    {/* t150: corregir era a ciegas. El formulario pedía re-elegir TODO sin
+                        mostrar los valores originales, así que arreglar un odómetro mal
+                        tipeado exponía a cambiar el estado sin querer. Acá está lo que dice
+                        hoy el movimiento; lo que quede distinto abajo es lo que se corrige. */}
+                    <div className="rounded-[var(--r-md)] px-3.5 py-3 text-[12px]" style={{ background: "var(--input)", border: "1px solid var(--bd-strong)", color: "var(--tx-4)" }}>
+                      <div className="mb-1.5 text-[10.5px] tracking-[.08em]" style={{ fontFamily: "var(--font-mono)", color: "var(--tx-6)" }}>VALORES ACTUALES DEL MOVIMIENTO</div>
+                      <div className="flex flex-wrap gap-x-4 gap-y-1">
+                        {actionEntry?.status && <span>Estado: <b style={{ color: "var(--tx-2)" }}>{actionEntry.status}</b></span>}
+                        {actionEntry?.vehicle?.mobile && <span>Vehículo: <b style={{ color: "var(--tx-2)" }}>{actionEntry.vehicle.mobile}</b></span>}
+                        {actionEntry?.kmAlta != null && <span>Odóm. al montar: <b style={{ color: "var(--tx-2)", fontFamily: "var(--font-mono)" }}>{fmtKm(actionEntry.kmAlta)}</b></span>}
+                        {actionEntry?.kmBaja != null && <span>Odóm. al desmontar: <b style={{ color: "var(--tx-2)", fontFamily: "var(--font-mono)" }}>{fmtKm(actionEntry.kmBaja)}</b></span>}
+                        {actionEntry?.orderNumber && <span>Orden: <b style={{ color: "var(--tx-2)", fontFamily: "var(--font-mono)" }}>{actionEntry.orderNumber}</b></span>}
+                      </div>
+                    </div>
                     <FloatingField as="select" label="Estado" required error={errors.status} value={form.status || ""} onChange={set("status")}>
                       <option value="">Seleccionar estado…</option>
-                      {statuses.map((s) => <option key={s.name} value={s.name}>{s.name}</option>)}
+                      {statuses.map((s) => <option key={s.name} value={s.name}>{s.name}{s.name === actionEntry?.status ? " — actual" : ""}</option>)}
                     </FloatingField>
                     {editBaseType(actionEntry) === "Asignación" && (
                       <>
@@ -522,13 +562,13 @@ const TireDrawer = ({ tireId, initialAction, initialAssign, onAssigned, onClose 
                           <option value="">Seleccionar vehículo…</option>
                           {vehicles.map((v) => <option key={v._id} value={v._id}>{v.mobile}{v.licensePlate ? ` · ${v.licensePlate}` : ""}</option>)}
                         </FloatingField>
-                        <FloatingField label="Kilometraje inicial" type="number" min="0" required error={errors.kmAlta} value={form.kmAlta ?? ""} onChange={set("kmAlta")} />
+                        <FloatingField label="Odómetro del móvil al montar (km)" type="number" min="0" required error={errors.kmAlta} value={form.kmAlta ?? ""} onChange={set("kmAlta")} />
                       </>
                     )}
                     {editBaseType(actionEntry) === "Desasignación" && (
-                      <FloatingField label="Kilometraje final" type="number" min="0" required error={errors.kmBaja} value={form.kmBaja ?? ""} onChange={set("kmBaja")} />
+                      <FloatingField label="Odómetro del móvil al desmontar (km)" type="number" min="0" required error={errors.kmBaja} value={form.kmBaja ?? ""} onChange={set("kmBaja")} />
                     )}
-                    <FloatingField label="Motivo de la corrección" required error={errors.reason} value={form.reason || ""} onChange={set("reason")} />
+                    <FloatingField label="Motivo de la corrección" required error={errors.reason} value={form.reason || ""} onChange={set("reason")} title="Ej.: se cargó el odómetro del móvil equivocado" />
                   </>
                 )}
 
@@ -536,14 +576,14 @@ const TireDrawer = ({ tireId, initialAction, initialAssign, onAssigned, onClose 
                 </div>
 
                 <div className="mt-5 flex gap-3">
-                  <button onClick={() => setAction(null)} className="flex-1 rounded-[9px] py-2.5 text-[13px] font-semibold" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--tx-2)" }}>
+                  <button onClick={() => setAction(null)} className="flex-1 rounded-[var(--r-md)] py-2.5 text-[13px] font-semibold" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--tx-2)" }}>
                     Cancelar
                   </button>
                   <button
                     onClick={actionHandlers[action]}
                     disabled={submitting}
-                    className="flex-1 rounded-[9px] py-2.5 text-[13px] font-bold"
-                    style={{ background: action === "discard" ? "var(--ink-red)" : "var(--ink-lime)", color: action === "discard" ? "#fff" : "#0A0C0D", opacity: submitting ? 0.6 : 1 }}
+                    className="flex-1 rounded-[var(--r-md)] py-2.5 text-[13px] font-bold"
+                    style={{ background: action === "discard" ? "var(--ink-red)" : "var(--ink-lime)", color: action === "discard" ? "#fff" : "var(--brand-ink)", opacity: submitting ? 0.6 : 1 }}
                   >
                     {submitting ? "Guardando…" : action === "discard" ? "Descartar" : action === "sendRecap" ? "Enviar a recapar" : action === "edit" ? "Guardar cambios" : action === "undo" ? "Deshacer" : action === "editHist" ? "Guardar" : "Confirmar"}
                   </button>
@@ -553,7 +593,7 @@ const TireDrawer = ({ tireId, initialAction, initialAssign, onAssigned, onClose 
               /* ---------- Vista de detalle · sidePanel (Claude Design) ---------- */
               <div className="flex-1 overflow-auto" style={{ padding: "22px 24px" }}>
                 {/* Lifecycle stepper */}
-                <div className="mb-4 text-[10.5px] tracking-[.06em]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-6)" }}>CICLO DE VIDA</div>
+                <div className="mb-4 text-[10.5px] tracking-[.06em]" style={{ fontFamily: "var(--font-mono)", color: "var(--tx-6)" }}>CICLO DE VIDA</div>
                 <div className="mb-6 flex items-start">
                   {steps.map((st, i) => {
                     const S = STEP_STYLE[st.kind]
@@ -575,11 +615,11 @@ const TireDrawer = ({ tireId, initialAction, initialAssign, onAssigned, onClose 
                 </div>
 
                 {/* Info grid */}
-                <div className="mb-6 grid" style={{ gridTemplateColumns: "1fr 1fr", gap: "16px 18px", padding: "18px 19px", border: "1px solid var(--bd-soft)", borderRadius: 12, background: "var(--input)" }}>
+                <div className="mb-6 grid" style={{ gridTemplateColumns: "1fr 1fr", gap: "16px 18px", padding: "18px 19px", border: "1px solid var(--bd-soft)", borderRadius: "var(--r-md)", background: "var(--input)" }}>
                   {infoItems.map((it) => (
                     <div key={it.label}>
                       <div className="mb-[3px] text-[11px] font-medium" style={{ color: "var(--tx-5)" }}>{it.label}</div>
-                      <div className="text-[14px] font-semibold" style={{ color: it.accent || "var(--tx)", fontFamily: it.mono ? "'IBM Plex Mono'" : undefined }}>{it.value}</div>
+                      <div className="text-[14px] font-semibold" style={{ color: it.accent || "var(--tx)", fontFamily: it.mono ? "var(--font-mono)" : undefined }}>{it.value}</div>
                     </div>
                   ))}
                 </div>
@@ -597,8 +637,8 @@ const TireDrawer = ({ tireId, initialAction, initialAssign, onAssigned, onClose 
 
                 {/* Timeline del historial */}
                 <div className="mb-4 flex items-center justify-between">
-                  <div className="text-[10.5px] tracking-[.06em]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-6)" }}>HISTORIAL DE MOVIMIENTOS</div>
-                  <span className="rounded-full px-2.5 py-[3px] text-[11px] font-semibold" style={{ fontFamily: "'IBM Plex Mono'", background: "var(--bd-soft)", color: "var(--tx-4)" }}>{history.length}</span>
+                  <div className="text-[10.5px] tracking-[.06em]" style={{ fontFamily: "var(--font-mono)", color: "var(--tx-6)" }}>HISTORIAL DE MOVIMIENTOS</div>
+                  <span className="rounded-full px-2.5 py-[3px] text-[11px] font-semibold" style={{ fontFamily: "var(--font-mono)", background: "var(--bd-soft)", color: "var(--tx-4)" }}>{history.length}</span>
                 </div>
                 {history.length === 0 ? (
                   <p className="text-[13px]" style={{ color: "var(--tx-5)" }}>Esta cubierta todavía no tiene movimientos registrados.</p>
@@ -618,16 +658,16 @@ const TireDrawer = ({ tireId, initialAction, initialAssign, onAssigned, onClose 
                           </div>
                           <div className="min-w-0 flex-1 pb-[18px]">
                             <div className="flex items-baseline justify-between gap-2.5">
-                              <span className="text-[14px] font-semibold" style={{ color, fontFamily: "'Space Grotesk'" }}>{h.type || "Movimiento"}</span>
-                              <span className="flex-none text-[11.5px]" style={{ color: "var(--tx-6)", fontFamily: "'IBM Plex Mono'" }}>{fmtDate(h.date)}</span>
+                              <span className="text-[14px] font-semibold" style={{ color, fontFamily: "var(--font-display)" }}>{h.type || "Movimiento"}</span>
+                              <span className="flex-none text-[11.5px]" style={{ color: "var(--tx-6)", fontFamily: "var(--font-mono)" }}>{fmtDate(h.date)}</span>
                             </div>
                             <div className="mt-[3px] text-[12.5px]" style={{ color: "var(--tx-4)" }}>{histDetail(h)}</div>
                             {histBits(h).length > 0 && (
                               <div className="mt-[9px] flex flex-wrap gap-[6px]">
                                 {histBits(h).map((bit, bi) => (
-                                  <span key={bi} className="rounded-md px-[9px] py-[2px] text-[11px]" style={{ background: "var(--hover)", border: "1px solid var(--bd)" }}>
+                                  <span key={bi} className="rounded-[var(--r-sm)] px-[9px] py-[2px] text-[11px]" style={{ background: "var(--hover)", border: "1px solid var(--bd)" }}>
                                     <span style={{ color: "var(--tx-6)" }}>{bit.k} </span>
-                                    <span style={{ fontFamily: "'IBM Plex Mono'", fontWeight: 600, color: "var(--tx-2)" }}>{bit.val}</span>
+                                    <span style={{ fontFamily: "var(--font-mono)", fontWeight: 600, color: "var(--tx-2)" }}>{bit.val}</span>
                                   </span>
                                 ))}
                               </div>

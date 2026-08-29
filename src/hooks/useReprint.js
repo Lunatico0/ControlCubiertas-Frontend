@@ -1,13 +1,15 @@
 import { useCallback } from "react"
 import { showToast } from "@utils/toast"
 import usePrintEngine from "./usePrintEngine"
+import useSettings from "./useSettings"
 import { buildReprintData } from "@utils/print-data"
 import { generateReceiptHTML } from "@utils/receipt-html"
 import { getCompanyCached } from "@api/company"
 
 export const useReprint = () => {
   const { printHtml, isPrinting } = usePrintEngine()
-  const layoutMode = localStorage.getItem("receiptLayout") || "dynamic";
+  // Misma fuente que usePrint: el contexto de ajustes.
+  const { receiptLayout: layoutMode } = useSettings()
 
 
   const execute = useCallback(
@@ -18,20 +20,21 @@ export const useReprint = () => {
         const html = generateReceiptHTML(data, layoutMode, company?.receiptDesign, company)
         const title = `Reimpresión-${data?.receiptNumber || "recibo"}`
 
-        const result = await printHtml(html, title)
+        // Reimprimir es una acción EXPLÍCITA del usuario: ignora la preferencia autoPrint del
+        // tenant (que sólo gobierna la impresión automática al ejecutar un movimiento).
+        await printHtml(html, title)
 
-        if (result) {
-          showToast("success", "Comprobante reimpreso correctamente")
-        } else {
-          showToast("warning", "La impresión fue cancelada")
-        }
+        // "Enviado a impresión", no "reimpreso": el motor sabe que el diálogo se abrió, no que
+        // el papel salió. El mensaje viejo afirmaba lo segundo, y su rama de "cancelada" no se
+        // mostraba nunca porque el booleano que la gateaba era true siempre.
+        showToast("success", `Comprobante ${data?.receiptNumber || ""} enviado a impresión`.replace(/\s+/g, " ").trim())
       } catch (error) {
         console.error("❌ Error al reimprimir:", error)
-        showToast("error", "Error al reimprimir el comprobante")
+        showToast("error", "No se pudo abrir la impresión del comprobante")
       }
     },
     [printHtml],
   )
 
-  return { execute, isPrinting }
+  return { execute, isPrinting, layoutMode }
 }

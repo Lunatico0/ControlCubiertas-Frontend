@@ -55,7 +55,7 @@ const Modal = ({ title, onClose, maxWidth = OVERLAY.maxWidth, onSubmit, portal =
         {title != null && (
           <div className="flex items-center px-[22px] py-[19px]" style={{ borderBottom: "1px solid var(--bd-soft)" }}>
             <div id={tituloId} className="font-semibold" style={{ fontFamily: OVERLAY.titleFont, fontSize: OVERLAY.titleSize, color: "var(--tx)" }}>{title}</div>
-            <button type="button" onClick={onClose} aria-label="Cerrar" className="ml-auto inline-flex rounded-[7px] p-1" style={{ color: "var(--tx-5)" }}>
+            <button type="button" onClick={onClose} aria-label="Cerrar" className="ml-auto inline-flex rounded-[var(--r-sm)] p-1" style={{ color: "var(--tx-5)" }}>
               <CloseRoundedIcon sx={{ fontSize: 18 }} />
             </button>
           </div>

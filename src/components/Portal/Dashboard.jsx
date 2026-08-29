@@ -14,8 +14,9 @@ import ApartmentOutlinedIcon from "@mui/icons-material/ApartmentOutlined"
 import OpenInNewRoundedIcon from "@mui/icons-material/OpenInNewRounded"
 import TaskAltOutlinedIcon from "@mui/icons-material/TaskAltOutlined"
 import DesktopDownload from "./DesktopDownload"
-import StatCard from "@components/UI/StatCard"
+import StatCard from "@components/common/StatCard"
 import { tituloPantalla } from "@utils/tokens"
+import { mensajeDeError } from "@utils/apiError"
 
 // Paleta de estados del design system (coherente entre donut y barras).
 const STATUS_COLORS = {
@@ -72,7 +73,7 @@ const Dashboard = () => {
   const [error, setError] = useState("")
 
   useEffect(() => {
-    getSummary().then(setData).catch((e) => setError(e.message || "No se pudo cargar el resumen")).finally(() => setLoading(false))
+    getSummary().then(setData).catch((e) => setError(mensajeDeError(e, "No se pudo cargar el resumen"))).finally(() => setLoading(false))
   }, [])
 
   const displayName = user?.name || user?.email?.split("@")[0] || "admin"
@@ -99,14 +100,14 @@ const Dashboard = () => {
 
       <div className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-2">
         {/* Estado de cubiertas */}
-        <section className="rounded-xl p-6" style={card}>
-          <h2 className="font-display text-lg font-semibold" style={{ color: "var(--tx)", fontFamily: "'Space Grotesk'" }}>Estado de cubiertas</h2>
+        <section className="rounded-[var(--r-lg)] p-6" style={card}>
+          <h2 className="font-display text-lg font-semibold" style={{ color: "var(--tx)", fontFamily: "var(--font-display)" }}>Estado de cubiertas</h2>
           <div className="mt-4 flex flex-col items-center gap-6 sm:flex-row">
             <div className="relative shrink-0">
               <Donut segments={segments} />
               <div className="absolute inset-0 grid place-items-center">
                 <div className="text-center">
-                  <div className="font-display text-2xl font-bold" style={{ color: "var(--tx)", fontFamily: "'Space Grotesk'" }}>{cubiertas.total}</div>
+                  <div className="font-display text-2xl font-bold" style={{ color: "var(--tx)", fontFamily: "var(--font-display)" }}>{cubiertas.total}</div>
                   <div className="text-xs" style={{ color: "var(--tx-6)" }}>cubiertas</div>
                 </div>
               </div>
@@ -134,22 +135,22 @@ const Dashboard = () => {
         </section>
 
         {/* Atención requerida */}
-        <section className="rounded-xl p-6" style={card}>
-          <h2 className="font-display text-lg font-semibold" style={{ color: "var(--tx)", fontFamily: "'Space Grotesk'" }}>Atención requerida</h2>
+        <section className="rounded-[var(--r-lg)] p-6" style={card}>
+          <h2 className="font-display text-lg font-semibold" style={{ color: "var(--tx)", fontFamily: "var(--font-display)" }}>Atención requerida</h2>
           <div className="mt-4 space-y-3">
             {senales.aRecapar === 0 && senales.vehiculosSinCubiertas === 0 ? (
               /* Sin acciones pendientes → estado positivo */
               <div className="flex flex-col items-center gap-2 py-8 text-center">
-                <span className="grid h-12 w-12 place-items-center rounded-xl" style={{ background: tintBg("var(--ink-teal)", 14), color: "var(--ink-teal)" }}><TaskAltOutlinedIcon /></span>
+                <span className="grid h-12 w-12 place-items-center rounded-[var(--r-lg)]" style={{ background: tintBg("var(--ink-teal)", 14), color: "var(--ink-teal)" }}><TaskAltOutlinedIcon /></span>
                 <div className="font-semibold" style={{ color: "var(--tx)" }}>Todo en orden</div>
                 <div className="text-sm" style={{ color: "var(--tx-5)" }}>No hay cubiertas pendientes de recapado ni vehículos sin cubiertas asignadas.</div>
               </div>
             ) : (
               <>
                 {senales.aRecapar > 0 && (
-                  <button onClick={() => navigate("/", { state: { op: { section: "cubiertas", tab: "recapar" } } })} className="flex w-full items-center gap-4 rounded-lg p-4 text-left"
+                  <button onClick={() => navigate("/", { state: { op: { section: "cubiertas", tab: "recapar" } } })} className="flex w-full items-center gap-4 rounded-[var(--r-md)] p-4 text-left"
                     style={{ background: tintBg("var(--ink-orange)", 10), border: "1px solid " + tintBg("var(--ink-orange)", 30) }}>
-                    <span className="grid h-11 w-11 shrink-0 place-items-center rounded-lg" style={{ background: tintBg("var(--ink-orange)", 20), color: "var(--ink-orange)" }}><WarningAmberRoundedIcon /></span>
+                    <span className="grid h-11 w-11 shrink-0 place-items-center rounded-[var(--r-md)]" style={{ background: tintBg("var(--ink-orange)", 20), color: "var(--ink-orange)" }}><WarningAmberRoundedIcon /></span>
                     <span className="flex-1">
                       <span className="block font-semibold" style={{ color: "var(--tx)" }}>{senales.aRecapar} cubiertas</span>
                       <span className="block text-sm" style={{ color: "var(--tx-4)" }}>Pendientes de recapado</span>
@@ -158,9 +159,9 @@ const Dashboard = () => {
                   </button>
                 )}
                 {senales.vehiculosSinCubiertas > 0 && (
-                  <button onClick={() => navigate("/", { state: { op: { section: "vehiculos" } } })} className="flex w-full items-center gap-4 rounded-lg p-4 text-left"
+                  <button onClick={() => navigate("/", { state: { op: { section: "vehiculos" } } })} className="flex w-full items-center gap-4 rounded-[var(--r-md)] p-4 text-left"
                     style={{ background: "var(--elev)", border: "1px solid var(--bd)" }}>
-                    <span className="grid h-11 w-11 shrink-0 place-items-center rounded-lg" style={{ background: "var(--bd-strong)", color: "var(--tx-3)" }}><DirectionsBusOutlinedIcon /></span>
+                    <span className="grid h-11 w-11 shrink-0 place-items-center rounded-[var(--r-md)]" style={{ background: "var(--bd-strong)", color: "var(--tx-3)" }}><DirectionsBusOutlinedIcon /></span>
                     <span className="flex-1">
                       <span className="block font-semibold" style={{ color: "var(--tx)" }}>{senales.vehiculosSinCubiertas} vehículos</span>
                       <span className="block text-sm" style={{ color: "var(--tx-4)" }}>Sin cubiertas asignadas</span>
@@ -176,7 +177,7 @@ const Dashboard = () => {
 
       {/* Acciones rápidas */}
       <section className="mt-6">
-        <h2 className="mb-3 font-display text-lg font-semibold" style={{ color: "var(--tx)", fontFamily: "'Space Grotesk'" }}>Acciones rápidas</h2>
+        <h2 className="mb-3 font-display text-lg font-semibold" style={{ color: "var(--tx)", fontFamily: "var(--font-display)" }}>Acciones rápidas</h2>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <QuickAction icon={<OpenInNewRoundedIcon />} tint="var(--ink-lime)" title="Abrir operación" subtitle="Ir a la aplicación operativa" onClick={() => navigate("/")} />
           <QuickAction icon={<GroupOutlinedIcon />} tint="var(--ink-teal)" title="Gestionar usuarios" subtitle="Administrar el equipo" onClick={() => navigate("/admin/usuarios")} />
@@ -191,8 +192,8 @@ const Dashboard = () => {
 }
 
 const QuickAction = ({ icon, tint, title, subtitle, onClick }) => (
-  <button onClick={onClick} className="flex items-center gap-3 rounded-xl p-4 text-left" style={{ background: "var(--card)", border: "1px solid var(--bd)" }}>
-    <span className="grid h-11 w-11 shrink-0 place-items-center rounded-lg" style={{ background: tintBg(tint, 12), color: tint }}>{icon}</span>
+  <button onClick={onClick} className="flex items-center gap-3 rounded-[var(--r-lg)] p-4 text-left" style={{ background: "var(--card)", border: "1px solid var(--bd)" }}>
+    <span className="grid h-11 w-11 shrink-0 place-items-center rounded-[var(--r-md)]" style={{ background: tintBg(tint, 12), color: tint }}>{icon}</span>
     <span className="flex-1">
       <span className="block font-medium" style={{ color: "var(--tx)" }}>{title}</span>
       <span className="block text-sm" style={{ color: "var(--tx-6)" }}>{subtitle}</span>

@@ -3,10 +3,13 @@ import ApiContext from "@context/apiContext"
 import { showToast } from "@utils/toast"
 import { buildCreateTirePrintData } from "@utils/print-data"
 import usePrint from "@hooks/usePrint"
+import { todayLocal, dateOnlyToLocalNoon } from "@utils/date"
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded"
-import Button from "@components/UI/Button"
-import Drawer from "@components/UI/Drawer"
-import FloatingField from "@components/UI/FloatingField"
+import Button from "@components/common/Button"
+import Drawer from "@components/common/Drawer"
+import FloatingField from "@components/common/FloatingField"
+import { normalizarTexto, sugerenciasDe } from "@utils/catalogoLibre"
+import { mensajeDeError } from "@utils/apiError"
 
 // Drawer de alta de cubierta nueva. Crea en depósito (status "Nueva"); la asignación
 // a vehículo es una acción aparte. Reutiliza tires.create (refresca la lista sola).
@@ -15,14 +18,9 @@ import FloatingField from "@components/UI/FloatingField"
 // operario lo vea marcado en rojo en vez de comerse un error después de mandar el formulario.
 const KM_MAX = 1_500_000
 
-const todayLocal = () => {
-  const d = new Date()
-  // YYYY-MM-DD en hora local (no UTC), para el value del input date.
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`
-}
 
 const AltaDrawer = ({ onClose, onCreated }) => {
-  const { tires, data, orders } = useContext(ApiContext)
+  const { tires, data} = useContext(ApiContext)
   const { print } = usePrint()
   const initialStatus = data?.initialStatus || "Nueva" // estado de alta configurable del tenant
   const [form, setForm] = useState({
@@ -42,6 +40,18 @@ const AltaDrawer = ({ onClose, onCreated }) => {
     setForm((f) => ({ ...f, [k]: e.target.value }))
     setErrors((p) => (p[k] ? { ...p, [k]: false } : p))
   }
+
+  // t137: marca, rodado y dibujo eran texto libre puro y el catálogo se llenaba de variantes
+  // del mismo valor ("michelin" y "Michelin" como dos marcas en el filtro). Dos medidas que
+  // se complementan: el <datalist> con lo YA cargado en el tenant (elegir en vez de tipear)
+  // y la normalización al salir del campo (trim + capitalización), que absorbe lo tipeado.
+  const catalogo = data?.tires || []
+  const sugerencias = {
+    brand: sugerenciasDe(catalogo, "brand"),
+    size: sugerenciasDe(catalogo, "size"),
+    pattern: sugerenciasDe(catalogo, "pattern"),
+  }
+  const normalizarAlSalir = (k) => () => setForm((f) => ({ ...f, [k]: normalizarTexto(f[k]) }))
 
   const submit = async () => {
     // Validación por campo: en vez de un toast genérico, marcamos en rojo los faltantes.
@@ -66,9 +76,9 @@ const AltaDrawer = ({ onClose, onCreated }) => {
     setErrors({})
     setSubmitting(true)
     try {
-      // Bug 2 (Fase 04): anclar la fecha a mediodía LOCAL para que no se corra de día
-      // al serializar a UTC (input date da "YYYY-MM-DD" = medianoche UTC → -1 día en GMT-3).
-      const createdAt = form.createdAt ? `${form.createdAt}T12:00:00` : new Date().toISOString()
+      // Bug 2: el día suelto se ancla a mediodía LOCAL (ver @utils/date) para que no se
+      // corra al serializar a UTC.
+      const createdAt = dateOnlyToLocalNoon(form.createdAt) || dateOnlyToLocalNoon(todayLocal())
       // El N° de comprobante lo reserva el BACKEND dentro del alta y vuelve en la respuesta.
       // Pedirlo antes quemaba el número cuando el alta se rechazaba (código duplicado, estado
       // inválido), y dejaba huecos inexplicables en el correlativo.
@@ -76,9 +86,9 @@ const AltaDrawer = ({ onClose, onCreated }) => {
         status: initialStatus,
         code: Number(form.code), // el input es editable (string) pero el code se guarda como Number
         serialNumber: form.serialNumber,
-        brand: form.brand,
-        size: form.size,
-        pattern: form.pattern,
+        brand: normalizarTexto(form.brand),
+        size: normalizarTexto(form.size),
+        pattern: normalizarTexto(form.pattern),
         kilometers: Number(form.kilometers) || 0,
         createdAt,
         orderNumber: form.orderNumber,
@@ -90,9 +100,9 @@ const AltaDrawer = ({ onClose, onCreated }) => {
         const printData = buildCreateTirePrintData({
           code: form.code || created?.code || created?.tire?.code || "",
           serialNumber: form.serialNumber,
-          brand: form.brand,
-          size: form.size,
-          pattern: form.pattern,
+          brand: normalizarTexto(form.brand),
+          size: normalizarTexto(form.size),
+          pattern: normalizarTexto(form.pattern),
           kilometers: Number(form.kilometers) || 0,
           status: initialStatus,
           orderNumber: form.orderNumber,
@@ -107,7 +117,7 @@ const AltaDrawer = ({ onClose, onCreated }) => {
       onCreated?.()
       onClose()
     } catch (e) {
-      showToast("error", e.message || "No se pudo crear la cubierta")
+      showToast("error", mensajeDeError(e, "No se pudo crear la cubierta"))
     } finally {
       setSubmitting(false)
     }
@@ -116,8 +126,8 @@ const AltaDrawer = ({ onClose, onCreated }) => {
   return (
     <Drawer onClose={onClose} onSubmit={() => !submitting && submit()}>
         <div className="flex items-center justify-between gap-3 p-5" style={{ borderBottom: "1px solid var(--bd-soft)" }}>
-          <h2 className="text-[20px] font-bold" style={{ fontFamily: "'Space Grotesk'", color: "var(--tx)" }}>Nueva cubierta</h2>
-          <button onClick={onClose} className="rounded-[7px] p-2" style={{ color: "var(--tx-5)" }} title="Cerrar">
+          <h2 className="text-[20px] font-bold" style={{ fontFamily: "var(--font-display)", color: "var(--tx)" }}>Nueva cubierta</h2>
+          <button onClick={onClose} className="rounded-[var(--r-sm)] p-2" style={{ color: "var(--tx-5)" }} title="Cerrar">
             <CloseRoundedIcon sx={{ fontSize: 20 }} />
           </button>
         </div>
@@ -132,10 +142,10 @@ const AltaDrawer = ({ onClose, onCreated }) => {
               <FloatingField label="Código interno" type="number" min="1" required error={errors.code} value={form.code} onChange={set("code")} />
               <FloatingField label="N° de serie" required error={errors.serialNumber} value={form.serialNumber} onChange={set("serialNumber")} />
             </div>
-            <FloatingField label="Marca" required error={errors.brand} value={form.brand} onChange={set("brand")} />
+            <FloatingField label="Marca" required error={errors.brand} value={form.brand} onChange={set("brand")} onBlur={normalizarAlSalir("brand")} suggestions={sugerencias.brand} />
             <div className="grid grid-cols-2 gap-3">
-              <FloatingField label="Rodado" required error={errors.size} value={form.size} onChange={set("size")} />
-              <FloatingField label="Dibujo" required error={errors.pattern} value={form.pattern} onChange={set("pattern")} />
+              <FloatingField label="Rodado" required error={errors.size} value={form.size} onChange={set("size")} onBlur={normalizarAlSalir("size")} suggestions={sugerencias.size} />
+              <FloatingField label="Dibujo" required error={errors.pattern} value={form.pattern} onChange={set("pattern")} onBlur={normalizarAlSalir("pattern")} suggestions={sugerencias.pattern} />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <FloatingField label="Kilómetros" type="number" min="0" max={KM_MAX} error={errors.kilometers} value={form.kilometers} onChange={set("kilometers")} />
@@ -145,8 +155,8 @@ const AltaDrawer = ({ onClose, onCreated }) => {
           </div>
 
           <div className="mt-5 flex gap-3">
-            <button onClick={onClose} className="flex-1 rounded-[9px] py-2.5 text-[13px] font-semibold" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--tx-2)" }}>Cancelar</button>
-            <Button variant="lime" onClick={submit} disabled={submitting} className="flex-1 text-[13px]" style={{ background: "#C4ED2B", color: "#0A0C0D", opacity: submitting ? 0.6 : 1 }}>
+            <button onClick={onClose} className="flex-1 rounded-[var(--r-md)] py-2.5 text-[13px] font-semibold" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--tx-2)" }}>Cancelar</button>
+            <Button variant="lime" onClick={submit} disabled={submitting} className="flex-1 text-[13px]" style={{ background: "var(--brand)", color: "var(--brand-ink)", opacity: submitting ? 0.6 : 1 }}>
               {submitting ? "Creando…" : "Crear cubierta"}
             </Button>
           </div>

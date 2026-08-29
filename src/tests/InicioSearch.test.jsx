@@ -1,5 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react'
 import { vi } from 'vitest'
+import { MemoryRouter, Routes, Route, Outlet } from 'react-router-dom'
 import ApiContext from '@context/apiContext'
 import Inicio from '@components/Operativa/Inicio'
 
@@ -17,10 +18,18 @@ const TIRES = [
   { _id: 't3', code: 2050, brand: 'Pirelli', serialNumber: 'PZ-7', status: 'Nueva' },
 ]
 
+// Inicio es una RUTA de la operativa (t132): recibe onNavigate por el contexto del Outlet,
+// no por props. El wrapper replica esa estructura mínima.
 const renderInicio = (onNavigate = vi.fn()) => {
   render(
     <ApiContext.Provider value={{ data: { tires: TIRES, vehicles: [], tireCodePrefix: '' } }}>
-      <Inicio onNavigate={onNavigate} />
+      <MemoryRouter initialEntries={['/inicio']}>
+        <Routes>
+          <Route path="/" element={<Outlet context={{ onNavigate }} />}>
+            <Route path="inicio" element={<Inicio />} />
+          </Route>
+        </Routes>
+      </MemoryRouter>
     </ApiContext.Provider>
   )
   return { input: screen.getByPlaceholderText(/Buscar por código/i), onNavigate }

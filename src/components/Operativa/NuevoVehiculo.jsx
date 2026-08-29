@@ -3,11 +3,11 @@ import ApiContext from "@context/apiContext"
 import { useModalEscape } from "@hooks/useModalStack"
 import isElectron from "@utils/isElectron"
 import { showToast } from "@utils/toast"
-import { formatPlate, normalizePlate } from "@utils/plateFormat"
+import { formatPlate, normalizePlate, isValidPlate, describirFormatos } from "@utils/plateFormat"
 import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded"
-import Button from "@components/UI/Button"
-import MonoLabel from "@components/UI/MonoLabel"
-import FloatingField from "@components/UI/FloatingField"
+import Button from "@components/common/Button"
+import MonoLabel from "@components/common/MonoLabel"
+import FloatingField from "@components/common/FloatingField"
 import { useAxleConfig } from "./useAxleConfig"
 import AxleEditor from "./AxleEditor"
 import TruckDiagram from "./TruckDiagram"
@@ -52,6 +52,13 @@ const NuevoVehiculo = ({ onClose, onCreated }) => {
     if (!form.movil.trim()) e.movil = true
     if (!form.patente.trim()) e.patente = true
     if (Object.keys(e).length) { setErrors(e); showToast("warning", "Completá los campos obligatorios"); return }
+    // t138: el formato se chequea ACÁ además del backend. No es una validación duplicada por
+    // desconfianza: es para que el error aparezca al lado del campo en vez de volver como un
+    // 400 y un toast, después de un viaje entero por un error de tipeo.
+    if (!isValidPlate(form.patente, data.plateFormats)) {
+      setErrors({ patente: `Formato de patente inválido. Se espera: ${describirFormatos(data.plateFormats, data.plateSep)}` })
+      return
+    }
     setErrors({})
     setSubmitting(true)
     try {
@@ -87,16 +94,16 @@ const NuevoVehiculo = ({ onClose, onCreated }) => {
     <div className="fixed bottom-0 right-0 left-64 z-60 flex flex-col" style={{ top: isElectron() ? 38 : 0, background: "var(--bg)", borderLeft: "1px solid var(--bd-faint)" }}>
       {/* ===== TOP BAR ===== */}
       <div className="flex h-16 flex-none items-center gap-3.5 px-6" style={{ background: "var(--sidebar)", borderBottom: "1px solid var(--bd-faint)" }}>
-        <button onClick={onClose} title="Volver" className="inline-flex h-[38px] w-[38px] items-center justify-center rounded-[9px]" style={{ border: "1px solid var(--bd)", background: "var(--elev)", color: "var(--tx-3)" }}>
+        <button onClick={onClose} title="Volver" className="inline-flex h-[38px] w-[38px] items-center justify-center rounded-[var(--r-md)]" style={{ border: "1px solid var(--bd)", background: "var(--elev)", color: "var(--tx-3)" }}>
           <ArrowBackRoundedIcon sx={{ fontSize: 18 }} />
         </button>
         <div style={{ lineHeight: 1.2 }}>
-          <div className="text-[17px] font-bold" style={{ fontFamily: "'Space Grotesk'", color: "var(--tx)" }}>Nuevo vehículo</div>
-          <div className="text-[11.5px]" style={{ color: "var(--tx-5)", fontFamily: "'IBM Plex Mono'" }}>Vehículos · Alta</div>
+          <div className="text-[17px] font-bold" style={{ fontFamily: "var(--font-display)", color: "var(--tx)" }}>Nuevo vehículo</div>
+          <div className="text-[11.5px]" style={{ color: "var(--tx-5)", fontFamily: "var(--font-mono)" }}>Vehículos · Alta</div>
         </div>
         <div className="ml-auto flex items-center gap-2.5">
-          <button onClick={onClose} className="h-10 rounded-[9px] px-[15px] text-[13.5px] font-semibold" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--tx)" }}>Cancelar</button>
-          <Button variant="lime" onClick={submit} disabled={submitting} className="h-10 text-[13.5px]" style={{ background: "#C4ED2B", color: "#0A0C0D", opacity: submitting ? 0.6 : 1 }}>
+          <button onClick={onClose} className="h-10 rounded-[var(--r-md)] px-[15px] text-[13.5px] font-semibold" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--tx)" }}>Cancelar</button>
+          <Button variant="lime" onClick={submit} disabled={submitting} className="h-10 text-[13.5px]" style={{ background: "var(--brand)", color: "var(--brand-ink)", opacity: submitting ? 0.6 : 1 }}>
             {submitting ? "Creando…" : "Crear vehículo"}
           </Button>
         </div>
@@ -110,9 +117,9 @@ const NuevoVehiculo = ({ onClose, onCreated }) => {
             <MonoLabel className="mb-4 text-[10px] tracking-[.12em]" style={{ color: "var(--tx-6)" }}>DATOS DEL VEHÍCULO</MonoLabel>
             <div className="grid grid-cols-2 gap-[13px]">
               <FloatingField label="Móvil / Identificador" required error={fieldError("movil")} value={form.movil} onChange={set("movil")} />
-              <FloatingField label="Patente" required error={fieldError("patente")} value={formatPlate(form.patente, data.plateSep)} onChange={set("patente")} style={{ fontFamily: "'IBM Plex Mono'", textTransform: "uppercase" }} />
+              <FloatingField label="Patente" required error={fieldError("patente")} value={formatPlate(form.patente, data.plateSep)} onChange={set("patente")} style={{ fontFamily: "var(--font-mono)", textTransform: "uppercase" }} />
               <FloatingField label="Marca" value={form.marca} onChange={set("marca")} />
-              <FloatingField label="Kilometraje actual" type="number" min="0" value={form.km} onChange={set("km")} style={{ fontFamily: "'IBM Plex Mono'" }} />
+              <FloatingField label="Kilometraje actual" type="number" min="0" value={form.km} onChange={set("km")} style={{ fontFamily: "var(--font-mono)" }} />
             </div>
           </div>
 

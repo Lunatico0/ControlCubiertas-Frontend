@@ -6,8 +6,8 @@ import Markdown from "@components/common/Markdown"
 // El contenido cambia según `phase`. La lista de releases es informativa (changelog);
 // la descarga/instalación aparece SOLO en la fila de la última versión (última del array).
 
-const LIME = "#C4ED2B"
-const INK = "#0A0C0D"
+const LIME = "var(--brand)"
+const INK = "var(--brand-ink)"
 
 // dd/mm/aaaa (es-AR) desde un ISO string.
 const fmtDate = (iso) => {
@@ -40,12 +40,12 @@ const UpdaterModal = ({ current, phase, list, dl, installingV, onClose, onRechec
     if (dl.st === "downloading") {
       return (
         <div className="w-full">
-          <div className="mb-1.5 flex items-center justify-between text-[10.5px]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-4)" }}>
+          <div className="mb-1.5 flex items-center justify-between text-[10.5px]" style={{ fontFamily: "var(--font-mono)", color: "var(--tx-4)" }}>
             <span>Descargando…</span>
             <span>{Math.round(dl.pct)} %</span>
           </div>
           <div className="h-1.5 w-full overflow-hidden rounded-full" style={{ background: "var(--bd-strong)" }}>
-            <div className="h-full rounded-full" style={{ width: `${dl.pct}%`, background: "var(--ink-lime)", transition: "width .2s ease" }} />
+            <div className="h-full rounded-full" style={{ width: `${dl.pct}%`, background: "var(--ink-lime)", transition: "width var(--t-base) var(--t-ease)" }} />
           </div>
         </div>
       )
@@ -53,10 +53,10 @@ const UpdaterModal = ({ current, phase, list, dl, installingV, onClose, onRechec
     if (dl.st === "downloaded") {
       return (
         <div className="flex flex-wrap items-center gap-2">
-          <button type="button" onClick={() => onInstallNow(version)} className="rounded-[8px] px-3.5 py-2 text-[12.5px] font-bold" style={{ background: LIME, color: INK }}>
+          <button type="button" onClick={() => onInstallNow(version)} className="rounded-[var(--r-sm)] px-3.5 py-2 text-[12.5px] font-bold" style={{ background: LIME, color: INK }}>
             Instalar y reiniciar
           </button>
-          <button type="button" onClick={() => onInstallLater(version)} className="rounded-[8px] px-3.5 py-2 text-[12.5px] font-semibold" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--tx)" }}>
+          <button type="button" onClick={() => onInstallLater(version)} className="rounded-[var(--r-sm)] px-3.5 py-2 text-[12.5px] font-semibold" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--tx)" }}>
             Instalar en el siguiente inicio
           </button>
         </div>
@@ -71,7 +71,7 @@ const UpdaterModal = ({ current, phase, list, dl, installingV, onClose, onRechec
     }
     // idle
     return (
-      <button type="button" onClick={onDownload} className="rounded-[8px] px-4 py-2 text-[12.5px] font-bold" style={{ background: LIME, color: INK }}>
+      <button type="button" onClick={onDownload} className="rounded-[var(--r-sm)] px-4 py-2 text-[12.5px] font-bold" style={{ background: LIME, color: INK }}>
         Descargar
       </button>
     )
@@ -95,13 +95,13 @@ const UpdaterModal = ({ current, phase, list, dl, installingV, onClose, onRechec
               <path d="M20 6 9 17l-5-5" />
             </svg>
           </div>
-          <div className="text-[16px] font-semibold" style={{ fontFamily: "'Space Grotesk'", color: "var(--tx)" }}>
+          <div className="text-[16px] font-semibold" style={{ fontFamily: "var(--font-display)", color: "var(--tx)" }}>
             Estás al día
           </div>
           <div className="text-[13px]" style={{ color: "var(--tx-4)" }}>
             Estás usando la versión más actual (v{current}).
           </div>
-          <button type="button" onClick={onRecheck} className="mt-1 rounded-[9px] px-4 py-2.5 text-[13px] font-semibold" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--tx)" }}>
+          <button type="button" onClick={onRecheck} className="mt-1 rounded-[var(--r-md)] px-4 py-2.5 text-[13px] font-semibold" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--tx)" }}>
             Buscar de nuevo
           </button>
         </div>
@@ -110,7 +110,7 @@ const UpdaterModal = ({ current, phase, list, dl, installingV, onClose, onRechec
       {phase === "installing" && (
         <div className="flex flex-col items-center gap-3 py-8 text-center">
           <Spin />
-          <div className="text-[15px] font-semibold" style={{ fontFamily: "'Space Grotesk'", color: "var(--tx)" }}>
+          <div className="text-[15px] font-semibold" style={{ fontFamily: "var(--font-display)", color: "var(--tx)" }}>
             Instalando v{installingV}…
           </div>
           <div className="text-[13px]" style={{ color: "var(--tx-4)" }}>
@@ -130,18 +130,18 @@ const UpdaterModal = ({ current, phase, list, dl, installingV, onClose, onRechec
             const openInfo = infoVer === rel.version
             const notes = (rel.notes || "").trim() // body del GitHub Release (markdown)
             return (
-              <div key={rel.version} className="rounded-[11px]" style={{ border: `1px solid ${isLatest ? "var(--bd-strong)" : "var(--bd)"}`, padding: 13 }}>
+              <div key={rel.version} className="rounded-[var(--r-md)]" style={{ border: `1px solid ${isLatest ? "var(--bd-strong)" : "var(--bd)"}`, padding: 13 }}>
                 {/* Encabezado de la fila */}
                 <div className="flex items-center gap-2">
-                  <span className="text-[14px] font-bold" style={{ fontFamily: "'Space Grotesk'", color: "var(--tx)" }}>
+                  <span className="text-[14px] font-bold" style={{ fontFamily: "var(--font-display)", color: "var(--tx)" }}>
                     v{rel.version}
                   </span>
                   {isLatest && (
-                    <span className="rounded-full px-2 py-[3px] text-[9.5px] font-bold tracking-wide" style={{ fontFamily: "'IBM Plex Mono'", background: LIME, color: INK }}>
+                    <span className="rounded-full px-2 py-[3px] text-[9.5px] font-bold tracking-wide" style={{ fontFamily: "var(--font-mono)", background: LIME, color: INK }}>
                       Última
                     </span>
                   )}
-                  <span className="ml-auto flex items-center gap-2.5 text-[10.5px]" style={{ fontFamily: "'IBM Plex Mono'", color: "var(--tx-6)" }}>
+                  <span className="ml-auto flex items-center gap-2.5 text-[10.5px]" style={{ fontFamily: "var(--font-mono)", color: "var(--tx-6)" }}>
                     {rel.date && <span>{fmtDate(rel.date)}</span>}
                     {rel.size ? <span>{fmtSize(rel.size)}</span> : null}
                   </span>
@@ -152,7 +152,7 @@ const UpdaterModal = ({ current, phase, list, dl, installingV, onClose, onRechec
                   <button
                     type="button"
                     onClick={() => setInfoVer(openInfo ? null : rel.version)}
-                    className="inline-flex items-center gap-1.5 rounded-[7px] px-2.5 py-[7px] text-[11.5px] font-medium"
+                    className="inline-flex items-center gap-1.5 rounded-[var(--r-sm)] px-2.5 py-[7px] text-[11.5px] font-medium"
                     style={{ border: "1px solid var(--bd)", background: "var(--elev)", color: "var(--tx-3)" }}
                   >
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
@@ -165,7 +165,7 @@ const UpdaterModal = ({ current, phase, list, dl, installingV, onClose, onRechec
 
                 {/* Notas (markdown del release de GitHub) */}
                 {openInfo && (
-                  <div className="mt-2.5 rounded-[9px]" style={{ background: "var(--elev)", border: "1px solid var(--bd-soft)", padding: 12 }}>
+                  <div className="mt-2.5 rounded-[var(--r-md)]" style={{ background: "var(--elev)", border: "1px solid var(--bd-soft)", padding: 12 }}>
                     {notes ? (
                       <Markdown>{notes}</Markdown>
                     ) : (

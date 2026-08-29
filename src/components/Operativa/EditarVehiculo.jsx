@@ -1,13 +1,13 @@
 import { useState, useContext } from "react"
 import ApiContext from "@context/apiContext"
 import { showToast } from "@utils/toast"
-import { formatPlate, normalizePlate } from "@utils/plateFormat"
+import { formatPlate, normalizePlate, isValidPlate, describirFormatos } from "@utils/plateFormat"
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded"
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined"
-import Button from "@components/UI/Button"
+import Button from "@components/common/Button"
 import Callout from "@components/common/Callout"
-import Drawer from "@components/UI/Drawer"
-import FloatingField from "@components/UI/FloatingField"
+import Drawer from "@components/common/Drawer"
+import FloatingField from "@components/common/FloatingField"
 
 // Drawer de edición de DATOS de un vehículo (móvil, patente, marca). Usa
 // vehicles.updateData → PUT /vehicles/details/:id (valida duplicados de móvil/patente).
@@ -35,6 +35,12 @@ const EditarVehiculo = ({ vehicle, onClose, onSaved }) => {
     if (!form.mobile.trim()) e.mobile = true
     if (!form.licensePlate.trim()) e.licensePlate = true
     if (Object.keys(e).length) { setErrors(e); showToast("warning", "Completá los campos obligatorios"); return }
+    // t138: mismo guard que en el alta. Editar una patente a una forma inválida es igual de
+    // dañino que crearla así, y el error tiene que llegar al campo, no como toast.
+    if (!isValidPlate(form.licensePlate, data.plateFormats)) {
+      setErrors({ licensePlate: `Formato de patente inválido. Se espera: ${describirFormatos(data.plateFormats, data.plateSep)}` })
+      return
+    }
     setErrors({})
     setSubmitting(true)
     try {
@@ -57,10 +63,10 @@ const EditarVehiculo = ({ vehicle, onClose, onSaved }) => {
     <Drawer onClose={onClose} maxWidth="440px" onSubmit={() => !submitting && submit()}>
         <div className="flex items-center justify-between gap-3 p-5" style={{ borderBottom: "1px solid var(--bd-soft)" }}>
           <div>
-            <h2 className="text-[20px] font-bold" style={{ fontFamily: "'Space Grotesk'", color: "var(--tx)" }}>Editar vehículo</h2>
-            <div className="mt-0.5 text-[11.5px]" style={{ color: "var(--tx-5)", fontFamily: "'IBM Plex Mono'" }}>Datos · los ejes se editan aparte</div>
+            <h2 className="text-[20px] font-bold" style={{ fontFamily: "var(--font-display)", color: "var(--tx)" }}>Editar vehículo</h2>
+            <div className="mt-0.5 text-[11.5px]" style={{ color: "var(--tx-5)", fontFamily: "var(--font-mono)" }}>Datos · los ejes se editan aparte</div>
           </div>
-          <button onClick={onClose} className="rounded-[7px] p-2" style={{ color: "var(--tx-5)" }} title="Cerrar">
+          <button onClick={onClose} className="rounded-[var(--r-sm)] p-2" style={{ color: "var(--tx-5)" }} title="Cerrar">
             <CloseRoundedIcon sx={{ fontSize: 20 }} />
           </button>
         </div>
@@ -68,7 +74,7 @@ const EditarVehiculo = ({ vehicle, onClose, onSaved }) => {
         <div className="flex-1 overflow-auto p-5">
           <div className="mb-3 flex flex-col gap-3.5">
             <FloatingField label="Móvil / Identificador" required error={errors.mobile} value={form.mobile} onChange={set("mobile")} />
-            <FloatingField label="Patente" required error={errors.licensePlate} value={formatPlate(form.licensePlate, data.plateSep)} onChange={set("licensePlate")} style={{ fontFamily: "'IBM Plex Mono'", textTransform: "uppercase" }} />
+            <FloatingField label="Patente" required error={errors.licensePlate} value={formatPlate(form.licensePlate, data.plateSep)} onChange={set("licensePlate")} style={{ fontFamily: "var(--font-mono)", textTransform: "uppercase" }} />
             <FloatingField label="Marca" value={form.brand} onChange={set("brand")} />
           </div>
           <Callout Icon={InfoOutlinedIcon} tone="var(--ink-blue)" className="mb-3">
@@ -76,8 +82,8 @@ const EditarVehiculo = ({ vehicle, onClose, onSaved }) => {
           </Callout>
 
           <div className="mt-5 flex gap-3">
-            <button onClick={onClose} className="flex-1 rounded-[9px] py-2.5 text-[13px] font-semibold" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--tx-2)" }}>Cancelar</button>
-            <Button variant="lime" onClick={submit} disabled={submitting} className="flex-1 text-[13px]" style={{ background: "#C4ED2B", color: "#0A0C0D", opacity: submitting ? 0.6 : 1 }}>
+            <button onClick={onClose} className="flex-1 rounded-[var(--r-md)] py-2.5 text-[13px] font-semibold" style={{ border: "1px solid var(--bd-strong)", background: "var(--elev)", color: "var(--tx-2)" }}>Cancelar</button>
+            <Button variant="lime" onClick={submit} disabled={submitting} className="flex-1 text-[13px]" style={{ background: "var(--brand)", color: "var(--brand-ink)", opacity: submitting ? 0.6 : 1 }}>
               {submitting ? "Guardando…" : "Guardar cambios"}
             </Button>
           </div>

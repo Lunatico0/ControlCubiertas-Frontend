@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react'
 import { vi } from 'vitest'
-import Drawer from '@components/UI/Drawer'
+import Drawer from '@components/common/Drawer'
 
 // MEDIDO en la auditoría de QA del operario (t133): al abrir "Alta de cubierta" el foco quedaba
 // en el botón que lo abrió y hacían falta 109 tabulaciones hasta el primer input, porque las

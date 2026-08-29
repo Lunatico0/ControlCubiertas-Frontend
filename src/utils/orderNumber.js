@@ -19,6 +19,18 @@ export const isValidOrderNumberInput = (value) => {
 export const extractOrderNumber = (formatted) =>
   isValidOrderNumberFormat(formatted) ? formatted.split("-")[1] : null
 
+// Forma canónica del número de orden, tolerante con lo que ya está en circulación.
+// Devuelve AAAA-NNNNNN si puede; si no, el valor original tal cual (para que el backend
+// devuelva el 400 con `field: "orderNumber"` y el formulario lo muestre en el campo).
+// A diferencia de formatOrderNumber, NO lanza: se usa en la capa de API, donde tirar una
+// excepción rompería la mutación antes de llegar al servidor.
+export const normalizeOrderNumber = (value) => {
+  const clean = String(value ?? "").trim()
+  if (ORDER_FORMAT_REGEX.test(clean)) return clean
+  if (!isValidOrderNumberInput(clean)) return value
+  return `${new Date().getFullYear()}-${clean.padStart(6, "0")}`
+}
+
 export const generateRandomOrderNumber = () => {
   const rand = Math.floor(Math.random() * 999999) + 1
   return formatOrderNumber(rand)
