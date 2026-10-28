@@ -61,12 +61,19 @@ const isPresetSep = (v) => PLATE_SEPS.some((p) => p.v === v)
 
 // Formatos de patente ofrecidos (t138). La máscara se escribe con A (letra) y 0 (dígito) y se
 // valida sobre la patente normalizada, así que el separador de display no la afecta.
+// El rótulo nombra el FORMATO, no el tipo de vehículo: una máscara marcada vale para cualquier
+// vehículo de la flota (auditoría 26/10, A13-g).
 const PLATE_FORMAT_PRESETS = [
-  { mask: "AAA000", label: "Auto, dominio viejo" },
-  { mask: "AA000AA", label: "Auto, Mercosur" },
-  { mask: "A000AAA", label: "Moto, Mercosur" },
-  { mask: "000AAA", label: "Moto, dominio viejo" },
+  { mask: "AA000AA", label: "Mercosur (AB 123 CD)" },
+  { mask: "AAA000", label: "Dominio viejo (ABC 123)" },
+  { mask: "A000AAA", label: "Mercosur moto" },
+  { mask: "000AAA", label: "Moto viejo" },
 ]
+
+// Plan y estado del tenant: el backend guarda claves en inglés. Un valor que no esté acá se
+// muestra tal cual (mejor eso que esconderlo).
+const PLAN_LABEL = { free: "Gratuito" }
+const STATUS_LABEL = { active: "Activa", suspended: "Suspendida" }
 
 const CompanySettings = () => {
   const { register, handleSubmit, reset, formState: { isSubmitting } } = useForm()
@@ -96,7 +103,7 @@ const CompanySettings = () => {
         setCodePrefix(c.tireCodePrefix || "")
         setAutoPrint(c.autoPrint !== false)
         setUsage(s?.cubiertas?.byStatus || {})
-        setMeta({ plan: c.plan, status: c.status, dbName: c.dbName })
+        setMeta({ plan: c.plan, status: c.status })
       })
       .catch((e) => setError(mensajeDeError(e, "No se pudo cargar la empresa")))
       .finally(() => setLoading(false))
@@ -207,7 +214,7 @@ const CompanySettings = () => {
             {PLATE_SEPS.map((p) => {
               const sel = plateSep === p.v
               return (
-                <button key={p.label} type="button" onClick={() => setPlateSep(p.v)}
+                <button key={p.label} type="button" onClick={() => setPlateSep(p.v)} aria-pressed={sel}
                   className="rounded-full border px-3.5 py-1.5 text-[12.5px] font-semibold transition"
                   style={{
                     borderColor: sel ? "var(--ink-lime)" : "var(--bd)",
@@ -244,7 +251,7 @@ const CompanySettings = () => {
               {PLATE_FORMAT_PRESETS.map((f) => {
                 const sel = plateFormats.includes(f.mask)
                 return (
-                  <button key={f.mask} type="button"
+                  <button key={f.mask} type="button" aria-pressed={sel}
                     onClick={() => setPlateFormats((prev) => (sel ? prev.filter((m) => m !== f.mask) : [...prev, f.mask]))}
                     className="rounded-[var(--r-md)] border px-3.5 py-2 text-left text-[12.5px] font-semibold transition"
                     style={{
@@ -404,9 +411,8 @@ const CompanySettings = () => {
           <section className={cardClass}>
             <h2 className="mb-4 font-display text-lg font-semibold text-(--tx)" style={{ fontFamily: "var(--font-display)" }}>Plan</h2>
             <div className="flex flex-wrap gap-6 text-sm">
-              <div><p className="text-(--tx-5)">Plan</p><p className="mt-0.5 font-medium capitalize text-(--tx-2)">{meta.plan || "—"}</p></div>
-              <div><p className="text-(--tx-5)">Estado</p><p className="mt-0.5 font-medium capitalize text-(--tx-2)">{meta.status || "—"}</p></div>
-              <div><p className="text-(--tx-5)">Base de datos</p><p className="mt-0.5 font-mono text-xs text-(--tx-4)">{meta.dbName}</p></div>
+              <div><p className="text-(--tx-5)">Plan</p><p className="mt-0.5 font-medium capitalize text-(--tx-2)">{PLAN_LABEL[meta.plan] || meta.plan || "Sin dato"}</p></div>
+              <div><p className="text-(--tx-5)">Estado</p><p className="mt-0.5 font-medium capitalize text-(--tx-2)">{STATUS_LABEL[meta.status] || meta.status || "Sin dato"}</p></div>
             </div>
             <p className="mt-3 text-xs text-(--tx-5)">El plan y el estado los administra el equipo de TireOps.</p>
           </section>
