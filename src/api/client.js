@@ -38,6 +38,22 @@ const forceLogout = (message) => {
   if (window.location.pathname !== "/login") window.location.assign("/login")
 }
 
+// Clave temporal sin cambiar: el backend responde 403 PASSWORD_CHANGE_REQUIRED en toda la API
+// salvo el cambio de contraseña. NO es un cierre de sesión: el token de la temporal es justo
+// el que autoriza el cambio, así que los tokens quedan. Mismo criterio de destino que
+// forceLogout (hash en Electron, path en la web) y mismo reload, que además hace que el
+// AuthContext se reconstruya. Si ya está en la pantalla del cambio no navega: los fetch de
+// fondo de esa pantalla también reciben el 403, y sin el guard sería un bucle de recargas.
+const goToChangePassword = () => {
+  if (isElectron()) {
+    if (window.location.hash === "#/cambiar-password") return
+    window.location.hash = "#/cambiar-password"
+    window.location.reload()
+    return
+  }
+  if (window.location.pathname !== "/cambiar-password") window.location.assign("/cambiar-password")
+}
+
 export const createAPI = (path) => {
   const client = axios.create({
     baseURL: `${BASE_URL}/api/${path}`,
@@ -65,6 +81,15 @@ export const createAPI = (path) => {
         const msg = error.response.data.message || "Tu empresa ya no está disponible."
         forceLogout(msg)
         return Promise.reject(new Error(msg))
+      }
+
+      if (error.response?.data?.code === "PASSWORD_CHANGE_REQUIRED") {
+        const msg = error.response.data.message || "Tenés que cambiar tu contraseña antes de seguir."
+        goToChangePassword()
+        const err = new Error(msg)
+        err.status = status
+        err.code = "PASSWORD_CHANGE_REQUIRED"
+        return Promise.reject(err)
       }
 
       // Access expirado → refresh transparente (una sola vez por request). No se intenta
