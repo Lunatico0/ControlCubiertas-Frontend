@@ -1,6 +1,7 @@
 import usePrintEngine from "./usePrintEngine"
 import useSettings from "./useSettings"
 import { generateReceiptHTML } from "@utils/receipt-html"
+import { nombreComprobante } from "@utils/print-data"
 import { getCompanyCached } from "@api/company"
 
 // Impresión del comprobante que acompaña a una acción sobre una cubierta.
@@ -30,8 +31,7 @@ export const usePrint = () => {
     if (company?.autoPrint === false) return { status: "disabled" }
 
     const html = generateReceiptHTML(data, layoutMode, company?.receiptDesign, company)
-    const title = `Comprobante-${data?.receiptNumber || "0000-00000000"}`
-    await printHtml(html, title)
+    await printHtml(html, nombreComprobante(data))
     return { status: "dispatched" }
   }
 
