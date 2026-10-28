@@ -11,10 +11,23 @@ const buildBaseTire = (tire) => ({
   pattern: tire.pattern,
 })
 
+const SIN_COMPROBANTE = "0000-00000000"
+
 const withReceipt = (data, receiptNumber) => ({
   ...data,
-  receiptNumber: receiptNumber || "0000-00000000",
+  receiptNumber: receiptNumber || SIN_COMPROBANTE,
 })
+
+// Título de la ventana de impresión = nombre que el diálogo propone al guardar como PDF.
+// "Desasignación 0001-00000049". Sin los caracteres que Windows rechaza en un archivo.
+export const nombreComprobante = (data) => {
+  const numero = data?.receiptNumber && data.receiptNumber !== SIN_COMPROBANTE ? data.receiptNumber : ""
+  return [data?.actionType || "Comprobante", numero]
+    .join(" ")
+    .replace(/[\\/:*?"<>|]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+}
 
 export const buildCreateTirePrintData = (tire, receiptNumber) =>
   withReceipt({

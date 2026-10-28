@@ -2,7 +2,7 @@ import { useCallback } from "react"
 import { showToast } from "@utils/toast"
 import usePrintEngine from "./usePrintEngine"
 import useSettings from "./useSettings"
-import { buildReprintData } from "@utils/print-data"
+import { buildReprintData, nombreComprobante } from "@utils/print-data"
 import { generateReceiptHTML } from "@utils/receipt-html"
 import { getCompanyCached } from "@api/company"
 
@@ -18,11 +18,9 @@ export const useReprint = () => {
         const company = await getCompanyCached()
         const data = buildReprintData(entry, tire)
         const html = generateReceiptHTML(data, layoutMode, company?.receiptDesign, company)
-        const title = `Reimpresión-${data?.receiptNumber || "recibo"}`
-
         // Reimprimir es una acción EXPLÍCITA del usuario: ignora la preferencia autoPrint del
         // tenant (que sólo gobierna la impresión automática al ejecutar un movimiento).
-        await printHtml(html, title)
+        await printHtml(html, nombreComprobante(data))
 
         // "Enviado a impresión", no "reimpreso": el motor sabe que el diálogo se abrió, no que
         // el papel salió. El mensaje viejo afirmaba lo segundo, y su rama de "cancelada" no se

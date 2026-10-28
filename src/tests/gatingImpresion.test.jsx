@@ -31,7 +31,10 @@ vi.mock('@hooks/usePrintEngine', () => ({
 }))
 
 vi.mock('@utils/receipt-html', () => ({ generateReceiptHTML: () => '<div>comprobante</div>' }))
-vi.mock('@utils/print-data', () => ({ buildReprintData: (entry) => ({ receiptNumber: entry.receiptNumber }) }))
+vi.mock('@utils/print-data', async (importOriginal) => ({
+  ...(await importOriginal()),
+  buildReprintData: (entry) => ({ receiptNumber: entry.receiptNumber }),
+}))
 
 const { usePrint } = await import('@hooks/usePrint')
 const { useTireAction } = await import('@hooks/useTireAction')
