@@ -19,6 +19,7 @@ import Field from "@components/common/Field"
 import Drawer from "@components/common/Drawer"
 import FloatingField from "@components/common/FloatingField"
 import { formatTireCode } from "@utils/tireCode"
+import { idsCorregidos, fueCorregida, entradasVigentes, esTipoCorreccion, fueDeshecha } from "@utils/historialCorregidas"
 
 // Botón chico de una entrada del timeline (Reimprimir / Corregir / Deshacer), con hover coloreable.
 const TimelineBtn = ({ onClick, disabled, icon, label, hover }) => (
@@ -71,6 +72,13 @@ const histColor = (h) => {
   if (/descart/i.test(t) || metaOf(h.status).role === "discard") return "var(--ink-red)"
   return metaOf(h.status).color
 }
+
+// Una entrada corregida o deshecha (S6: conserva su tipo, otra entrada la `corrects`) se pinta
+// con el violeta de las correcciones: ya no es un movimiento vigente. Las que ya vienen con tipo
+// "Corrección-*" (las que corrigen, y los datos previos a S6) se ven como siempre.
+const colorDeEntrada = (h, corregida) => (corregida ? "var(--ink-purple)" : histColor(h))
+const detalleDeEntrada = (h, corregida) =>
+  corregida && !esTipoCorreccion(h.type) ? `${fueDeshecha(h) ? "Deshecho" : "Corregido"}: ${histDetail(h)}` : histDetail(h)
 
 // Descripción legible + chips de datos para cada entrada del historial.
 const histDetail = (h) => {
@@ -346,17 +354,24 @@ const TireDrawer = ({ tireId, initialAction, initialAssign, onAssigned, onClose 
   const actionHandlers = { assign: doAssign, unassign: doUnassign, recap: doRecap, sendRecap: doSendRecap, edit: doEdit, discard: doDiscard, undo: doUndo, editHist: doEditHist }
 
   const history = [...(tire?.history || [])].sort((a, b) => new Date(b.date) - new Date(a.date))
+  // S6: las entradas corregidas o deshechas siguen en el timeline (son movimientos que
+  // existieron, con su comprobante) pero NO cuentan para nada que calcule el estado vigente.
+  const corregidas = idsCorregidos(history)
+  const vigentes = entradasVigentes(history)
   const lastReceiptEntry = history.find((h) => h.receiptNumber) // para "Imprimir recibo" (último comprobante)
-  // history está ordenado desc por fecha: la primera es el último movimiento, el único que se
+  // vigentes está ordenado desc por fecha: la primera es el último movimiento, el único que se
   // puede deshacer sin inventar movimientos que nunca pasaron.
-  const ultimaEntrada = history[0]
-  const steps = tire ? lifecycleSteps(tire, history, stockScale) : []
+  const ultimaEntrada = vigentes[0]
+  const steps = tire ? lifecycleSteps(tire, vigentes, stockScale) : []
 
   // t141: contexto del montaje vigente, para la cabecera de "Desasignar". El formulario era
   // sólo "Kilometraje final" + "N° de orden": no decía de qué móvil ni de qué posición se
   // estaba bajando la cubierta, ni contra qué odómetro se iba a validar. El operario tenía
   // que cerrar el modal, ir al historial, anotar el número y volver.
-  const montajeVigente = history.find((h) => /^asign/i.test(h.type || ""))
+  // S6: la asignación corregida ya no es el montaje vigente; lo es la corrección que la
+  // reemplaza ("Corrección-Asignación"), igual que en recalculateTireState del backend, que es
+  // contra lo que se valida el odómetro al desmontar.
+  const montajeVigente = history.find((h) => !fueCorregida(h, corregidas) && /^(correcci[oó]n-)?asign/i.test(h.type || ""))
   const odometroAlMontar = montajeVigente?.kmAlta ?? montajeVigente?.km
   const infoItems = tire ? [
     { label: "Marca", value: tire.brand || "—" },
@@ -386,7 +401,7 @@ const TireDrawer = ({ tireId, initialAction, initialAssign, onAssigned, onClose 
     return m.role === "stock" || m.role === "initial" ? m.level ?? 0 : 0
   }
   const nivelActual = tire
-    ? Math.max(nivelAlcanzado(tire.status), ...history.map((h) => nivelAlcanzado(h.status)), 0)
+    ? Math.max(nivelAlcanzado(tire.status), ...vigentes.map((h) => nivelAlcanzado(h.status)), 0)
     : 0
   const recapOptions = statuses
     .filter((s) => s.role === "stock")
@@ -645,8 +660,9 @@ const TireDrawer = ({ tireId, initialAction, initialAssign, onAssigned, onClose 
                 ) : (
                   <div>
                     {history.map((h, i) => {
-                      const color = histColor(h)
-                      const isCorr = /^correcc/i.test(h.type || "")
+                      const corregida = fueCorregida(h, corregidas)
+                      const color = colorDeEntrada(h, corregida)
+                      const isCorr = esTipoCorreccion(h.type)
                       const last = i === history.length - 1
                       return (
                         <div key={h._id || i} className="flex gap-[14px]">
@@ -661,7 +677,7 @@ const TireDrawer = ({ tireId, initialAction, initialAssign, onAssigned, onClose 
                               <span className="text-[14px] font-semibold" style={{ color, fontFamily: "var(--font-display)" }}>{h.type || "Movimiento"}</span>
                               <span className="flex-none text-[11.5px]" style={{ color: "var(--tx-6)", fontFamily: "var(--font-mono)" }}>{fmtDate(h.date)}</span>
                             </div>
-                            <div className="mt-[3px] text-[12.5px]" style={{ color: "var(--tx-4)" }}>{histDetail(h)}</div>
+                            <div className="mt-[3px] text-[12.5px]" style={{ color: "var(--tx-4)" }}>{detalleDeEntrada(h, corregida)}</div>
                             {histBits(h).length > 0 && (
                               <div className="mt-[9px] flex flex-wrap gap-[6px]">
                                 {histBits(h).map((bit, bi) => (
@@ -674,13 +690,13 @@ const TireDrawer = ({ tireId, initialAction, initialAssign, onAssigned, onClose 
                             )}
                             <div className="mt-[10px] flex flex-wrap gap-[6px]">
                               {h.receiptNumber && <TimelineBtn onClick={() => reprintAct.execute({ entry: h, tire })} disabled={reprintAct.isPrinting} icon={<LocalPrintshopOutlinedIcon sx={{ fontSize: 13 }} />} label="Reimprimir" hover="var(--bd-hover)" />}
-                              {!isCorr && <TimelineBtn onClick={() => openEntryAction("editHist", h)} icon={<EditOutlinedIcon sx={{ fontSize: 13 }} />} label="Corregir" hover="var(--ink-blue)" />}
+                              {!isCorr && !corregida && <TimelineBtn onClick={() => openEntryAction("editHist", h)} icon={<EditOutlinedIcon sx={{ fontSize: 13 }} />} label="Corregir" hover="var(--ink-blue)" />}
                               {/* Deshacer SOLO en el último movimiento. Fuera de orden, el backend arma la
                                   reversión contra el estado de HOY: deshacer una asignación vieja de una
                                   cubierta ya desmontada creaba una desasignación con fecha de hoy y 0 km,
                                   de un vehículo del que ya no estaba montada. Movimientos que nunca
                                   ocurrieron, en el historial que respalda cada operación. */}
-                              {!isCorr && h.type !== "Alta" && String(h._id) === String(ultimaEntrada?._id) && (
+                              {!isCorr && !corregida && h.type !== "Alta" && String(h._id) === String(ultimaEntrada?._id) && (
                                 <TimelineBtn onClick={() => openEntryAction("undo", h)} icon={<UndoRoundedIcon sx={{ fontSize: 13 }} />} label="Deshacer" hover="var(--ink-red)" />
                               )}
                             </div>
